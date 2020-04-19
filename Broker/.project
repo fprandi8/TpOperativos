@@ -3,7 +3,7 @@
 	<name>Broker</name>
 	<comment></comment>
 	<projects>
-		<project>SharedLibray</project>
+		<project>SharedLibrary</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

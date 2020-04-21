@@ -70,11 +70,19 @@ int main(void) {
 
 t_log* startLogger(char* logFilename)
 {
-	return log_create(logFilename, "Team", 1, LOG_LEVEL_DEBUG);
+	t_log* logger;
+	logger = log_create(logFilename, "Team", 1, LOG_LEVEL_DEBUG);
+	if (logger == NULL){
+		printf("No se pudo crear el logger\n");
+		exit(1);
+	}
+	return logger;
 }
 void deleteLogger(t_log* logger)
 {
-	log_destroy(logger);
+	if (logger != NULL){
+		log_destroy(logger);
+	}
 }
 void removeLogger(char* logFilename)
 {
@@ -82,6 +90,12 @@ void removeLogger(char* logFilename)
 }
 t_config* leer_config(void)
 {
-	return config_create("Team.config");
+	t_config* config;
+	config = config_create("Team.config");
+	if (config == NULL){
+		printf("No se pudo crear el config\n");
+		exit(2);
+	}
+	return config;
 
 }

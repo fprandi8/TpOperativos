@@ -19,6 +19,8 @@ int main(void) {
 	char* port;
 	char* logFilename;
 	void* mensaje = "Mensaje de prueba";
+	pthread_t tid[2];
+	sem_t sem;
 
 	config = leer_config();
 	if (config_has_property(config,"LOG_FILE")){
@@ -41,23 +43,6 @@ int main(void) {
 
 	log_debug(logger,"Process Team Started");
 
-
-	/*//Cuando el team funciona como cliente
-	struct sockaddr_in brokerAdress;
-		brokerAdress.sin_family = AF_INET;
-		brokerAdress.sin_addr.s_addr = inet_addr(ip);
-		brokerAdress.sin_port = htons(port);
-
-		int broker = socket(AF_INET,SOCK_STREAM,0);
-		if(connect(broker, (void*)&brokerAdress, sizeof(brokerAdress))!=0){
-			perror("No se pudo conectar");
-			log_debug(logger, "No se pudo conectar al servidor");
-			return 1;
-		}
-		log_debug(logger, "Se conectó al servidor");
-
-
-	*/
 	//Cuando el team funciona como server
 
 	teamSocket = iniciar_cliente(ip, port,logger);

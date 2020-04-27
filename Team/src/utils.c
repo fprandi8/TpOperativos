@@ -40,6 +40,7 @@ int iniciar_cliente(char* ip, char* puerto,t_log* logger)
 		}
 		close(teamSocket);
 	}
+    return -1;
 }
 
 void* serializar_paquete(t_paquete* paquete, int bytes)
@@ -113,6 +114,6 @@ void process_request(int cod_op, int cliente_fd,t_log* logger) {
 			break;
 
 		default:
-			exit;
+			break;
 		}
 }

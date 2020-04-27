@@ -1,12 +1,10 @@
-[DEBUG] 01:36:01:258 Team/(22897:22897): team.log
-[DEBUG] 01:36:01:258 Team/(22897:22897): 127.0.0.1
-[DEBUG] 01:36:01:258 Team/(22897:22897): 6009
-[DEBUG] 01:36:01:258 Team/(22897:22897): Process Team Started
-[DEBUG] 01:36:01:259 Team/(22897:22897): IP y puerto configurado
-[DEBUG] 01:36:01:259 Team/(22897:22897): Socket configurado
-[DEBUG] 01:36:01:259 Team/(22897:22897): Se intentará conectar con Broker
-[DEBUG] 01:36:01:259 Team/(22897:22897): La conexión fue realizada
-[DEBUG] 01:36:01:259 Team/(22897:22897): El socket del proceso Team es 4
-[DEBUG] 01:36:01:259 Team/(22897:22897): Se analizó el codigo de operación, se obtuvo el siguiente: 1
-[DEBUG] 01:36:01:259 Team/(22897:22897): Se recibió un mensaje
-[DEBUG] 01:36:01:259 Team/(22897:22897): Mensaje de pruebao
+[DEBUG] 02:45:20:624 Team/(20652:20652): team.log
+[DEBUG] 02:45:20:625 Team/(20652:20652): 127.0.0.1
+[DEBUG] 02:45:20:625 Team/(20652:20652): 6009
+[DEBUG] 02:45:20:625 Team/(20652:20652): Process Team Started
+[DEBUG] 02:45:20:625 Team/(20652:20652): IP y puerto configurado
+[DEBUG] 02:45:20:627 Team/(20652:20652): Socket configurado
+[DEBUG] 02:45:20:627 Team/(20652:20652): Se intentará conectar con Broker
+[DEBUG] 02:45:20:627 Team/(20652:20652): La conexión falló
+[DEBUG] 02:45:20:627 Team/(20652:20652): El socket del proceso Team es -1
+[DEBUG] 02:45:20:627 Team/(20652:20652): Se analizó el codigo de operación, se obtuvo el siguiente: -1

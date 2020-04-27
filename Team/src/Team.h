@@ -16,6 +16,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#include <semaphore.h>
 
 t_log* iniciar_logger(void);
 t_config* leer_config(void);

@@ -21,7 +21,12 @@
 
 typedef enum
 {
-	MENSAJE=1
+	MENSAJE=1,//Handshake
+	GET=2, //hacia el broker
+	LOCALIZED=3,//desde el broker
+	APPEARED=4, //desde el gameboy y broker
+	CATCH=5, //hacia el broker
+	CAUGHT=6//desde el broker
 }op_code;
 
 typedef struct

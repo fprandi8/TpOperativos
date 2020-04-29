@@ -61,7 +61,6 @@ typedef struct
 } t_paquete;
 
 t_log* logger;
-pthread_t thread;
 int iniciar_cliente(char*, char*,t_log*);
 void* serializar_paquete(t_paquete*, int);
 void enviar_mensaje(void*, int, int);
@@ -79,5 +78,7 @@ void getTrainerAttr(char**,char**,char**,t_trainerParameters**,int);
 void getTrainerAttrPos(char**,t_trainerParameters**,int);
 void getTrainerAttrPkm(char**,t_trainerParameters**,int);
 void getTrainerAttrObj(char**,t_trainerParameters**,int);
-
+void startTrainers(pthread_t*,t_trainerParameters**,int);
+void startTrainer(pthread_t,t_trainerParameters*);
+void startThread(t_trainerParameters*);
 #endif /* UTILS_H_ */

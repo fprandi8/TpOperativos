@@ -1,65 +1,67 @@
-[DEBUG] 05:19:33:679 Team/(12651:12651): team.log
-[DEBUG] 05:19:33:679 Team/(12651:12651): 127.0.0.1
-[DEBUG] 05:19:33:680 Team/(12651:12651): 6009
-[DEBUG] 05:19:33:680 Team/(12651:12651): Process Team Started
-[DEBUG] 05:19:33:680 Team/(12651:12651): Comienza la carga de config de entrenadores
-[DEBUG] 05:19:33:680 Team/(12651:12651): Finalizó la carga de config de entrenadores
-[DEBUG] 05:19:33:680 Team/(12651:12651): Se contaron 3 entrenadores
-[DEBUG] 05:19:33:680 Team/(12651:12651): Se alocó memoria para el array de threads
-[DEBUG] 05:19:33:680 Team/(12651:12651): Se alocó memoria para los el array de parametros de entrenadores
-[DEBUG] 05:19:33:680 Team/(12651:12651): Comienza el proceso de carga de atributos
-[DEBUG] 05:19:33:680 Team/(12651:12651): Comienza el proceso de carga de posición
-[DEBUG] 05:19:33:680 Team/(12651:12651): Comienza el proceso de carga de posición del entrenador 0
-[DEBUG] 05:19:33:681 Team/(12651:12651): Comienza el proceso de carga de posición x
-[DEBUG] 05:19:33:681 Team/(12651:12651): El valor es 1
-[DEBUG] 05:19:33:681 Team/(12651:12651): Comienza el proceso de carga de posición y
-[DEBUG] 05:19:33:681 Team/(12651:12651): El valor es 2
-[DEBUG] 05:19:33:681 Team/(12651:12651): Comienza el proceso de carga de posición del entrenador 1
-[DEBUG] 05:19:33:681 Team/(12651:12651): Comienza el proceso de carga de posición x
-[DEBUG] 05:19:33:681 Team/(12651:12651): El valor es 7
-[DEBUG] 05:19:33:681 Team/(12651:12651): Comienza el proceso de carga de posición y
-[DEBUG] 05:19:33:681 Team/(12651:12651): El valor es 2
-[DEBUG] 05:19:33:681 Team/(12651:12651): Comienza el proceso de carga de posición del entrenador 2
-[DEBUG] 05:19:33:682 Team/(12651:12651): Comienza el proceso de carga de posición x
-[DEBUG] 05:19:33:682 Team/(12651:12651): El valor es 5
-[DEBUG] 05:19:33:682 Team/(12651:12651): Comienza el proceso de carga de posición y
-[DEBUG] 05:19:33:682 Team/(12651:12651): El valor es 13
-[DEBUG] 05:19:33:682 Team/(12651:12651): Comienza el proceso de carga de pokemons
-[DEBUG] 05:19:33:682 Team/(12651:12651): Comienza el proceso de carga de pokemons del entrenador 0
-[DEBUG] 05:19:33:682 Team/(12651:12651): Comienza el proceso de carga de pokemon
-[DEBUG] 05:19:33:682 Team/(12651:12651): El valor es Pikachu
-[DEBUG] 05:19:33:682 Team/(12651:12651): Comienza el proceso de carga de pokemon
-[DEBUG] 05:19:33:682 Team/(12651:12651): El valor es Squirtle
-[DEBUG] 05:19:33:682 Team/(12651:12651): Comienza el proceso de carga de pokemon
-[DEBUG] 05:19:33:682 Team/(12651:12651): El valor es Pidgey
-[DEBUG] 05:19:33:682 Team/(12651:12651): Comienza el proceso de carga de pokemons del entrenador 1
-[DEBUG] 05:19:33:682 Team/(12651:12651): Comienza el proceso de carga de pokemon
-[DEBUG] 05:19:33:683 Team/(12651:12651): El valor es Squirtle
-[DEBUG] 05:19:33:683 Team/(12651:12651): Comienza el proceso de carga de pokemon
-[DEBUG] 05:19:33:683 Team/(12651:12651): El valor es Charmander
-[DEBUG] 05:19:33:683 Team/(12651:12651): Comienza el proceso de carga de pokemons del entrenador 2
-[DEBUG] 05:19:33:683 Team/(12651:12651): Comienza el proceso de carga de pokemon
-[DEBUG] 05:19:33:683 Team/(12651:12651): El valor es Bulbasaur
-[DEBUG] 05:19:33:683 Team/(12651:12651): Comienza el proceso de carga de objetivos
-[DEBUG] 05:19:33:683 Team/(12651:12651): Comienza el proceso de carga de objetivos del entrenador 0
-[DEBUG] 05:19:33:684 Team/(12651:12651): Comienza el proceso de carga de objetivos
-[DEBUG] 05:19:33:684 Team/(12651:12651): El valor es Pikachu
-[DEBUG] 05:19:33:684 Team/(12651:12651): Comienza el proceso de carga de objetivos
-[DEBUG] 05:19:33:685 Team/(12651:12651): El valor es Pikachu
-[DEBUG] 05:19:33:685 Team/(12651:12651): Comienza el proceso de carga de objetivos
-[DEBUG] 05:19:33:685 Team/(12651:12651): El valor es Squirtle
-[DEBUG] 05:19:33:685 Team/(12651:12651): Comienza el proceso de carga de objetivos
-[DEBUG] 05:19:33:685 Team/(12651:12651): El valor es Pidgey
-[DEBUG] 05:19:33:685 Team/(12651:12651): Comienza el proceso de carga de objetivos del entrenador 1
-[DEBUG] 05:19:33:686 Team/(12651:12651): Comienza el proceso de carga de objetivos
-[DEBUG] 05:19:33:686 Team/(12651:12651): El valor es Pikachu
-[DEBUG] 05:19:33:686 Team/(12651:12651): Comienza el proceso de carga de objetivos
-[DEBUG] 05:19:33:686 Team/(12651:12651): El valor es Charmander
-[DEBUG] 05:19:33:686 Team/(12651:12651): Comienza el proceso de carga de objetivos
-[DEBUG] 05:19:33:686 Team/(12651:12651): El valor es Charmander
-[DEBUG] 05:19:33:687 Team/(12651:12651): Comienza el proceso de carga de objetivos del entrenador 2
-[DEBUG] 05:19:33:687 Team/(12651:12651): Comienza el proceso de carga de objetivos
-[DEBUG] 05:19:33:687 Team/(12651:12651): El valor es Squirtle
-[DEBUG] 05:19:33:687 Team/(12651:12651): Comienza el proceso de carga de objetivos
-[DEBUG] 05:19:33:687 Team/(12651:12651): El valor es Bulbasaur
-[DEBUG] 05:19:33:687 Team/(12651:12651): Finalizó el proceso de carga de atributos
+[DEBUG] 10:43:50:229 Team/(5192:5192): team.log
+[DEBUG] 10:43:50:229 Team/(5192:5192): 127.0.0.1
+[DEBUG] 10:43:50:229 Team/(5192:5192): 6009
+[DEBUG] 10:43:50:229 Team/(5192:5192): Process Team Started
+[DEBUG] 10:43:50:229 Team/(5192:5192): Comienza la carga de config de entrenadores
+[DEBUG] 10:43:50:229 Team/(5192:5192): Finalizó la carga de config de entrenadores
+[DEBUG] 10:43:50:229 Team/(5192:5192): Se contaron 3 entrenadores
+[DEBUG] 10:43:50:229 Team/(5192:5192): Se alocó memoria para el array de threads
+[DEBUG] 10:43:50:230 Team/(5192:5192): Se alocó memoria para los el array de parametros de entrenadores
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de atributos
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de posición
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de posición del entrenador 0
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de posición x
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es 1
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de posición y
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es 2
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de posición del entrenador 1
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de posición x
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es 7
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de posición y
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es 2
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de posición del entrenador 2
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de posición x
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es 5
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de posición y
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es 13
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de pokemons
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de pokemons del entrenador 0
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de pokemon
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es Pikachu
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de pokemon
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es Squirtle
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de pokemon
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es Pidgey
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de pokemons del entrenador 1
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de pokemon
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es Squirtle
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de pokemon
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es Charmander
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de pokemons del entrenador 2
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de pokemon
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es Bulbasaur
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de objetivos
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de objetivos del entrenador 0
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de objetivos
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es Pikachu
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de objetivos
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es Pikachu
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de objetivos
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es Squirtle
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de objetivos
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es Pidgey
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de objetivos del entrenador 1
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de objetivos
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es Pikachu
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de objetivos
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es Charmander
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de objetivos
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es Charmander
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de objetivos del entrenador 2
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de objetivos
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es Squirtle
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de carga de objetivos
+[DEBUG] 10:43:50:230 Team/(5192:5192): El valor es Bulbasaur
+[DEBUG] 10:43:50:230 Team/(5192:5192): Finalizó el proceso de carga de atributos
+[DEBUG] 10:43:50:230 Team/(5192:5192): Comienza el proceso de creación de threads
+[DEBUG] 10:43:50:230 Team/(5192:5192): Finalizó el proceso de creación de threads

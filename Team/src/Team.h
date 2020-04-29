@@ -27,8 +27,6 @@ void deleteLogger(t_log*);
 void removeLogger(char*);
 
 
-//init trainer
-void startTrainers(char**,char**,char**,pthread_t);
 
 
 #endif /* TEAM_H_ */

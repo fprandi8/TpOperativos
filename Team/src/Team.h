@@ -17,11 +17,18 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <semaphore.h>
+#include<commons/collections/list.h>
+
 
 t_log* iniciar_logger(void);
 t_config* leer_config(void);
 t_log* startLogger(char*);
 void deleteLogger(t_log*);
 void removeLogger(char*);
+
+
+//init trainer
+void startTrainers(char**,char**,char**,pthread_t);
+
 
 #endif /* TEAM_H_ */

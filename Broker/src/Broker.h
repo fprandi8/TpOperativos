@@ -16,11 +16,17 @@
 #include<commons/collections/list.h>
 #include "utils.h"
 
-
-
+typedef enum{
+	NEW_POKEMON,
+	APPEARED_POKEMON,
+	CATCH_POKEMON,
+	CAUGHT_POKEMON,
+	GET_POKEMON,
+	LOCALIZED_POKEMON,
+	} t_queue_type;
 
 typedef struct {
-	char* nombre;
+	t_queue_type tipo;
 	t_queue* queue;
 	t_list* suscriptores;
 	} t_queue_handler;
@@ -30,11 +36,11 @@ typedef struct {
 	int suscripto;
 	} t_suscriptor;
 
-
 t_log* iniciar_logger(void);
 t_config* leer_config(void);
-
-t_queue_handler* inicializar_queue_handler(char* nombre);
+t_list* inicializar_queues();
+t_queue_handler* inicializar_queue_handler(t_queue_type tipo);
+int destroy_queue_list(t_list*);
 void destroy_queue_handler(t_queue_handler* self);
 t_suscriptor* queue_handler_get_suscriptor(t_queue_handler* self,int pos);
 

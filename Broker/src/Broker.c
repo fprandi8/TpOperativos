@@ -14,53 +14,45 @@ int main(void) {
 
 	t_log* logger;
 	t_config* config;
-	t_queue_handler* colaDePrueba;
-	t_list* mensajes;
 
 	char* ip;
 	char* puerto;
+	int servidor,cliente;
 
 	logger = iniciar_logger();
 
-	log_debug(logger,"PROCESO BROKER ONLINE");
+	log_info(logger,"PROCESO BROKER ONLINE");
 
 	config = leer_config();
 
 	if (config_has_property(config,"IP_BROKER")){
-		log_debug(logger,config_get_string_value(config,"IP_BROKER"));
+		log_info(logger,config_get_string_value(config,"IP_BROKER"));
 		ip=config_get_string_value(config,"IP_BROKER");
 	}
 
 	if (config_has_property(config,"PUERTO_BROKER")){
-		log_debug(logger,config_get_string_value(config,"PUERTO_BROKER"));
+		log_info(logger,config_get_string_value(config,"PUERTO_BROKER"));
 		puerto=config_get_string_value(config,"PUERTO_BROKER");
 	}
 
-	char* nombre = "FEDE";
+	t_list* queue_list;
 
-	colaDePrueba = inicializar_queue_handler(nombre);
+	queue_list = inicializar_queues();
+	int resultado = destroy_queue_list(queue_list);
 
-	list_add(colaDePrueba->suscriptores, "un suscriptor");
-	printf("El suscriptor que tengo %s \n", list_get(colaDePrueba->suscriptores,0));
+	if (resultado == 0){
+		log_debug(logger,"SE LIBERARON LOS RECURSOS DE LAS QUEUE");
+	}
 
-	mensajes = list_create();
-	char* msj1 = "hola";
-	char* msj2 = "chau";
+	servidor = iniciar_servidor(ip, puerto);
 
-	list_add(mensajes,msj1);
-	list_add(mensajes,msj2);
+	log_debug(logger,"SERVIDOR INICIADO");
 
-	queue_push(colaDePrueba->queue,mensajes);
-	t_list* aux;
-
-	aux = queue_peek(colaDePrueba->queue);
-
-	printf("El mensaje de la lista %s \n", list_get(aux,0));
-
-	list_destroy(mensajes);
-	destroy_queue_handler(colaDePrueba);
-
-//	iniciar_servidor(ip, puerto);
+	while (1){
+		cliente = esperar_cliente(servidor);
+		pthread_create(&thread,NULL,(void*)serve_client,&cliente);
+		pthread_detach(thread);
+	}
 
 	return EXIT_SUCCESS;
 }
@@ -76,18 +68,34 @@ t_config* leer_config(void)
 
 }
 
-t_queue_handler* inicializar_queue_handler(char* nombre){
+t_list* inicializar_queues(){
+	t_list* aux;
+	aux= list_create();
+
+	for (int i=0; i < 7; i++){
+		t_queue_handler* queue_handler;
+		queue_handler= inicializar_queue_handler((t_queue_type)i);
+		list_add(aux,queue_handler);
+	}
+
+	return aux;
+}
+
+int destroy_queue_list(t_list* self){
+	list_destroy_and_destroy_elements(self,(void*)destroy_queue_handler);
+	return 0;
+}
+
+t_queue_handler* inicializar_queue_handler(t_queue_type tipo){
 	t_queue_handler* aux;
 	aux = malloc(sizeof(t_queue_handler));
-	aux->nombre =malloc(sizeof(char) * strlen(nombre));
 	aux->queue = queue_create();
 	aux->suscriptores = list_create();
-	strcpy(aux->nombre,nombre);
+	aux->tipo=tipo;
 	return aux;
 }
 
 void destroy_queue_handler(t_queue_handler* self){
-	free(self->nombre);
 	queue_destroy(self->queue);
 	list_destroy(self->suscriptores);
 }
@@ -95,3 +103,4 @@ void destroy_queue_handler(t_queue_handler* self){
 t_suscriptor* queue_handler_get_suscriptor(t_queue_handler* self,int pos){
 	return list_get(self->suscriptores,pos);
 }
+

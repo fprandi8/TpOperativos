@@ -1,6 +1,6 @@
 #include"utils.h"
 
-void iniciar_servidor(char* ip, char* puerto)
+int iniciar_servidor(char* ip, char* puerto)
 {
 	int socket_servidor;
 
@@ -29,26 +29,25 @@ void iniciar_servidor(char* ip, char* puerto)
 
     freeaddrinfo(servinfo);
 
-    while(1)
-    	esperar_cliente(socket_servidor);
+    return socket_servidor;
 }
 
-void esperar_cliente(int socket_servidor)
+int esperar_cliente(int socket_servidor)
 {
 	struct sockaddr_in dir_cliente;
 
 	int tam_direccion = sizeof(struct sockaddr_in);
 
-	int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
-
-	pthread_create(&thread,NULL,(void*)serve_client,&socket_cliente);
-	pthread_detach(thread);
+	return accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
 
 }
 
 void serve_client(int* socket)
 {
 	int cod_op;
+	char* msg = "CONECTADO \n";
+	send(*socket, msg, strlen(msg), 0);
+
 	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
 		cod_op = -1;
 	process_request(cod_op, *socket);
@@ -56,7 +55,8 @@ void serve_client(int* socket)
 
 void process_request(int cod_op, int cliente_fd) {
 	int size;
-	printf("conectado \n");
+	char* procesando = "PROCESANDO MENSAJE \n";
+	send(cliente_fd,procesando,strlen(procesando),0);
 	void* msg;
 		switch (cod_op) {
 		case MENSAJE:

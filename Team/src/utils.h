@@ -60,7 +60,7 @@ typedef struct
 	t_buffer* buffer;
 } t_paquete;
 
-t_log* logger;
+
 int iniciar_cliente(char*, char*,t_log*);
 void* serializar_paquete(t_paquete*, int);
 void enviar_mensaje(void*, int, int);
@@ -73,11 +73,11 @@ void addToList(char *);
 void initlist(char *);
 int getListSize(t_list *);
 void getMatrix(char**,char**);
-int getTrainersCount(char**);
-void getTrainerAttr(char**,char**,char**,t_trainerParameters**,int);
-void getTrainerAttrPos(char**,t_trainerParameters**,int);
-void getTrainerAttrPkm(char**,t_trainerParameters**,int);
-void getTrainerAttrObj(char**,t_trainerParameters**,int);
+int getTrainersCount(char**,t_log*);
+void getTrainerAttr(char**,char**,char**,t_trainerParameters**,int,t_log*);
+void getTrainerAttrPos(char**,t_trainerParameters**,int,t_log*);
+void getTrainerAttrPkm(char**,t_trainerParameters**,int,t_log*);
+void getTrainerAttrObj(char**,t_trainerParameters**,int,t_log*);
 void startTrainers(pthread_t*,t_trainerParameters**,int);
 void startTrainer(pthread_t,t_trainerParameters*);
 void startThread(t_trainerParameters*);

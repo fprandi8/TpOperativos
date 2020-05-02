@@ -20,13 +20,58 @@
 #include<commons/collections/list.h>
 
 
-t_log* iniciar_logger(void);
-t_config* leer_config(void);
-t_log* startLogger(char*);
-void deleteLogger(t_log*);
+
+/* typedef enum
+{
+	FIFO=1,//FIFO
+	RR=2, //RoundRobin
+	SJFCD=3, //SJF con desalojo
+	SJFSD=4	//SJF sin desalojo
+} schedulingAlgorithm;
+*/
+
+struct Broker
+{
+	char* ipKey;
+	char* ip;
+	char* portKey;
+	char* port;
+} broker;
+
+struct SchedulingAlgorithm
+{
+	char* algorithmKey;
+	char* algorithm;
+	char* quantumKey;
+	char* quantum;
+	char* initEstimationKey;
+	char* initEstimation;
+} schedulingAlgorithm;
+
+
+void createConfig(t_config**);
+void startLogger(t_config*,t_log**);
+void createLogger(char*,t_log**);
+t_config* readConfig(void);
+t_config* startConfig(void);
+void deleteLogger(t_log**);
 void removeLogger(char*);
+void initBroker(struct Broker*);
+void readConfigBrokerValues(t_config*,t_log*,struct Broker*);
+void readConfigSchedulerValues(t_config*, t_log*, struct SchedulingAlgorithm*);
+void readConfigTrainersValues(t_config*,t_log*,char***,char***,char***);
+void initScheduler(struct SchedulingAlgorithm*);
 
+void initBroker(struct Broker *broker){
+	broker->ipKey="IP_BROKER";
+	broker->portKey="PUERTO_BROKER";
 
+}
+void initScheduler(struct SchedulingAlgorithm *schedulingAlgorithm){
+	schedulingAlgorithm->algorithmKey="ALGORITMO_PLANIFICACION";
+	schedulingAlgorithm->quantumKey="QUANTUM";
+	schedulingAlgorithm->initEstimationKey="ESTIMACION_INICIAL";
+}
 
 
 #endif /* TEAM_H_ */

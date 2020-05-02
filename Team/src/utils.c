@@ -119,32 +119,6 @@ void process_request(int cod_op, int cliente_fd,t_log* logger) {
 }
 
 
-
-
-int getTrainersCount(char** array) {
-	int count=0;
-  t_list *list = list_create();
-  void _toLista(char *row) {
-    if (row != NULL) {
-      list_add(list, row);
-    }
-  }
-  void _getRow(char *string) {
-	  if(string != NULL) {
-		  char **row = string_split(string, "|");
-		  string_iterate_lines(row, _toLista);
-		  count++;
-    } else {
-      printf("Got NULL\n");
-    }
-  }
-  string_iterate_lines(array, _getRow);
-  list_destroy_and_destroy_elements(list,free);
-  return count;
-}
-
-
-
 /*void getMatrix(char** array, char **matrix){
 
 	  t_list *list = list_create();

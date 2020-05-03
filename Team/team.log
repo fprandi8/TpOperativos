@@ -1,27 +1,27 @@
-[DEBUG] 06:11:49:623 Team/(9616:9616): 1. Finaliza creación de config y logger
-[DEBUG] 06:11:49:623 Team/(9616:9616): 2. Comienza lectura de config de broker
-[DEBUG] 06:11:49:623 Team/(9616:9616): 2. Se leyó la IP: 127.0.0.1
-[DEBUG] 06:11:49:623 Team/(9616:9616): 2. Se leyó el puerto: 6009
-[DEBUG] 06:11:49:623 Team/(9616:9616): 2. Finaliza lectura de config de broker
-[DEBUG] 06:11:49:623 Team/(9616:9616): 3. Comienza lectura de config de scheduler
-[DEBUG] 06:11:49:623 Team/(9616:9616): 3. Se leyó el algoritmo: RR
-[DEBUG] 06:11:49:623 Team/(9616:9616): 3. Se leyó el quantum: 2
-[DEBUG] 06:11:49:623 Team/(9616:9616): 3. Se leyó la estimación inicial: 0
-[DEBUG] 06:11:49:623 Team/(9616:9616): 3. Finaliza lectura de config de scheduler
-[DEBUG] 06:11:49:623 Team/(9616:9616): 4. Comienza lectura de parámetros de entrenador
-[DEBUG] 06:11:49:623 Team/(9616:9616): Finalizó la carga de config de entrenadores
-[DEBUG] 06:11:49:623 Team/(9616:9616): Comienza el conteo de entrenadores
-[DEBUG] 06:11:49:623 Team/(9616:9616): Los entrenadores son: 3
-[DEBUG] 06:11:49:623 Team/(9616:9616): 4. Se contaron 3 entrenadores
-[DEBUG] 06:11:49:623 Team/(9616:9616): 4. Se alocó memoria para el array de parametros de entrenadores
-[DEBUG] 06:11:49:623 Team/(9616:9616): 4. Comienza el proceso de carga de atributos en struc
-[DEBUG] 06:11:49:623 Team/(9616:9616): 4.1. Comienza el proceso de carga de posición de entrenadores
-[DEBUG] 06:11:49:623 Team/(9616:9616): 4.1. Finaliza el proceso de carga de posición de entrenadores
-[DEBUG] 06:11:49:623 Team/(9616:9616): 4.2. Comienza el proceso de carga de pokemons de entrenadores
-[DEBUG] 06:11:49:623 Team/(9616:9616): 4.2. Finaliza el proceso de carga de pokemons de entrenadores
-[DEBUG] 06:11:49:623 Team/(9616:9616): 4.3. Comienza el proceso de carga de objetivos de entrenadores
-[DEBUG] 06:11:49:623 Team/(9616:9616): 4.3. Finaliza el proceso de carga de objetivos de entrenadores
-[DEBUG] 06:11:49:623 Team/(9616:9616): 4. Finalizó el proceso de carga de atributos
-[DEBUG] 06:11:49:623 Team/(9616:9616): 5.Comienza el proceso de creación de threads
-[DEBUG] 06:11:49:623 Team/(9616:9616): 5.Se alocó memoria para el array de threads
-[DEBUG] 06:11:49:623 Team/(9616:9616): 5.Finalizó el proceso de creación de threads
+[DEBUG] 16:44:28:819 Team/(26377:26377): 1. Finaliza creación de config y logger
+[DEBUG] 16:44:28:819 Team/(26377:26377): 2. Comienza lectura de config de broker
+[DEBUG] 16:44:28:819 Team/(26377:26377): 2. Se leyó la IP: 127.0.0.1
+[DEBUG] 16:44:28:819 Team/(26377:26377): 2. Se leyó el puerto: 6009
+[DEBUG] 16:44:28:819 Team/(26377:26377): 2. Finaliza lectura de config de broker
+[DEBUG] 16:44:28:819 Team/(26377:26377): 3. Comienza lectura de config de scheduler
+[DEBUG] 16:44:28:819 Team/(26377:26377): 3. Se leyó el algoritmo: RR
+[DEBUG] 16:44:28:819 Team/(26377:26377): 3. Se leyó el quantum: 2
+[DEBUG] 16:44:28:819 Team/(26377:26377): 3. Se leyó la estimación inicial: 0
+[DEBUG] 16:44:28:819 Team/(26377:26377): 3. Finaliza lectura de config de scheduler
+[DEBUG] 16:44:28:819 Team/(26377:26377): 4. Comienza lectura de parámetros de entrenador
+[DEBUG] 16:44:28:819 Team/(26377:26377): Finalizó la carga de config de entrenadores
+[DEBUG] 16:44:28:819 Team/(26377:26377): Comienza el conteo de entrenadores
+[DEBUG] 16:44:28:819 Team/(26377:26377): Los entrenadores son: 3
+[DEBUG] 16:44:28:819 Team/(26377:26377): 4. Se contaron 3 entrenadores
+[DEBUG] 16:44:28:819 Team/(26377:26377): 4. Se alocó memoria para el array de parametros de entrenadores
+[DEBUG] 16:44:28:819 Team/(26377:26377): 4. Comienza el proceso de carga de atributos en struc
+[DEBUG] 16:44:28:819 Team/(26377:26377): 4.1. Comienza el proceso de carga de posición de entrenadores
+[DEBUG] 16:44:28:819 Team/(26377:26377): 4.1. Finaliza el proceso de carga de posición de entrenadores
+[DEBUG] 16:44:28:819 Team/(26377:26377): 4.2. Comienza el proceso de carga de pokemons de entrenadores
+[DEBUG] 16:44:28:819 Team/(26377:26377): 4.2. Finaliza el proceso de carga de pokemons de entrenadores
+[DEBUG] 16:44:28:819 Team/(26377:26377): 4.3. Comienza el proceso de carga de objetivos de entrenadores
+[DEBUG] 16:44:28:819 Team/(26377:26377): 4.3. Finaliza el proceso de carga de objetivos de entrenadores
+[DEBUG] 16:44:28:819 Team/(26377:26377): 4. Finalizó el proceso de carga de atributos
+[DEBUG] 16:44:28:820 Team/(26377:26377): 5.Comienza el proceso de creación de threads
+[DEBUG] 16:44:28:820 Team/(26377:26377): 5.Se alocó memoria para el array de threads
+[DEBUG] 16:44:28:820 Team/(26377:26377): 5.Finalizó el proceso de creación de threads

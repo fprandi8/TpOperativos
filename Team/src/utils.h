@@ -39,11 +39,14 @@ typedef struct
 {
 	int x;
 	int y;
-} t_trainerPosition;
+} t_trainerPosition, t_pokemonPosition;
+
+
 
 typedef struct
-{;
+{
 	char** name;
+	t_pokemonPosition* position;
 } t_pokemon;
 
 
@@ -59,6 +62,12 @@ typedef struct
 	op_code codigo_operacion;
 	t_buffer* buffer;
 } t_paquete;
+
+//TODO
+typedef struct
+{
+
+} t_map;
 
 
 int iniciar_cliente(char*, char*,t_log*);

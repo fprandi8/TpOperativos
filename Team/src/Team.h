@@ -73,5 +73,8 @@ void initScheduler(struct SchedulingAlgorithm *schedulingAlgorithm){
 	schedulingAlgorithm->initEstimationKey="ESTIMACION_INICIAL";
 }
 
+void moveTrainerToTarget(t_trainerParameters* trainer, int distanceToMoveInX, int distanceToMoveInY);
+
+t_trainerParameters* moveTrainerToObjective(t_trainerParameters** trainer,  t_pokemon* pokemonTargeted);
 
 #endif /* TEAM_H_ */

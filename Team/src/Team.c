@@ -1,7 +1,7 @@
 /*
  ============================================================================
  Name        : Team.c
- Author      : Mauro
+ Author      : Mauro y Cristian
  Version     :
  Copyright   : Your copyright notice
  Description : Team Process
@@ -26,6 +26,7 @@ int main(void) {
 	int trainersCount;
 	t_trainerParameters** trainersParameters;
 	t_log* logger;
+	int x, y;
 
 	//Init de config y logger
 	createConfig(&config);
@@ -355,3 +356,64 @@ int getTrainersCount(char** array,t_log* logger) {
 	log_debug(logger,"Los entrenadores son: %i",count);
 	return count;
 }
+
+
+
+//TODO - Función que mueve al entrenador - Falta ver como implementaremos los semáforos
+t_trainerParameters* moveTrainerToObjective(t_trainerParameters** trainer,  t_pokemon* pokemonTargeted){
+
+	//t_trainerParameters* trainerToMove;
+	//trainerToMove = *trainer;
+	int difference_x;
+	difference_x = calculateDifference((*trainer)->position->x, pokemonTargeted->position->x);
+	int difference_y;
+	difference_y = calculateDifference((*trainer)->position->y, pokemonTargeted->position->y);
+	//meter semáforos acá
+	moveTrainerToTarget(*trainer, difference_x, difference_y);
+	//fin semáforos;
+	return *trainer;
+}
+
+//TODO - funcion que mueve una posición al entrenador - Falta Definir como haremos el CATCH
+void moveTrainerToTarget(t_trainerParameters* trainer, int distanceToMoveInX, int distanceToMoveInY){
+	if(distanceToMoveInX > 0){
+		trainer->position->x++;
+	}
+	else if(distanceToMoveInX < 0){
+		trainer->position->x--;
+	}
+	else if(distanceToMoveInY > 0){
+		trainer->position->y++;
+	}
+	else if(distanceToMoveInY < 0){
+		trainer->position->y++;
+	}
+	else{
+		//CATCH_POKEMON
+	}
+}
+
+
+//Funcion que calcula la diferencia de posiciones tanto en x como y
+int calculateDifference(int position_old, int position_new){
+	int difference = position_old - position_new;
+	return difference;
+}
+
+
+//Función que calcula los ciclos de Reloj que demora en mover al entrenador
+int getClockTimeToNewPosition(int difference_x, int difference_y){
+	int clockTime = 0;
+	(difference_x >= 0) ? clockTime + difference_x : clockTime - difference_x;
+	(difference_y >= 0) ? clockTime + difference_y : clockTime - difference_y;
+	return clockTime;
+}
+
+//Función que devuelve la distancia hacia el pokemon.
+int getDistanceToPokemonTarget(t_trainerParameters* trainer,  t_pokemon* targetPokemon){
+	int distanceInX = calculateDifference(trainer->position->x, targetPokemon->position->x);
+	int distanceInY = calculateDifference(trainer->position->y, targetPokemon->position->y);
+	int distance = getClockTimeToNewPosition(distanceInX, distanceInY);
+	return distance;
+}
+

@@ -1,0 +1,35 @@
+#include <messages.h>
+
+void* SerializePackage(t_package*);
+
+t_buffer* SerializeMessage(t_message*);
+
+//--Will keep this for now, might delete later
+//t_buffer* SerializeMessageContent(message_type, void*);
+
+t_buffer *SerializeNewPokemon(new_pokemon);
+
+//TODO Implement this
+/*
+t_buffer *SerializeLocalizedPokemon(localized_pokemon);
+t_buffer *SerializeGetPokemon(get_pokemon);
+t_buffer *SerializeAppearedPokemon(appeared_pokemon);
+t_buffer *SerializeCatchPokemon(catch_pokemon);
+t_buffer *SerializeCaughtPokemon(caught_pokemon);
+*/
+t_package* DeserializePackage(void*);
+
+t_message* DeserializeMessage(void*);
+
+void* DeserializeMessageContent(message_type, void*);
+
+new_pokemon *DeserializeNewPokemon(void*);
+
+//TODO Implement this
+/*
+localized_pokemon *DeserializeLocalizedPokemon(void*);
+get_pokemon *DeserializeGetPokemon(void*);
+appeared_pokemon *DeserializeAppearedPokemon(void*);
+catch_pokemon *DeserializeCatchPokemon(void*);
+caught_pokemon *DeserializeCaughtPokemon(void*);
+*/

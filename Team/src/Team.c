@@ -60,6 +60,7 @@ int main(void) {
 	startTrainers(trainers,trainersParameters,trainersCount);
 	log_debug(logger,"5.Finalizó el proceso de creación de threads");
 	deleteLogger(&logger);
+	printf("\n%i",getClockTimeToNewPosition(2,6));
 	return EXIT_SUCCESS;
 }
 
@@ -357,6 +358,48 @@ int getTrainersCount(char** array,t_log* logger) {
 	return count;
 }
 
+void schedule(pthread_t** threads,struct SchedulingAlgorithm* schedulingAlgorithm,t_log* logger){
+	if (strcmp(schedulingAlgorithm->algorithm,"FIFO")==0){
+		scheduleFifo(threads);
+	}
+	else if(strcmp(schedulingAlgorithm->algorithm,"RR")==0){
+		scheduleRR(threads,schedulingAlgorithm);
+	}else if(strcmp(schedulingAlgorithm->algorithm,"SJF-SD")==0){
+		scheduleSJFSD(threads,schedulingAlgorithm);
+	}else if(strcmp(schedulingAlgorithm->algorithm,"SJF-CD")==0){
+		scheduleSJFCD(threads,schedulingAlgorithm);
+	}else{
+		log_debug(logger,"Valor incorrecto de scheduler en config");
+		exit(8);
+	}
+}
+
+//TODO
+void scheduleFifo(pthread_t** threads){
+	int i=1;
+	i++;
+}
+
+//TODO
+void scheduleRR(pthread_t** threads,struct SchedulingAlgorithm* schedulingAlgorithm){
+	int i=1;
+	i++;
+}
+
+//TODO
+void scheduleSJFSD(pthread_t** threads,struct SchedulingAlgorithm* schedulingAlgorithm){
+	int i=1;
+	i++;
+}
+
+//TODO
+void scheduleSJFCD(pthread_t** threads,struct SchedulingAlgorithm* schedulingAlgorithm){
+	int i=1;
+	i++;
+}
+
+
+
 
 
 //TODO - Función que mueve al entrenador - Falta ver como implementaremos los semáforos
@@ -404,12 +447,12 @@ int calculateDifference(int position_old, int position_new){
 //Función que calcula los ciclos de Reloj que demora en mover al entrenador
 int getClockTimeToNewPosition(int difference_x, int difference_y){
 	int clockTime = 0;
-	(difference_x >= 0) ? clockTime + difference_x : clockTime - difference_x;
-	(difference_y >= 0) ? clockTime + difference_y : clockTime - difference_y;
+	clockTime = (difference_x >= 0) ? clockTime + difference_x : clockTime - difference_x;
+	clockTime = (difference_y >= 0) ? clockTime + difference_y : clockTime - difference_y;
 	return clockTime;
 }
 
-//Función que devuelve la distancia hacia el pokemon.
+//Función que devuelve la distancia hacia el pokemon.  TODO hay que hacer una funcion target generica,porque el target puede ser un trainer tambien (deadlock)
 int getDistanceToPokemonTarget(t_trainerParameters* trainer,  t_pokemon* targetPokemon){
 	int distanceInX = calculateDifference(trainer->position->x, targetPokemon->position->x);
 	int distanceInY = calculateDifference(trainer->position->y, targetPokemon->position->y);

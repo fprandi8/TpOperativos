@@ -61,12 +61,18 @@ void readConfigBrokerValues(t_config*,t_log*,struct Broker*);
 void readConfigSchedulerValues(t_config*, t_log*, struct SchedulingAlgorithm*);
 void readConfigTrainersValues(t_config*,t_log*,char***,char***,char***);
 void initScheduler(struct SchedulingAlgorithm*);
+void scheduleFifo(pthread_t**);
+void scheduleRR(pthread_t**,struct SchedulingAlgorithm*);
+void scheduleSJFSD(pthread_t**,struct SchedulingAlgorithm*);
+void scheduleSJFCD(pthread_t**,struct SchedulingAlgorithm*);
+void scheduleDistance(pthread_t**);
 
 void initBroker(struct Broker *broker){
 	broker->ipKey="IP_BROKER";
 	broker->portKey="PUERTO_BROKER";
 
 }
+
 void initScheduler(struct SchedulingAlgorithm *schedulingAlgorithm){
 	schedulingAlgorithm->algorithmKey="ALGORITMO_PLANIFICACION";
 	schedulingAlgorithm->quantumKey="QUANTUM";
@@ -76,5 +82,7 @@ void initScheduler(struct SchedulingAlgorithm *schedulingAlgorithm){
 void moveTrainerToTarget(t_trainerParameters* trainer, int distanceToMoveInX, int distanceToMoveInY);
 
 t_trainerParameters* moveTrainerToObjective(t_trainerParameters** trainer,  t_pokemon* pokemonTargeted);
+int calculateDifference(int, int);
+int getDistanceToPokemonTarget(t_trainerParameters*, t_pokemon*);
 
 #endif /* TEAM_H_ */

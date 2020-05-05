@@ -61,10 +61,10 @@ void readConfigBrokerValues(t_config*,t_log*,struct Broker*);
 void readConfigSchedulerValues(t_config*, t_log*, struct SchedulingAlgorithm*);
 void readConfigTrainersValues(t_config*,t_log*,char***,char***,char***);
 void initScheduler(struct SchedulingAlgorithm*);
-void scheduleFifo(pthread_t**);
-void scheduleRR(pthread_t**,struct SchedulingAlgorithm*);
-void scheduleSJFSD(pthread_t**,struct SchedulingAlgorithm*);
-void scheduleSJFCD(pthread_t**,struct SchedulingAlgorithm*);
+void scheduleFifo(pthread_t**,int*);
+void scheduleRR(pthread_t**,int*,struct SchedulingAlgorithm*);
+void scheduleSJFSD(pthread_t**,int*,struct SchedulingAlgorithm*);
+void scheduleSJFCD(pthread_t**,int*,struct SchedulingAlgorithm*);
 void scheduleDistance(pthread_t**);
 
 void initBroker(struct Broker *broker){

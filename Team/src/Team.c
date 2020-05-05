@@ -18,7 +18,7 @@ int main(void) {
 	char* ip;
 	char* port;
 	void* mensaje = "Mensaje de prueba";
-	pthread_t* trainers;
+	pthread_t* new;
 	//sem_t sem;
 	char** trainersPosition;
 	char** trainersPokemons;
@@ -27,6 +27,8 @@ int main(void) {
 	t_trainerParameters** trainersParameters;
 	t_log* logger;
 	int x, y;
+	pthread_t* ready,exec;
+	int readyCount,execCount;
 
 	//Init de config y logger
 	createConfig(&config);
@@ -56,8 +58,8 @@ int main(void) {
 	getTrainerAttr(trainersPosition,trainersPokemons,trainersObjetives,trainersParameters,trainersCount,logger);
 	log_debug(logger,"5.Comienza el proceso de creación de threads");
 	log_debug(logger,"5.Se alocó memoria para el array de threads");
-	trainers = (pthread_t*)malloc(sizeof(pthread_t)*trainersCount);
-	startTrainers(trainers,trainersParameters,trainersCount);
+	new = (pthread_t*)malloc(sizeof(pthread_t)*trainersCount);
+	startTrainers(new,trainersParameters,trainersCount);
 	log_debug(logger,"5.Finalizó el proceso de creación de threads");
 	deleteLogger(&logger);
 	printf("\n%i",getClockTimeToNewPosition(2,6));
@@ -358,42 +360,68 @@ int getTrainersCount(char** array,t_log* logger) {
 	return count;
 }
 
-void schedule(pthread_t** threads,struct SchedulingAlgorithm* schedulingAlgorithm,t_log* logger){
+void schedule(pthread_t** threads,int* readyCount,struct SchedulingAlgorithm* schedulingAlgorithm,t_log* logger){
 	if (strcmp(schedulingAlgorithm->algorithm,"FIFO")==0){
-		scheduleFifo(threads);
-	}
-	else if(strcmp(schedulingAlgorithm->algorithm,"RR")==0){
-		scheduleRR(threads,schedulingAlgorithm);
+		scheduleFifo(threads,readyCount);
+	}else if(strcmp(schedulingAlgorithm->algorithm,"RR")==0){
+		scheduleRR(threads,readyCount,schedulingAlgorithm);
 	}else if(strcmp(schedulingAlgorithm->algorithm,"SJF-SD")==0){
-		scheduleSJFSD(threads,schedulingAlgorithm);
+		scheduleSJFSD(threads,readyCount,schedulingAlgorithm);
 	}else if(strcmp(schedulingAlgorithm->algorithm,"SJF-CD")==0){
-		scheduleSJFCD(threads,schedulingAlgorithm);
+		scheduleSJFCD(threads,readyCount,schedulingAlgorithm);
 	}else{
 		log_debug(logger,"Valor incorrecto de scheduler en config");
 		exit(8);
 	}
 }
 
+void addToReady(pthread_t* thread,pthread_t** threads,int* countReady,struct SchedulingAlgorithm* schedulingAlgorithm,t_log* logger){
+	void* temp = realloc(*threads,sizeof(pthread_t)*((*countReady)+1));
+	if (!temp){
+		log_debug(logger,"error en realloc");
+		exit(9);
+	}
+	(*threads)=temp;
+	(*threads)[(*countReady)]=(*thread);
+	(*countReady)++;
+	schedule(threads,countReady,schedulingAlgorithm,logger);
+}
+
+//TODO - No debería hacer nada; siempre se agregan cosas al final de ready y se sacan del HEAD de ready
+void scheduleFifo(pthread_t** threads,int* count){
+	int i;
+	i++;
+
+}
+
+void addToExec(pthread_t** ready,int* countReady,pthread_t** exec,t_log* logger){
+	(*exec)[0]=(*ready)[0];
+	(*countReady)--;
+	for(int i=0;i<(*countReady);i++){
+		(*ready)[i]=(*ready)[i+1];
+	}
+	void* temp = realloc(*ready,sizeof(pthread_t)*(*countReady));
+		if (!temp){
+			log_debug(logger,"error en realloc");
+			exit(9);
+		}
+		(*ready)=temp;
+}
+
 //TODO
-void scheduleFifo(pthread_t** threads){
+void scheduleRR(pthread_t** threads,int* countReady,struct SchedulingAlgorithm* schedulingAlgorithm){
 	int i=1;
 	i++;
 }
 
 //TODO
-void scheduleRR(pthread_t** threads,struct SchedulingAlgorithm* schedulingAlgorithm){
+void scheduleSJFSD(pthread_t** threads,int* countReady,struct SchedulingAlgorithm* schedulingAlgorithm){
 	int i=1;
 	i++;
 }
 
 //TODO
-void scheduleSJFSD(pthread_t** threads,struct SchedulingAlgorithm* schedulingAlgorithm){
-	int i=1;
-	i++;
-}
-
-//TODO
-void scheduleSJFCD(pthread_t** threads,struct SchedulingAlgorithm* schedulingAlgorithm){
+void scheduleSJFCD(pthread_t** threads,int* countReady,struct SchedulingAlgorithm* schedulingAlgorithm){
 	int i=1;
 	i++;
 }

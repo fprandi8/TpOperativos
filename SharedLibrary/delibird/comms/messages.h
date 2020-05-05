@@ -1,4 +1,7 @@
-#include<unistd.h>
+#ifndef DELIBIRD_MESSAGES_H_
+#define DELIBIRD_MESSAGES_H_
+
+#include <stdint.h>
 
 //enum for type of message
 typedef enum
@@ -24,6 +27,12 @@ typedef enum
 //structs used only for communication, user should not have to touch this
 typedef struct
 {
+	uint32_t bufferSize;
+	void* stream;
+} t_buffer;
+
+typedef struct
+{
 	uint32_t operationCode;
 	t_buffer* buffer;
 } t_package;
@@ -35,13 +44,6 @@ typedef struct
 	uint32_t messageType;
 	t_buffer* messageBuffer;
 } t_message;
-
-typedef struct
-{
-	uint32_t bufferSize;
-	void* stream;
-} t_buffer;
-
 
 
 //structs used by the delibird protocol, used by the user to send and recieve messages
@@ -98,3 +100,5 @@ typedef struct
 {
 	uint32_t cathched;
 } caught_pokemon;
+
+#endif

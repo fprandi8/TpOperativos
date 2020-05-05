@@ -1,4 +1,4 @@
-#include <serialization.h>
+#include "serialization.h"
 
 // ---- Serialization ----------------
 
@@ -24,7 +24,7 @@ t_buffer* SerializeMessage(t_message* message)
 	t_buffer* newBuffer = (t_buffer*)malloc(sizeof(t_buffer));
 	newBuffer->bufferSize = sizeof(uint32_t) * 4 + message->messageBuffer->bufferSize;
 
-	void serializedMessage = malloc(newBuffer->bufferSize);
+	void* serializedMessage = malloc(newBuffer->bufferSize);
 
 	int offset = 0;
 	memcpy(serializedMessage + offset, &(message->messageType), sizeof(uint32_t));
@@ -74,7 +74,7 @@ void* SerializeMessageContent(message_type type, void* content)
 t_buffer* SerializeNewPokemon(new_pokemon newPokemon)
 {
 	//size of name, name, cordinate in x, cordinate in y, ammoun of pokemon
-	uint32_t sizeOfPokemonName = strlen(newPokemon->pokemonName) + 1;
+	uint32_t sizeOfPokemonName = strlen(newPokemon.pokemonName) + 1;
 
 	t_buffer* newBuffer = (t_buffer*)malloc(sizeof(t_buffer));
 	newBuffer->bufferSize = sizeof(uint32_t) * 4 + sizeOfPokemonName;
@@ -84,13 +84,13 @@ t_buffer* SerializeNewPokemon(new_pokemon newPokemon)
 	int offset = 0;
 	memcpy(newPokemonSerialized + offset, &(sizeOfPokemonName), sizeof(uint32_t));
 	offset += sizeof(uint32_t);
-	memcpy(newPokemonSerialized + offset, newPokemon->pokemonName, sizeOfPokemonName);
+	memcpy(newPokemonSerialized + offset, newPokemon.pokemonName, sizeOfPokemonName);
 	offset += sizeOfPokemonName;
-	memcpy(newPokemonSerialized + offset, &(newPokemon->horizontalCoordinate), sizeof(uint32_t));
+	memcpy(newPokemonSerialized + offset, &(newPokemon.horizontalCoordinate), sizeof(uint32_t));
 	offset += sizeof(uint32_t);
-	memcpy(newPokemonSerialized + offset, &(newPokemon->verticalCoordinate), sizeof(uint32_t));
+	memcpy(newPokemonSerialized + offset, &(newPokemon.verticalCoordinate), sizeof(uint32_t));
 	offset += sizeof(uint32_t);
-	memcpy(newPokemonSerialized + offset, &(newPokemon->ammount),  sizeof(uint32_t));
+	memcpy(newPokemonSerialized + offset, &(newPokemon.ammount),  sizeof(uint32_t));
 
 	newBuffer->stream = newPokemonSerialized;
 
@@ -139,26 +139,28 @@ void* DeerializeMessageContent(message_type type, void* serializedContent)
 	switch(type)
 	{
 		case NEW_POKEMON:
-			serializedContent = DeserializeNewPokemon((new_pokemon)content);
+			content = (void*)DeserializeNewPokemon(serializedContent);
 			break;
-		case LOCALIZED_POKEMON:
-			serializedContent = DeserializeLocalizedPokemon((localized_pokemon)content);
+			//TODO Complete implementation
+		/*case LOCALIZED_POKEMON:
+			serializedContent = DeserializeLocalizedPokemon(content);
 			break;
 		case GET_POKEMON:
-			serializedContent = DeserializeGetPokemon((get_pokemon)content);
+			serializedContent = DeserializeGetPokemon(content);
 			break;
 		case APPEARED_POKEMON:
-			serializedContent = DeserializeAppearedPokemon((appeared_pokemon)content);
+			serializedContent = DeserializeAppearedPokemon(content);
 			break;
 		case CATCH_POKEMON:
-			serializedContent = DeserializeCatchPokemon((catch_pokemon)content);
+			serializedContent = DeserializeCatchPokemon(content);
 			break;
 		case CAUGHT_POKEMON:
-			serializedContent = DeserializeCaughtPokemon((caught_pokemon)content);
-			break;
+			serializedContent = DeserializeCaughtPokemon(content);
+			break;*/
 		default:
 			return 0;
 	}
+	return content;
 }
 
 

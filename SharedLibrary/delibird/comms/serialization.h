@@ -1,4 +1,9 @@
-#include <messages.h>
+#ifndef DELIBIRD_SERIALIZATION_H_
+#define DELIBIRD_SERIALIZATION_H_
+
+#include <string.h>
+#include <stdlib.h>
+#include "messages.h"
 
 void* SerializePackage(t_package*);
 
@@ -33,3 +38,5 @@ appeared_pokemon *DeserializeAppearedPokemon(void*);
 catch_pokemon *DeserializeCatchPokemon(void*);
 caught_pokemon *DeserializeCaughtPokemon(void*);
 */
+
+#endif

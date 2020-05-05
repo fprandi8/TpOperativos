@@ -1,6 +1,4 @@
-#include <pokeio.h>
-
-#define MAXDATASIZE 100
+#include "pokeio.h"
 
 void SendMessageAcknowledge(int messageId, int client_socket)
 {
@@ -78,7 +76,7 @@ t_package* GetPackage(int client_socket)
 		void* stream = malloc(streamSize);
 		recv(client_socket, stream, streamSize, MSG_WAITALL);
 
-		t_package recievedPackage = (t_package*)malloc(sizeof(t_package));
+		t_package* recievedPackage = (t_package*)malloc(sizeof(t_package));
 		recievedPackage->operationCode = op_code;
 		recievedPackage->buffer->bufferSize = streamSize;
 		recievedPackage->buffer->stream = stream;

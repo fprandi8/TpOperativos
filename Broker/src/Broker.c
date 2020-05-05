@@ -12,13 +12,13 @@
 
 
 sem_t* mutex_id;
-
+uint32_t ID = 0;
 
 int main(void) {
 
 	t_log* logger;
 	t_config* config;
-	uint32_t ID = 0;
+
 
 	char* ip;
 	char* puerto;

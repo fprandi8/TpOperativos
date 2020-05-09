@@ -18,6 +18,7 @@
 #include<string.h>
 #include<pthread.h>
 #include<commons/config.h>
+#include<semaphore.h>
 
 typedef enum
 {
@@ -55,6 +56,7 @@ typedef struct
 	t_trainerPosition* position;
 	t_pokemon** pokemons;
 	t_pokemon** objetives;
+	sem_t** semaphore;
 } t_trainerParameters;
 
 typedef struct

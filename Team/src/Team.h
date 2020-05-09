@@ -21,6 +21,7 @@
 
 
 
+
 /* typedef enum
 {
 	FIFO=1,//FIFO

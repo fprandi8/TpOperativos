@@ -1,6 +1,26 @@
 #include "pokeio.h"
 
 
+int SendAll(int client_socket, char *stream, uint32_t *lenght)
+{
+    int totalBytesSent = 0;
+    int bytesleft = *lenght;
+    int sendResult;
+
+    while(totalBytesSent < *lenght)
+    {
+    	sendResult = send(client_socket, stream + totalBytesSent, bytesleft, 0);
+        if (sendResult == -1) { break; }
+        totalBytesSent += sendResult;
+        bytesleft -= sendResult;
+    }
+
+    *lenght = totalBytesSent; // return number actually sent here
+
+    return sendResult ==-1?-1:0; // return -1 on failure, 0 on success
+}
+
+
 void SendPackage(op_code opCode, t_buffer* buffer, int client_socket)
 {
 	t_package* package = (t_package*)malloc(sizeof(t_package));
@@ -8,8 +28,9 @@ void SendPackage(op_code opCode, t_buffer* buffer, int client_socket)
 	package->buffer = buffer;
 
 	void* serializedPackage = SerializePackage(package);
+	uint32_t packageSize = sizeof(uint32_t) + sizeof(uint32_t) + package->buffer->bufferSize;
 
-	send(client_socket, serializedPackage, sizeof(uint32_t) + sizeof(uint32_t) + package->buffer->bufferSize, 0);
+	SendAll(client_socket, serializedPackage, &packageSize);
 
 	Free_t_package(package);
 	free(serializedPackage);
@@ -27,8 +48,9 @@ void SendMessageAcknowledge(int messageId, int client_socket)
 	package->buffer->stream = stream;
 
 	void* serializedPackage = SerializePackage(package);
+	uint32_t packageSize =  sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t);
 
-	send(client_socket, serializedPackage, sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t), 0);
+	SendAll(client_socket, serializedPackage, &packageSize);
 
 	Free_t_package(package);
 	free(serializedPackage);
@@ -46,8 +68,9 @@ void SendSubscriptionRequest(message_type queueType, int client_socket)
 	package->buffer->stream = stream;
 
 	void* serializedPackage = SerializePackage(package);
+	uint32_t packageSize =  sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t);
 
-	send(client_socket, serializedPackage, sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t), 0);
+	SendAll(client_socket, serializedPackage, &packageSize);
 
 	Free_t_package(package);
 	free(serializedPackage);

@@ -1,5 +1,20 @@
 #include "pokeio.h"
 
+
+void SendPackage(op_code opCode, t_buffer* buffer, int client_socket)
+{
+	t_package* package = (t_package*)malloc(sizeof(t_package));
+	package->operationCode = opCode;
+	package->buffer = buffer;
+
+	void* serializedPackage = SerializePackage(package);
+
+	send(client_socket, serializedPackage, sizeof(uint32_t) + sizeof(uint32_t) + package->buffer->bufferSize, 0);
+
+	free(package);
+	free(serializedPackage);
+}
+
 void SendMessageAcknowledge(int messageId, int client_socket)
 {
 	void* stream = malloc(sizeof(uint32_t));
@@ -39,27 +54,35 @@ void SendSubscriptionRequest(message_type queueType, int client_socket)
 }
 
 
+void SendMessage(deli_message deliMessage, int client_socket)
+{
+	t_message* message = ConvertDeliMessageToMessage(deliMessage);
+	t_buffer* buffer = SerializeMessage(message);
+
+	SendPackage(MESSAGE, buffer, client_socket);
+
+	free(buffer->stream);
+	free(buffer);
+	free(message->messageBuffer);
+	free(message);
+}
+
 void Send_NEW(new_pokemon new, int client_socket)
 {
 	t_message* message = (t_message*)malloc(sizeof(t_message));
 	message->id = 0;
 	message->correlationId = 0;
 	message->messageType = NEW_POKEMON;
-	message->messageBuffer = SerializeNewPokemon(new);
+	message->messageBuffer = SerializeNewPokemon(&new);
 
-	t_package* package = (t_package*)malloc(sizeof(t_package));
-	package->operationCode = MESSAGE;
-	package->buffer = SerializeMessage(message);
+	t_buffer* buffer = SerializeMessage(message);
 
-	void* serializedPackage = SerializePackage(package);
-
-	send(client_socket, serializedPackage, sizeof(uint32_t) + sizeof(uint32_t) + package->buffer->bufferSize, 0);
+	SendPackage(MESSAGE, buffer, client_socket);
 
 	free(message->messageBuffer);
 	free(message);
-	free(package->buffer);
-	free(package);
-	free(serializedPackage);
+	free(buffer->stream);
+	free(buffer);
 }
 
 t_package* GetPackage(int client_socket)

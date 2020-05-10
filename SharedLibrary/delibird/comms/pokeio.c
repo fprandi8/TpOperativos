@@ -21,7 +21,7 @@ int SendAll(int client_socket, char *stream, uint32_t *lenght)
 }
 
 
-void SendPackage(op_code opCode, t_buffer* buffer, int client_socket)
+int SendPackage(op_code opCode, t_buffer* buffer, int client_socket)
 {
 	t_package* package = (t_package*)malloc(sizeof(t_package));
 	package->operationCode = opCode;
@@ -30,13 +30,15 @@ void SendPackage(op_code opCode, t_buffer* buffer, int client_socket)
 	void* serializedPackage = SerializePackage(package);
 	uint32_t packageSize = sizeof(uint32_t) + sizeof(uint32_t) + package->buffer->bufferSize;
 
-	SendAll(client_socket, serializedPackage, &packageSize);
+	int result = SendAll(client_socket, serializedPackage, &packageSize);
 
 	Free_t_package(package);
 	free(serializedPackage);
+
+	return result;
 }
 
-void SendMessageAcknowledge(int messageId, int client_socket)
+int SendMessageAcknowledge(int messageId, int client_socket)
 {
 	void* stream = malloc(sizeof(uint32_t));
 	memcpy(stream, &(messageId), sizeof(uint32_t));
@@ -50,13 +52,15 @@ void SendMessageAcknowledge(int messageId, int client_socket)
 	void* serializedPackage = SerializePackage(package);
 	uint32_t packageSize =  sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t);
 
-	SendAll(client_socket, serializedPackage, &packageSize);
+	int result = SendAll(client_socket, serializedPackage, &packageSize);
 
 	Free_t_package(package);
 	free(serializedPackage);
+
+	return result;
 }
 
-void SendSubscriptionRequest(message_type queueType, int client_socket)
+int SendSubscriptionRequest(message_type queueType, int client_socket)
 {
 	void* stream = malloc(sizeof(uint32_t));
 	memcpy(stream, &(queueType), sizeof(uint32_t));
@@ -70,24 +74,28 @@ void SendSubscriptionRequest(message_type queueType, int client_socket)
 	void* serializedPackage = SerializePackage(package);
 	uint32_t packageSize =  sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t);
 
-	SendAll(client_socket, serializedPackage, &packageSize);
+	int result = SendAll(client_socket, serializedPackage, &packageSize);
 
 	Free_t_package(package);
 	free(serializedPackage);
+
+	return result;
 }
 
 
-void SendMessage(deli_message deliMessage, int client_socket)
+int SendMessage(deli_message deliMessage, int client_socket)
 {
 	t_message* message = ConvertDeliMessageToMessage(&deliMessage);
 	t_buffer* buffer = SerializeMessage(message);
 
-	SendPackage(MESSAGE, buffer, client_socket);
+	int result = SendPackage(MESSAGE, buffer, client_socket);
 
 	Free_t_message(message);
+
+	return result;
 }
 
-void Send_NEW(new_pokemon new, int client_socket)
+int Send_NEW(new_pokemon new, int client_socket)
 {
 	t_message* message = (t_message*)malloc(sizeof(t_message));
 	message->id = 0;
@@ -97,9 +105,11 @@ void Send_NEW(new_pokemon new, int client_socket)
 
 	t_buffer* buffer = SerializeMessage(message);
 
-	SendPackage(MESSAGE, buffer, client_socket);
+	int result = SendPackage(MESSAGE, buffer, client_socket);
 
 	Free_t_message(message);
+
+	return result;
 }
 
 t_package* GetPackage(int client_socket)

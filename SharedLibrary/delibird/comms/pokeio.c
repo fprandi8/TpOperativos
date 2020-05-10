@@ -11,7 +11,7 @@ void SendPackage(op_code opCode, t_buffer* buffer, int client_socket)
 
 	send(client_socket, serializedPackage, sizeof(uint32_t) + sizeof(uint32_t) + package->buffer->bufferSize, 0);
 
-	free(package);
+	Free_t_package(package);
 	free(serializedPackage);
 }
 
@@ -30,7 +30,7 @@ void SendMessageAcknowledge(int messageId, int client_socket)
 
 	send(client_socket, serializedPackage, sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t), 0);
 
-	free(stream);
+	Free_t_package(package);
 	free(serializedPackage);
 }
 
@@ -49,22 +49,19 @@ void SendSubscriptionRequest(message_type queueType, int client_socket)
 
 	send(client_socket, serializedPackage, sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t), 0);
 
-	free(stream);
+	Free_t_package(package);
 	free(serializedPackage);
 }
 
 
 void SendMessage(deli_message deliMessage, int client_socket)
 {
-	t_message* message = ConvertDeliMessageToMessage(deliMessage);
+	t_message* message = ConvertDeliMessageToMessage(&deliMessage);
 	t_buffer* buffer = SerializeMessage(message);
 
 	SendPackage(MESSAGE, buffer, client_socket);
 
-	free(buffer->stream);
-	free(buffer);
-	free(message->messageBuffer);
-	free(message);
+	Free_t_message(message);
 }
 
 void Send_NEW(new_pokemon new, int client_socket)
@@ -79,10 +76,7 @@ void Send_NEW(new_pokemon new, int client_socket)
 
 	SendPackage(MESSAGE, buffer, client_socket);
 
-	free(message->messageBuffer);
-	free(message);
-	free(buffer->stream);
-	free(buffer);
+	Free_t_message(message);
 }
 
 t_package* GetPackage(int client_socket)
@@ -124,8 +118,7 @@ deli_message* GetMessage(int client_socket)
 	{
 		message = 0;
 	}
-	free(package->buffer->stream);
-	free(package);
+	Free_t_package(package);
 	return message;
 }
 
@@ -142,8 +135,9 @@ uint32_t GetAcknowledge(int client_socket)
 	{
 		acknowledge = 0;
 	}
-	free(package->buffer->stream);
-	free(package);
+
+	Free_t_package(package);
+
 	return acknowledge;
 }
 
@@ -159,8 +153,9 @@ message_type GetSubscription(int client_socket)
 	{
 		type = 0;
 	}
-	free(package->buffer->stream);
-	free(package);
+
+	Free_t_package(package);
+
 	return type;
 }
 

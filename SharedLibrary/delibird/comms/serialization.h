@@ -12,6 +12,8 @@ t_buffer* SerializeMessage(t_message*);
 //--Will keep this for now, might delete later
 //t_buffer* SerializeMessageContent(message_type, void*);
 
+t_message* ConvertDeliMessageToMessage(deli_message* deliMessage);
+
 void* SerializeDeliMessage(deli_message*);
 
 t_buffer* SerializeNewPokemon(new_pokemon*);

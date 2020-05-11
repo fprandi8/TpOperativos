@@ -10,7 +10,7 @@
 
 #include "Team.h"
 
-
+pthread_mutex_t mutex;
 
 int main(void) {
 	t_config* config;
@@ -18,15 +18,9 @@ int main(void) {
 	char* ip;
 	char* port;
 	void* mensaje = "Mensaje de prueba";
-	pthread_t* new;
-	//sem_t sem;
-	char** trainersPosition;
-	char** trainersPokemons;
-	char** trainersObjetives;
+	t_trainer* new;
 	int trainersCount;
-	t_trainerParameters** trainersParameters;
 	t_log* logger;
-	int x, y;
 	pthread_t* ready,exec;
 	int readyCount,execCount;
 
@@ -41,7 +35,7 @@ int main(void) {
 
 	//Init de scheduler
 	initScheduler(&schedulingAlgorithm);
-	readConfigSchedulerValues(config,logger,&schedulingAlgorithm);
+	readConfigSchedulerValues(config,logger,&schedulingAlgorithm);//TODO agregar validaciones para que sólo se acepten los algoritmos especificos
 
 /*
 	teamSocket = iniciar_cliente(ip, port,logger);
@@ -49,20 +43,21 @@ int main(void) {
 	enviar_mensaje(mensaje,strlen(mensaje),teamSocket);
 	serve_client(&teamSocket,logger);
 */
-	readConfigTrainersValues(config,logger,&trainersPosition,&trainersPokemons,&trainersObjetives);
-	trainersCount=getTrainersCount(trainersPosition,logger);
+	trainersCount=getTrainersCount(config,logger);
 	log_debug(logger,"4. Se contaron %i entrenadores",trainersCount);
-	trainersParameters = malloc(trainersCount*sizeof(t_trainerParameters));
-	log_debug(logger,"4. Se alocó memoria para el array de parametros de entrenadores");
-	log_debug(logger,"4. Comienza el proceso de carga de atributos en struc");
-	getTrainerAttr(trainersPosition,trainersPokemons,trainersObjetives,trainersParameters,trainersCount,logger);
+	new = (t_trainer*)malloc(sizeof(t_trainer)*trainersCount);
+	startTrainers(new,trainersCount,config,logger);
 	log_debug(logger,"5.Comienza el proceso de creación de threads");
 	log_debug(logger,"5.Se alocó memoria para el array de threads");
-	new = (pthread_t*)malloc(sizeof(pthread_t)*trainersCount);
-	startTrainers(new,trainersParameters,trainersCount);
 	log_debug(logger,"5.Finalizó el proceso de creación de threads");
+
+	log_debug(logger,"\n\n\n\nTest de parametros");
+	log_debug(logger,"Entrenador 0 está en la posición (x,y)=(%i,%i), tiene %i pokemons: %s, %s y %s y tiene %i objetivos %s, %s, %s y %s",new[0].parameters.position.x,new[0].parameters.position.y,new[0].parameters.pokemonsCount,new[0].parameters.pokemons[0].name,new[0].parameters.pokemons[1].name,new[0].parameters.pokemons[2].name,new[0].parameters.objetivesCount,new[0].parameters.objetives[0].name,new[0].parameters.objetives[1].name,new[0].parameters.objetives[2].name,new[0].parameters.objetives[3].name);
+	log_debug(logger,"Entrenador 1 está en la posición (x,y)=(%i,%i), tiene %i pokemons: %s y %s y tiene %i objetivos %s, %s y %s",new[1].parameters.position.x,new[1].parameters.position.y,new[1].parameters.pokemonsCount,new[1].parameters.pokemons[0].name,new[1].parameters.pokemons[1].name,new[1].parameters.objetivesCount,new[1].parameters.objetives[0].name,new[1].parameters.objetives[1].name,new[1].parameters.objetives[2].name);
+	log_debug(logger,"Entrenador 2 está en la posición (x,y)=(%i,%i), tiene %i pokemons: %s y tiene %i objetivos %s y %s",new[2].parameters.position.x,new[2].parameters.position.y,new[2].parameters.pokemonsCount,new[2].parameters.pokemons[0].name,new[2].parameters.objetivesCount,new[2].parameters.objetives[0].name,new[2].parameters.objetives[1].name);
+
+
 	deleteLogger(&logger);
-	printf("\n%i",getClockTimeToNewPosition(2,6));
 	return EXIT_SUCCESS;
 }
 
@@ -168,42 +163,72 @@ void readConfigTrainersValues(t_config *config,t_log *logger,char*** trainersPos
 	if (config_has_property(config,"OBJETIVOS_ENTRENADORES")){
 		*trainersObjetives=config_get_array_value(config,"OBJETIVOS_ENTRENADORES");
 	}
-	log_debug(logger,"Finalizó la carga de config de entrenadores");
+	log_debug(logger,"4. Finalizó la carga de config de entrenadores");
 
 }
 
-void startTrainers(pthread_t* trainers,t_trainerParameters** trainersParameters,int trainersCount)
-{
+void startTrainers(t_trainer* trainers,int trainersCount,t_config *config,t_log* logger){
+
+	char** trainersPosition;
+	char** trainersPokemons;
+	char** trainersObjetives;
+
+	readConfigTrainersValues(config,logger,&trainersPosition,&trainersPokemons,&trainersObjetives);
+	//trainersParameters = (t_trainerParameters*)malloc(trainersCount*sizeof(t_trainerParameters));
+	log_debug(logger,"4. Se alocó memoria para el array de parametros de entrenadore");
+	log_debug(logger,"4. Comienza el proceso de carga de atributos en struc");
+	getTrainerAttr(trainersPosition,trainersPokemons,trainersObjetives,trainersCount,logger,trainers);
 	for(int actualTrainer = 0; actualTrainer < trainersCount; actualTrainer++){
-		startTrainer(trainers[actualTrainer],trainersParameters[actualTrainer]);
+		sem_init(&(trainers[actualTrainer].semaphore),0,0);
+		log_debug(logger,"Creando el entrenador %i",actualTrainer);
+		startTrainer(&(trainers[actualTrainer]),logger);
 	}
-	//log_debug(logger,"Se leyeron %i entrenadores",trainerCount);
-}
-void startTrainer(pthread_t trainer,t_trainerParameters* trainerParameters)
-{
-	pthread_create(&trainer,NULL,startThread,trainerParameters);
-	pthread_join(trainer,NULL);
+	log_debug(logger,"Terminó el proceso de creación de threads");
+	//freeMemoryParameters(trainersParameters,trainersCount,logger);
 }
 
-void getTrainerAttr(char** trainersPosition,char** trainersPokemons,char** trainersObjetives,t_trainerParameters** trainersParameters, int trainersCount,t_log* logger)
-{
+void freeMemoryParameters(t_trainerParameters* trainersParameters,int trainersCount,t_log* logger){
+	log_debug(logger,"Comienza el proceso para liberar memoria");
 	for(int actualTrainer = 0; actualTrainer < trainersCount; actualTrainer++){
-			trainersParameters[actualTrainer]=malloc(sizeof(t_trainerParameters*));
+			int pkmCount = sizeof(trainersParameters[actualTrainer].pokemons)/(sizeof(t_pokemon));
+			log_debug(logger,"pkmcount %i",pkmCount);
+			for(int count=0;count<pkmCount;count++){
+				log_debug(logger,"Se borrará al pokemon dele entrenador %i llamado %s",actualTrainer,trainersParameters[actualTrainer].pokemons[count].name);
+				free(trainersParameters[actualTrainer].pokemons[count].name);
+			}
+			free(trainersParameters[actualTrainer].pokemons);
+			int objCount = sizeof(trainersParameters[actualTrainer].objetives)/(sizeof(t_pokemon));
+			for(int count=0;count<objCount;count++){
+				log_debug(logger,"Se borrará al objetivo dele entrenador %i llamado %s",actualTrainer,trainersParameters[actualTrainer].objetives[count].name);
+				free(trainersParameters[actualTrainer].objetives[count].name);
+			}
+			free(trainersParameters[actualTrainer].objetives);
 	}
-	getTrainerAttrPos(trainersPosition,trainersParameters,trainersCount,logger);
-	getTrainerAttrPkm(trainersPokemons,trainersParameters,trainersCount,logger);
-	getTrainerAttrObj(trainersObjetives,trainersParameters,trainersCount,logger);
+	free(trainersParameters);
+}
+
+void startTrainer(t_trainer* trainer,t_log *logger){
+
+	trainer->trainer=(pthread_t)malloc(sizeof(pthread_t));
+	pthread_create(&(trainer->trainer),NULL,startThread,trainer);
+	pthread_join(trainer->trainer,NULL);
+	log_debug(logger,"Se creó el entrenador");
+}
+
+void getTrainerAttr(char** trainersPosition,char** trainersPokemons,char** trainersObjetives, int trainersCount,t_log* logger,t_trainer* trainers){
+
+	getTrainerAttrPos(trainersPosition,trainers,trainersCount,logger);
+	getTrainerAttrPkm(trainersPokemons,trainers,trainersCount,logger);
+	getTrainerAttrObj(trainersObjetives,trainers,trainersCount,logger);
 	log_debug(logger,"4. Finalizó el proceso de carga de atributos");
-	}
+}
 
 
 
-void getTrainerAttrPos(char** trainersPosition,t_trainerParameters** trainersParameters, int trainersCount,t_log *logger)
-{
+void getTrainerAttrPos(char** trainersPosition,t_trainer* trainers, int trainersCount,t_log *logger){
 
 	log_debug(logger,"4.1. Comienza el proceso de carga de posición de entrenadores");
 	for(int actualTrainer = 0; actualTrainer < trainersCount; actualTrainer++){
-		trainersParameters[actualTrainer]->position=malloc(sizeof(t_trainerPosition*));
 		int rowCount=0;
 			char pos='x';
 
@@ -215,12 +240,10 @@ void getTrainerAttrPos(char** trainersPosition,t_trainerParameters** trainersPar
 		  }
 		  void getElement(void *element) {
 			  if(pos=='x'){
-				  trainersParameters[actualTrainer]->position->x=malloc(sizeof(int));
-				  trainersParameters[actualTrainer]->position->x=atoi((char*)element);
+				  trainers[actualTrainer].parameters.position.x=atoi((char*)element);
 				  pos='y';
 			  }else if(pos=='y'){
-				  trainersParameters[actualTrainer]->position->y=malloc(sizeof(int));
-				  trainersParameters[actualTrainer]->position->y=atoi((char*)element);
+				  trainers[actualTrainer].parameters.position.y=atoi((char*)element);
 			  }
 		  }
 
@@ -241,9 +264,8 @@ void getTrainerAttrPos(char** trainersPosition,t_trainerParameters** trainersPar
 	  }
 	log_debug(logger,"4.1. Finaliza el proceso de carga de posición de entrenadores");
 }
-void getTrainerAttrPkm(char** trainersPokemons,t_trainerParameters** trainersParameters, int trainersCount,t_log *logger)
+void getTrainerAttrPkm(char** trainersPokemons,t_trainer* trainers, int trainersCount,t_log *logger)
 {
-
 	log_debug(logger,"4.2. Comienza el proceso de carga de pokemons de entrenadores");
 	for(int actualTrainer = 0; actualTrainer < trainersCount; actualTrainer++){
 
@@ -259,12 +281,11 @@ void getTrainerAttrPkm(char** trainersPokemons,t_trainerParameters** trainersPar
 		  void countPokemons(void *element){
 			  pokemonCount++;
 		  }
+		  int counter=0;
 		  void getElement(void *element) {
-				  int counter=0;
-				  trainersParameters[actualTrainer]->pokemons[counter]=malloc(sizeof(t_pokemon*));
-				  trainersParameters[actualTrainer]->pokemons[counter]->name=malloc(sizeof(char*));
-				  trainersParameters[actualTrainer]->pokemons[counter]->name=(char*)element;
-				  counter++;
+			  trainers[actualTrainer].parameters.pokemons[counter].name=malloc(sizeof((char*)element));
+			  strcpy(trainers[actualTrainer].parameters.pokemons[counter].name,(char*)element);
+			  counter++;
 		  }
 
 		  void _getRow(char *string) {
@@ -273,7 +294,9 @@ void getTrainerAttrPkm(char** trainersPokemons,t_trainerParameters** trainersPar
 				  char **row = string_split(string, "|");
 				  string_iterate_lines(row, _toList);
 				  list_iterate(list, countPokemons);
-				  trainersParameters[actualTrainer]->pokemons=malloc(pokemonCount*sizeof(t_pokemon*));
+				  trainers[actualTrainer].parameters.pokemonsCount=pokemonCount;
+				  trainers[actualTrainer].parameters.pokemons=malloc(pokemonCount*sizeof(t_pokemon));
+				  int counter=0;
 				  list_iterate(list, getElement);
 				  }
 				  rowCount++;
@@ -284,15 +307,14 @@ void getTrainerAttrPkm(char** trainersPokemons,t_trainerParameters** trainersPar
 		  string_iterate_lines(trainersPokemons, _getRow);
 		  list_destroy_and_destroy_elements(list,free);
 	  }
-	log_debug(logger,"4.2. Finaliza el proceso de carga de pokemons de entrenadores");
+
 }
-void getTrainerAttrObj(char** trainersObjetives,t_trainerParameters** trainersParameters, int trainersCount,t_log *logger)
+void getTrainerAttrObj(char** trainersObjetives,t_trainer* trainers, int trainersCount,t_log *logger)
 {
 
 	log_debug(logger,"4.3. Comienza el proceso de carga de objetivos de entrenadores");
 	for(int actualTrainer = 0; actualTrainer < trainersCount; actualTrainer++){
 		int rowCount=0;
-			char pos='x';
 
 		  t_list *list = list_create();
 		  void _toList(char *row) {
@@ -304,11 +326,10 @@ void getTrainerAttrObj(char** trainersObjetives,t_trainerParameters** trainersPa
 		  void countPokemons(void *element){
 			  pokemonCount++;
 		  }
+		  int counter=0;
 		  void getElement(void *element) {
-				  int counter=0;
-				  trainersParameters[actualTrainer]->objetives[counter]=malloc(sizeof(t_pokemon*));
-				  trainersParameters[actualTrainer]->objetives[counter]->name=malloc(sizeof(char*));
-				  trainersParameters[actualTrainer]->objetives[counter]->name=(char*)element;
+			  trainers[actualTrainer].parameters.objetives[counter].name=malloc(sizeof((char*)element));
+				  strcpy(trainers[actualTrainer].parameters.objetives[counter].name,(char*)element);
 				  counter++;
 		  }
 
@@ -318,7 +339,8 @@ void getTrainerAttrObj(char** trainersObjetives,t_trainerParameters** trainersPa
 				  char **row = string_split(string, "|");
 				  string_iterate_lines(row, _toList);
 				  list_iterate(list, countPokemons);
-				  trainersParameters[actualTrainer]->objetives=malloc(pokemonCount*sizeof(t_pokemon*));
+				  trainers[actualTrainer].parameters.objetivesCount=pokemonCount;
+				  trainers[actualTrainer].parameters.objetives=malloc(pokemonCount*sizeof(t_pokemon));
 				  list_iterate(list, getElement);
 				  }
 				  rowCount++;
@@ -331,13 +353,18 @@ void getTrainerAttrObj(char** trainersObjetives,t_trainerParameters** trainersPa
 	  }
 	log_debug(logger,"4.3. Finaliza el proceso de carga de objetivos de entrenadores");
 }
-void startThread(t_trainerParameters* trainerParameters){
-//do something
-	int prueba;
+void startThread(t_trainer* trainer){
+//	sem_wait(&(trainer->semaphore));
+	printf("\n\ntuvieja\n\n");
+
 }
 
-int getTrainersCount(char** array,t_log* logger) {
-	log_debug(logger,"Comienza el conteo de entrenadores");
+int getTrainersCount(t_config *config,t_log* logger) {
+	char** array;
+	if (config_has_property(config,"POSICIONES_ENTRENADORES")){
+			array=config_get_array_value(config,"POSICIONES_ENTRENADORES");
+		}
+
 	int count=0;
 	t_list *list = list_create();
 	void _toLista(char *row) {
@@ -356,11 +383,10 @@ int getTrainersCount(char** array,t_log* logger) {
 	}
 	string_iterate_lines(array, _getRow);
 	list_destroy_and_destroy_elements(list,free);
-	log_debug(logger,"Los entrenadores son: %i",count);
 	return count;
 }
 
-void schedule(pthread_t** threads,int* readyCount,struct SchedulingAlgorithm* schedulingAlgorithm,t_log* logger){
+void schedule(pthread_t** threads,int* readyCount,struct SchedulingAlgorithm* schedulingAlgorithm,t_log* logger){//Para el caso de FIFO y RR no hace nada, ya que las listas están ordenadas por FIFO y RR solo cambia como se procesa.
 	if (strcmp(schedulingAlgorithm->algorithm,"FIFO")==0){
 		scheduleFifo(threads,readyCount);
 	}else if(strcmp(schedulingAlgorithm->algorithm,"RR")==0){
@@ -369,9 +395,6 @@ void schedule(pthread_t** threads,int* readyCount,struct SchedulingAlgorithm* sc
 		scheduleSJFSD(threads,readyCount,schedulingAlgorithm);
 	}else if(strcmp(schedulingAlgorithm->algorithm,"SJF-CD")==0){
 		scheduleSJFCD(threads,readyCount,schedulingAlgorithm);
-	}else{
-		log_debug(logger,"Valor incorrecto de scheduler en config");
-		exit(8);
 	}
 }
 
@@ -389,9 +412,7 @@ void addToReady(pthread_t* thread,pthread_t** threads,int* countReady,struct Sch
 
 //TODO - No debería hacer nada; siempre se agregan cosas al final de ready y se sacan del HEAD de ready
 void scheduleFifo(pthread_t** threads,int* count){
-	int i;
-	i++;
-
+;
 }
 
 void addToExec(pthread_t** ready,int* countReady,pthread_t** exec,t_log* logger){
@@ -408,22 +429,19 @@ void addToExec(pthread_t** ready,int* countReady,pthread_t** exec,t_log* logger)
 		(*ready)=temp;
 }
 
-//TODO
+//TODO - No debería hacer nada; siempre se agregan cosas al final de ready y se sacan del HEAD de ready
 void scheduleRR(pthread_t** threads,int* countReady,struct SchedulingAlgorithm* schedulingAlgorithm){
-	int i=1;
-	i++;
+	;
 }
 
 //TODO
-void scheduleSJFSD(pthread_t** threads,int* countReady,struct SchedulingAlgorithm* schedulingAlgorithm){
-	int i=1;
-	i++;
+void scheduleSJFSD(pthread_t** Sthreads,int* countReady,struct SchedulingAlgorithm* schedulingAlgorithm){
+;
 }
 
 //TODO
 void scheduleSJFCD(pthread_t** threads,int* countReady,struct SchedulingAlgorithm* schedulingAlgorithm){
-	int i=1;
-	i++;
+;
 }
 
 
@@ -431,33 +449,32 @@ void scheduleSJFCD(pthread_t** threads,int* countReady,struct SchedulingAlgorith
 
 
 //TODO - Función que mueve al entrenador - Falta ver como implementaremos los semáforos
-t_trainerParameters* moveTrainerToObjective(t_trainerParameters** trainer,  t_pokemon* pokemonTargeted){
+void moveTrainerToObjective(t_trainerParameters* trainer,  t_pokemon pokemonTargeted){
 
 	//t_trainerParameters* trainerToMove;
 	//trainerToMove = *trainer;
 	int difference_x;
-	difference_x = calculateDifference((*trainer)->position->x, pokemonTargeted->position->x);
+	difference_x = calculateDifference(trainer->position.x, pokemonTargeted.position.x);
 	int difference_y;
-	difference_y = calculateDifference((*trainer)->position->y, pokemonTargeted->position->y);
+	difference_y = calculateDifference(trainer->position.y, pokemonTargeted.position.y);
 	//meter semáforos acá
-	moveTrainerToTarget(*trainer, difference_x, difference_y);
+	moveTrainerToTarget(trainer, difference_x, difference_y);
 	//fin semáforos;
-	return *trainer;
 }
 
 //TODO - funcion que mueve una posición al entrenador - Falta Definir como haremos el CATCH
 void moveTrainerToTarget(t_trainerParameters* trainer, int distanceToMoveInX, int distanceToMoveInY){
 	if(distanceToMoveInX > 0){
-		trainer->position->x++;
+		trainer->position.x++;
 	}
 	else if(distanceToMoveInX < 0){
-		trainer->position->x--;
+		trainer->position.x--;
 	}
 	else if(distanceToMoveInY > 0){
-		trainer->position->y++;
+		trainer->position.y++;
 	}
 	else if(distanceToMoveInY < 0){
-		trainer->position->y++;
+		trainer->position.y++;
 	}
 	else{
 		//CATCH_POKEMON
@@ -482,8 +499,8 @@ int getClockTimeToNewPosition(int difference_x, int difference_y){
 
 //Función que devuelve la distancia hacia el pokemon.  TODO hay que hacer una funcion target generica,porque el target puede ser un trainer tambien (deadlock)
 int getDistanceToPokemonTarget(t_trainerParameters* trainer,  t_pokemon* targetPokemon){
-	int distanceInX = calculateDifference(trainer->position->x, targetPokemon->position->x);
-	int distanceInY = calculateDifference(trainer->position->y, targetPokemon->position->y);
+	int distanceInX = calculateDifference(trainer->position.x, targetPokemon->position.x);
+	int distanceInY = calculateDifference(trainer->position.y, targetPokemon->position.y);
 	int distance = getClockTimeToNewPosition(distanceInX, distanceInY);
 	return distance;
 }

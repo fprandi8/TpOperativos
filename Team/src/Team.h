@@ -19,16 +19,37 @@
 #include <semaphore.h>
 #include<commons/collections/list.h>
 
-
-
-/* typedef enum
+typedef struct
 {
-	FIFO=1,//FIFO
-	RR=2, //RoundRobin
-	SJFCD=3, //SJF con desalojo
-	SJFSD=4	//SJF sin desalojo
-} schedulingAlgorithm;
-*/
+	int x;
+	int y;
+} t_trainerPosition, t_pokemonPosition;
+
+
+typedef struct
+{
+	char* name;
+	t_pokemonPosition position;
+} t_pokemon;
+
+
+typedef struct
+{
+	t_trainerPosition position;
+	t_pokemon* pokemons;
+	int pokemonsCount;
+	t_pokemon* objetives;
+	int objetivesCount;
+} t_trainerParameters;
+
+
+ typedef struct
+{
+	pthread_t trainer;
+	t_trainerParameters parameters;
+	sem_t semaphore;
+} t_trainer;
+
 
 struct Broker
 {
@@ -66,6 +87,20 @@ void scheduleRR(pthread_t**,int*,struct SchedulingAlgorithm*);
 void scheduleSJFSD(pthread_t**,int*,struct SchedulingAlgorithm*);
 void scheduleSJFCD(pthread_t**,int*,struct SchedulingAlgorithm*);
 void scheduleDistance(pthread_t**);
+void startInitMatrix(char *);
+void assignMatrixValues(void *);
+void addToList(char *);
+void initlist(char *);
+int getListSize(t_list *);
+void getMatrix(char**,char**);
+int getTrainersCount(t_config*,t_log*);
+void getTrainerAttr(char**,char**,char**,int,t_log*,t_trainer*);
+void getTrainerAttrPos(char**,t_trainer*,int,t_log*);
+void getTrainerAttrPkm(char**,t_trainer*,int,t_log*);
+void getTrainerAttrObj(char**,t_trainer*,int,t_log*);
+void startTrainers(t_trainer*,int,t_config*,t_log*);
+void startTrainer(t_trainer*,t_log*);
+void startThread(t_trainer*);
 
 void initBroker(struct Broker *broker){
 	broker->ipKey="IP_BROKER";
@@ -81,7 +116,7 @@ void initScheduler(struct SchedulingAlgorithm *schedulingAlgorithm){
 
 void moveTrainerToTarget(t_trainerParameters* trainer, int distanceToMoveInX, int distanceToMoveInY);
 
-t_trainerParameters* moveTrainerToObjective(t_trainerParameters** trainer,  t_pokemon* pokemonTargeted);
+void moveTrainerToObjective(t_trainerParameters* trainer,  t_pokemon pokemonTargeted);
 int calculateDifference(int, int);
 int getDistanceToPokemonTarget(t_trainerParameters*, t_pokemon*);
 

@@ -37,28 +37,6 @@ typedef struct
 
 typedef struct
 {
-	int x;
-	int y;
-} t_trainerPosition, t_pokemonPosition;
-
-
-
-typedef struct
-{
-	char** name;
-	t_pokemonPosition* position;
-} t_pokemon;
-
-
-typedef struct
-{
-	t_trainerPosition* position;
-	t_pokemon** pokemons;
-	t_pokemon** objetives;
-} t_trainerParameters;
-
-typedef struct
-{
 	op_code codigo_operacion;
 	t_buffer* buffer;
 } t_paquete;
@@ -76,18 +54,4 @@ void enviar_mensaje(void*, int, int);
 void* recibir_mensaje(int, int*,t_log*);
 void serve_client(int *socket,t_log*);
 void process_request(int cod_op, int cliente_fd,t_log*);
-void startInitMatrix(char *);
-void assignMatrixValues(void *);
-void addToList(char *);
-void initlist(char *);
-int getListSize(t_list *);
-void getMatrix(char**,char**);
-int getTrainersCount(char**,t_log*);
-void getTrainerAttr(char**,char**,char**,t_trainerParameters**,int,t_log*);
-void getTrainerAttrPos(char**,t_trainerParameters**,int,t_log*);
-void getTrainerAttrPkm(char**,t_trainerParameters**,int,t_log*);
-void getTrainerAttrObj(char**,t_trainerParameters**,int,t_log*);
-void startTrainers(pthread_t*,t_trainerParameters**,int);
-void startTrainer(pthread_t,t_trainerParameters*);
-void startThread(t_trainerParameters*);
 #endif /* UTILS_H_ */

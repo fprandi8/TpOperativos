@@ -483,8 +483,8 @@ void moveTrainerToTarget(t_trainerParameters* trainer, int distanceToMoveInX, in
 
 
 //Funcion que calcula la diferencia de posiciones tanto en x como y
-int calculateDifference(int position_old, int position_new){
-	int difference = position_old - position_new;
+int calculateDifference(int oldPostion, int newPosition){
+	int difference = oldPostion - newPosition;
 	return difference;
 }
 

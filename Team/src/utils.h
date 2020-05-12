@@ -18,6 +18,7 @@
 #include<string.h>
 #include<pthread.h>
 #include<commons/config.h>
+#include<semaphore.h>
 
 typedef enum
 {

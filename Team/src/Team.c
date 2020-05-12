@@ -474,7 +474,7 @@ void moveTrainerToTarget(t_trainerParameters* trainer, int distanceToMoveInX, in
 		trainer->position.y++;
 	}
 	else if(distanceToMoveInY < 0){
-		trainer->position.y++;
+		trainer->position.y--;
 	}
 	else{
 		//CATCH_POKEMON

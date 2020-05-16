@@ -1,6 +1,6 @@
 #include"utils.h"
 
-void iniciar_servidor(char* ip, char* puerto)
+int iniciar_servidor(char* ip, char* puerto)
 {
 	int socket_servidor;
 
@@ -29,34 +29,43 @@ void iniciar_servidor(char* ip, char* puerto)
 
     freeaddrinfo(servinfo);
 
-    while(1)
-    	esperar_cliente(socket_servidor);
+    return socket_servidor;
 }
 
-void esperar_cliente(int socket_servidor)
+int esperar_cliente(int socket_servidor)
 {
 	struct sockaddr_in dir_cliente;
 
 	int tam_direccion = sizeof(struct sockaddr_in);
 
-	int socket_cliente = accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
-
-	pthread_create(&thread,NULL,(void*)serve_client,&socket_cliente);
-	pthread_detach(thread);
+	return accept(socket_servidor, (void*) &dir_cliente, &tam_direccion);
 
 }
 
-void serve_client(int* socket)
+//void serve_client(int* socket, sem_t* mutex_id, uint32_t* ID)
+void serve_client(void* variables)
 {
-	int cod_op;
-	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
-		cod_op = -1;
-	process_request(cod_op, *socket);
+//	int cod_op;
+
+	char* msg = "CONECTADO \n";
+	puts("antes de enviar el mensaje");
+
+	send((*((t_arg_get_id*)variables)->cliente), msg, strlen(msg), 0);
+//	sem_wait(((t_arg_get_id*)variables)->mutex);
+	printf("Cliente %d \n", (*((t_arg_get_id*)variables)->cliente));
+	printf("ID del mensaje %d \n", (*((t_arg_get_id*)variables)->id));
+	(*((t_arg_get_id*)variables)->id)++;
+//	sem_post(((t_arg_get_id*)variables)->mutex);
+	pthread_exit(NULL);
+//	if(recv(*socket, &cod_op, sizeof(int), MSG_WAITALL) == -1)
+//		cod_op = -1;
+//	process_request(cod_op, *socket);
 }
 
 void process_request(int cod_op, int cliente_fd) {
 	int size;
-	printf("conectado \n");
+	char* procesando = "PROCESANDO MENSAJE \n";
+	send(cliente_fd,procesando,strlen(procesando),0);
 	void* msg;
 		switch (cod_op) {
 		case MENSAJE:

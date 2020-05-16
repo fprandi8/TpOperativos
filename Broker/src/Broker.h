@@ -29,18 +29,13 @@
 #include <semaphore.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include "delibird/comms/messages.h"
+#include "delibird/comms/serialization.h"
+#include "delibird/comms/pokeio.h"
 
-typedef enum{
-	NEW_POKEMON,
-	APPEARED_POKEMON,
-	CATCH_POKEMON,
-	CAUGHT_POKEMON,
-	GET_POKEMON,
-	LOCALIZED_POKEMON,
-	} t_queue_type;
 
 typedef struct {
-	t_queue_type tipo;
+	message_type tipo;
 	t_queue* queue;
 	t_list* suscriptores;
 	} t_queue_handler;
@@ -54,10 +49,16 @@ t_log* iniciar_logger(void);
 t_config* leer_config(void);
 char* obtener_valor_config(t_config* , t_log* , char* );
 t_list* inicializar_queues();
-t_queue_handler* inicializar_queue_handler(t_queue_type );
+t_queue_handler* inicializar_queue_handler(message_type );
 int destroy_queue_list(t_list*);
 void destroy_queue_handler(t_queue_handler* );
 t_suscriptor* queue_handler_get_suscriptor(t_queue_handler* ,int );
 void suscribir_proceso(t_queue_handler* , int );
+void serve_client(void *);
+void recibir_mensaje(t_package*, int, t_list*);
+void procesar_mensaje(t_buffer*, t_list*);
+void procesar_suscripcion(t_buffer*, int, t_list*);
+void recibir_acknowledge(t_buffer*);
+
 
 #endif /* BROKER_H_ */

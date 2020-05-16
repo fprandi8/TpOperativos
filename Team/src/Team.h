@@ -82,10 +82,12 @@ void readConfigBrokerValues(t_config*,t_log*,struct Broker*);
 void readConfigSchedulerValues(t_config*, t_log*, struct SchedulingAlgorithm*);
 void readConfigTrainersValues(t_config*,t_log*,char***,char***,char***);
 void initScheduler(struct SchedulingAlgorithm*);
-void scheduleFifo(pthread_t**,int*);
-void scheduleRR(pthread_t**,int*,struct SchedulingAlgorithm*);
-void scheduleSJFSD(pthread_t**,int*,struct SchedulingAlgorithm*);
-void scheduleSJFCD(pthread_t**,int*,struct SchedulingAlgorithm*);
+void addToReady(t_trainer*,t_trainer*,int*,struct SchedulingAlgorithm,t_log*);
+void addToExec(t_trainer*,int*,t_trainer*,t_log*);
+void scheduleFifo(t_trainer*,int*);
+void scheduleRR(t_trainer*,int*,struct SchedulingAlgorithm);
+void scheduleSJFSD(t_trainer*,int*,struct SchedulingAlgorithm);
+void scheduleSJFCD(t_trainer*,int*,struct SchedulingAlgorithm);
 void scheduleDistance(pthread_t**);
 void startInitMatrix(char *);
 void assignMatrixValues(void *);
@@ -101,7 +103,6 @@ void getTrainerAttrObj(char**,t_trainer*,int,t_log*);
 void startTrainers(t_trainer*,int,t_config*,t_log*);
 void startTrainer(t_trainer*,t_log*);
 void startThread(t_trainer*);
-void freeMemoryParameters(t_trainerParameters*,int,t_log*);
 
 void initBroker(struct Broker *broker){
 	broker->ipKey="IP_BROKER";

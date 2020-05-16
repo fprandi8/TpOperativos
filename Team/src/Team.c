@@ -10,8 +10,6 @@
 
 #include "Team.h"
 
-pthread_mutex_t mutex;
-
 int main(void) {
 	t_config* config;
 	int teamSocket;
@@ -23,6 +21,7 @@ int main(void) {
 	t_log* logger;
 	pthread_t* ready,exec;
 	int readyCount,execCount;
+	t_pokemon* missingPkms;
 
 	//Init de config y logger
 	createConfig(&config);
@@ -48,24 +47,35 @@ int main(void) {
 	log_debug(logger,"5.Se alocó memoria para el array de threads");
 	new = (t_trainer*)malloc(sizeof(t_trainer)*trainersCount);
 	startTrainers(new,trainersCount,config,logger);
+	//missingPokemons(new,missingPkms,trainersCount,logger);
 	log_debug(logger,"\n\n\n\nTest de parametros");
 	log_debug(logger,"Entrenador 0 está en la posición (x,y)=(%i,%i), tiene %i pokemons: %s, %s y %s y tiene %i objetivos %s, %s, %s y %s",new[0].parameters.position.x,new[0].parameters.position.y,new[0].parameters.pokemonsCount,new[0].parameters.pokemons[0].name,new[0].parameters.pokemons[1].name,new[0].parameters.pokemons[2].name,new[0].parameters.objetivesCount,new[0].parameters.objetives[0].name,new[0].parameters.objetives[1].name,new[0].parameters.objetives[2].name,new[0].parameters.objetives[3].name);
 	log_debug(logger,"Entrenador 1 está en la posición (x,y)=(%i,%i), tiene %i pokemons: %s y %s y tiene %i objetivos %s, %s y %s",new[1].parameters.position.x,new[1].parameters.position.y,new[1].parameters.pokemonsCount,new[1].parameters.pokemons[0].name,new[1].parameters.pokemons[1].name,new[1].parameters.objetivesCount,new[1].parameters.objetives[0].name,new[1].parameters.objetives[1].name,new[1].parameters.objetives[2].name);
 	log_debug(logger,"Entrenador 2 está en la posición (x,y)=(%i,%i), tiene %i pokemons: %s y tiene %i objetivos %s y %s",new[2].parameters.position.x,new[2].parameters.position.y,new[2].parameters.pokemonsCount,new[2].parameters.pokemons[0].name,new[2].parameters.objetivesCount,new[2].parameters.objetives[0].name,new[2].parameters.objetives[1].name);
-
+	//startScheduler(new,logger);
 
 	deleteLogger(&logger);
 	return EXIT_SUCCESS;
 }
 
 
+//TODO
+/*
+void missingPokemons(t_trainer* trainers, t_pokemon* pokemons, int trainersCount,t_log* logger){
+	int i = 0;
+	int pkmTotalCount =0;
+	for(int trainer=0;trainer<trainersCount;trainer++){
+		pkmTotalCount = pkmTotalCount+trainers[trainer].parameters.pokemonsCount;
+	}
 
-
-
-
-
-
-
+	for(int trainer=0;trainer<trainersCount;trainer++){
+		for(int pkm=0;pkm<trainers[trainer].parameters.pokemonsCount;pkm++){
+			pokemons[i]=trainers[trainer].parameters.pokemons[pkm];
+			log_debug(logger,"MssngPkm: %i: Se agregó el pokemon %s a la lista. En la lista se lee: %s",i,trainers[trainer].parameters.pokemons[pkm].name,pokemons[i]);
+			i++;
+		}
+	}
+}*/
 
 void createLogger(char* logFilename, t_log **logger)
 {
@@ -171,7 +181,6 @@ void startTrainers(t_trainer* trainers,int trainersCount,t_config *config,t_log*
 	char** trainersObjetives;
 
 	readConfigTrainersValues(config,logger,&trainersPosition,&trainersPokemons,&trainersObjetives);
-	//trainersParameters = (t_trainerParameters*)malloc(trainersCount*sizeof(t_trainerParameters));
 	log_debug(logger,"4. Se alocó memoria para el array de parametros de entrenadore");
 	log_debug(logger,"4. Comienza el proceso de carga de atributos en struc");
 	getTrainerAttr(trainersPosition,trainersPokemons,trainersObjetives,trainersCount,logger,trainers);
@@ -286,6 +295,7 @@ void getTrainerAttrPkm(char** trainersPokemons,t_trainer* trainers, int trainers
 	  }
 
 }
+
 void getTrainerAttrObj(char** trainersObjetives,t_trainer* trainers, int trainersCount,t_log *logger)
 {
 
@@ -330,9 +340,11 @@ void getTrainerAttrObj(char** trainersObjetives,t_trainer* trainers, int trainer
 	  }
 	log_debug(logger,"4.3. Finaliza el proceso de carga de objetivos de entrenadores");
 }
+
+//TODO SACAR SEM_WAIT
 void startThread(t_trainer* trainer){
-//	sem_wait(&(trainer->semaphore));
-	printf("\nPuto el que lee\n");
+	//sem_wait(&(trainer->semaphore));
+	printf("\nTrainer Thread created\n");
 
 }
 
@@ -363,61 +375,61 @@ int getTrainersCount(t_config *config,t_log* logger) {
 	return count;
 }
 
-void schedule(pthread_t** threads,int* readyCount,struct SchedulingAlgorithm* schedulingAlgorithm,t_log* logger){//Para el caso de FIFO y RR no hace nada, ya que las listas están ordenadas por FIFO y RR solo cambia como se procesa.
-	if (strcmp(schedulingAlgorithm->algorithm,"FIFO")==0){
-		scheduleFifo(threads,readyCount);
-	}else if(strcmp(schedulingAlgorithm->algorithm,"RR")==0){
-		scheduleRR(threads,readyCount,schedulingAlgorithm);
-	}else if(strcmp(schedulingAlgorithm->algorithm,"SJF-SD")==0){
-		scheduleSJFSD(threads,readyCount,schedulingAlgorithm);
-	}else if(strcmp(schedulingAlgorithm->algorithm,"SJF-CD")==0){
-		scheduleSJFCD(threads,readyCount,schedulingAlgorithm);
+void schedule(t_trainer* trainers,int* readyCount,struct SchedulingAlgorithm schedulingAlgorithm,t_log* logger){//Para el caso de FIFO y RR no hace nada, ya que las listas están ordenadas por FIFO y RR solo cambia como se procesa.
+	if (strcmp(schedulingAlgorithm.algorithm,"FIFO")==0){
+		scheduleFifo(trainers,readyCount);
+	}else if(strcmp(schedulingAlgorithm.algorithm,"RR")==0){
+		scheduleRR(trainers,readyCount,schedulingAlgorithm);
+	}else if(strcmp(schedulingAlgorithm.algorithm,"SJF-SD")==0){
+		scheduleSJFSD(trainers,readyCount,schedulingAlgorithm);
+	}else if(strcmp(schedulingAlgorithm.algorithm,"SJF-CD")==0){
+		scheduleSJFCD(trainers,readyCount,schedulingAlgorithm);
 	}
 }
 
-void addToReady(pthread_t* thread,pthread_t** threads,int* countReady,struct SchedulingAlgorithm* schedulingAlgorithm,t_log* logger){
-	void* temp = realloc(*threads,sizeof(pthread_t)*((*countReady)+1));
+void addToReady(t_trainer* trainer,t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm,t_log* logger){
+	void* temp = realloc(trainers,sizeof(t_trainer)*((*countReady)+1));
 	if (!temp){
 		log_debug(logger,"error en realloc");
 		exit(9);
 	}
-	(*threads)=temp;
-	(*threads)[(*countReady)]=(*thread);
+	(trainers)=temp;
+	(trainers)[(*countReady)]=(*trainer);
 	(*countReady)++;
-	schedule(threads,countReady,schedulingAlgorithm,logger);
+	schedule(trainers,countReady,schedulingAlgorithm,logger);
 }
 
 //TODO - No debería hacer nada; siempre se agregan cosas al final de ready y se sacan del HEAD de ready
-void scheduleFifo(pthread_t** threads,int* count){
+void scheduleFifo(t_trainer* trainer,int* count){
 ;
 }
 
-void addToExec(pthread_t** ready,int* countReady,pthread_t** exec,t_log* logger){
-	(*exec)[0]=(*ready)[0];
+void addToExec(t_trainer* ready,int* countReady,t_trainer* exec,t_log* logger){
+	exec[0]=ready[0];
 	(*countReady)--;
 	for(int i=0;i<(*countReady);i++){
-		(*ready)[i]=(*ready)[i+1];
+		ready[i]=ready[i+1];
 	}
-	void* temp = realloc(*ready,sizeof(pthread_t)*(*countReady));
+	void* temp = realloc(ready,sizeof(t_trainer)*(*countReady));
 		if (!temp){
 			log_debug(logger,"error en realloc");
 			exit(9);
 		}
-		(*ready)=temp;
+		ready=temp;
 }
 
 //TODO - No debería hacer nada; siempre se agregan cosas al final de ready y se sacan del HEAD de ready
-void scheduleRR(pthread_t** threads,int* countReady,struct SchedulingAlgorithm* schedulingAlgorithm){
+void scheduleRR(t_trainer* trainer,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm){
 	;
 }
 
 //TODO
-void scheduleSJFSD(pthread_t** Sthreads,int* countReady,struct SchedulingAlgorithm* schedulingAlgorithm){
+void scheduleSJFSD(t_trainer* trainer,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm){
 ;
 }
 
 //TODO
-void scheduleSJFCD(pthread_t** threads,int* countReady,struct SchedulingAlgorithm* schedulingAlgorithm){
+void scheduleSJFCD(t_trainer* trainer,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm){
 ;
 }
 

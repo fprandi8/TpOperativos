@@ -1,38 +1,38 @@
-[DEBUG] 21:33:32:802 Team/(3543:3543): 1. Finaliza creación de config y logger
-[DEBUG] 21:33:32:803 Team/(3543:3543): 2. Comienza lectura de config de broker
-[DEBUG] 21:33:32:803 Team/(3543:3543): 2. Se leyó la IP: 127.0.0.1
-[DEBUG] 21:33:32:803 Team/(3543:3543): 2. Se leyó el puerto: 6009
-[DEBUG] 21:33:32:803 Team/(3543:3543): 2. Finaliza lectura de config de broker
-[DEBUG] 21:33:32:803 Team/(3543:3543): 3. Comienza lectura de config de scheduler
-[DEBUG] 21:33:32:803 Team/(3543:3543): 3. Se leyó el algoritmo: RR
-[DEBUG] 21:33:32:803 Team/(3543:3543): 3. Se leyó el quantum: 2
-[DEBUG] 21:33:32:803 Team/(3543:3543): 3. Se leyó la estimación inicial: 0
-[DEBUG] 21:33:32:803 Team/(3543:3543): 3. Finaliza lectura de config de scheduler
-[DEBUG] 21:33:32:803 Team/(3543:3543): 4. Se contaron 3 entrenadores
-[DEBUG] 21:33:32:803 Team/(3543:3543): 5.Se alocó memoria para el array de threads
-[DEBUG] 21:33:32:803 Team/(3543:3543): 4. Comienza lectura de parámetros de entrenador
-[DEBUG] 21:33:32:803 Team/(3543:3543): 4. Finalizó la carga de config de entrenadores
-[DEBUG] 21:33:32:803 Team/(3543:3543): 4. Se alocó memoria para el array de parametros de entrenadore
-[DEBUG] 21:33:32:803 Team/(3543:3543): 4. Comienza el proceso de carga de atributos en struc
-[DEBUG] 21:33:32:803 Team/(3543:3543): 4.1. Comienza el proceso de carga de posición de entrenadores
-[DEBUG] 21:33:32:803 Team/(3543:3543): 4.1. Finaliza el proceso de carga de posición de entrenadores
-[DEBUG] 21:33:32:803 Team/(3543:3543): 4.2. Comienza el proceso de carga de pokemons de entrenadores
-[DEBUG] 21:33:32:803 Team/(3543:3543): 4.3. Comienza el proceso de carga de objetivos de entrenadores
-[DEBUG] 21:33:32:803 Team/(3543:3543): 4.3. Finaliza el proceso de carga de objetivos de entrenadores
-[DEBUG] 21:33:32:803 Team/(3543:3543): 4. Finalizó el proceso de carga de atributos
-[DEBUG] 21:33:32:803 Team/(3543:3543): 5.Comienza el proceso de creación de threads
-[DEBUG] 21:33:32:803 Team/(3543:3543): Creando el entrenador 0
-[DEBUG] 21:33:43:314 Team/(3543:3543): 5. Se creó un entrenador
-[DEBUG] 21:33:43:314 Team/(3543:3543): Creando el entrenador 1
-[DEBUG] 21:33:43:317 Team/(3543:3543): 5. Se creó un entrenador
-[DEBUG] 21:33:43:317 Team/(3543:3543): Creando el entrenador 2
-[DEBUG] 21:33:43:321 Team/(3543:3543): 5. Se creó un entrenador
-[DEBUG] 21:33:43:321 Team/(3543:3543): 5. Terminó el proceso de creación de threads
-[DEBUG] 21:33:43:321 Team/(3543:3543): 
+[DEBUG] 00:00:14:467 Team/(11932:11932): 1. Finaliza creación de config y logger
+[DEBUG] 00:00:14:467 Team/(11932:11932): 2. Comienza lectura de config de broker
+[DEBUG] 00:00:14:467 Team/(11932:11932): 2. Se leyó la IP: 127.0.0.1
+[DEBUG] 00:00:14:467 Team/(11932:11932): 2. Se leyó el puerto: 6009
+[DEBUG] 00:00:14:467 Team/(11932:11932): 2. Finaliza lectura de config de broker
+[DEBUG] 00:00:14:467 Team/(11932:11932): 3. Comienza lectura de config de scheduler
+[DEBUG] 00:00:14:467 Team/(11932:11932): 3. Se leyó el algoritmo: RR
+[DEBUG] 00:00:14:467 Team/(11932:11932): 3. Se leyó el quantum: 2
+[DEBUG] 00:00:14:467 Team/(11932:11932): 3. Se leyó la estimación inicial: 0
+[DEBUG] 00:00:14:467 Team/(11932:11932): 3. Finaliza lectura de config de scheduler
+[DEBUG] 00:00:14:467 Team/(11932:11932): 4. Se contaron 3 entrenadores
+[DEBUG] 00:00:14:467 Team/(11932:11932): 5.Se alocó memoria para el array de threads
+[DEBUG] 00:00:14:467 Team/(11932:11932): 4. Comienza lectura de parámetros de entrenador
+[DEBUG] 00:00:14:467 Team/(11932:11932): 4. Finalizó la carga de config de entrenadores
+[DEBUG] 00:00:14:467 Team/(11932:11932): 4. Se alocó memoria para el array de parametros de entrenadore
+[DEBUG] 00:00:14:467 Team/(11932:11932): 4. Comienza el proceso de carga de atributos en struc
+[DEBUG] 00:00:14:468 Team/(11932:11932): 4.1. Comienza el proceso de carga de posición de entrenadores
+[DEBUG] 00:00:14:468 Team/(11932:11932): 4.1. Finaliza el proceso de carga de posición de entrenadores
+[DEBUG] 00:00:14:468 Team/(11932:11932): 4.2. Comienza el proceso de carga de pokemons de entrenadores
+[DEBUG] 00:00:14:468 Team/(11932:11932): 4.3. Comienza el proceso de carga de objetivos de entrenadores
+[DEBUG] 00:00:14:468 Team/(11932:11932): 4.3. Finaliza el proceso de carga de objetivos de entrenadores
+[DEBUG] 00:00:14:468 Team/(11932:11932): 4. Finalizó el proceso de carga de atributos
+[DEBUG] 00:00:14:468 Team/(11932:11932): 5.Comienza el proceso de creación de threads
+[DEBUG] 00:00:14:468 Team/(11932:11932): Creando el entrenador 0
+[DEBUG] 00:00:14:468 Team/(11932:11932): 5. Se creó un entrenador
+[DEBUG] 00:00:14:468 Team/(11932:11932): Creando el entrenador 1
+[DEBUG] 00:00:14:468 Team/(11932:11932): 5. Se creó un entrenador
+[DEBUG] 00:00:14:468 Team/(11932:11932): Creando el entrenador 2
+[DEBUG] 00:00:14:468 Team/(11932:11932): 5. Se creó un entrenador
+[DEBUG] 00:00:14:468 Team/(11932:11932): 5. Terminó el proceso de creación de threads
+[DEBUG] 00:00:14:468 Team/(11932:11932): 
 
 
 
 Test de parametros
-[DEBUG] 21:33:43:321 Team/(3543:3543): Entrenador 0 está en la posición (x,y)=(1,2), tiene 3 pokemons: Pikachu, Squirtle y Pidgey y tiene 4 objetivos Pikachu, Pikachu, Squirtle y Pidgey
-[DEBUG] 21:33:43:321 Team/(3543:3543): Entrenador 1 está en la posición (x,y)=(7,2), tiene 2 pokemons: Squirtle y Charmander y tiene 3 objetivos Pikachu, Charmander y Charmander
-[DEBUG] 21:33:43:321 Team/(3543:3543): Entrenador 2 está en la posición (x,y)=(5,13), tiene 1 pokemons: Bulbasaur y tiene 2 objetivos Squirtle y Bulbasaur
+[DEBUG] 00:00:14:468 Team/(11932:11932): Entrenador 0 está en la posición (x,y)=(1,2), tiene 3 pokemons: Pikachu, Squirtle y Pidgey y tiene 4 objetivos Pikachu, Pikachu, Squirtle y Pidgey
+[DEBUG] 00:00:14:468 Team/(11932:11932): Entrenador 1 está en la posición (x,y)=(7,2), tiene 2 pokemons: Squirtle y Charmander y tiene 3 objetivos Pikachu, Charmander y Charmander
+[DEBUG] 00:00:14:468 Team/(11932:11932): Entrenador 2 está en la posición (x,y)=(5,13), tiene 1 pokemons: Bulbasaur y tiene 2 objetivos Squirtle y Bulbasaur

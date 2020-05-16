@@ -1,6 +1,44 @@
 #include "pokeio.h"
 
-void SendMessageAcknowledge(int messageId, int client_socket)
+
+int SendAll(int client_socket, char *stream, uint32_t *lenght)
+{
+    int totalBytesSent = 0;
+    int bytesleft = *lenght;
+    int sendResult;
+
+    while(totalBytesSent < *lenght)
+    {
+    	sendResult = send(client_socket, stream + totalBytesSent, bytesleft, 0);
+        if (sendResult == -1) { break; }
+        totalBytesSent += sendResult;
+        bytesleft -= sendResult;
+    }
+
+    *lenght = totalBytesSent; // return number actually sent here
+
+    return sendResult ==-1?-1:0; // return -1 on failure, 0 on success
+}
+
+
+int SendPackage(op_code opCode, t_buffer* buffer, int client_socket)
+{
+	t_package* package = (t_package*)malloc(sizeof(t_package));
+	package->operationCode = opCode;
+	package->buffer = buffer;
+
+	void* serializedPackage = SerializePackage(package);
+	uint32_t packageSize = sizeof(uint32_t) + sizeof(uint32_t) + package->buffer->bufferSize;
+
+	int result = SendAll(client_socket, serializedPackage, &packageSize);
+
+	Free_t_package(package);
+	free(serializedPackage);
+
+	return result;
+}
+
+int SendMessageAcknowledge(int messageId, int client_socket)
 {
 	void* stream = malloc(sizeof(uint32_t));
 	memcpy(stream, &(messageId), sizeof(uint32_t));
@@ -12,14 +50,17 @@ void SendMessageAcknowledge(int messageId, int client_socket)
 	package->buffer->stream = stream;
 
 	void* serializedPackage = SerializePackage(package);
+	uint32_t packageSize =  sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t);
 
-	send(client_socket, serializedPackage, sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t), 0);
+	int result = SendAll(client_socket, serializedPackage, &packageSize);
 
-	free(stream);
+	Free_t_package(package);
 	free(serializedPackage);
+
+	return result;
 }
 
-void SendSubscriptionRequest(message_type queueType, int client_socket)
+int SendSubscriptionRequest(message_type queueType, int client_socket)
 {
 	void* stream = malloc(sizeof(uint32_t));
 	memcpy(stream, &(queueType), sizeof(uint32_t));
@@ -31,35 +72,44 @@ void SendSubscriptionRequest(message_type queueType, int client_socket)
 	package->buffer->stream = stream;
 
 	void* serializedPackage = SerializePackage(package);
+	uint32_t packageSize =  sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t);
 
-	send(client_socket, serializedPackage, sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t), 0);
+	int result = SendAll(client_socket, serializedPackage, &packageSize);
 
-	free(stream);
+	Free_t_package(package);
 	free(serializedPackage);
+
+	return result;
 }
 
 
-void Send_NEW(new_pokemon new, int client_socket)
+int SendMessage(deli_message deliMessage, int client_socket)
+{
+	t_message* message = ConvertDeliMessageToMessage(&deliMessage);
+	t_buffer* buffer = SerializeMessage(message);
+
+	int result = SendPackage(MESSAGE, buffer, client_socket);
+
+	Free_t_message(message);
+
+	return result;
+}
+
+int Send_NEW(new_pokemon new, int client_socket)
 {
 	t_message* message = (t_message*)malloc(sizeof(t_message));
 	message->id = 0;
 	message->correlationId = 0;
 	message->messageType = NEW_POKEMON;
-	message->messageBuffer = SerializeNewPokemon(new);
+	message->messageBuffer = SerializeNewPokemon(&new);
 
-	t_package* package = (t_package*)malloc(sizeof(t_package));
-	package->operationCode = MESSAGE;
-	package->buffer = SerializeMessage(message);
+	t_buffer* buffer = SerializeMessage(message);
 
-	void* serializedPackage = SerializePackage(package);
+	int result = SendPackage(MESSAGE, buffer, client_socket);
 
-	send(client_socket, serializedPackage, sizeof(uint32_t) + sizeof(uint32_t) + package->buffer->bufferSize, 0);
+	Free_t_message(message);
 
-	free(message->messageBuffer);
-	free(message);
-	free(package->buffer);
-	free(package);
-	free(serializedPackage);
+	return result;
 }
 
 t_package* GetPackage(int client_socket)
@@ -101,8 +151,7 @@ deli_message* GetMessage(int client_socket)
 	{
 		message = 0;
 	}
-	free(package->buffer->stream);
-	free(package);
+	Free_t_package(package);
 	return message;
 }
 
@@ -119,8 +168,9 @@ uint32_t GetAcknowledge(int client_socket)
 	{
 		acknowledge = 0;
 	}
-	free(package->buffer->stream);
-	free(package);
+
+	Free_t_package(package);
+
 	return acknowledge;
 }
 
@@ -136,8 +186,9 @@ message_type GetSubscription(int client_socket)
 	{
 		type = 0;
 	}
-	free(package->buffer->stream);
-	free(package);
+
+	Free_t_package(package);
+
 	return type;
 }
 

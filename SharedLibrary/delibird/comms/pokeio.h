@@ -7,10 +7,12 @@
 #include "serialization.h"
 #include <string.h>
 
-void SendMessageAcknowledge(int messageId, int client_socket);
-void SendSubscriptionRequest(message_type queueType, int client_socket);
+int SendMessageAcknowledge(int messageId, int client_socket);
+int SendSubscriptionRequest(message_type queueType, int client_socket);
 
-void Send_NEW(new_pokemon new, int client_socket);
+int SendMessage(deli_message message, int client_socket);
+
+int Send_NEW(new_pokemon new, int client_socket);
 
 //TODO Implement the rest
 /*

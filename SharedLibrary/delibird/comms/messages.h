@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+///////// STRUCTS
+
 //enum for type of message
 typedef enum
 {
@@ -98,7 +100,27 @@ typedef struct
 // struct for caught_pokemon
 typedef struct
 {
-	uint32_t cathched;
+	uint32_t caught;
 } caught_pokemon;
+
+//////// METHODS
+
+void Free_t_message(t_message* message);
+
+void Free_t_package(t_package* package);
+
+void Free_deli_message(deli_message* message);
+
+void Free_new_pokemon(new_pokemon* new);
+
+void Free_localized_pokemon(localized_pokemon* localized);
+
+void Free_get_pokemon(get_pokemon* get);
+
+void Free_appeared_pokemon(appeared_pokemon* appeared);
+
+void Free_catch_pokemon(catch_pokemon* catch);
+
+void Free_caught_pokemon(caught_pokemon* caught);
 
 #endif

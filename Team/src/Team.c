@@ -182,27 +182,6 @@ void startTrainers(t_trainer* trainers,int trainersCount,t_config *config,t_log*
 		startTrainer(&(trainers[actualTrainer]),logger);
 	}
 	log_debug(logger,"5. Terminó el proceso de creación de threads");
-	//freeMemoryParameters(trainersParameters,trainersCount,logger);
-}
-
-void freeMemoryParameters(t_trainerParameters* trainersParameters,int trainersCount,t_log* logger){
-	log_debug(logger,"Comienza el proceso para liberar memoria");
-	for(int actualTrainer = 0; actualTrainer < trainersCount; actualTrainer++){
-			int pkmCount = sizeof(trainersParameters[actualTrainer].pokemons)/(sizeof(t_pokemon));
-			log_debug(logger,"pkmcount %i",pkmCount);
-			for(int count=0;count<pkmCount;count++){
-				log_debug(logger,"Se borrará al pokemon dele entrenador %i llamado %s",actualTrainer,trainersParameters[actualTrainer].pokemons[count].name);
-				free(trainersParameters[actualTrainer].pokemons[count].name);
-			}
-			free(trainersParameters[actualTrainer].pokemons);
-			int objCount = sizeof(trainersParameters[actualTrainer].objetives)/(sizeof(t_pokemon));
-			for(int count=0;count<objCount;count++){
-				log_debug(logger,"Se borrará al objetivo dele entrenador %i llamado %s",actualTrainer,trainersParameters[actualTrainer].objetives[count].name);
-				free(trainersParameters[actualTrainer].objetives[count].name);
-			}
-			free(trainersParameters[actualTrainer].objetives);
-	}
-	free(trainersParameters);
 }
 
 void startTrainer(t_trainer* trainer,t_log *logger){

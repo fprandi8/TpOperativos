@@ -101,6 +101,7 @@ void getTrainerAttrObj(char**,t_trainer*,int,t_log*);
 void startTrainers(t_trainer*,int,t_config*,t_log*);
 void startTrainer(t_trainer*,t_log*);
 void startThread(t_trainer*);
+void freeMemoryParameters(t_trainerParameters*,int,t_log*);
 
 void initBroker(struct Broker *broker){
 	broker->ipKey="IP_BROKER";

@@ -45,12 +45,9 @@ int main(void) {
 */
 	trainersCount=getTrainersCount(config,logger);
 	log_debug(logger,"4. Se contaron %i entrenadores",trainersCount);
+	log_debug(logger,"5.Se alocó memoria para el array de threads");
 	new = (t_trainer*)malloc(sizeof(t_trainer)*trainersCount);
 	startTrainers(new,trainersCount,config,logger);
-	log_debug(logger,"5.Comienza el proceso de creación de threads");
-	log_debug(logger,"5.Se alocó memoria para el array de threads");
-	log_debug(logger,"5.Finalizó el proceso de creación de threads");
-
 	log_debug(logger,"\n\n\n\nTest de parametros");
 	log_debug(logger,"Entrenador 0 está en la posición (x,y)=(%i,%i), tiene %i pokemons: %s, %s y %s y tiene %i objetivos %s, %s, %s y %s",new[0].parameters.position.x,new[0].parameters.position.y,new[0].parameters.pokemonsCount,new[0].parameters.pokemons[0].name,new[0].parameters.pokemons[1].name,new[0].parameters.pokemons[2].name,new[0].parameters.objetivesCount,new[0].parameters.objetives[0].name,new[0].parameters.objetives[1].name,new[0].parameters.objetives[2].name,new[0].parameters.objetives[3].name);
 	log_debug(logger,"Entrenador 1 está en la posición (x,y)=(%i,%i), tiene %i pokemons: %s y %s y tiene %i objetivos %s, %s y %s",new[1].parameters.position.x,new[1].parameters.position.y,new[1].parameters.pokemonsCount,new[1].parameters.pokemons[0].name,new[1].parameters.pokemons[1].name,new[1].parameters.objetivesCount,new[1].parameters.objetives[0].name,new[1].parameters.objetives[1].name,new[1].parameters.objetives[2].name);
@@ -178,12 +175,13 @@ void startTrainers(t_trainer* trainers,int trainersCount,t_config *config,t_log*
 	log_debug(logger,"4. Se alocó memoria para el array de parametros de entrenadore");
 	log_debug(logger,"4. Comienza el proceso de carga de atributos en struc");
 	getTrainerAttr(trainersPosition,trainersPokemons,trainersObjetives,trainersCount,logger,trainers);
+	log_debug(logger,"5.Comienza el proceso de creación de threads");
 	for(int actualTrainer = 0; actualTrainer < trainersCount; actualTrainer++){
 		sem_init(&(trainers[actualTrainer].semaphore),0,0);
 		log_debug(logger,"Creando el entrenador %i",actualTrainer);
 		startTrainer(&(trainers[actualTrainer]),logger);
 	}
-	log_debug(logger,"Terminó el proceso de creación de threads");
+	log_debug(logger,"5. Terminó el proceso de creación de threads");
 	//freeMemoryParameters(trainersParameters,trainersCount,logger);
 }
 
@@ -212,7 +210,7 @@ void startTrainer(t_trainer* trainer,t_log *logger){
 	trainer->trainer=(pthread_t)malloc(sizeof(pthread_t));
 	pthread_create(&(trainer->trainer),NULL,startThread,trainer);
 	pthread_join(trainer->trainer,NULL);
-	log_debug(logger,"Se creó el entrenador");
+	log_debug(logger,"5. Se creó un entrenador");
 }
 
 void getTrainerAttr(char** trainersPosition,char** trainersPokemons,char** trainersObjetives, int trainersCount,t_log* logger,t_trainer* trainers){
@@ -355,7 +353,7 @@ void getTrainerAttrObj(char** trainersObjetives,t_trainer* trainers, int trainer
 }
 void startThread(t_trainer* trainer){
 //	sem_wait(&(trainer->semaphore));
-	printf("\n\ntuvieja\n\n");
+	printf("\nPuto el que lee\n");
 
 }
 

@@ -10,6 +10,8 @@
 
 #include "Team.h"
 
+t_log* logger;
+
 int main(void) {
 	t_config* config;
 	int teamSocket;
@@ -18,11 +20,11 @@ int main(void) {
 	void* mensaje = "Mensaje de prueba";
 	t_trainer* new;
 	int trainersCount;
-	t_log* logger;
 	pthread_t* ready,exec;
+	pthread_t* subs;
 	int readyCount,execCount;
-	t_pokemon* missingPkms;
-
+	t_objetive* missingPkms;
+	int globalObjetivesDistinctCount=0,globalObjetivesCount=0;
 	//Init de config y logger
 	createConfig(&config);
 	startLogger(config,&logger);
@@ -47,11 +49,32 @@ int main(void) {
 	log_debug(logger,"5.Se alocó memoria para el array de threads");
 	new = (t_trainer*)malloc(sizeof(t_trainer)*trainersCount);
 	startTrainers(new,trainersCount,config,logger);
-	//missingPokemons(new,missingPkms,trainersCount,logger);
-	log_debug(logger,"\n\n\n\nTest de parametros");
+	globalObjetivesCount = getGlobalObjetivesCount(new,trainersCount);
+	missingPkms=(t_objetive*)malloc(sizeof(t_objetive)*globalObjetivesCount);
+	missingPokemons(new,missingPkms,trainersCount,&globalObjetivesCount,&globalObjetivesDistinctCount,logger);
+	void* temp = realloc(missingPkms,sizeof(t_objetive)*globalObjetivesDistinctCount);
+	if (!temp){
+		log_debug(logger,"error en realloc");
+		exit(9);
+	}
+	missingPkms=temp;
+	requestNewPokemons(missingPkms,globalObjetivesDistinctCount,logger);
+	subs=(pthread_t*)malloc(sizeof(pthread_t)*3);
+	subscribeToBroker(broker,subs);//TODO ver si esto no conviene hacerlo con select (Falta ver con Marcos)
+
+
+	log_debug(logger,"\n\n");
+	log_debug(logger,"Test de parametros");
 	log_debug(logger,"Entrenador 0 está en la posición (x,y)=(%i,%i), tiene %i pokemons: %s, %s y %s y tiene %i objetivos %s, %s, %s y %s",new[0].parameters.position.x,new[0].parameters.position.y,new[0].parameters.pokemonsCount,new[0].parameters.pokemons[0].name,new[0].parameters.pokemons[1].name,new[0].parameters.pokemons[2].name,new[0].parameters.objetivesCount,new[0].parameters.objetives[0].name,new[0].parameters.objetives[1].name,new[0].parameters.objetives[2].name,new[0].parameters.objetives[3].name);
 	log_debug(logger,"Entrenador 1 está en la posición (x,y)=(%i,%i), tiene %i pokemons: %s y %s y tiene %i objetivos %s, %s y %s",new[1].parameters.position.x,new[1].parameters.position.y,new[1].parameters.pokemonsCount,new[1].parameters.pokemons[0].name,new[1].parameters.pokemons[1].name,new[1].parameters.objetivesCount,new[1].parameters.objetives[0].name,new[1].parameters.objetives[1].name,new[1].parameters.objetives[2].name);
-	log_debug(logger,"Entrenador 2 está en la posición (x,y)=(%i,%i), tiene %i pokemons: %s y tiene %i objetivos %s y %s",new[2].parameters.position.x,new[2].parameters.position.y,new[2].parameters.pokemonsCount,new[2].parameters.pokemons[0].name,new[2].parameters.objetivesCount,new[2].parameters.objetives[0].name,new[2].parameters.objetives[1].name);
+	log_debug(logger,"Entrenador 2 está  en la posición (x,y)=(%i,%i), tiene %i pokemons: %s y tiene %i objetivos %s y %s",new[2].parameters.position.x,new[2].parameters.position.y,new[2].parameters.pokemonsCount,new[2].parameters.pokemons[0].name,new[2].parameters.objetivesCount,new[2].parameters.objetives[0].name,new[2].parameters.objetives[1].name);
+	log_debug(logger,"globalObjetivesCount: %i",globalObjetivesCount);
+	log_debug(logger,"globalObjetivesDistinctCount: %i",globalObjetivesDistinctCount);
+	for(int objCount=0;objCount<globalObjetivesDistinctCount;objCount++){
+		log_debug(logger,"Missing Pokemon %i: %i %s",objCount,missingPkms[objCount].count,missingPkms[objCount].pokemon.name);
+	}
+
+
 	//startScheduler(new,logger);
 
 	deleteLogger(&logger);
@@ -59,23 +82,122 @@ int main(void) {
 }
 
 
-//TODO
-/*
-void missingPokemons(t_trainer* trainers, t_pokemon* pokemons, int trainersCount,t_log* logger){
-	int i = 0;
-	int pkmTotalCount =0;
+int getGlobalObjetivesCount(t_trainer* trainers, int trainersCount){
+	int objcount = 0;
 	for(int trainer=0;trainer<trainersCount;trainer++){
-		pkmTotalCount = pkmTotalCount+trainers[trainer].parameters.pokemonsCount;
+		objcount = objcount+trainers[trainer].parameters.objetivesCount;
+	}
+	return objcount;
+}
+
+
+//TODO Consultar con marcos como importar las comons de delibird, meter en threads
+void subscribeToBroker(struct Broker broker,pthread_t* subs){
+
+	pthread_create(&(subs[0]),NULL,subscribeToBrokerLocalized,(void*)&broker);
+	pthread_create(&(subs[1]),NULL,subscribeToBrokerAppeared,(void*)&broker);
+	pthread_create(&(subs[2]),NULL,subscribeToBrokerCaught,(void*)&broker);
+}
+
+void* subscribeToBrokerLocalized(void *brokerAdress){
+	log_debug(logger,"Creando thread Localized Subscriptions Handler");
+	struct Broker broker = *((struct Broker*) brokerAdress);
+	int socketLocalized = startClient(broker.ip,broker.port,logger);
+	if (-1==SendSubscriptionRequest(LOCALIZED_POKEMON,socketLocalized)){
+		printf("Error en subscripcion de Localized");
+	}
+	pthread_exit(NULL);
+}
+
+void* subscribeToBrokerAppeared(void *brokerAdress){
+	struct Broker broker = *((struct Broker*) brokerAdress);
+	int socketAppeared = startClient(broker.ip,broker.port,logger);
+	if(-1==SendSubscriptionRequest(APPEARED_POKEMON,socketAppeared)){
+		printf("Error en subscripcion de Appeared");
+	}
+	pthread_exit(NULL);
+}
+
+void* subscribeToBrokerCaught(void *brokerAdress){
+	struct Broker broker = *((struct Broker*) brokerAdress);
+	int socketCaught = startClient(broker.ip,broker.port,logger);
+	if(-1==SendSubscriptionRequest(CAUGHT_POKEMON,socketCaught)){
+		printf("Error en subscripcion de Caught");
+	}
+	pthread_exit(NULL);
+}
+
+void requestNewPokemons(t_objetive* pokemons,int globalObjetivesDistinctCount,t_log* logger){
+	for(int obj=0;obj<globalObjetivesDistinctCount;obj++){
+		requestNewPokemon(pokemons[obj].pokemon,logger);
+	}
+}
+
+//TODO debería usar la shared cuando este implementado para mandar
+void requestNewPokemon(t_pokemon missingPkm,t_log* logger){
+	log_debug(logger,"Pokemon requested: %s",missingPkm.name);
+}
+
+
+void missingPokemons(t_trainer* trainers, t_objetive* objetives, int trainersCount,int* globalObjetivesCount,int* globalObjetivesDistinctCount,t_log* logger){
+	for(int obj=0;obj<(*globalObjetivesCount);obj++){
+		objetives[obj].count = 0;
 	}
 
 	for(int trainer=0;trainer<trainersCount;trainer++){
-		for(int pkm=0;pkm<trainers[trainer].parameters.pokemonsCount;pkm++){
-			pokemons[i]=trainers[trainer].parameters.pokemons[pkm];
-			log_debug(logger,"MssngPkm: %i: Se agregó el pokemon %s a la lista. En la lista se lee: %s",i,trainers[trainer].parameters.pokemons[pkm].name,pokemons[i]);
-			i++;
+		for(int obj=0;obj<trainers[trainer].parameters.objetivesCount;obj++){
+			if((*globalObjetivesDistinctCount)==0){
+				objetives[(*globalObjetivesDistinctCount)].pokemon=trainers[trainer].parameters.objetives[obj];
+				objetives[(*globalObjetivesDistinctCount)].count++;
+				log_debug(logger,"add Entrenador %i, objetivo: %i, Agregar objetivo: %s en registro %i, cantidad total %i",trainer,obj,objetives[(*globalObjetivesDistinctCount)].pokemon.name,(*globalObjetivesDistinctCount),objetives[(*globalObjetivesDistinctCount)].count);
+				(*globalObjetivesDistinctCount)++;
+			}else{
+				int added=0;
+				for(int objCmp=0;objCmp<(*globalObjetivesDistinctCount);objCmp++){
+					if(0==strcmp(objetives[objCmp].pokemon.name,trainers[trainer].parameters.objetives[obj].name)){
+						added=1;
+						objetives[objCmp].count++;
+						log_debug(logger,"add Entrenador %i, objetivo: %i, Agregar objetivo: %s en registro %i, cantidad total %i",trainer,obj,objetives[objCmp].pokemon.name,objCmp,objetives[objCmp].count);
+					}
+
+				}
+				if(added==0){
+					objetives[(*globalObjetivesDistinctCount)].pokemon=trainers[trainer].parameters.objetives[obj];
+					objetives[(*globalObjetivesDistinctCount)].count++;
+					log_debug(logger,"add Entrenador %i, objetivo: %i, Agregar objetivo: %s en registro %i, cantidad total %i",trainer,obj,objetives[(*globalObjetivesDistinctCount)].pokemon.name,(*globalObjetivesDistinctCount),objetives[(*globalObjetivesDistinctCount)].count);
+					(*globalObjetivesDistinctCount)++;
+				}
+			}
 		}
 	}
-}*/
+	for(int trainer=0;trainer<trainersCount;trainer++){
+			for(int pkm=0;pkm<trainers[trainer].parameters.pokemonsCount;pkm++){
+				for(int total=0;total<(*globalObjetivesCount);total++){
+					if(0==strcmp(objetives[total].pokemon.name,trainers[trainer].parameters.pokemons[pkm].name)){
+						if(objetives[total].count==1){
+							log_debug(logger,"diff Entrenador %i, objetivo entrenador: %i vs objetivo lista: %i, Nombre: %s",trainer,pkm,total,objetives[total].pokemon.name);
+							for(int new=total;new<(*globalObjetivesDistinctCount);new++){
+								objetives[new]=objetives[new+1];
+							}
+							(*globalObjetivesCount)--;
+							(*globalObjetivesDistinctCount)--;
+						}else{
+							log_debug(logger,"diff Entrenador %i, objetivo entrenador: %i vs objetivo lista: %i, Nombre: %s",trainer,pkm,total,objetives[total].pokemon.name);
+							objetives[total].count--;
+							(*globalObjetivesCount)--;
+						}
+						total=(*globalObjetivesCount);
+					}
+				}
+			}
+		}
+	log_debug(logger,"El objetivo global consta de %i pokemons",(*globalObjetivesCount));
+	log_debug(logger,"El objetivo global consta de %i registros",(*globalObjetivesDistinctCount));
+
+	for(int count=0;count<(*globalObjetivesDistinctCount);count++){
+		log_debug(logger,"Registro %i: %i %s",count,objetives[count].count,objetives[count].pokemon.name);
+	}
+}
 
 void createLogger(char* logFilename, t_log **logger)
 {
@@ -197,7 +319,7 @@ void startTrainer(t_trainer* trainer,t_log *logger){
 
 	trainer->trainer=(pthread_t)malloc(sizeof(pthread_t));
 	pthread_create(&(trainer->trainer),NULL,startThread,trainer);
-	pthread_join(trainer->trainer,NULL);
+	//pthread_join(trainer->trainer,NULL);
 	log_debug(logger,"5. Se creó un entrenador");
 }
 
@@ -343,7 +465,7 @@ void getTrainerAttrObj(char** trainersObjetives,t_trainer* trainers, int trainer
 
 //TODO SACAR SEM_WAIT
 void startThread(t_trainer* trainer){
-	//sem_wait(&(trainer->semaphore));
+	sem_wait(&(trainer->semaphore));
 	printf("\nTrainer Thread created\n");
 
 }
@@ -494,3 +616,38 @@ int getDistanceToPokemonTarget(t_trainerParameters* trainer,  t_pokemon* targetP
 	return distance;
 }
 
+int startClient(char* ip, char* puerto,t_log* logger)
+{
+	int teamSocket;
+
+    struct addrinfo hints, *servinfo, *p;
+
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    //hints.ai_flags = AI_PASSIVE;
+    hints.ai_flags = 0;
+    hints.ai_protocol = 0;
+
+    getaddrinfo(ip, puerto, &hints, &servinfo);
+    log_debug(logger,"IP y puerto configurado");
+    for (p = servinfo; p != NULL; p = p->ai_next) {
+    	teamSocket = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+		log_debug(logger,"Socket configurado");
+		if (teamSocket == -1){
+			log_debug(logger,"El socket se configuró incorrectamente");
+			return -2;
+		}
+		log_debug(logger,"Se intentará conectar con Broker");
+		if (connect(teamSocket, p->ai_addr, p->ai_addrlen)==0) {
+			log_debug(logger,"La conexión fue realizada");
+			freeaddrinfo(servinfo);
+			return teamSocket;
+		}else{
+			log_debug(logger,"La conexión falló");
+			close(teamSocket);
+			return -1;
+		}
+	}
+    return -1;
+}

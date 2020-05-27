@@ -6,7 +6,7 @@
  */
 
 #include"utils.h"
-
+/*
 int iniciar_cliente(char* ip, char* puerto,t_log* logger)
 {
 	int teamSocket;
@@ -43,7 +43,9 @@ int iniciar_cliente(char* ip, char* puerto,t_log* logger)
     return -1;
 }
 
-void* serializar_paquete(t_paquete* paquete, int bytes)
+
+
+ void* serializar_paquete(t_paquete* paquete, int bytes)
 {
 	void * magic = malloc(bytes);
 	int desplazamiento = 0;
@@ -119,86 +121,4 @@ void process_request(int cod_op, int cliente_fd,t_log* logger) {
 }
 
 
-/*void getMatrix(char** array, char **matrix){
-
-	  t_list *list = list_create();
-	  //int trainerPositions[][];
-	  int matrixSize;
-
-
-
-
-	  void _imprimir(char *string) {
-	    if(string != NULL) {
-	      row++;
-	      char **pokes = string_split(string, "|");
-	      string_iterate_lines(pokes, addToList);
-	      t_list *sublist = list_create();
-	      int col=-1;
-		  void mostrar(void *elemento) {
-			col++;
-			//int *mat = (int *)malloc(rows * cols * sizeof(int));
-		    printf("\nPosición[%i][%i]",row,col);
-			printf("El elemento: %s\n", (char *)elemento);
-		  }
-	      sublist = list_take_and_remove(list,2);
-
-	      list_iterate(sublist, mostrar);
-	      list_destroy(sublist);
-	    } else {
-	      printf("Got NULL\n");
-	    }
-
-	  }
-
-	  void addToList(char *line) {
-	    //if (line != NULL) {
-	      list_add(list, line);
-	    //}
-	  }
-
-	  void initlist(char *string){
-		  //if(string != NULL) {
-		 	      char **rows = string_split(string, "|");
-		 	      string_iterate_lines(rows, addToList);
-
-		  //}
-	  }
-
-	  int getListSize(t_list *list){
-		  return list_size(list);
-	  }
-	  string_iterate_lines(array, initlist);
-	  matrixSize = getListSize(list);
-	  matrix = (char**)malloc(matrixSize * sizeof(char *));
-	  int row=-1;
-
-	  void startInitMatrix(t_list *list){
-		  row++;
-		  //printf("aca pincha");
-		  int col = -1;
-		  t_list *sublist = list_create();
-		  void assignMatrixValues(void *element){
-			  col++;
-			  	int b =(sizeof((char *)element)+1);
-			  	 log_debug(logger,"pre malloc %i %i %s size %i\n",row,col,element,b);
-
-				matrix[row][col] = (char **)malloc(sizeof((char *)element)+1);
-				//printf("\ncol %i",col);
-				  log_debug(logger,"poss malloc %i %i %s\n",row,col,element);
-				matrix[row][col]=(char *)element;
-				log_debug(logger,"possasignacion %i %i %s\n",row,col,element);
-			    //printf("\nPosición[%i][%i]",row,col);
-			    //printf("\nEl elemento: %i\n", atoi((char *)element));
-				  log_debug(logger,"en [%i][%i] %p\n",row,col,matrix[row][col]);
-		  }
-		  sublist = list_take_and_remove(list,2);
-		  list_iterate(sublist,assignMatrixValues);
-		  list_destroy(sublist);
-	  }
-	  for(int i=0;i<matrixSize/2;i++){
-		  startInitMatrix(list);
-	  }
-
-}
 */

@@ -8,16 +8,18 @@
 #ifndef TEAM_H_
 #define TEAM_H_
 
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-#include<commons/log.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <commons/log.h>
 #include "utils.h"
 #include <string.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <semaphore.h>
-#include<commons/collections/list.h>
+#include <commons/collections/list.h>
+#include <delibird/comms/pokeio.h>
+
 
 typedef struct
 {
@@ -32,6 +34,11 @@ typedef struct
 	t_pokemonPosition position;
 } t_pokemon;
 
+typedef struct
+{
+	t_pokemon pokemon;
+	int count;
+} t_objetive;
 
 typedef struct
 {
@@ -103,6 +110,16 @@ void getTrainerAttrObj(char**,t_trainer*,int,t_log*);
 void startTrainers(t_trainer*,int,t_config*,t_log*);
 void startTrainer(t_trainer*,t_log*);
 void startThread(t_trainer*);
+void missingPokemons(t_trainer*, t_objetive*, int,int*,int*,t_log*);
+void subscribeToBroker(struct Broker,pthread_t*);
+void* subscribeToBrokerLocalized(void* Broker);
+void* subscribeToBrokerAppeared(void* Broker);
+void* subscribeToBrokerCaught(void* Broker);
+int startClient(char*, char*,t_log*);
+void requestNewPokemons(t_objetive*,int,t_log*);
+void requestNewPokemon(t_pokemon,t_log*);
+int getGlobalObjetivesCount(t_trainer*, int);
+
 
 void initBroker(struct Broker *broker){
 	broker->ipKey="IP_BROKER";

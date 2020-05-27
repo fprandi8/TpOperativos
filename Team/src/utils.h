@@ -20,7 +20,7 @@
 #include<commons/config.h>
 #include<semaphore.h>
 
-typedef enum
+/*typedef enum
 {
 	MENSAJE=1,//Handshake
 	GET=2, //hacia el broker
@@ -47,12 +47,13 @@ typedef struct
 {
 
 } t_map;
-
+/*
 
 int iniciar_cliente(char*, char*,t_log*);
-void* serializar_paquete(t_paquete*, int);
+/*void* serializar_paquete(t_paquete*, int);
 void enviar_mensaje(void*, int, int);
 void* recibir_mensaje(int, int*,t_log*);
 void serve_client(int *socket,t_log*);
 void process_request(int cod_op, int cliente_fd,t_log*);
+*/
 #endif /* UTILS_H_ */

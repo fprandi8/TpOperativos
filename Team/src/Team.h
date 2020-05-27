@@ -76,7 +76,6 @@ struct SchedulingAlgorithm
 	char* initEstimation;
 } schedulingAlgorithm;
 
-
 void createConfig(t_config**);
 void startLogger(t_config*,t_log**);
 void createLogger(char*,t_log**);

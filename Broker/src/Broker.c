@@ -136,7 +136,6 @@ void recibir_mensaje(t_package* package, int cliente, t_list* queue_list){
 
 void procesar_suscripcion(t_buffer* buffer, int cliente, t_list* queue_list){
 
-
 }
 
 void procesar_mensaje(t_buffer* buffer,t_list* queue_list){

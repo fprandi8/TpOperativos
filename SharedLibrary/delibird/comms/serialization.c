@@ -144,7 +144,7 @@ t_message* DeserializeMessage(void* serializedMessage)
 }
 
 
-void* DeerializeMessageContent(message_type type, void* serializedContent)
+void* DeserializeMessageContent(message_type type, void* serializedContent)
 {
 	void* content;
 	switch(type)

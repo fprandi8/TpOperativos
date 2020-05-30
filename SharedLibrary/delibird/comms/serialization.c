@@ -114,6 +114,7 @@ t_package* DeserializePackage(void* serializedPackage)
 {
 	t_package* package = (t_package*)malloc(sizeof(t_package));
 	package->buffer = (t_buffer*)malloc(sizeof(t_buffer));
+	package->buffer->stream = malloc(sizeof(void*));
 
 	memcpy(&(package->operationCode), serializedPackage, sizeof(uint32_t));
 	serializedPackage += sizeof(uint32_t);

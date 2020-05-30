@@ -21,13 +21,6 @@
 #include <semaphore.h>
 #include "delibird/comms/messages.h"
 
-typedef struct {
-	int* cliente;
-	sem_t* mutex;
-	t_list * queues;
-	} t_args;
-
-
 void* recibir_buffer(int*, int);
 
 int iniciar_servidor(char*, char*);

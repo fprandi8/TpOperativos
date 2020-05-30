@@ -26,6 +26,7 @@
 #include<commons/collections/queue.h>
 #include<commons/collections/list.h>
 #include "utils.h"
+#include "CacheMemory.h"
 #include <semaphore.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -35,30 +36,49 @@
 
 
 typedef struct {
-	message_type tipo;
+	message_type type;
 	t_queue* queue;
-	t_list* suscriptores;
+	t_list* suscriptors;
 	} t_queue_handler;
 
 typedef struct {
-	int suscripto;
+	int suscripted;
 	} t_suscriptor;
+
+typedef struct {
+	t_list * queues;
+	t_CacheMemory* cacheMemory;
+	} t_Broker;
+
+typedef struct {
+	int* cliente;
+	sem_t* mutex;
+	t_Broker * broker;
+	} t_args;
+
 
 
 t_log* iniciar_logger(void);
 t_config* leer_config(void);
 char* obtener_valor_config(t_config* , t_log* , char* );
-t_list* inicializar_queues();
-t_queue_handler* inicializar_queue_handler(message_type );
+
+void Broker_initialize(t_Broker*);
+void Broker_destroy(t_Broker*);
+void Broker_Suscribe_Process(t_buffer* buffer, int cliente, t_Broker* broker);
+t_queue_handler* Broker_Get_Specific_Queue(t_Broker , message_type );
+void Broker_Get_Acknowledge();
+void Broker_Process_Message();
+
+
+t_queue_handler* queue_handler_initialize(message_type );
+
 int destroy_queue_list(t_list*);
 void destroy_queue_handler(t_queue_handler* );
+
 t_suscriptor* queue_handler_get_suscriptor(t_queue_handler* ,int );
-void suscribir_proceso(t_queue_handler* , int );
+
 void serve_client(void *);
-void recibir_mensaje(t_package*, int, t_list*);
-void procesar_mensaje(t_buffer*, t_list*);
-void procesar_suscripcion(t_buffer*, int, t_list*);
-void recibir_acknowledge(t_buffer*);
+void recive_message(t_package* , int, t_Broker*);
 
 
 #endif /* BROKER_H_ */

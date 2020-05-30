@@ -129,7 +129,6 @@ t_package* GetPackage(int client_socket)
 		t_package* recievedPackage = (t_package*)malloc(sizeof(t_package));
 		recievedPackage->operationCode = op_code;
 		recievedPackage->buffer = (t_buffer*)malloc(sizeof(t_buffer));
-		recievedPackage->buffer->bufferSize = sizeof(uint32_t);
 		recievedPackage->buffer->bufferSize = streamSize;
 		recievedPackage->buffer->stream = stream;
 		return recievedPackage;
@@ -145,9 +144,9 @@ deli_message* GetMessage(int client_socket)
 		t_message* recievedMessage = DeserializeMessage(package->buffer->stream);
 		message = (deli_message*)malloc(sizeof(recievedMessage));
 		message->id = recievedMessage->id;
-		message->correlationId = malloc(sizeof(uint32_t));
+		message->correlationId = (uint32_t)malloc(sizeof(uint32_t));
 		message->correlationId = recievedMessage->correlationId;
-		message->messageType = malloc(sizeof(uint32_t));
+		message->messageType = (uint32_t)malloc(sizeof(uint32_t));
 		message->messageType = recievedMessage->messageType;
 		message->messageContent = malloc(sizeof(void*));
 		message->messageContent = DeserializeMessageContent(recievedMessage->messageType, recievedMessage->messageBuffer->stream);

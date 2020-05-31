@@ -227,15 +227,7 @@ void Broker_Process_Message(t_buffer* buffer, int cliente, t_Broker* broker){
 	message = (deli_message*)malloc(sizeof(recievedMessage));
 	message->id = recievedMessage->id;
 
-	//TODO logica de mutex para la asignacion de ID
-	//el broker puede tener el semáforo en su estructura y podemos hacer
-	// sem_wait(broker->semaforo)
-	// ID ++;
-	// message->id = ID;
-	// sem_post(broker->semaforo);
 	Broker_Assign_id(broker, message);
-//	ID++;
-//	message->id = ID;
 
 	printf("El ID del mensaje es %d \n", message->id);
 
@@ -259,6 +251,8 @@ void Broker_Process_Message(t_buffer* buffer, int cliente, t_Broker* broker){
 
 void queue_handler_process_message(t_queue_handler* queue, deli_message* message){
 
+	//TODO lógica de cada mensaje, guardar en cache, enviar a los suscriptores, push en la cola
+	//TODO estructura para administrar mensajes, a quienes se enviaron si fueron recibidos
 	switch (message->messageType) {
 
 		case NEW_POKEMON:

@@ -156,6 +156,7 @@ void Broker_initialize(t_Broker* broker){
 	}
 
 	broker->queues = aux;
+	sem_init(&(broker->semaphoreID),0,1);
 }
 
 void Broker_destroy(t_Broker* broker){
@@ -210,6 +211,14 @@ void Broker_Get_Acknowledge(t_buffer* buffer, int cliente, t_Broker* broker){
 
 }
 
+void Broker_Assign_id(t_Broker* broker, deli_message* message){
+	sem_wait(&(broker->semaphoreID));
+	ID++;
+	message->id = ID;
+	sem_post(&(broker->semaphoreID));
+
+}
+
 void Broker_Process_Message(t_buffer* buffer, int cliente, t_Broker* broker){
 
 	deli_message* message;
@@ -224,9 +233,11 @@ void Broker_Process_Message(t_buffer* buffer, int cliente, t_Broker* broker){
 	// ID ++;
 	// message->id = ID;
 	// sem_post(broker->semaforo);
-	// Broker_Assign_id(broker, *message);
-	ID++;
-	message->id = ID;
+	Broker_Assign_id(broker, message);
+//	ID++;
+//	message->id = ID;
+
+	printf("El ID del mensaje es %d \n", message->id);
 
 	//TODO ver que hacer con el correlation ID, podríamos saber si es necesario hacer algo por el tipo de mensaje
 	message->correlationId = (uint32_t)malloc(sizeof(uint32_t));

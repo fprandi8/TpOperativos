@@ -48,6 +48,7 @@ typedef struct {
 typedef struct {
 	t_list * queues;
 	t_CacheMemory* cacheMemory;
+	sem_t semaphoreID;
 	} t_Broker;
 
 typedef struct {
@@ -67,6 +68,7 @@ void Broker_Suscribe_Process(t_buffer* buffer, int cliente, t_Broker* broker);
 t_queue_handler* Broker_Get_Specific_Queue(t_Broker , message_type );
 void Broker_Get_Acknowledge(t_buffer* , int , t_Broker* );
 void Broker_Process_Message(t_buffer* , int , t_Broker* );
+void Broker_Assign_id(t_Broker* , deli_message* );
 
 
 t_queue_handler* queue_handler_initialize(message_type );

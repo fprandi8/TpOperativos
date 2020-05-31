@@ -139,6 +139,7 @@ t_message* DeserializeMessage(void* serializedMessage)
 	serializedMessage += sizeof(uint32_t);
 	memcpy(&(message->messageBuffer->bufferSize), serializedMessage, sizeof(uint32_t));
 	serializedMessage += sizeof(uint32_t);
+	message->messageBuffer->stream = malloc(message->messageBuffer->bufferSize);
 	memcpy(message->messageBuffer->stream, serializedMessage, message->messageBuffer->bufferSize);
 
 	return message;
@@ -184,6 +185,7 @@ new_pokemon* DeserializeNewPokemon(void* serializedNewPokemon)
 
 	uint32_t sizeOfPokemonName;
 	memcpy(&(sizeOfPokemonName),serializedNewPokemon, sizeof(uint32_t));
+	newPokemon->pokemonName = malloc(sizeOfPokemonName);
 	serializedNewPokemon += sizeof(uint32_t);
 	memcpy(newPokemon->pokemonName, serializedNewPokemon, sizeOfPokemonName);
 	serializedNewPokemon += sizeOfPokemonName;

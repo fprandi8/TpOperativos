@@ -52,7 +52,6 @@ typedef struct {
 
 typedef struct {
 	int* cliente;
-	sem_t* mutex;
 	t_Broker * broker;
 	} t_args;
 
@@ -66,11 +65,12 @@ void Broker_initialize(t_Broker*);
 void Broker_destroy(t_Broker*);
 void Broker_Suscribe_Process(t_buffer* buffer, int cliente, t_Broker* broker);
 t_queue_handler* Broker_Get_Specific_Queue(t_Broker , message_type );
-void Broker_Get_Acknowledge();
-void Broker_Process_Message();
+void Broker_Get_Acknowledge(t_buffer* , int , t_Broker* );
+void Broker_Process_Message(t_buffer* , int , t_Broker* );
 
 
 t_queue_handler* queue_handler_initialize(message_type );
+void queue_handler_process_message(t_queue_handler* , deli_message*);
 
 int destroy_queue_list(t_list*);
 void destroy_queue_handler(t_queue_handler* );

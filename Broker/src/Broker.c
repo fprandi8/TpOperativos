@@ -23,7 +23,7 @@ int main(void) {
 	char* ip;
 	char* puerto;
 	int servidor,cliente;
-	char* tam_men, tam_min_part, algo_mem, algo_reem, algo_part, frec_comp;
+//	char* tam_men, tam_min_part, algo_mem, algo_reem, algo_part, frec_comp;
 	char* nombre;
 
 	pthread_t* thread;
@@ -42,16 +42,16 @@ int main(void) {
 
 	ip= obtener_valor_config(config,logger,IP_BROKER);
 	puerto = obtener_valor_config(config,logger,PUERTO_BROKER);
-	tam_men = obtener_valor_config(config,logger,TAMANO_MEMORIA);
-	tam_min_part = obtener_valor_config(config,logger,TAMANO_MINIMO_PARTICION);
-	algo_mem= obtener_valor_config(config,logger,ALGORITMO_MEMORIA);
-	algo_reem= obtener_valor_config(config,logger,ALGORITMO_REEMPLAZO);
-	algo_part= obtener_valor_config(config,logger,ALGORITMO_PARTICION_LIBRE);
-	frec_comp= obtener_valor_config(config,logger,FRECUENCIA_COMPACTACION);
+//	tam_men = obtener_valor_config(config,logger,TAMANO_MEMORIA);
+//	tam_min_part =(char*) obtener_valor_config(config,logger,TAMANO_MINIMO_PARTICION);
+//	algo_mem=  obtener_valor_config(config,logger,ALGORITMO_MEMORIA);
+//	algo_reem=  obtener_valor_config(config,logger,ALGORITMO_REEMPLAZO);
+//	algo_part=  obtener_valor_config(config,logger,ALGORITMO_PARTICION_LIBRE);
+//	frec_comp=  obtener_valor_config(config,logger,FRECUENCIA_COMPACTACION);
 
-	t_list* queue_list;
+	t_Broker* broker= (t_Broker*) malloc(sizeof(t_Broker));
 
-	queue_list = inicializar_queues();
+	Broker_initialize(broker);
 
 	servidor = iniciar_servidor(ip, puerto);
 
@@ -65,11 +65,11 @@ int main(void) {
 
 		args->cliente = (int*)malloc (sizeof(int*));;
 		args->mutex = (sem_t*)malloc (sizeof(sem_t*));
-		args->queues = (t_list*) malloc (sizeof(t_list*));
+		args->broker = (t_Broker*) malloc (sizeof(t_Broker*));
 
 		args->cliente = &cliente;
 		args->mutex=mutex_id;
-		args->queues = queue_list;
+		args->broker = broker;
 
 		printf("Crea un hilo para el cliente %d \n", cliente);
 
@@ -81,12 +81,7 @@ int main(void) {
 		//free(args);
 	}
 
-	int resultado = destroy_queue_list(queue_list);
-
-	if (resultado == 0){
-		log_debug(logger,"SE LIBERARON LOS RECURSOS DE LAS QUEUE");
-	}
-
+	Broker_destroy(broker);
 
 	sem_close(mutex_id);
 	sem_unlink(nombre);
@@ -99,7 +94,7 @@ void serve_client(void* variables)
 {
 	char* msg = "CONECTADO \n";
 	int cliente = *((t_args*)variables)->cliente;
-	t_list* queue_list = ((t_args*)variables)->queues;
+	t_Broker* broker = ((t_args*)variables)->broker;
 	send(cliente, msg, strlen(msg), 0);
 
 //	sem_wait(mutex_id);
@@ -112,57 +107,29 @@ void serve_client(void* variables)
 	puts("espera el paquete");
 
 	t_package* package = GetPackage(cliente);
-	recibir_mensaje(package, cliente, queue_list);
+	recive_message(package, cliente, broker);
 
 }
 
 
-void recibir_mensaje(t_package* package, int cliente, t_list* queue_list){
+void recive_message(t_package* package, int cliente, t_Broker* broker){
 
 	puts("recibió el mensaje");
 	switch (package->operationCode){
 		case SUBSCRIPTION:
-			procesar_suscripcion(package->buffer, cliente, queue_list);
+			puts("Va a suscribir al cliente");
+			Broker_Suscribe_Process(package->buffer, cliente, broker);
 			break;
 		case MESSAGE:
-			procesar_mensaje(package->buffer, queue_list);
+			Broker_Process_Message();
 			break;
 		case ACKNOWLEDGE:
-			recibir_acknowledge(package->buffer);
+			Broker_Get_Acknowledge();
 			break;
 	}
 }
 
 
-void procesar_suscripcion(t_buffer* buffer, int cliente, t_list* queue_list){
-
-
-}
-
-void procesar_mensaje(t_buffer* buffer,t_list* queue_list){
-	t_message* msj = malloc(buffer->bufferSize);
-	memcpy(msj,buffer->stream,buffer->bufferSize);
-	switch (msj->messageType){
-		case NEW_POKEMON:
-			break;
-		case LOCALIZED_POKEMON:
-			break;
-		case GET_POKEMON:
-			break;
-		case APPEARED_POKEMON:
-			break;
-		case CATCH_POKEMON:
-			break;
-		case CAUGHT_POKEMON:
-			break;
-	}
-
-	free(msj);
-}
-
-void recibir_acknowledge(t_buffer* buffer){
-
-}
 
 t_log* iniciar_logger(void)
 {
@@ -184,46 +151,95 @@ char* obtener_valor_config(t_config* config, t_log* logger, char* propiedad){
 	return NULL;
 }
 
-t_list* inicializar_queues(){
+
+void Broker_initialize(t_Broker* broker){
+
 	t_list* aux;
 	aux= list_create();
 
 	for (int i=0; i < 6; i++){
 		t_queue_handler* queue_handler;
-		queue_handler= inicializar_queue_handler((message_type)i);
+		queue_handler= queue_handler_initialize((message_type)i);
 		list_add(aux,queue_handler);
 	}
 
-	return aux;
+	broker->queues = aux;
 }
 
+void Broker_destroy(t_Broker* broker){
+	list_destroy_and_destroy_elements(broker->queues,(void*)destroy_queue_handler);
+	free(broker->cacheMemory);
+	free(broker);
+}
+
+t_queue_handler* Broker_Get_Specific_Queue(t_Broker broker, message_type queueType ){
+
+	int Match = 0;
+	int index = 0;
+	t_queue_handler* queue_handler = (t_queue_handler*)list_get(broker.queues,index);
+
+	while((!Match) && (queue_handler != NULL) ){
+		if (queue_handler->type == queueType)
+			Match=1;
+		else
+		{
+			index++;
+			queue_handler = (t_queue_handler*)list_get(broker.queues,index);
+		}
+	}
+
+	return queue_handler;
+}
+
+
+void Broker_Suscribe_Process(t_buffer* buffer, int cliente, t_Broker* broker){
+
+	void* stream = malloc(sizeof(uint32_t));
+	memcpy(stream, buffer->stream, buffer->bufferSize);
+
+	uint32_t QueueType = (uint32_t) *(stream);
+
+	t_queue_handler* queueToSuscribe = Broker_Get_Specific_Queue(*(broker), QueueType);
+
+	if (queueToSuscribe != NULL){
+		t_suscriptor* aux= (t_suscriptor*)malloc(sizeof(t_suscriptor));
+		aux->suscripted = cliente;
+		list_add(queueToSuscribe->suscriptors,aux);
+	}
+
+}
+
+//TODO - implementar los métodos para procesar un acknowledge y un mensaje
+void Broker_Get_Acknowledge(){
+
+}
+
+void Broker_Process_Message(){
+
+}
+
+//QUEUE LOGIC
 int destroy_queue_list(t_list* self){
 	list_destroy_and_destroy_elements(self,(void*)destroy_queue_handler);
 	return 0;
 }
 
-t_queue_handler* inicializar_queue_handler(message_type tipo){
+t_queue_handler* queue_handler_initialize(message_type type){
 	t_queue_handler* aux;
 	aux = malloc(sizeof(t_queue_handler));
 	aux->queue = queue_create();
-	aux->suscriptores = list_create();
-	aux->tipo=tipo;
+	aux->suscriptors = list_create();
+	aux->type=type;
 	return aux;
 }
 
 void destroy_queue_handler(t_queue_handler* self){
 	queue_destroy(self->queue);
-	list_destroy(self->suscriptores);
+	list_destroy(self->suscriptors);
 }
 
 t_suscriptor* queue_handler_get_suscriptor(t_queue_handler* self,int pos){
-	return list_get(self->suscriptores,pos);
+	return list_get(self->suscriptors,pos);
 }
 
-void suscribir_proceso(t_queue_handler* queue, int cliente){
-	t_suscriptor* aux;
-	aux= malloc(sizeof(t_suscriptor));
-	aux->suscripto = cliente;
-	list_add(queue->suscriptores,aux);
-}
 

@@ -24,13 +24,12 @@
 #include<commons/collections/queue.h>
 #include<commons/collections/list.h>
 #include "utils.h"
-#include "messages.h"
 
 typedef struct t_CacheMemory{
 	char *full_memory;
 	int partition_minimum_size;
 	int memory_size;
-}cache;
+}t_CacheMemory;
 
 //size configuration
 t_config* get_config(t_config* config);

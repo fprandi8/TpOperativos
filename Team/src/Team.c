@@ -400,8 +400,8 @@ void addToReady(t_trainer* trainer,t_trainer* trainers,int* countReady,struct Sc
 }
 
 //TODO - No debería hacer nada; siempre se agregan cosas al final de ready y se sacan del HEAD de ready
-void scheduleFifo(t_trainer* trainer,int* count){
-;
+void scheduleFifo(t_trainer* trainers,int* count){
+
 }
 
 void addToExec(t_trainer* ready,int* countReady,t_trainer* exec,t_log* logger){
@@ -419,55 +419,63 @@ void addToExec(t_trainer* ready,int* countReady,t_trainer* exec,t_log* logger){
 }
 
 //TODO - No debería hacer nada; siempre se agregan cosas al final de ready y se sacan del HEAD de ready
-void scheduleRR(t_trainer* trainer,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm){
-	;
+void scheduleRR(t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm){
+	//int quantum = atoi(schedulingAlgorithm)->quantum);
+
+
 }
 
 //TODO
-void scheduleSJFSD(t_trainer* trainer,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm){
+void scheduleSJFSD(t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm){
 ;
 }
 
 //TODO
-void scheduleSJFCD(t_trainer* trainer,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm){
+void scheduleSJFCD(t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm){
 ;
 }
 
 
+//TODO - Cómo hacemos para pasarle el targetedPokemon
+void executeClock(char* schedule,int countReady, t_trainer* trainer, t_pokemon* pokemonTargeted){
 
+	if(getDistanceToPokemonTarget(trainer,pokemonTargeted)!=0){
+		moveTrainetToObjective(trainer, pokemonTargeted);
+	}else if(getDistanceToPokemonTarget(trainer,pokemonTargeted)==0){
+		//CATCH_POKEMON
+	}
+}
 
 
 //TODO - Función que mueve al entrenador - Falta ver como implementaremos los semáforos
-void moveTrainerToObjective(t_trainerParameters* trainer,  t_pokemon pokemonTargeted){
+void moveTrainerToObjective(t_trainer* trainer,  t_pokemon* pokemonTargeted){
 
 	//t_trainerParameters* trainerToMove;
 	//trainerToMove = *trainer;
 	int difference_x;
-	difference_x = calculateDifference(trainer->position.x, pokemonTargeted.position.x);
+	difference_x = calculateDifference(trainer->parameters->position->x, pokemonTargeted->position->x);
 	int difference_y;
-	difference_y = calculateDifference(trainer->position.y, pokemonTargeted.position.y);
+	difference_y = calculateDifference(trainer->parameters->position->y, pokemonTargeted->position->y);
 	//meter semáforos acá
 	moveTrainerToTarget(trainer, difference_x, difference_y);
 	//fin semáforos;
 }
 
 //TODO - funcion que mueve una posición al entrenador - Falta Definir como haremos el CATCH
-void moveTrainerToTarget(t_trainerParameters* trainer, int distanceToMoveInX, int distanceToMoveInY){
+void moveTrainerToTarget(t_trainer* trainer, int distanceToMoveInX, int distanceToMoveInY){
 	if(distanceToMoveInX > 0){
-		trainer->position.x++;
+		trainer->parameters->position.x++;
 	}
 	else if(distanceToMoveInX < 0){
-		trainer->position.x--;
+		trainer->parameters->position.x--;
 	}
 	else if(distanceToMoveInY > 0){
-		trainer->position.y++;
+		trainer->parameters->position.y++;
 	}
 	else if(distanceToMoveInY < 0){
-		trainer->position.y--;
+		trainer->parameters->position.y--;
 	}
-	else{
-		//CATCH_POKEMON
-	}
+
 }
 
 
@@ -487,9 +495,9 @@ int getClockTimeToNewPosition(int difference_x, int difference_y){
 }
 
 //Función que devuelve la distancia hacia el pokemon.  TODO hay que hacer una funcion target generica,porque el target puede ser un trainer tambien (deadlock)
-int getDistanceToPokemonTarget(t_trainerParameters* trainer,  t_pokemon* targetPokemon){
-	int distanceInX = calculateDifference(trainer->position.x, targetPokemon->position.x);
-	int distanceInY = calculateDifference(trainer->position.y, targetPokemon->position.y);
+int getDistanceToPokemonTarget(t_trainer* trainer,  t_pokemon* targetPokemon){
+	int distanceInX = calculateDifference(trainer->parameters->position->x, targetPokemon->position->x);
+	int distanceInY = calculateDifference(trainer->parameters->position->y, targetPokemon->position->y);
 	int distance = getClockTimeToNewPosition(distanceInX, distanceInY);
 	return distance;
 }

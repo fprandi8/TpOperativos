@@ -1,4 +1,5 @@
 #include "pokeio.h"
+#include <stdio.h>
 
 
 int SendAll(int client_socket, char *stream, uint32_t *lenght)
@@ -112,12 +113,12 @@ int Send_NEW(new_pokemon new, int client_socket)
 	return result;
 }
 
-t_package* GetPackage(int client_socket)
+int GetPackage(int client_socket, t_package** recievedPackage)
 {
 	uint32_t op_code;
 	if(recv(client_socket, &op_code, sizeof(uint32_t), MSG_WAITALL) == -1)
 	{
-		return 0;
+		return -1;
 	}
 	else
 	{
@@ -126,22 +127,24 @@ t_package* GetPackage(int client_socket)
 		void* stream = malloc(streamSize);
 		recv(client_socket, stream, streamSize, MSG_WAITALL);
 
-		t_package* recievedPackage = (t_package*)malloc(sizeof(t_package));
-		recievedPackage->operationCode = op_code;
-		recievedPackage->buffer = (t_buffer*)malloc(sizeof(t_buffer));
-		recievedPackage->buffer->bufferSize = streamSize;
-		recievedPackage->buffer->stream = stream;
-		return recievedPackage;
+		t_package* newPackage = (t_package*)malloc(sizeof(t_package));
+		newPackage->operationCode = op_code;
+		newPackage->buffer = (t_buffer*)malloc(sizeof(t_buffer));
+		newPackage->buffer->bufferSize = streamSize;
+		newPackage->buffer->stream = stream;
+		*recievedPackage = newPackage;
+		return 0;
 	}
 }
-
-deli_message* GetMessage(int client_socket)
+/*
+int GetMessage(int client_socket, deli_message* recievedMessage)
 {
 	t_package* package = GetPackage(client_socket);
 	deli_message* message;
 	if(package->operationCode == MESSAGE)
 	{
-		t_message* recievedMessage = DeserializeMessage(package->buffer->stream);
+		free(recievedMessage);
+		recievedMessage = DeserializeMessage(package->buffer->stream);
 		message = (deli_message*)malloc(sizeof(recievedMessage));
 		message->id = recievedMessage->id;
 		message->correlationId = (uint32_t)malloc(sizeof(uint32_t));
@@ -153,10 +156,10 @@ deli_message* GetMessage(int client_socket)
 	}
 	else
 	{
-		message = 0;
+		message = -1;
 	}
 	Free_t_package(package);
-	return message;
+	return 0;
 }
 
 
@@ -180,6 +183,7 @@ uint32_t GetAcknowledge(int client_socket)
 
 message_type GetSubscription(int client_socket)
 {
+	
 	t_package* package = GetPackage(client_socket);
 	message_type type;
 	if(package->operationCode == ACKNOWLEDGE)
@@ -194,6 +198,49 @@ message_type GetSubscription(int client_socket)
 	Free_t_package(package);
 
 	return type;
+}
+*/
+
+int RecievePackage(int client_socket, op_code* operationCode, void** content)
+{
+	t_package* recievedPackage;
+	if(GetPackage(client_socket, &recievedPackage) == 0)
+	{
+		//printf("%i",recievedPackage->operationCode);
+		*operationCode = recievedPackage->operationCode;
+		switch(recievedPackage->operationCode)
+		{
+			case SUBSCRIPTION:
+				{
+				message_type* type = (message_type*)malloc(sizeof(uint32_t));
+				memcpy(type, recievedPackage->buffer->stream, recievedPackage->buffer->bufferSize);
+				*content = (void*)type;
+				break;
+				}
+			case MESSAGE:
+				{
+				t_message* recievedMessage = DeserializeMessage(recievedPackage->buffer->stream);
+				deli_message* message = (deli_message*)malloc(sizeof(deli_message));
+				message->id = recievedMessage->id;
+				message->correlationId = recievedMessage->correlationId;
+				message->messageType = recievedMessage->messageType;
+				message->messageContent = DeserializeMessageContent(recievedMessage->messageType, recievedMessage->messageBuffer->stream);
+				*content = (void*)message;
+				break;
+				}
+			case ACKNOWLEDGE:
+				{
+				uint32_t* id = (void*)malloc(sizeof(uint32_t));
+				memcpy(id, recievedPackage->buffer->stream, recievedPackage->buffer->bufferSize);
+				*content = (void*)id;
+				break;
+				}
+			default:
+				return -1;
+		}
+		return 0;
+	}
+	return -1;
 }
 
 

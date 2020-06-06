@@ -15,6 +15,7 @@ uint32_t ID = 0;
 
 int main(void) {
 
+	start_cache();
 	t_log* logger;
 	t_config* config;
 
@@ -305,5 +306,4 @@ void destroy_queue_handler(t_queue_handler* self){
 t_suscriptor* queue_handler_get_suscriptor(t_queue_handler* self,int pos){
 	return list_get(self->suscriptors,pos);
 }
-
 

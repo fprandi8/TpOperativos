@@ -7,16 +7,19 @@
 
 #include "CacheMemory.h"
 
-int main(void)
+void start_cache(void)
 {
 	//Receives config from Broker
-	t_config* config = get_config();
-	cache cache;
+	config = get_config();
 	define_partition_size();
+	printf("Partition size %d: ", cache.partition_minimum_size);
 	define_cache_maximum_size();
+	printf("memory size %d: ", cache.memory_size);
 	set_full_memory();
+	printf("Memory starting at %d: ", &cache.full_memory);
 
-	return 0;
+
+	int i; // random variable to use for breakpoints
 }
 
 t_config* get_config(){
@@ -32,7 +35,7 @@ void define_cache_maximum_size(void){
 }
 
 void set_full_memory(void){
-	cache.full_memory = (char) malloc(sizeof(cache.memory_size));
+	cache.full_memory = (char) malloc(cache.memory_size);
 }
 
 void save_message(t_message message){
@@ -46,12 +49,17 @@ void save_message_body(t_buffer* messageBuffer){
 	save_body_in_partition(messageBuffer, partition);
 }
 
+void save_body_in_partition(t_buffer* messageBuffer,char *partition){
+
+}
+
+
 char* find_empty_partition_of_size(int size){
 	char *partition = select_partition(size);
-	if(false)//TODO partition found logic
-		compact_memory(void);
-	if(false)//TODO check compact logic
-		delete_partition(void);
+	if(0)//TODO partition found logic
+		compact_memory();
+	if(0)//TODO check compact logic
+		delete_partition();
 }
 
 char* select_partition(int size){
@@ -76,7 +84,7 @@ char* select_partition_bf(int size){
 
 
 void compact_memory(void){
-	check_compact_restrictions(void);
+	check_compact_restrictions();
 	//TODO compact logic
 }
 
@@ -86,9 +94,9 @@ void check_compact_restrictions(void){
 
 void delete_partition(void){
 	if(ALGORITMO_REEMPLAZO){//compare dif algoritmos
-		delete_partition_fifo(void);
+		delete_partition_fifo();
 	}else{
-		delete_partition_lru(void);
+		delete_partition_lru();
 	}
 }
 

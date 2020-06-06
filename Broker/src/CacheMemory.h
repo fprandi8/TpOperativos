@@ -24,16 +24,21 @@
 #include<commons/collections/queue.h>
 #include<commons/collections/list.h>
 #include "utils.h"
-#include "messages.h"
+#include "delibird/comms/messages.h"
 
-typedef struct t_CacheMemory{
+typedef struct{
 	char *full_memory;
 	int partition_minimum_size;
 	int memory_size;
-}cache;
+}t_CacheMemory;
+
+t_CacheMemory cache;
+t_config* config;
+
+void start_cache(void);
 
 //size configuration
-t_config* get_config(t_config* config);
+t_config* get_config(void);
 void define_partition_size(void);
 void define_cache_maximum_size(void);
 //memory reservation

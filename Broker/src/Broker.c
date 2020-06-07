@@ -11,7 +11,6 @@
 #include "Broker.h"
 
 
-sem_t* mutex_id;
 uint32_t ID = 0;
 
 int main(void) {
@@ -24,16 +23,16 @@ int main(void) {
 	char* puerto;
 	int servidor,cliente;
 //	char* tam_men, tam_min_part, algo_mem, algo_reem, algo_part, frec_comp;
-	char* nombre;
+//	char* nombre;
 
 	pthread_t* thread;
 
 	thread = (pthread_t*)malloc(sizeof(pthread_t));
 
-	nombre = (char*)malloc(strlen("mutex_id")+1);
+	//nombre = (char*)malloc(strlen("mutex_id")+1);
 
 	//attach to semaphore, if not exist will be created
-	mutex_id = sem_open(nombre, O_CREAT, S_IRWXU, 1);
+	//mutex_id = sem_open(nombre, O_CREAT, S_IRWXU, 1);
 
 	logger = iniciar_logger();
 	log_info(logger,"PROCESO BROKER ONLINE");
@@ -63,12 +62,7 @@ int main(void) {
 
 		t_args* args= (t_args*) malloc (sizeof (t_args*));
 
-		args->cliente = (int*)malloc (sizeof(int*));;
-		args->mutex = (sem_t*)malloc (sizeof(sem_t*));
-		args->broker = (t_Broker*) malloc (sizeof(t_Broker*));
-
 		args->cliente = &cliente;
-		args->mutex=mutex_id;
 		args->broker = broker;
 
 		printf("Crea un hilo para el cliente %d \n", cliente);
@@ -76,15 +70,10 @@ int main(void) {
 		pthread_create(thread,NULL,(void*)serve_client,args);
 		pthread_detach(*thread);
 
-		free(args->mutex);
-		//free(args->cliente);
-		//free(args);
 	}
 
 	Broker_destroy(broker);
 
-	sem_close(mutex_id);
-	sem_unlink(nombre);
 	return EXIT_SUCCESS;
 }
 
@@ -93,6 +82,7 @@ int main(void) {
 void serve_client(void* variables)
 {
 	char* msg = "CONECTADO \n";
+	t_args* args= (t_args*)variables;
 	int cliente = *((t_args*)variables)->cliente;
 	t_Broker* broker = ((t_args*)variables)->broker;
 	send(cliente, msg, strlen(msg), 0);
@@ -109,6 +99,8 @@ void serve_client(void* variables)
 	t_package* package = GetPackage(cliente);
 	recive_message(package, cliente, broker);
 
+	free(args);
+
 }
 
 
@@ -121,14 +113,14 @@ void recive_message(t_package* package, int cliente, t_Broker* broker){
 			Broker_Suscribe_Process(package->buffer, cliente, broker);
 			break;
 		case MESSAGE:
-			Broker_Process_Message();
+			Broker_Process_Message(package->buffer, cliente, broker);
 			break;
 		case ACKNOWLEDGE:
-			Broker_Get_Acknowledge();
+			Broker_Get_Acknowledge(package->buffer, cliente, broker);
 			break;
 	}
+	free(package);
 }
-
 
 
 t_log* iniciar_logger(void)
@@ -164,6 +156,7 @@ void Broker_initialize(t_Broker* broker){
 	}
 
 	broker->queues = aux;
+	sem_init(&(broker->semaphoreID),0,1);
 }
 
 void Broker_destroy(t_Broker* broker){
@@ -194,10 +187,14 @@ t_queue_handler* Broker_Get_Specific_Queue(t_Broker broker, message_type queueTy
 
 void Broker_Suscribe_Process(t_buffer* buffer, int cliente, t_Broker* broker){
 
-	void* stream = malloc(sizeof(uint32_t));
+	uint32_t* stream = (uint32_t*)malloc(sizeof(uint32_t));
 	memcpy(stream, buffer->stream, buffer->bufferSize);
 
-	uint32_t QueueType = (uint32_t) *(stream);
+
+	uint32_t QueueType = *(stream);
+
+	printf("Cola a la que se quiere suscribir %d \n", QueueType );
+
 
 	t_queue_handler* queueToSuscribe = Broker_Get_Specific_Queue(*(broker), QueueType);
 
@@ -210,15 +207,82 @@ void Broker_Suscribe_Process(t_buffer* buffer, int cliente, t_Broker* broker){
 }
 
 //TODO - implementar los métodos para procesar un acknowledge y un mensaje
-void Broker_Get_Acknowledge(){
+void Broker_Get_Acknowledge(t_buffer* buffer, int cliente, t_Broker* broker){
 
 }
 
-void Broker_Process_Message(){
+void Broker_Assign_id(t_Broker* broker, deli_message* message){
+	sem_wait(&(broker->semaphoreID));
+	ID++;
+	message->id = ID;
+	sem_post(&(broker->semaphoreID));
+
+}
+
+void Broker_Process_Message(t_buffer* buffer, int cliente, t_Broker* broker){
+
+	deli_message* message;
+
+	t_message* recievedMessage = DeserializeMessage(buffer->stream);
+	message = (deli_message*)malloc(sizeof(recievedMessage));
+	message->id = recievedMessage->id;
+
+	Broker_Assign_id(broker, message);
+
+	printf("El ID del mensaje es %d \n", message->id);
+
+	//TODO ver que hacer con el correlation ID, podríamos saber si es necesario hacer algo por el tipo de mensaje
+	message->correlationId = (uint32_t)malloc(sizeof(uint32_t));
+	message->correlationId = recievedMessage->correlationId;
+
+	message->messageType = (uint32_t)malloc(sizeof(uint32_t));
+	message->messageType = recievedMessage->messageType;
+
+	message->messageContent = malloc(sizeof(void*));
+	message->messageContent = DeserializeMessageContent(recievedMessage->messageType, recievedMessage->messageBuffer->stream);
+
+	t_queue_handler* queue = Broker_Get_Specific_Queue(*broker,message->messageType);
+
+	queue_handler_process_message(queue,message);
 
 }
 
 //QUEUE LOGIC
+
+void queue_handler_process_message(t_queue_handler* queue, deli_message* message){
+
+	//TODO lógica de cada mensaje, guardar en cache, enviar a los suscriptores, push en la cola
+	//TODO estructura para administrar mensajes, a quienes se enviaron si fueron recibidos
+	switch (message->messageType) {
+
+		case NEW_POKEMON:
+			puts("new pokemon");
+			break;
+
+		case LOCALIZED_POKEMON:
+			puts("localized pokemon");
+			break;
+
+		case GET_POKEMON:
+			puts("get pokemon");
+			break;
+
+		case APPEARED_POKEMON:
+			puts("appeared pokemon");
+			break;
+
+		case CATCH_POKEMON:
+			puts("catch pokemon");
+			break;
+
+		case CAUGHT_POKEMON:
+			puts("caught pokemon");
+			break;
+	}
+
+}
+
+
 int destroy_queue_list(t_list* self){
 	list_destroy_and_destroy_elements(self,(void*)destroy_queue_handler);
 	return 0;

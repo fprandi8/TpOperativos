@@ -219,6 +219,7 @@ new_pokemon* DeserializeNewPokemon(void* serializedNewPokemon)
 
 	uint32_t sizeOfPokemonName;
 	memcpy(&(sizeOfPokemonName),serializedNewPokemon, sizeof(uint32_t));
+	newPokemon->pokemonName = malloc(sizeOfPokemonName);
 	serializedNewPokemon += sizeof(uint32_t);
 	newPokemon->pokemonName = (char*)malloc(sizeOfPokemonName);
 	memcpy(newPokemon->pokemonName, serializedNewPokemon, sizeOfPokemonName);

@@ -30,7 +30,7 @@ typedef enum
 int main(int argc, char **argv) {
 	puts("GameBoy (Publicador)"); /* prints GameBoy (Publicador) */
 
-	/*
+
 	for(int i = 0; i < argc; i++)
 	{
 		printf("%s\n",argv[i]);
@@ -38,8 +38,9 @@ int main(int argc, char **argv) {
 	printf("-------\n");
 	printf("%i\n",argc);
 	puts("////////////\n\n");
-	// check if config file is exists and is valid
-	*/
+	// TODO check if config file is exists and is valid
+
+
 
 	if(argc < 3)
 	{
@@ -88,38 +89,8 @@ int main(int argc, char **argv) {
 		messageIntegerArguments[u] = argument;
 	}
 
-	/*
-	for(int i = 0; i < numberOfArguments; i++)
-	{
-		printf("%i\n",messageIntegerArguments[i]);
-	}
-	return 0;
-	 */
 
-	void* message = NULL;
 
-	//For the message, try to create the message
-	switch(messageType)
-	{
-		case NEW_POKEMON:
-		{
-			if(numberOfIntegerArguments < 3 || numberOfIntegerArguments > 3)
-			{
-				printf("Incorrect number of arguments for new pokemon\n");
-				return 1;
-			}
-			new_pokemon new = { "", 0, 0, 0};
-			new.pokemonName = pokemonName;
-			new.horizontalCoordinate = messageIntegerArguments[0];
-			new.verticalCoordinate = messageIntegerArguments[1];
-			new.ammount = messageIntegerArguments[2];
-			message = &new;
-			break;
-		}
-		default:
-			printf("Message type not supported\n");
-			return 1;
-	}
 
 	//Get IP from config
 	t_config* config = config_create("gameboy.config");
@@ -150,62 +121,61 @@ int main(int argc, char **argv) {
 
 	if(result == -1)
 	{
-		Printf("Could not connect");
+		printf("Could not connect");
 		return -1;
 	}
 
 	free(server_info);
 
+
+
 	//////////////////////// ENVIAR ////////////////////////////////
 
-	char* mensaje = "Hello";
-	int socket_cliente = server_socket;
+	//TODO Create message as requested and send
 
-	t_buffer* buffer = (t_buffer*) malloc(sizeof(t_buffer));
-	buffer->bufferSize = strlen(mensaje) + 1;
-	buffer->stream = mensaje;
+	/*
 
-	t_package* paquete = (t_package*) malloc(sizeof(t_package));
+	void* message = NULL;
+	//For the message, try to create the message
+	switch(messageType)
+	{
+		case NEW_POKEMON:
+		{
+			if(numberOfIntegerArguments < 3 || numberOfIntegerArguments > 3)
+			{
+				printf("Incorrect number of arguments for new pokemon\n");
+				return 1;
+			}
+			new_pokemon new = { "", 0, 0, 0};
+			new.pokemonName = pokemonName;
+			new.horizontalCoordinate = messageIntegerArguments[0];
+			new.verticalCoordinate = messageIntegerArguments[1];
+			new.ammount = messageIntegerArguments[2];
+			message = &new;
+			break;
+		}
+		default:
+			printf("Message type not supported\n");
+			return 1;
+	}
 
-	paquete->operationCode = MESSAGE;
-	paquete->buffer = buffer;
+	*/
 
-	void* aEnviar = malloc(buffer->bufferSize + sizeof(paquete->operationCode) + sizeof(int));
+	/// Test Sending, TODO Remove
+	Vector2 coordinates[] = {{1,2},{89,34},{75,13}};
+	localized_pokemon localized = {"squirtle", 3, coordinates};
+	Send_LOCALIZED(localized, server_socket);
+	//SendSubscriptionRequest(APPEARED_POKEMON, server_socket);
+	//SendMessageAcknowledge(319, server_socket);
 
-	int offset = 0;
-	memcpy(aEnviar + offset, &(paquete->operationCode), sizeof(paquete->operationCode));
-	offset += sizeof(paquete->operationCode);
-	memcpy(aEnviar + offset, &(paquete->buffer->bufferSize), sizeof(int));
-	offset += sizeof(int);
-	memcpy(aEnviar + offset, paquete->buffer->stream, paquete->buffer->bufferSize);
 
-	send(socket_cliente, aEnviar, buffer->bufferSize +  sizeof(int) + sizeof(paquete->operationCode), 0);
-	printf("Mensaje Enviado\n");
+	//////////////////////// RECIBIR ACKNOWLEDGE ///////////////////
 
-	free(aEnviar);
-	free(paquete->buffer);
-	free(paquete);
-
-	//////////////////////// RECIBIR ////////////////////////////////
-
-	op_code operacion;
-	recv(socket_cliente, &operacion, sizeof(operacion), 0);
-	int messageSize;
-	recv(socket_cliente, &messageSize, sizeof(messageSize), 0);
-	char* message2 = malloc(messageSize);
-	recv(socket_cliente, message2, messageSize, 0);
-
-	printf("%s\n",message2);
+	//TODO
 
 	//////////////////////// END ////////////////////////////////
 
-	//Send message
-
-	//Wait for response
-
-	//On any fail,Inform it and terminate the program
-
-	//On succes, show the acknowledge and terminate the program
+	close(server_socket);
 
 
 	return EXIT_SUCCESS;

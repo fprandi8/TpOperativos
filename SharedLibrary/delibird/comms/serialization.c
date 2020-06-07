@@ -114,12 +114,12 @@ t_package* DeserializePackage(void* serializedPackage)
 {
 	t_package* package = (t_package*)malloc(sizeof(t_package));
 	package->buffer = (t_buffer*)malloc(sizeof(t_buffer));
-	package->buffer->stream = malloc(sizeof(void*));
 
 	memcpy(&(package->operationCode), serializedPackage, sizeof(uint32_t));
 	serializedPackage += sizeof(uint32_t);
 	memcpy(&(package->buffer->bufferSize), serializedPackage, sizeof(uint32_t));
 	serializedPackage += sizeof(uint32_t);
+	package->buffer->stream = malloc(package->buffer->bufferSize);
 	memcpy(&(package->buffer->stream), serializedPackage, package->buffer->bufferSize);
 
 	return package;
@@ -187,6 +187,7 @@ new_pokemon* DeserializeNewPokemon(void* serializedNewPokemon)
 	memcpy(&(sizeOfPokemonName),serializedNewPokemon, sizeof(uint32_t));
 	newPokemon->pokemonName = malloc(sizeOfPokemonName);
 	serializedNewPokemon += sizeof(uint32_t);
+	newPokemon->pokemonName = (char*)malloc(sizeOfPokemonName);
 	memcpy(newPokemon->pokemonName, serializedNewPokemon, sizeOfPokemonName);
 	serializedNewPokemon += sizeOfPokemonName;
 	memcpy(&(newPokemon->horizontalCoordinate), serializedNewPokemon, sizeof(uint32_t));

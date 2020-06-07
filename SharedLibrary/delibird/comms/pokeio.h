@@ -23,8 +23,11 @@ void Send_LOCALIZED(localized_pokemon localized, int socket_cliente);
 void Send_GET(get_pokemon get, int socket_cliente);
 */
 
-message_type GetSubscription(int client_socket);
+//REMOVED
+/*message_type GetSubscription(int client_socket);
 uint32_t GetAcknowledge(int client_socket);
-deli_message* GetMessage(int client_socket);
+deli_message* GetMessage(int client_socket);*/
+
+int RecievePackage(int client_socket, op_code* operationCode, void** content);
 
 #endif

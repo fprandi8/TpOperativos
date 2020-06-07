@@ -3,6 +3,7 @@
 	<name>GameBoy</name>
 	<comment></comment>
 	<projects>
+		<project>SharedLibray</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

@@ -16,7 +16,6 @@ void Free_t_package(t_package* package)
 
 void Free_deli_message(deli_message* message)
 {
-	free(message->messageContent);
 	free(message);
 }
 

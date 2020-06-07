@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <delibird/comms/messages.h>
+#include <delibird/comms/pokeio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>

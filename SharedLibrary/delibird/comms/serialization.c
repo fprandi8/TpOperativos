@@ -108,6 +108,39 @@ t_buffer* SerializeNewPokemon(new_pokemon* newPokemon)
 	return newBuffer;
 }
 
+t_buffer* SerializeLocalizedPokemon(localized_pokemon* localizedPokemon)
+{
+	//size of name, name, ammount in x, cordinates
+	uint32_t sizeOfPokemonName = strlen(localizedPokemon->pokemonName) + 1;
+
+	t_buffer* newBuffer = (t_buffer*)malloc(sizeof(t_buffer));
+	newBuffer->bufferSize = sizeof(uint32_t) * 2 + sizeOfPokemonName + sizeof(uint32_t) * localizedPokemon->ammount * 2;
+
+	void* localizedPokemonSerialized = malloc(newBuffer->bufferSize);
+
+	uint32_t offset = 0;
+	memcpy(localizedPokemonSerialized + offset, &(sizeOfPokemonName), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+	memcpy(localizedPokemonSerialized + offset, localizedPokemon->pokemonName, sizeOfPokemonName);
+	offset += sizeOfPokemonName;
+	memcpy(localizedPokemonSerialized + offset, &(localizedPokemon->ammount),  sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+
+	for(int i = 0; i < (localizedPokemon->ammount); i++)
+	{
+		memcpy(localizedPokemonSerialized + offset, &(localizedPokemon->coordinates[i].x), sizeof(uint32_t));
+		offset += sizeof(uint32_t);
+		memcpy(localizedPokemonSerialized + offset, &(localizedPokemon->coordinates[i].y), sizeof(uint32_t));
+		offset += sizeof(uint32_t);
+	}
+
+	newBuffer->stream = localizedPokemonSerialized;
+
+	return newBuffer;
+}
+
+
+
 // ---- De-serialization ----------------
 
 t_package* DeserializePackage(void* serializedPackage)
@@ -154,10 +187,11 @@ void* DeserializeMessageContent(message_type type, void* serializedContent)
 		case NEW_POKEMON:
 			content = (void*)DeserializeNewPokemon(serializedContent);
 			break;
-			//TODO Complete implementation
-		/*case LOCALIZED_POKEMON:
-			serializedContent = DeserializeLocalizedPokemon(content);
+		case LOCALIZED_POKEMON:
+			content = (void*)DeserializeLocalizedPokemon(serializedContent);
 			break;
+			//TODO Complete implementation
+		/*
 		case GET_POKEMON:
 			serializedContent = DeserializeGetPokemon(content);
 			break;
@@ -198,4 +232,30 @@ new_pokemon* DeserializeNewPokemon(void* serializedNewPokemon)
 	return newPokemon;
 }
 
+localized_pokemon* DeserializeLocalizedPokemon(void* serializedLocalizedPokemon)
+{
+	//size of name, name, cordinate in x, cordinate in y, ammoun of pokemon
+	localized_pokemon* localizedPokemon = (localized_pokemon*)malloc(sizeof(localized_pokemon));
+
+	uint32_t sizeOfPokemonName;
+	memcpy(&(sizeOfPokemonName),serializedLocalizedPokemon, sizeof(uint32_t));
+	serializedLocalizedPokemon += sizeof(uint32_t);
+	localizedPokemon->pokemonName = (char*)malloc(sizeOfPokemonName);
+	memcpy(localizedPokemon->pokemonName, serializedLocalizedPokemon, sizeOfPokemonName);
+	serializedLocalizedPokemon += sizeOfPokemonName;
+	memcpy(&(localizedPokemon->ammount), serializedLocalizedPokemon,  sizeof(uint32_t));
+	serializedLocalizedPokemon += sizeof(uint32_t);
+
+	localizedPokemon->coordinates = (uint32_t*)malloc(sizeof(uint32_t)*localizedPokemon->ammount*2);
+
+	for(int i = 0; i < (localizedPokemon->ammount); i++)
+	{
+		memcpy( &(localizedPokemon->coordinates[i].x), serializedLocalizedPokemon, sizeof(uint32_t));
+		serializedLocalizedPokemon += sizeof(uint32_t);
+		memcpy( &(localizedPokemon->coordinates[i].y), serializedLocalizedPokemon, sizeof(uint32_t));
+		serializedLocalizedPokemon += sizeof(uint32_t);
+	}
+	
+	return localizedPokemon;
+}
 

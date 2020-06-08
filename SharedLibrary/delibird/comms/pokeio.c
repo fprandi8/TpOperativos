@@ -96,11 +96,11 @@ int SendMessage(deli_message deliMessage, int client_socket)
 	return result;
 }
 
-int _send_message(t_buffer* messageBuffer, message_type type, int client_socket)
+int _send_message(t_buffer* messageBuffer, message_type type, uint32_t corelationId, int client_socket)
 {
 	t_message* message = (t_message*)malloc(sizeof(t_message));
 	message->id = 0;
-	message->correlationId = 0;
+	message->correlationId = corelationId;
 	message->messageType = type;
 	message->messageBuffer = messageBuffer;
 
@@ -119,16 +119,29 @@ int Send_NEW(new_pokemon new, int client_socket)
 	int result = _send_message(
 		SerializeNewPokemon(&new),
 		NEW_POKEMON,
+		0,
 		client_socket
 	);
 	return result;
 }
 
-int Send_LOCALIZED(localized_pokemon localized, int client_socket)
+int Send_LOCALIZED(localized_pokemon localized, uint32_t corelationId, int client_socket)
 {
 	int result = _send_message(
 		SerializeLocalizedPokemon(&localized),
 		LOCALIZED_POKEMON,
+		corelationId,
+		client_socket
+	);
+	return result;
+}
+
+int Send_GET(get_pokemon get, int client_socket)
+{
+	int result = _send_message(
+		SerializeGetPokemon(&get),
+		GET_POKEMON,
+		0,
 		client_socket
 	);
 	return result;

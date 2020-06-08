@@ -147,6 +147,17 @@ int Send_GET(get_pokemon get, int client_socket)
 	return result;
 }
 
+int Send_CATCH(catch_pokemon catch, int client_socket)
+{
+	int result = _send_message(
+		SerializeCatchPokemon(&catch),
+		CATCH_POKEMON,
+		0,
+		client_socket
+	);
+	return result;
+}
+
 
 int GetPackage(int client_socket, t_package** recievedPackage)
 {

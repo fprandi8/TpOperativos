@@ -35,7 +35,7 @@ void define_cache_maximum_size(void){
 }
 
 void set_full_memory(void){
-	cache.full_memory = (char) malloc(cache.memory_size);
+	cache.full_memory = (char) malloc(cache.memory_size * sizeof(char));
 }
 
 void save_message(t_message message){

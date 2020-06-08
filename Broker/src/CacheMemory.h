@@ -27,10 +27,14 @@
 #include "delibird/comms/messages.h"
 
 typedef struct{
-	char *full_memory;
+	char* full_memory;
 	int partition_minimum_size;
 	int memory_size;
 }t_CacheMemory;
+
+typedef struct{
+
+}t_partition;
 
 t_CacheMemory cache;
 t_config* config;

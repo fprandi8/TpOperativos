@@ -7,7 +7,6 @@
  Description : Team Process
  ============================================================================
  */
-
 #include "Team.h"
 
 t_pokemon* localized_pokemon;

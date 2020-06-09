@@ -13,6 +13,7 @@ int SendSubscriptionRequest(message_type queueType, int client_socket);
 int SendMessage(deli_message message, int client_socket);
 
 int Send_NEW(new_pokemon new, int client_socket);
+int Send_LOCALIZED(localized_pokemon localized, int client_socket);
 
 //TODO Implement the rest
 /*

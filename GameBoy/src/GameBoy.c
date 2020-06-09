@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <delibird/comms/messages.h>
+#include <delibird/comms/pokeio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -24,12 +25,24 @@ typedef enum
 	BROKER = 1,
 	GAMECARD = 2,
 	TEAM = 3,
+	SUSCRIPTOR = 4
 } t_reciever;
+
+struct Broker
+{
+	char* ipKey;
+	char* ip;
+	char* portKey;
+	char* port;
+} broker;
+
+void initBroker(struct Broker*);
+void readConfigBrokerValues(t_config*,struct Broker*);
 
 int main(int argc, char **argv) {
 	puts("GameBoy (Publicador)"); /* prints GameBoy (Publicador) */
 
-	/*
+
 	for(int i = 0; i < argc; i++)
 	{
 		printf("%s\n",argv[i]);
@@ -37,10 +50,11 @@ int main(int argc, char **argv) {
 	printf("-------\n");
 	printf("%i\n",argc);
 	puts("////////////\n\n");
-	// check if config file is exists and is valid
-	*/
+	// TODO check if config file is exists and is valid
 
-	if(argc < 3)
+
+
+	if(argc < 2)
 	{
 		printf("Incorrect number of parameters for any function\n");
 		return 1;
@@ -48,33 +62,129 @@ int main(int argc, char **argv) {
 
 	//Check if reciever is valid
 	t_reciever reciver;
-
-	if(strcmp(argv[1], "BROKER")) 		{ reciver = BROKER; }
-	else if(strcmp(argv[1],"GAMECARD")) { reciver = GAMECARD; }
-	else if(strcmp(argv[1],"GAMECARD")) { reciver = TEAM; }
-	else
-	{
-		printf("Invalid message reciever\n");
-		return 1;
-	}
-
-	//Check if message type is valid
 	message_type messageType;
 
-	if(strcmp(argv[2], "NEW_POKEMON") == 0) 				{ messageType = NEW_POKEMON; }
-	else if(strcmp(argv[2], "LOCALIZED_POKEMON")) 	{ messageType = LOCALIZED_POKEMON; }
-	else if(strcmp(argv[2], "GET_POKEMON")) 		{ messageType = GET_POKEMON; }
-	else if(strcmp(argv[2], "APPEARED_POKEMON")) 	{ messageType = APPEARED_POKEMON; }
-	else if(strcmp(argv[2], "CATCH_POKEMON")) 		{ messageType = CATCH_POKEMON; }
-	else if(strcmp(argv[2], "CAUGHT_POKEMON")) 		{ messageType = CAUGHT_POKEMON; }
+	if(strcmp(argv[1], "BROKER") == 0){
+		reciver = BROKER;
+		if(strcmp(argv[2], "NEW_POKEMON") == 0){
+			if(argc == 7){
+				messageType = NEW_POKEMON;
+			}else{
+				printf("Incorrect number of parameters for function BROKER - NEW POKEMON, must be 6\n");
+				return 1;
+			}
+		}else if(strcmp(argv[2], "APPEARED_POKEMON") == 0){
+			if(argc == 7){
+				messageType = APPEARED_POKEMON;
+			}else{
+				printf("Incorrect number of parameters for function BROKER - APPEARED_POKEMON, must be 6\n");
+				return 1;
+			}
+		}else if(strcmp(argv[2], "CATCH_POKEMON") == 0){
+			if(argc == 6){
+				messageType = CATCH_POKEMON;
+			}else{
+				printf("Incorrect number of parameters for function BROKER - CATCH_POKEMON, must be 5\n");
+				return 1;
+			}
+		}else if(strcmp(argv[2], "CAUGHT_POKEMON") == 0){
+			if(argc == 5){
+				messageType = CAUGHT_POKEMON;
+			}else{
+				printf("Incorrect number of parameters for function BROKER - CAUGHT_POKEMON, must be 4\n");
+				return 1;
+			}
+		}else if(strcmp(argv[2], "GET_POKEMON") == 0){
+			if(argc == 4){
+				messageType = GET_POKEMON;
+			}else{
+				printf("Incorrect number of parameters for function BROKER - GET_POKEMON, must be 3\n");
+				return 1;
+			}
+		}else{
+
+			printf("Incorrect message, for Broker must be one of: GET_POKEMON, CAUGHT_POKEMON, CATCH_POKEMON, NEW POKEMON, APPEARED_POKEMON \n");
+			return 1;
+		}
+
+	}else if(strcmp(argv[1],"GAMECARD")) {
+		reciver = GAMECARD;
+		if(strcmp(argv[2], "NEW_POKEMON") == 0){
+					if(argc == 8){
+						messageType = NEW_POKEMON;
+					}else{
+						printf("Incorrect number of parameters for function GAMECARD - NEW POKEMON, must be 7\n");
+						return 1;
+					}
+				}else if(strcmp(argv[2], "CATCH_POKEMON") == 0){
+					if(argc == 7){
+						messageType = CATCH_POKEMON;
+					}else{
+						printf("Incorrect number of parameters for function GAMECARD - CATCH_POKEMON, must be 6\n");
+						return 1;
+					}
+				}else if(strcmp(argv[2], "GET_POKEMON") == 0){
+					if(argc == 5){
+						messageType = GET_POKEMON;
+					}else{
+						printf("Incorrect number of parameters for function GAMECARD - GET_POKEMON, must be 4\n");
+						return 1;
+					}
+				}else{
+
+					printf("Incorrect message, for GAMECARD must be one of: GET_POKEMON, CATCH_POKEMON, NEW POKEMON \n");
+					return 1;
+				}
+	}
+	else if(strcmp(argv[1],"TEAM")) {
+		reciver = TEAM;
+		if(strcmp(argv[2], "APPEARED_POKEMON") == 0){
+			if(argc == 6){
+				messageType = APPEARED_POKEMON;
+			}else{
+				printf("Incorrect number of parameters for function TEAM - APPEARED_POKEMON, must be 5\n");
+				return 1;
+			}
+		}else{
+
+			printf("Incorrect message, for TEAM must be APPEARED_POKEMON \n");
+			return 1;
+		}
+	}else if(strcmp(argv[1],"SUSCRIPTOR")) {
+		reciver = SUSCRIPTOR;
+		if(argc == 4){
+			if(strcmp(argv[2], "NEW_POKEMON") == 0){
+				messageType = NEW_POKEMON;
+			}else if(strcmp(argv[2], "LOCALIZED_POKEMON") == 0){
+				messageType = LOCALIZED_POKEMON;
+			}else if(strcmp(argv[2], "GET_POKEMON") == 0){
+				messageType = GET_POKEMON;
+			}else if(strcmp(argv[2], "APPEARED_POKEMON") == 0){
+				messageType = APPEARED_POKEMON;
+			}else if(strcmp(argv[2], "CATCH_POKEMON") == 0){
+				messageType = CATCH_POKEMON;
+			}else if(strcmp(argv[2], "CAUGHT_POKEMON") == 0){
+				messageType = CAUGHT_POKEMON;
+			}else{
+				printf("Incorrect message, for SUSCRIPTOR must be GET_POKEMON, CAUGHT_POKEMON, CATCH_POKEMON, NEW POKEMON, APPEARED_POKEMON, LOCALIZED_POKEMON \n");
+				return 1;
+			}
+		}else{
+
+			printf("Incorrect number of parameters for function SUSCRIPTOR, must be 3\n");
+			return 1;
+		}
+	}
 	else
 	{
-		printf("Message type is invalid or not yet supported\n");
+		printf("Invalid message reciever, must be one of: BROKER, TEAM, GAMECARD, SUSCRIPTOR \n");
 		return 1;
 	}
 
 	char* pokemonName = argv[3];
+	printf("%s \n",pokemonName);
 	int numberOfIntegerArguments = argc-4;
+	printf("%i \n",numberOfIntegerArguments);
 	int* messageIntegerArguments = (int*)malloc(sizeof(int)*numberOfIntegerArguments);
 	for(int i = 4, u = 0; u < numberOfIntegerArguments; i++, u++)
 	{
@@ -87,16 +197,54 @@ int main(int argc, char **argv) {
 		messageIntegerArguments[u] = argument;
 	}
 
-	/*
-	for(int i = 0; i < numberOfArguments; i++)
+
+	//Get IP from config
+	t_config* config = config_create("gameboy.config");
+
+	initBroker(&broker);
+	readConfigBrokerValues(config,&broker);
+
+	/*char* brokerIp = config_get_string_value(config, "IP_BROKER");
+	char* teamIp = config_get_string_value(config, "IP_TEAM");
+	char* gameCardIp = config_get_string_value(config, "IP_GAMECARD");
+
+	char* brokerPort = config_get_string_value(config, "PUERTO_BROKER");
+	char* teamPort = config_get_string_value(config, "PUERTO_TEAM");
+	char* gameCardPort = config_get_string_value(config, "PUERTO_GAMECARD");
+*/
+
+	struct addrinfo hints;
+	struct addrinfo *server_info;
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_flags = AI_PASSIVE;
+
+	getaddrinfo(broker.ip, broker.port, &hints, &server_info);
+
+	int server_socket = socket(server_info->ai_family, server_info->ai_socktype, server_info->ai_protocol);
+
+	//Connect
+	int result = connect(server_socket, server_info->ai_addr, server_info->ai_addrlen);
+
+	if(result == -1)
 	{
-		printf("%i\n",messageIntegerArguments[i]);
+		printf("Could not connect");
+		return -1;
 	}
-	return 0;
-	 */
+
+	free(server_info);
+
+
+
+	//////////////////////// ENVIAR ////////////////////////////////
+
+	//TODO Create message as requested and send
+
+	/*
 
 	void* message = NULL;
-
 	//For the message, try to create the message
 	switch(messageType)
 	{
@@ -120,92 +268,48 @@ int main(int argc, char **argv) {
 			return 1;
 	}
 
-	//Get IP from config
-	t_config* config = config_create("gameboy.config");
+	*/
 
-	char* brokerIp = config_get_string_value(config, "IP_BROKER");
-	char* teamIp = config_get_string_value(config, "IP_TEAM");
-	char* gameCardIp = config_get_string_value(config, "IP_GAMECARD");
-
-	char* brokerPort = config_get_string_value(config, "PUERTO_BROKER");
-	char* teamPort = config_get_string_value(config, "PUERTO_TEAM");
-	char* gameCardPort = config_get_string_value(config, "PUERTO_GAMECARD");
+	/// Test Sending, TODO Remove
+	Vector2 coordinates[] = {{1,2},{89,34},{75,13}};
+	localized_pokemon localized = {"squirtle", 3, coordinates};
+	Send_LOCALIZED(localized, server_socket);
+	//SendSubscriptionRequest(APPEARED_POKEMON, server_socket);
+	//SendMessageAcknowledge(319, server_socket);
 
 
-	struct addrinfo hints;
-	struct addrinfo *server_info;
+	//////////////////////// RECIBIR ACKNOWLEDGE ///////////////////
 
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_STREAM;
-	hints.ai_flags = AI_PASSIVE;
-
-	getaddrinfo(brokerIp, brokerPort, &hints, &server_info);
-
-	int server_socket = socket(server_info->ai_family, server_info->ai_socktype, server_info->ai_protocol);
-
-	//Connect
-	int result = connect(server_socket, server_info->ai_addr, server_info->ai_addrlen);
-
-	if(result == -1)
-	{
-		Printf("Could not connect");
-		return -1;
-	}
-
-	free(server_info);
-
-	//////////////////////// ENVIAR ////////////////////////////////
-
-	char* mensaje = "Hello";
-	int socket_cliente = server_socket;
-
-	t_buffer* buffer = (t_buffer*) malloc(sizeof(t_buffer));
-	buffer->bufferSize = strlen(mensaje) + 1;
-	buffer->stream = mensaje;
-
-	t_package* paquete = (t_package*) malloc(sizeof(t_package));
-
-	paquete->operationCode = MESSAGE;
-	paquete->buffer = buffer;
-
-	void* aEnviar = malloc(buffer->bufferSize + sizeof(paquete->operationCode) + sizeof(int));
-
-	int offset = 0;
-	memcpy(aEnviar + offset, &(paquete->operationCode), sizeof(paquete->operationCode));
-	offset += sizeof(paquete->operationCode);
-	memcpy(aEnviar + offset, &(paquete->buffer->bufferSize), sizeof(int));
-	offset += sizeof(int);
-	memcpy(aEnviar + offset, paquete->buffer->stream, paquete->buffer->bufferSize);
-
-	send(socket_cliente, aEnviar, buffer->bufferSize +  sizeof(int) + sizeof(paquete->operationCode), 0);
-	printf("Mensaje Enviado\n");
-
-	free(aEnviar);
-	free(paquete->buffer);
-	free(paquete);
-
-	//////////////////////// RECIBIR ////////////////////////////////
-
-	op_code operacion;
-	recv(socket_cliente, &operacion, sizeof(operacion), 0);
-	int messageSize;
-	recv(socket_cliente, &messageSize, sizeof(messageSize), 0);
-	char* message2 = malloc(messageSize);
-	recv(socket_cliente, message2, messageSize, 0);
-
-	printf("%s\n",message2);
+	//TODO
 
 	//////////////////////// END ////////////////////////////////
 
-	//Send message
-
-	//Wait for response
-
-	//On any fail,Inform it and terminate the program
-
-	//On succes, show the acknowledge and terminate the program
+	close(server_socket);
 
 
 	return EXIT_SUCCESS;
+}
+
+void readConfigBrokerValues(t_config *config,struct Broker *broker){
+	printf("2. Comienza lectura de config de broker\n");
+	if (config_has_property(config,broker->ipKey)){
+		broker->ip=config_get_string_value(config,broker->ipKey);
+		printf("2. Se leyó la IP: %s\n",broker->ip);
+	}else{
+		exit(-3);
+	}
+
+	if (config_has_property(config,broker->portKey)){
+		broker->port=config_get_string_value(config,broker->portKey);
+		printf("2. Se leyó el puerto: %s\n",broker->port);
+	}else{
+		exit(-3);
+	}
+	printf("2. Finaliza lectura de config de broker\n");
+}
+
+void initBroker(struct Broker *broker){
+	broker->ipKey="IP_BROKER";
+	broker->portKey="PUERTO_BROKER";
+
 }

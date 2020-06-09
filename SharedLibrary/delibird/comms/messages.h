@@ -52,6 +52,12 @@ typedef struct
 
 typedef struct
 {
+	uint32_t x;
+	uint32_t y;
+} Vector2;
+
+typedef struct
+{
 	uint32_t id;
 	uint32_t correlationId;
 	uint32_t messageType;
@@ -72,7 +78,7 @@ typedef struct
 {
 	char* pokemonName;
 	uint32_t ammount;
-	uint32_t* coordinates;
+	Vector2* coordinates;
 } localized_pokemon;
 
 // struct for get_pokemon

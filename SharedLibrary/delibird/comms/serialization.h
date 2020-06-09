@@ -17,10 +17,11 @@ t_message* ConvertDeliMessageToMessage(deli_message* deliMessage);
 void* SerializeDeliMessage(deli_message*);
 
 t_buffer* SerializeNewPokemon(new_pokemon*);
+t_buffer *SerializeLocalizedPokemon(localized_pokemon*);
+
 
 //TODO Implement this
 /*
-t_buffer *SerializeLocalizedPokemon(localized_pokemon);
 t_buffer *SerializeGetPokemon(get_pokemon);
 t_buffer *SerializeAppearedPokemon(appeared_pokemon);
 t_buffer *SerializeCatchPokemon(catch_pokemon);
@@ -33,10 +34,10 @@ t_message* DeserializeMessage(void*);
 void* DeserializeMessageContent(message_type, void*);
 
 new_pokemon *DeserializeNewPokemon(void*);
+localized_pokemon *DeserializeLocalizedPokemon(void*);
 
 //TODO Implement this
 /*
-localized_pokemon *DeserializeLocalizedPokemon(void*);
 get_pokemon *DeserializeGetPokemon(void*);
 appeared_pokemon *DeserializeAppearedPokemon(void*);
 catch_pokemon *DeserializeCatchPokemon(void*);

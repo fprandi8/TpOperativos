@@ -242,30 +242,27 @@ int main(int argc, char **argv) {
 
 	//TODO Create message as requested and send
 
-	/*
 
+/*
 	void* message = NULL;
 	//For the message, try to create the message
-	switch(messageType)
-	{
-		case NEW_POKEMON:
-		{
-			if(numberOfIntegerArguments < 3 || numberOfIntegerArguments > 3)
-			{
-				printf("Incorrect number of arguments for new pokemon\n");
+	switch(reciver){
+		case BROKER:{
+				switch(messageType){
+					case NEW_POKEMON:
+						new_pokemon new = { "", 0, 0, 0};
+						new.pokemonName = pokemonName;
+						new.horizontalCoordinate = messageIntegerArguments[0];
+						new.verticalCoordinate = messageIntegerArguments[1];
+						new.ammount = messageIntegerArguments[2];
+						message = &new;
+						break;
+					case
+			}
+			default:
+				printf("Message type not supported\n");
 				return 1;
 			}
-			new_pokemon new = { "", 0, 0, 0};
-			new.pokemonName = pokemonName;
-			new.horizontalCoordinate = messageIntegerArguments[0];
-			new.verticalCoordinate = messageIntegerArguments[1];
-			new.ammount = messageIntegerArguments[2];
-			message = &new;
-			break;
-		}
-		default:
-			printf("Message type not supported\n");
-			return 1;
 	}
 
 	*/

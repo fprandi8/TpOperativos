@@ -10,6 +10,8 @@
 
 #include "Team.h"
 
+t_pokemon* localized_pokemon;
+
 int main(void) {
 	t_config* config;
 	int teamSocket;
@@ -19,7 +21,7 @@ int main(void) {
 	t_trainer* new;
 	int trainersCount;
 	t_log* logger;
-	pthread_t* ready,exec;
+	t_trainer* ready,exec;
 	int readyCount,execCount;
 	t_pokemon* missingPkms;
 
@@ -375,19 +377,19 @@ int getTrainersCount(t_config *config,t_log* logger) {
 	return count;
 }
 
-void schedule(t_trainer* trainers,int* readyCount,struct SchedulingAlgorithm schedulingAlgorithm,t_log* logger){//Para el caso de FIFO y RR no hace nada, ya que las listas están ordenadas por FIFO y RR solo cambia como se procesa.
+void schedule(t_trainer* trainers,int* readyCount,struct SchedulingAlgorithm schedulingAlgorithm,t_trainer* exec, t_log* logger){//Para el caso de FIFO y RR no hace nada, ya que las listas están ordenadas por FIFO y RR solo cambia como se procesa.
 	if (strcmp(schedulingAlgorithm.algorithm,"FIFO")==0){
-		scheduleFifo(trainers,readyCount);
+		scheduleFifo(trainers,readyCount, exec, logger);
 	}else if(strcmp(schedulingAlgorithm.algorithm,"RR")==0){
-		scheduleRR(trainers,readyCount,schedulingAlgorithm);
+		scheduleRR(trainers,readyCount,schedulingAlgorithm, exec, logger);
 	}else if(strcmp(schedulingAlgorithm.algorithm,"SJF-SD")==0){
-		scheduleSJFSD(trainers,readyCount,schedulingAlgorithm);
+		scheduleSJFSD(trainers,readyCount,schedulingAlgorithm, exec, logger);
 	}else if(strcmp(schedulingAlgorithm.algorithm,"SJF-CD")==0){
-		scheduleSJFCD(trainers,readyCount,schedulingAlgorithm);
+		scheduleSJFCD(trainers,readyCount,schedulingAlgorithm, exec, logger);
 	}
 }
 
-void addToReady(t_trainer* trainer,t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm,t_log* logger){
+void addToReady(t_trainer* trainer,t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm,t_log* logger, t_trainer* exec){
 	void* temp = realloc(trainers,sizeof(t_trainer)*((*countReady)+1));
 	if (!temp){
 		log_debug(logger,"error en realloc");
@@ -396,11 +398,11 @@ void addToReady(t_trainer* trainer,t_trainer* trainers,int* countReady,struct Sc
 	(trainers)=temp;
 	(trainers)[(*countReady)]=(*trainer);
 	(*countReady)++;
-	schedule(trainers,countReady,schedulingAlgorithm,logger);
+	schedule(trainers,countReady,schedulingAlgorithm,exec, logger);
 }
 
 //TODO - No debería hacer nada; siempre se agregan cosas al final de ready y se sacan del HEAD de ready
-void scheduleFifo(t_trainer* trainers,int* count){
+void scheduleFifo(t_trainer* trainers,int* count, t_trainer* exec, t_log* logger){
 
 }
 
@@ -418,31 +420,40 @@ void addToExec(t_trainer* ready,int* countReady,t_trainer* exec,t_log* logger){
 		ready=temp;
 }
 
-//TODO - No debería hacer nada; siempre se agregan cosas al final de ready y se sacan del HEAD de ready
-void scheduleRR(t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm){
-	//int quantum = atoi(schedulingAlgorithm)->quantum);
-
-
+//TODO - cuando termina el quantum mandar al final de la lista de ready.
+void scheduleRR(t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_trainer* exec, t_log* logger){
+	while((&countReady)){
+		int i=0;
+		t_trainer* trainer;
+		trainer = ((&trainers)[i]);
+		addToExec(trainer, countReady, exec, logger);
+		for(int j=0;j<=(int)(schedulingAlgorithm.quantum);j++){
+			executeClock(&countReady, exec, localized_pokemon);
+		}
+		(*countReady)--;
+	}
 }
 
 //TODO
-void scheduleSJFSD(t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm){
+void scheduleSJFSD(t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_trainer* exec, t_log* logger){
 ;
 }
 
 //TODO
-void scheduleSJFCD(t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm){
+void scheduleSJFCD(t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_trainer* exec, t_log* logger){
 ;
 }
 
 
 //TODO - Cómo hacemos para pasarle el targetedPokemon
-void executeClock(char* schedule,int countReady, t_trainer* trainer, t_pokemon* pokemonTargeted){
+int executeClock(int countReady, t_trainer* trainer, t_pokemon* pokemonTargeted){
 
 	if(getDistanceToPokemonTarget(trainer,pokemonTargeted)!=0){
 		moveTrainerToObjective(trainer, pokemonTargeted);
+		return 1;
 	}else if(getDistanceToPokemonTarget(trainer,pokemonTargeted)==0){
-		//CATCH_POKEMON
+		//CATCH_POKEMON(localized_pokemon)
+		return 0;
 	}
 }
 

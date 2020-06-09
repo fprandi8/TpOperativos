@@ -18,8 +18,10 @@
 
 #include<stdio.h>
 #include<stdlib.h>
-#include<stdint.h>
+#include <stdbool.h>
+#include<stduint32_t.h>
 #include<unistd.h>
+#include <time.h>
 #include<commons/log.h>
 #include<commons/collections/queue.h>
 #include<commons/collections/list.h>
@@ -28,16 +30,32 @@
 
 typedef struct{
 	char* full_memory;
-	int partition_minimum_size;
-	int memory_size;
+	uint32_t partition_minimum_size;
+	uint32_t memory_size;
 }t_CacheMemory;
 
 typedef struct{
-
+	//partition number would be generated when iterating the list
+	uint32_t id; //check if partition id or message id
+	char* begining;
+	uint32_t size;
+	message_type queue_type;
+	bool free;
+	clock_t timestap; //use clock() get a stamp
 }t_partition;
+
+typedef struct{
+	uint32_t id;
+	message_type queue_type;
+	t_list* sent_to_subscribers;
+	t_list* ack_by_subscribers;
+	char* memory_location;
+}t_cachedMessage;
 
 t_CacheMemory cache;
 t_config* config;
+t_list* cached_messages;
+t_list* partitions;
 
 void start_cache(void);
 
@@ -52,14 +70,14 @@ void save_message(t_message message);
 t_buffer* get_message_body(); //implement if needed
 void save_message_body(t_buffer* messageBuffer); //see if we need to return a value
 //partition handlers
-char* find_empty_partition_of_size(int size);
+char* find_empty_partition_of_size(uint32_t size);
 void save_body_in_partition(t_buffer* messageBuffer, char* position); //check if this is needed
 void compact_memory(void);
 void check_compact_restrictions(void);
 void delete_partition(void);
-char* select_partition(int size);
-char* select_partition_ff(int size); //select by first fit
-char* select_partition_bf(int size); //select by best fit
+char* select_partition(uint32_t size);
+char* select_partition_ff(uint32_t size); //select by first fit
+char* select_partition_bf(uint32_t size); //select by best fit
 void delete_partition_fifo(void); //delete by fifo
 void delete_partition_lru(void); //delete by lru
 

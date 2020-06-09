@@ -19,7 +19,7 @@ void start_cache(void)
 	printf("Memory starting at %d: ", &cache.full_memory);
 
 
-	int i; // random variable to use for breakpoints
+	uint32_t i; // random variable to use for breakpoints
 }
 
 t_config* get_config(){
@@ -39,11 +39,27 @@ void set_full_memory(void){
 }
 
 void save_message(t_message message){
-	//see what to do with the rest of the message's information
+	t_cachedMessage new_message = create_cached_from_message(message);
+	add_to_cached_messages(new_message);
+	//change order so that we have the pointer or change it after
 	save_message_body(message.messageBuffer);
 
 }
 
+t_cachedMessage create_cached_from_message(t_message m){
+	t_cachedMessage new_message;
+	new_message.id = m.id;
+	new_message.queue_type = m.messageType;
+	new_message.sent_to_subscribers = NULL;
+	new_message.ack_by_subscribers = NULL;
+	new_message.memory_location = NULL;
+	return new_message;
+}
+
+void add_to_cached_messages(t_cachedMessage new_message){
+	list_add(cached_messages, new_message);
+}
+//todo refactor this with the new partition structure
 void save_message_body(t_buffer* messageBuffer){
 	char *partition = find_empty_partition_of_size(sizeof messageBuffer);
 	save_body_in_partition(messageBuffer, partition);
@@ -54,7 +70,7 @@ void save_body_in_partition(t_buffer* messageBuffer,char *partition){
 }
 
 
-char* find_empty_partition_of_size(int size){
+char* find_empty_partition_of_size(uint32_t size){
 	char *partition = select_partition(size);
 	if(0)//TODO partition found logic
 		compact_memory();
@@ -62,7 +78,7 @@ char* find_empty_partition_of_size(int size){
 		delete_partition();
 }
 
-char* select_partition(int size){
+char* select_partition(uint32_t size){
 	char *partition;
 	if(ALGORITMO_PARTICION_LIBRE){ //compare dif algoritmos
 		partition = select_partition_ff(size);
@@ -72,12 +88,12 @@ char* select_partition(int size){
 	return partition;
 }
 
-char* select_partition_ff(int size){
+char* select_partition_ff(uint32_t size){
 	//TODO
 	return 0;
 }
 
-char* select_partition_bf(int size){
+char* select_partition_bf(uint32_t size){
 	//TODO
 	return 0;
 }

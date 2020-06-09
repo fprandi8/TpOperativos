@@ -17,11 +17,7 @@ int Send_LOCALIZED(localized_pokemon localized, uint32_t corelationId,  int clie
 int Send_GET(get_pokemon get, int client_socket);
 int Send_CATCH(catch_pokemon, int client_socket);
 int Send_CAUGHT(caught_pokemon caught, uint32_t corelationId, int client_socket);
-
-//TODO Implement the rest
-/*
-void Send_APPEARED(appeared_pokemon appeared, int socket_cliente);
-*/
+int Send_APPEARED(appeared_pokemon appeared, uint32_t corelationId, int socket_cliente);
 
 //REMOVED
 /*message_type GetSubscription(int client_socket);

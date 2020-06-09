@@ -63,10 +63,9 @@ t_buffer* SerializeMessageContent(message_type type, void* content)
 		case CAUGHT_POKEMON:
 			serializedContent = SerializeCaughtPokemon((caught_pokemon*)content);
 			break;
-		/*case APPEARED_POKEMON:
+		case APPEARED_POKEMON:
 			serializedContent = SerializeAppearedPokemon((appeared_pokemon*)content);
 			break;
-			*/
 		default:
 			return -1;
 	}
@@ -186,8 +185,6 @@ t_buffer* SerializeCatchPokemon(catch_pokemon* catchPokemon)
 	return newBuffer;
 }
 
-
-
 t_buffer* SerializeCaughtPokemon(caught_pokemon* caughtPokemon)
 {
 	//int representing boolean awnser
@@ -199,6 +196,30 @@ t_buffer* SerializeCaughtPokemon(caught_pokemon* caughtPokemon)
 	memcpy(caughtPokemonSerialized, &(caughtPokemon->caught), sizeof(uint32_t));
 
 	newBuffer->stream = caughtPokemonSerialized;
+
+	return newBuffer;
+}
+
+t_buffer* SerializeAppearedPokemon(appeared_pokemon* appearedPokemon)
+{
+	//size of name, name, cordinate in x, cordinate in y
+	uint32_t sizeOfPokemonName = strlen(appearedPokemon->pokemonName) + 1;
+
+	t_buffer* newBuffer = (t_buffer*)malloc(sizeof(t_buffer));
+	newBuffer->bufferSize = sizeof(uint32_t) * 3 + sizeOfPokemonName;
+
+	void* appearedPokemonSerialized = malloc(newBuffer->bufferSize);
+
+	int offset = 0;
+	memcpy(appearedPokemonSerialized + offset, &(sizeOfPokemonName), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+	memcpy(appearedPokemonSerialized + offset, appearedPokemon->pokemonName, sizeOfPokemonName);
+	offset += sizeOfPokemonName;
+	memcpy(appearedPokemonSerialized + offset, &(appearedPokemon->horizontalCoordinate), sizeof(uint32_t));
+	offset += sizeof(uint32_t);
+	memcpy(appearedPokemonSerialized + offset, &(appearedPokemon->verticalCoordinate), sizeof(uint32_t));
+
+	newBuffer->stream = appearedPokemonSerialized;
 
 	return newBuffer;
 }
@@ -258,17 +279,14 @@ void* DeserializeMessageContent(message_type type, void* serializedContent)
 			content = (void*)DeserializeGetPokemon(serializedContent);
 			break;
 		case CATCH_POKEMON:
-			content = DeserializeCatchPokemon(serializedContent);
+			content = (void*)DeserializeCatchPokemon(serializedContent);
 			break;
 		case CAUGHT_POKEMON:
-			content = DeserializeCaughtPokemon(serializedContent);
+			content = (void*)DeserializeCaughtPokemon(serializedContent);
 			break;
-			//TODO Complete implementation
-		/*
 		case APPEARED_POKEMON:
-			content = DeserializeAppearedPokemon(serializedContent);
+			content = (void*)DeserializeAppearedPokemon(serializedContent);
 			break;
-			*/
 			//TODO Handle error
 		default:
 			return -1;
@@ -369,5 +387,23 @@ caught_pokemon* DeserializeCaughtPokemon(void* serializedCaughtPokemon)
 	return caughtPokemon;
 }
 
+appeared_pokemon* DeserializeAppearedPokemon(void* serializedAppearedPokemon)
+{
+	//size of name, name, cordinate in x, cordinate in y, ammoun of pokemon
+	appeared_pokemon* appearedPokemon = (appeared_pokemon*)malloc(sizeof(appeared_pokemon));
+
+	uint32_t sizeOfPokemonName;
+	memcpy(&(sizeOfPokemonName),serializedAppearedPokemon, sizeof(uint32_t));
+	appearedPokemon->pokemonName = malloc(sizeOfPokemonName);
+	serializedAppearedPokemon += sizeof(uint32_t);
+	appearedPokemon->pokemonName = (char*)malloc(sizeOfPokemonName);
+	memcpy(appearedPokemon->pokemonName, serializedAppearedPokemon, sizeOfPokemonName);
+	serializedAppearedPokemon += sizeOfPokemonName;
+	memcpy(&(appearedPokemon->horizontalCoordinate), serializedAppearedPokemon, sizeof(uint32_t));
+	serializedAppearedPokemon += sizeof(uint32_t);
+	memcpy(&(appearedPokemon->verticalCoordinate), serializedAppearedPokemon, sizeof(uint32_t));
+
+	return appearedPokemon;
+}
 
 

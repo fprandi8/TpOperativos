@@ -169,6 +169,16 @@ int Send_CAUGHT(caught_pokemon caught, uint32_t corelationId, int client_socket)
 	return result;
 }
 
+int Send_APPEARED(appeared_pokemon appeared, uint32_t corelationId, int client_socket)
+{
+	int result = _send_message(
+		SerializeAppearedPokemon(&appeared),
+		APPEARED_POKEMON,
+		corelationId,
+		client_socket
+	);
+	return result;
+}
 
 
 int GetPackage(int client_socket, t_package** recievedPackage)

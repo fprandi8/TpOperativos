@@ -18,39 +18,15 @@
 #include<string.h>
 #include<pthread.h>
 #include<commons/config.h>
-
-#define IP "127.0.0.1"
-#define PUERTO "4444"
-
-typedef enum
-{
-	MENSAJE=1
-}op_code;
-
-typedef struct
-{
-	int size;
-	void* stream;
-} t_buffer;
-
-typedef struct
-{
-	op_code codigo_operacion;
-	t_buffer* buffer;
-} t_paquete;
-
-pthread_t thread;
+#include <semaphore.h>
+#include "delibird/comms/messages.h"
 
 void* recibir_buffer(int*, int);
 
-void iniciar_servidor(char*, char*);
-void esperar_cliente(int);
-void* recibir_mensaje(int socket_cliente, int* size);
+int iniciar_servidor(char*, char*);
+int esperar_cliente(int);
 int recibir_operacion(int);
 void process_request(int cod_op, int cliente_fd);
-void serve_client(int *socket);
-void* serializar_paquete(t_paquete* paquete, int bytes);
-void devolver_mensaje(void* payload, int size, int socket_cliente);
 
 
 #endif /* CONEXIONES_H_ */

@@ -7,7 +7,6 @@
  Description : Team Process
  ============================================================================
  */
-
 #include "Team.h"
 
 t_pokemon* localized_pokemon;
@@ -69,7 +68,6 @@ void missingPokemons(t_trainer* trainers, t_pokemon* pokemons, int trainersCount
 	for(int trainer=0;trainer<trainersCount;trainer++){
 		pkmTotalCount = pkmTotalCount+trainers[trainer].parameters.pokemonsCount;
 	}
-
 	for(int trainer=0;trainer<trainersCount;trainer++){
 		for(int pkm=0;pkm<trainers[trainer].parameters.pokemonsCount;pkm++){
 			pokemons[i]=trainers[trainer].parameters.pokemons[pkm];
@@ -512,4 +510,3 @@ int getDistanceToPokemonTarget(t_trainer* trainer,  t_pokemon* targetPokemon){
 	int distance = getClockTimeToNewPosition(distanceInX, distanceInY);
 	return distance;
 }
-

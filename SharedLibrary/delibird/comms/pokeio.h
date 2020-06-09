@@ -16,10 +16,10 @@ int Send_NEW(new_pokemon new, int client_socket);
 int Send_LOCALIZED(localized_pokemon localized, uint32_t corelationId,  int client_socket);
 int Send_GET(get_pokemon get, int client_socket);
 int Send_CATCH(catch_pokemon, int client_socket);
+int Send_CAUGHT(caught_pokemon caught, uint32_t corelationId, int client_socket);
 
 //TODO Implement the rest
 /*
-void Send_CAUGHT(caught_pokemon caught, int socket_cliente);
 void Send_APPEARED(appeared_pokemon appeared, int socket_cliente);
 */
 

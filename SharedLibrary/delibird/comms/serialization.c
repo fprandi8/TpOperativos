@@ -60,12 +60,13 @@ t_buffer* SerializeMessageContent(message_type type, void* content)
 		case CATCH_POKEMON:
 			serializedContent = SerializeCatchPokemon((catch_pokemon*)content);
 			break;
+		case CAUGHT_POKEMON:
+			serializedContent = SerializeCaughtPokemon((caught_pokemon*)content);
+			break;
 		/*case APPEARED_POKEMON:
 			serializedContent = SerializeAppearedPokemon((appeared_pokemon*)content);
 			break;
-		case CAUGHT_POKEMON:
-			serializedContent = SerializeCaughtPokemon((caught_pokemon*)content);
-			break;*/
+			*/
 		default:
 			return -1;
 	}
@@ -163,7 +164,7 @@ t_buffer* SerializeGetPokemon(get_pokemon* getPokemon)
 
 t_buffer* SerializeCatchPokemon(catch_pokemon* catchPokemon)
 {
-	//size of name, name, cordinate in x, cordinate in y, ammoun of pokemon
+	//size of name, name, cordinate in x, cordinate in y
 	uint32_t sizeOfPokemonName = strlen(catchPokemon->pokemonName) + 1;
 
 	t_buffer* newBuffer = (t_buffer*)malloc(sizeof(t_buffer));
@@ -181,6 +182,23 @@ t_buffer* SerializeCatchPokemon(catch_pokemon* catchPokemon)
 	memcpy(catchPokemonSerialized + offset, &(catchPokemon->verticalCoordinate), sizeof(uint32_t));
 
 	newBuffer->stream = catchPokemonSerialized;
+
+	return newBuffer;
+}
+
+
+
+t_buffer* SerializeCaughtPokemon(caught_pokemon* caughtPokemon)
+{
+	//int representing boolean awnser
+	t_buffer* newBuffer = (t_buffer*)malloc(sizeof(t_buffer));
+	newBuffer->bufferSize = sizeof(uint32_t);
+
+	void* caughtPokemonSerialized = malloc(newBuffer->bufferSize);
+
+	memcpy(caughtPokemonSerialized, &(caughtPokemon->caught), sizeof(uint32_t));
+
+	newBuffer->stream = caughtPokemonSerialized;
 
 	return newBuffer;
 }
@@ -242,14 +260,15 @@ void* DeserializeMessageContent(message_type type, void* serializedContent)
 		case CATCH_POKEMON:
 			content = DeserializeCatchPokemon(serializedContent);
 			break;
+		case CAUGHT_POKEMON:
+			content = DeserializeCaughtPokemon(serializedContent);
+			break;
 			//TODO Complete implementation
 		/*
 		case APPEARED_POKEMON:
 			content = DeserializeAppearedPokemon(serializedContent);
 			break;
-		case CAUGHT_POKEMON:
-			content = DeserializeCaughtPokemon(serializedContent);
-			break;*/
+			*/
 			//TODO Handle error
 		default:
 			return -1;
@@ -324,7 +343,6 @@ get_pokemon* DeserializeGetPokemon(void* serializedGetPokemon)
 catch_pokemon* DeserializeCatchPokemon(void* serializedCatchPokemon)
 {
 	//size of name, name, cordinate in x, cordinate in y, ammoun of pokemon
-	//void* newPokemonSerialized = malloc(sizeof(uint32_t) * 4 + sizeOfPokemonName);
 	catch_pokemon* catchPokemon = (catch_pokemon*)malloc(sizeof(catch_pokemon));
 
 	uint32_t sizeOfPokemonName;
@@ -340,5 +358,16 @@ catch_pokemon* DeserializeCatchPokemon(void* serializedCatchPokemon)
 
 	return catchPokemon;
 }
+
+caught_pokemon* DeserializeCaughtPokemon(void* serializedCaughtPokemon)
+{
+	//int representing boolean awnser
+	caught_pokemon* caughtPokemon = (caught_pokemon*)malloc(sizeof(caught_pokemon));
+
+	memcpy(&(caughtPokemon->caught), serializedCaughtPokemon, sizeof(uint32_t));
+
+	return caughtPokemon;
+}
+
 
 

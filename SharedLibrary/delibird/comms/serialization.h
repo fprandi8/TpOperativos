@@ -20,11 +20,11 @@ t_buffer* SerializeNewPokemon(new_pokemon*);
 t_buffer* SerializeLocalizedPokemon(localized_pokemon*);
 t_buffer* SerializeGetPokemon(get_pokemon*);
 t_buffer* SerializeCatchPokemon(catch_pokemon*);
+t_buffer* SerializeCaughtPokemon(caught_pokemon*);
 
 //TODO Implement this
 /*
-t_buffer *SerializeAppearedPokemon(appeared_pokemon);
-t_buffer *SerializeCaughtPokemon(caught_pokemon);
+t_buffer *SerializeAppearedPokemon(appeared_pokemon*);
 */
 
 t_package* DeserializePackage(void*);
@@ -37,11 +37,11 @@ new_pokemon* DeserializeNewPokemon(void*);
 localized_pokemon* DeserializeLocalizedPokemon(void*);
 get_pokemon* DeserializeGetPokemon(void*);
 catch_pokemon* DeserializeCatchPokemon(void*);
+caught_pokemon* DeserializeCaughtPokemon(void*);
 
 //TODO Implement this
 /*
 appeared_pokemon *DeserializeAppearedPokemon(void*);
-caught_pokemon *DeserializeCaughtPokemon(void*);
 */
 
 #endif

@@ -189,8 +189,19 @@ t_partition* select_partition_ff(uint32_t size){
 
 
 char* select_partition_bf(uint32_t size){
-	//TODO
-	return 0;
+
+	t_partition* bestFitPartition = NULL;
+	void _get_best_fit(t_partition* partition)
+	{
+		if(partition->free == 0) return;
+		if(bestFitPartition == NULL && partition->size >= size) bestFitPartition = partition;
+		else
+		{
+			if(partition->size >= size && partition->size < bestFitPartition->size) bestFitPartition = partition;
+		}
+	}
+	list_iterate(t_list *, (void*)_get_best_fit);
+	return bestFitPartition;
 }
 
 
@@ -210,11 +221,27 @@ void delete_partition(void){
 	}else{
 		deletedParitionId = delete_partition_lru();
 	}
+
+	
+	bool _message_in_partition(t_cachedMessage* message)
+	{
+		if(message->partitionId == deletedParitionId) return true; else return false;
+	}
+	t_cachedMessage* message = (t_cachedMessage*)list_remove_by_condition(cached_messages, (void*)_message_in_partition);
+
+	message->partitionId = 0;
+	
 	//TODO Remove cached message
 }
 
-void delete_partition_fifo(void){
-	//TODO
+int delete_partition_fifo(void){
+	bool _first_busy_partition(t_partition* partition)
+	{
+		if(partition->free == 0) return true; else return false;
+	}
+	t_partition* partition = (t_parition*)list_find(partitions, (void*)_first_busy_partition);
+	partition->free = 1;
+	return partition->id;
 }
 
 int delete_partition_lru(void){
@@ -228,7 +255,7 @@ int delete_partition_lru(void){
 		}
 	}
 
-	void list_iterate(t_list *, (void)leastUsedPartition);
+	list_iterate(t_list *, (void)_get_least_used);
 	leastUsedPartition->free = 1;
 	leastUsedPartition->timestamp = clock();
 

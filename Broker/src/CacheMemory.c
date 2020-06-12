@@ -206,7 +206,6 @@ char* select_partition_bf(uint32_t size){
 
 
 void compact_memory(void){
-	check_compact_restrictions();
     bool _is_empty_partition(t_partition* partition){ return partition->free; }
     bool _filter_busy_partition(t_partition* partition){ return !partition->free;}
 
@@ -233,6 +232,7 @@ void compact_memory(void){
     }
 
     partitions = occupied_partitions;
+    //TODO add times compacting here or outside?
 }
 
 uint32_t add_occupied_size_from(t_list* list){

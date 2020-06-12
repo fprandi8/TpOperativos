@@ -29,6 +29,9 @@
 #include "delibird/comms/messages.h"
 #include "delibird/comms/serialization.h"
 
+/*
+	******************STRUCTS***********************
+*/
 typedef struct{
 	char* full_memory;
 	uint32_t partition_minimum_size;
@@ -54,12 +57,19 @@ typedef struct{
 	uint32_t partitionId;
 }t_cachedMessage;
 
+/*
+	*******************GLOBAL VARIABLES*****************
+*/
 t_CacheMemory cache;
 t_config* config;
 t_list* cached_messages;
 t_list* partitions;
 int nextPartitionId;
 
+/*
+	********************CONTRACTS***********************
+*/
+	
 void start_cache(void);
 
 //size configuration

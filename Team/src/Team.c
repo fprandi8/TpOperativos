@@ -8,6 +8,8 @@
  ============================================================================
  */
 #include "Team.h"
+#include "./SharedLibrary/delibird/comms/pokeio.h"
+
 
 t_pokemon* localized_pokemon;
 
@@ -420,13 +422,13 @@ void addToExec(t_trainer* ready,int* countReady,t_trainer* exec,t_log* logger){
 
 //TODO - cuando termina el quantum mandar al final de la lista de ready.
 void scheduleRR(t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_trainer* exec, t_log* logger){
-	while((&countReady)){
+	while(*countReady){
 		int i=0;
 		t_trainer* trainer;
 		trainer = ((&trainers)[i]);
 		addToExec(trainer, countReady, exec, logger);
 		for(int j=0;j<=(int)(schedulingAlgorithm.quantum);j++){
-			executeClock(&countReady, exec, localized_pokemon);
+			//TODO executeClock(*countReady, exec, localized_pokemon);
 		}
 		(*countReady)--;
 	}

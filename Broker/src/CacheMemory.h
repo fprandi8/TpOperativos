@@ -27,6 +27,7 @@
 #include<commons/collections/list.h>
 #include "utils.h"
 #include "delibird/comms/messages.h"
+#include "delibird/comms/serialization.h"
 
 typedef struct{
 	char* full_memory;
@@ -46,16 +47,18 @@ typedef struct{
 
 typedef struct{
 	uint32_t id;
+	uint32_t corelationId;
 	message_type queue_type;
 	t_list* sent_to_subscribers;
 	t_list* ack_by_subscribers;
-	char* memory_location;
+	uint32_t partitionId;
 }t_cachedMessage;
 
 t_CacheMemory cache;
 t_config* config;
 t_list* cached_messages;
 t_list* partitions;
+int nextPartitionId;
 
 void start_cache(void);
 

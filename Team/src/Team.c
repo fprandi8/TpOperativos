@@ -132,7 +132,7 @@ void requestNewPokemons(t_objetive* pokemons,int globalObjetivesDistinctCount,t_
 	}
 }
 
-//TODO debería usar la shared cuando este implementado para mandar
+//TODO debería usar la shared cuando este implementado para mandar.
 void requestNewPokemon(t_pokemon missingPkm,t_log* logger){
 	log_debug(logger,"Pokemon requested: %s",missingPkm.name);
 }

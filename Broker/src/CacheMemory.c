@@ -211,8 +211,34 @@ void compact_memory(void){
 
 	t_partition first_empty_partition = list_find(partitions, (void *)_is_empty_partition);
     t_list* occupied_partitions = list_filter(partitions, (void *) _filter_busy_partition);
+
+	t_CacheMemory newCache;
+	newCache.partition_minimum_size = cache.partition_minimum_size;
+	newCache.memory_size = cache.memory_size;
+	newCache.full_memory = (char) malloc(cache.memory_size * sizeof(char));
+
+	//For each occupied partition, copy from the cache to the new memory, and re-asign begining of cache
+	int offset = 0;
+	void _asignPartitionOnNewCache(t_partition* partition)
+	{
+		memcpy(newCache.full_memory + offset, partition->begining, partition->size);
+		partition->begining = newCache.full_memory + offset;
+		offset += partition->size;
+	}
+	list_iterate(occupied_partitions, (void*)_asignPartitionOnNewCache);
+	free(cache.full_memory); //The moment of truth
+	cache = newCache;
+
+	t_partition* emptySpacePartition = CreateNewPartition();
+
+	//TODO
+	//- delete all empty partitions
+	//- create big empty paritition
+
     //TODO check if needed to change partitions beginnings
     uint32_t occupied_size = add_occupied_size_from(occupied_partitions);
+
+	//TODO crear nueva cache, ir por cada particion ocupada y moverla a la nueva cache
 
     t_partition available_space_partition;
     available_space_partition.id = sizeof(occupied_partitions) + 1;

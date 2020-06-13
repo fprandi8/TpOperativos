@@ -114,9 +114,9 @@ void subscribeToBroker(struct Broker,pthread_t*);
 void* subscribeToBrokerLocalized(void* Broker);
 void* subscribeToBrokerAppeared(void* Broker);
 void* subscribeToBrokerCaught(void* Broker);
-int startClient(char*, char*,t_log*);
-void requestNewPokemons(t_objetive*,int,t_log*);
-void requestNewPokemon(t_pokemon,t_log*);
+int connectBroker(char*, char*,t_log*);
+void requestNewPokemons(t_objetive*,int,t_log*,struct Broker broker);
+void requestNewPokemon(t_pokemon,t_log*,struct Broker broker);
 int getGlobalObjetivesCount(t_trainer*, int);
 
 

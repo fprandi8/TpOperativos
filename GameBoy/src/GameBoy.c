@@ -242,115 +242,162 @@ int main(int argc, char **argv) {
 	//TODO Create message as requested and send
 
 
-
+	deli_message deliMessage;
+	deliMessage.messageType = messageType;
 	void* message = NULL;
 	//For the message, try to create the message
+
+
 	switch(reciver){
 		case BROKER:
+		{
 				switch(messageType){
 					case NEW_POKEMON:
-						new_pokemon new = {"",0,0,0};
-						new.pokemonName = malloc(sizeof(argv[3]));
+					{
+						new_pokemon new;
 						new.pokemonName = argv[3];
 						new.horizontalCoordinate = argv[4];
 						new.verticalCoordinate = argv[5];
 						new.ammount = argv[6];
 						message = &new;
+						deliMessage.messageContent = message;
+						deliMessage.id = 0;
+						deliMessage.correlationId = 0;
 						break;
+					}
 					case APPEARED_POKEMON:
-						appeared_pokemon app = malloc(sizeof(appeared_pokemon));
-						app.pokemonName = malloc(sizeof(argv[3]));
-						memcpy(app.pokemonName,argv[3]);
+					{
+						appeared_pokemon app;
+						app.pokemonName=argv[3];
 						app.horizontalCoordinate = argv[4];
 						app.verticalCoordinate = argv[5];
-						//TODO ver con marcos por el correlation id
-						//app.cid = argv[6];
 						message = &app;
+						deliMessage.messageContent = message;
+						deliMessage.id = 0;
+						deliMessage.correlationId = argv[6];
 						break;
+					}
 					case CATCH_POKEMON:
-						catch_pokemon cat = malloc(sizeof(catch_pokemon));
-						cat.pokemonName = malloc(sizeof(argv[3]));
-						memcpy(cat.pokemonName,argv[3]);
+					{
+						catch_pokemon cat;
+						cat.pokemonName = argv[3];
 						cat.horizontalCoordinate = argv[4];
 						cat.verticalCoordinate = argv[5];
 						message = &cat;
+						deliMessage.messageContent = message;
+						deliMessage.id = 0;
+						deliMessage.correlationId = 0;
 						break;
+					}
 					case CAUGHT_POKEMON:
-						caught_pokemon cau = malloc(sizeof(caught_pokemon));
-						//TODO ver con marcos por el correlation id
-						//cau.cid = argv[3];
+					{
+						caught_pokemon cau;
 						cau.caught = argv[4];
 						message = &cau;
+						deliMessage.messageContent = message;
+						deliMessage.id = 0;
+						deliMessage.correlationId = argv[3];
 						break;
+					}
 					case GET_POKEMON:
-						get_pokemon get = malloc(sizeof(get_pokemon));
-						get.pokemonName = malloc(sizeof(argv[3]));
-						memcpy(cat.pokemonName,argv[3]);
-						message = &cat;
+					{
+						get_pokemon get;
+						get.pokemonName = argv[3];
+						message = &get;
+						deliMessage.messageContent = message;
+						deliMessage.id = 0;
+						deliMessage.correlationId = 0;
 						break;
+					}
 					default:
+					{
 						return -1;
+					}
 				}
 				break;
+	}
 			case TEAM:
+			{
 				switch(messageType){
 					case APPEARED_POKEMON:
-						appeared_pokemon app = malloc(sizeof(appeared_pokemon));
-						app.pokemonName = malloc(sizeof(argv[3]));
-						memcpy(app.pokemonName,argv[3]);
+					{
+						appeared_pokemon app;
+						app.pokemonName = argv[3];
 						app.horizontalCoordinate = argv[4];
 						app.verticalCoordinate = argv[5];
 						message = &app;
+						deliMessage.messageContent = message;
+						deliMessage.id = 0;
+						deliMessage.correlationId = 0;
 						break;
+					}
 				default:
+				{
 					return -1;
 				}
+				}
 				break;
+			}
 			case GAMECARD:
+			{
 				switch(messageType){
 					case NEW_POKEMON:
-						new_pokemon new = malloc(sizeof(new_pokemon));
-						new.pokemonName = malloc(sizeof(argv[3]));
+					{
+						new_pokemon new;
 						new.pokemonName = argv[3];
 						new.horizontalCoordinate = argv[4];
 						new.verticalCoordinate = argv[5];
 						new.ammount = argv[6];
-						//TODO ver con marcos por el correlation id
-						//new.cid = argv[7];
 						message = &new;
+						deliMessage.messageContent = message;
+						deliMessage.id = argv[7];
+						deliMessage.correlationId = 0;
 						break;
+					}
 					case CATCH_POKEMON:
-						catch_pokemon cat = malloc(sizeof(catch_pokemon));
-						cat.pokemonName = malloc(sizeof(argv[3]));
-						memcpy(cat.pokemonName,argv[3],sizeof(argv[3]));
-						memcpy
+					{
+						catch_pokemon cat;
+						cat.pokemonName = argv[3];
 						cat.horizontalCoordinate = argv[4];
 						cat.verticalCoordinate = argv[5];
-						//TODO ver con marcos por el correlation id
-						//cat.cid = argv[6];
 						message = &cat;
+						deliMessage.messageContent = message;
+						deliMessage.id = argv[6];
+						deliMessage.correlationId = 0;
 						break;
+					}
 					case GET_POKEMON:
-						get_pokemon get = malloc(sizeof(get_pokemon));
-						get.pokemonName = malloc(sizeof(argv[3]));
-						memcpy(cat.pokemonName,argv[3]);
-						//TODO ver con marcos por el correlation id
-						//get.cid = argv[4];
-						message = &cat;
+					{
+						get_pokemon get;
+						get.pokemonName =argv[3];
+						message = &get;
+						deliMessage.messageContent = message;
+						deliMessage.id = argv[4];
+						deliMessage.correlationId = 0;
 						break;
+					}
 					default:
+					{
 						return -1;
+					}
 				}
 				break;
+			}
 				case SUSCRIPTOR:
+				{
 					//TODO
+					return 12;
+				}
 
 			default:
 				printf("Message type not supported\n");
-				return 1;
+				return -1;
 			}
 
 
+
+
+	SendMessage(deliMessage,server_socket);
 	/// Test Sending, TODO Remove
 	//Vector2 coordinates[] = {{1,2},{89,34},{75,13}};
 	//localized_pokemon localized = {"squirtle", 3, coordinates};

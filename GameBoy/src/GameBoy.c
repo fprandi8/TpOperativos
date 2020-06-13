@@ -181,7 +181,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	char* pokemonName = argv[3];
+	/*char* pokemonName = argv[3];
 	printf("%s \n",pokemonName);
 	int numberOfIntegerArguments = argc-4;
 	printf("%i \n",numberOfIntegerArguments);
@@ -195,12 +195,11 @@ int main(int argc, char **argv) {
 			return 1;
 		}
 		messageIntegerArguments[u] = argument;
-	}
+	}*/
 
 
 	//Get IP from config
 	t_config* config = config_create("gameboy.config");
-
 	initBroker(&broker);
 	readConfigBrokerValues(config,&broker);
 
@@ -242,38 +241,167 @@ int main(int argc, char **argv) {
 
 	//TODO Create message as requested and send
 
-	/*
 
+	deli_message deliMessage;
+	deliMessage.messageType = messageType;
 	void* message = NULL;
 	//For the message, try to create the message
-	switch(messageType)
-	{
-		case NEW_POKEMON:
+
+
+	switch(reciver){
+		case BROKER:
 		{
-			if(numberOfIntegerArguments < 3 || numberOfIntegerArguments > 3)
-			{
-				printf("Incorrect number of arguments for new pokemon\n");
-				return 1;
-			}
-			new_pokemon new = { "", 0, 0, 0};
-			new.pokemonName = pokemonName;
-			new.horizontalCoordinate = messageIntegerArguments[0];
-			new.verticalCoordinate = messageIntegerArguments[1];
-			new.ammount = messageIntegerArguments[2];
-			message = &new;
-			break;
-		}
-		default:
-			printf("Message type not supported\n");
-			return 1;
+				switch(messageType){
+					case NEW_POKEMON:
+					{
+						new_pokemon new;
+						new.pokemonName = argv[3];
+						new.horizontalCoordinate = argv[4];
+						new.verticalCoordinate = argv[5];
+						new.ammount = argv[6];
+						message = &new;
+						deliMessage.messageContent = message;
+						deliMessage.id = 0;
+						deliMessage.correlationId = 0;
+						break;
+					}
+					case APPEARED_POKEMON:
+					{
+						appeared_pokemon app;
+						app.pokemonName=argv[3];
+						app.horizontalCoordinate = argv[4];
+						app.verticalCoordinate = argv[5];
+						message = &app;
+						deliMessage.messageContent = message;
+						deliMessage.id = 0;
+						deliMessage.correlationId = argv[6];
+						break;
+					}
+					case CATCH_POKEMON:
+					{
+						catch_pokemon cat;
+						cat.pokemonName = argv[3];
+						cat.horizontalCoordinate = argv[4];
+						cat.verticalCoordinate = argv[5];
+						message = &cat;
+						deliMessage.messageContent = message;
+						deliMessage.id = 0;
+						deliMessage.correlationId = 0;
+						break;
+					}
+					case CAUGHT_POKEMON:
+					{
+						caught_pokemon cau;
+						cau.caught = argv[4];
+						message = &cau;
+						deliMessage.messageContent = message;
+						deliMessage.id = 0;
+						deliMessage.correlationId = argv[3];
+						break;
+					}
+					case GET_POKEMON:
+					{
+						get_pokemon get;
+						get.pokemonName = argv[3];
+						message = &get;
+						deliMessage.messageContent = message;
+						deliMessage.id = 0;
+						deliMessage.correlationId = 0;
+						break;
+					}
+					default:
+					{
+						return -1;
+					}
+				}
+				break;
 	}
+			case TEAM:
+			{
+				switch(messageType){
+					case APPEARED_POKEMON:
+					{
+						appeared_pokemon app;
+						app.pokemonName = argv[3];
+						app.horizontalCoordinate = argv[4];
+						app.verticalCoordinate = argv[5];
+						message = &app;
+						deliMessage.messageContent = message;
+						deliMessage.id = 0;
+						deliMessage.correlationId = 0;
+						break;
+					}
+				default:
+				{
+					return -1;
+				}
+				}
+				break;
+			}
+			case GAMECARD:
+			{
+				switch(messageType){
+					case NEW_POKEMON:
+					{
+						new_pokemon new;
+						new.pokemonName = argv[3];
+						new.horizontalCoordinate = argv[4];
+						new.verticalCoordinate = argv[5];
+						new.ammount = argv[6];
+						message = &new;
+						deliMessage.messageContent = message;
+						deliMessage.id = argv[7];
+						deliMessage.correlationId = 0;
+						break;
+					}
+					case CATCH_POKEMON:
+					{
+						catch_pokemon cat;
+						cat.pokemonName = argv[3];
+						cat.horizontalCoordinate = argv[4];
+						cat.verticalCoordinate = argv[5];
+						message = &cat;
+						deliMessage.messageContent = message;
+						deliMessage.id = argv[6];
+						deliMessage.correlationId = 0;
+						break;
+					}
+					case GET_POKEMON:
+					{
+						get_pokemon get;
+						get.pokemonName =argv[3];
+						message = &get;
+						deliMessage.messageContent = message;
+						deliMessage.id = argv[4];
+						deliMessage.correlationId = 0;
+						break;
+					}
+					default:
+					{
+						return -1;
+					}
+				}
+				break;
+			}
+				case SUSCRIPTOR:
+				{
+					//TODO
+					return 12;
+				}
 
-	*/
+			default:
+				printf("Message type not supported\n");
+				return -1;
+			}
 
+
+
+
+	SendMessage(deliMessage,server_socket);
 	/// Test Sending, TODO Remove
-	Vector2 coordinates[] = {{1,2},{89,34},{75,13}};
-	localized_pokemon localized = {"squirtle", 3, coordinates};
-	Send_LOCALIZED(localized, server_socket);
+	//Vector2 coordinates[] = {{1,2},{89,34},{75,13}};
+	//localized_pokemon localized = {"squirtle", 3, coordinates};
+	//Send_LOCALIZED(localized, server_socket);
 	//SendSubscriptionRequest(APPEARED_POKEMON, server_socket);
 	//SendMessageAcknowledge(319, server_socket);
 

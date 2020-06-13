@@ -23,11 +23,11 @@ void start_cache(void)
 	first_partition.id = 1;
 	first_partition.begining = cache.full_memory;
 	first_partition.size = cache.memory_size;
-	first_partition.queue_type = NULL;
+	first_partition.queue_type = 0;
 	first_partition.free = 1;
 	first_partition.timestap = clock();
 
-	list_add(partitions, first_partition);
+	list_add(partitions, &(first_partition));
 
 	nextPartitionId++; //TODO create a function to wrap the id asignation, so that we only modify it in one place
 
@@ -69,7 +69,7 @@ t_cachedMessage create_cached_from_message(deli_message message){
 }
 
 void add_to_cached_messages(t_cachedMessage new_message){
-	list_add(cached_messages, new_message);
+	list_add(cached_messages, (void*)new_message);
 }
 
 int save_message_body(void* messageContent, message_type queue){
@@ -327,7 +327,7 @@ int delete_partition_lru(void){
 		}
 	}
 
-	list_iterate(partitions, (void)_get_least_used);
+	list_iterate(partitions, (void*)_get_least_used);
 	leastUsedPartition->free = 1;
 	leastUsedPartition->timestap = clock();
 
@@ -361,8 +361,8 @@ void Free_CachedMessage(t_cachedMessage* message)
 
 t_partition* CreateNewPartition()
 {
-	t_partition partition;
-	partition.id = nextPartitionId;
+	t_partition* partition;
+	partition->id = nextPartitionId;
 	nextPartitionId++;
 	if(nextPartitionId== INT_MAX) nextPartitionId = 0;
 	return partition;

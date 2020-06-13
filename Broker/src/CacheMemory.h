@@ -79,24 +79,26 @@ void define_cache_maximum_size(void);
 //memory reservation
 void set_full_memory(void);
 //message handler
-void save_message(t_message message);
+void save_message(deli_message message);
 t_buffer* get_message_body(); //implement if needed
-int save_message_body(t_buffer* messageBuffer); //see if we need to return a value
+int save_message_body(void*, message_type);
 //partition handlers
 t_partition* find_empty_partition_of_size(uint32_t size);
-uint32_t save_body_in_partition(t_buffer* messageBuffer, char* position); //check if this is needed
+uint32_t save_body_in_partition(t_buffer*, t_partition*, message_type); //check if this is needed
 void compact_memory(void);
 void check_compact_restrictions(void);
 void delete_partition(void);
 char* select_partition(uint32_t size);
 t_partition* select_partition_ff(uint32_t size); //select by first fit
 char* select_partition_bf(uint32_t size); //select by best fit
-void delete_partition_fifo(void); //delete by fifo
+int delete_partition_fifo(void); //delete by fifo
 int delete_partition_lru(void); //delete by lru
 t_list* GetMessagesFromQueue(queue_type);
 t_cachedMessage* GetMessage(int);
 void* GetMessageContent(int);
 t_partition* CreateNewPartition();
-void Free_CachedMessage(t_message*);
+t_cachedMessage create_cached_from_message(deli_message);
+void Free_CachedMessage(t_cachedMessage*);
+void add_to_cached_messages(t_cachedMessage);
 
 #endif /* CACHEMEMORY_H_ */

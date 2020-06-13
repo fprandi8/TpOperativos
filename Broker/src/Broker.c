@@ -15,6 +15,7 @@ uint32_t ID = 0;
 
 int main(void) {
 
+	start_cache();
 	t_log* logger;
 	t_config* config;
 
@@ -140,7 +141,7 @@ void broker_initialize(t_Broker* broker, int server, t_log* logger){
 	t_list* aux;
 	aux= list_create();
 
-	for (int i=0; i < 6; i++){
+	for (int i=1; i < 7; i++){
 		t_queue_handler* queue_handler;
 		queue_handler= queue_handler_initialize((message_type)i);
 		list_add(aux,queue_handler);
@@ -412,6 +413,5 @@ uint32_t message_administrator_get_amountACK(t_message_administrator* self){
 void signaltHandler(int sig_num){
 	printf("Proceso interrunpido \n");
 }
-
 
 

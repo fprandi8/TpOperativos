@@ -57,10 +57,10 @@ int main(void) {
 		exit(9);
 	}
 	missingPkms=temp;
-	requestNewPokemons(missingPkms,globalObjetivesDistinctCount,logger);
+
 	subs=(pthread_t*)malloc(sizeof(pthread_t)*3);
 	subscribeToBroker(broker,subs);//TODO ver si esto no conviene hacerlo con select (Falta ver con Marcos)
-
+	requestNewPokemons(missingPkms,globalObjetivesDistinctCount,logger,broker);
 	log_debug(logger,"\n\n");
 	log_debug(logger,"Test de parametros");
 	log_debug(logger,"Entrenador 0 está en la posición (x,y)=(%i,%i), tiene %i pokemons: %s, %s y %s y tiene %i objetivos %s, %s, %s y %s",new[0].parameters.position.x,new[0].parameters.position.y,new[0].parameters.pokemonsCount,new[0].parameters.pokemons[0].name,new[0].parameters.pokemons[1].name,new[0].parameters.pokemons[2].name,new[0].parameters.objetivesCount,new[0].parameters.objetives[0].name,new[0].parameters.objetives[1].name,new[0].parameters.objetives[2].name,new[0].parameters.objetives[3].name);
@@ -89,9 +89,12 @@ int getGlobalObjetivesCount(t_trainer* trainers, int trainersCount){
 //TODO Consultar con marcos como importar las comons de delibird, meter en threads
 void subscribeToBroker(struct Broker broker,pthread_t* subs){
 
-	pthread_create(&(subs[0]),NULL,subscribeToBrokerLocalized,(void*)&broker);
+	pthread_create(&(subs[0]),NULL,subscribeToBrokerCaught,(void*)&broker);
+	sleep(2);
 	pthread_create(&(subs[1]),NULL,subscribeToBrokerAppeared,(void*)&broker);
-	pthread_create(&(subs[2]),NULL,subscribeToBrokerCaught,(void*)&broker);
+	sleep(2);
+	pthread_create(&(subs[2]),NULL,subscribeToBrokerLocalized,(void*)&broker);
+	sleep(10);
 	//Dejar para pruebas
 	/*subscribeToBrokerLocalized((void*)&broker);
 	subscribeToBrokerLocalized((void*)&broker);
@@ -101,39 +104,54 @@ void subscribeToBroker(struct Broker broker,pthread_t* subs){
 void* subscribeToBrokerLocalized(void *brokerAdress){
 	log_debug(logger,"Creando thread Localized Subscriptions Handler");
 	struct Broker broker = *((struct Broker*) brokerAdress);
-	int socketLocalized = startClient(broker.ip,broker.port,logger);
+	int socketLocalized = connectBroker(broker.ip,broker.port,logger);
 	if (-1==SendSubscriptionRequest(LOCALIZED_POKEMON,socketLocalized)){
-		printf("Error en subscripcion de Localized\n");
+		log_debug(logger,"Error en subscripcion de Localized");
+	}else{
+		log_debug(logger,"Se subscribió a Localized");
 	}
 	pthread_exit(NULL);
 }
 
 void* subscribeToBrokerAppeared(void *brokerAdress){
+	log_debug(logger,"Creando thread Appeared Subscriptions Handler");
 	struct Broker broker = *((struct Broker*) brokerAdress);
-	int socketAppeared = startClient(broker.ip,broker.port,logger);
+	int socketAppeared = connectBroker(broker.ip,broker.port,logger);
 	if(-1==SendSubscriptionRequest(APPEARED_POKEMON,socketAppeared)){
-		printf("Error en subscripcion de Appeared\n");
+		log_debug(logger,"Error en subscripcion de Appeared");
+	}else{
+		log_debug(logger,"Se subscribió a Appeared");
 	}
 	pthread_exit(NULL);
 }
 
 void* subscribeToBrokerCaught(void *brokerAdress){
+	log_debug(logger,"Creando thread Caught Subscriptions Handler");
 	struct Broker broker = *((struct Broker*) brokerAdress);
-	int socketCaught = startClient(broker.ip,broker.port,logger);
+	int socketCaught = connectBroker(broker.ip,broker.port,logger);
 	if(-1==SendSubscriptionRequest(CAUGHT_POKEMON,socketCaught)){
-		printf("Error en subscripcion de Caught\n");
+		log_debug(logger,"Error en subscripcion de Caught");
+	}else{
+		log_debug(logger,"Se subscribió a Caught");
 	}
 	pthread_exit(NULL);
 }
 
-void requestNewPokemons(t_objetive* pokemons,int globalObjetivesDistinctCount,t_log* logger){
+void requestNewPokemons(t_objetive* pokemons,int globalObjetivesDistinctCount,t_log* logger,struct Broker broker){
+	log_debug(logger,"Se solicitarán %i pokemons",globalObjetivesDistinctCount);
 	for(int obj=0;obj<globalObjetivesDistinctCount;obj++){
-		requestNewPokemon(pokemons[obj].pokemon,logger);
+		requestNewPokemon(pokemons[obj].pokemon,logger,broker);
 	}
 }
 
 //TODO debería usar la shared cuando este implementado para mandar.
-void requestNewPokemon(t_pokemon missingPkm,t_log* logger){
+void requestNewPokemon(t_pokemon missingPkm,t_log* logger, struct Broker broker){
+	log_debug(logger,"Se solicitarán el pokemon %s", missingPkm.name);
+	int client_socket = connectBroker(broker.ip, broker.port,logger);
+	get_pokemon get;
+	strcpy(get.pokemonName,missingPkm.name);
+	log_debug(logger,"Se enviará el send para el pokemon %s", missingPkm.name);
+	Send_GET(get, client_socket);
 	log_debug(logger,"Pokemon requested: %s",missingPkm.name);
 }
 
@@ -634,7 +652,7 @@ int getDistanceToPokemonTarget(t_trainer* trainer,  t_pokemon* targetPokemon){
 	return distance;
 }
 
-int startClient(char* ip, char* puerto,t_log* logger)
+int connectBroker(char* ip, char* puerto,t_log* logger)
 {
 	int teamSocket;
 

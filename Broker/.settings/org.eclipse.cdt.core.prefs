@@ -1,0 +1,14 @@
+eclipse.preferences.version=1
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1696097113/LD_LIBRARY_PATH/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1696097113/LD_LIBRARY_PATH/operation=append
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1696097113/LD_LIBRARY_PATH/value=/home/utnso/workspace/tp-2020-1c-MATE-OS/SharedLibrary/Debug
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1696097113/append=true
+environment/project/cdt.managedbuild.config.gnu.exe.debug.1696097113/appendContributed=true
+environment/project/cdt.managedbuild.config.gnu.exe.release.1134740757/Export\ LD_LIBRARY_PATH\=/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.exe.release.1134740757/Export\ LD_LIBRARY_PATH\=/operation=append
+environment/project/cdt.managedbuild.config.gnu.exe.release.1134740757/Export\ LD_LIBRARY_PATH\=/value="/home/utnso/workspace/tp-2020-1c-MATE-OS/SharedLibrary/Debug"
+environment/project/cdt.managedbuild.config.gnu.exe.release.1134740757/LD_LIBRARY_PATH\=/delimiter=\:
+environment/project/cdt.managedbuild.config.gnu.exe.release.1134740757/LD_LIBRARY_PATH\=/operation=append
+environment/project/cdt.managedbuild.config.gnu.exe.release.1134740757/LD_LIBRARY_PATH\=/value="/home/utnso/workspace/tp-2020-1c-MATE-OS/SharedLibrary/Debug"
+environment/project/cdt.managedbuild.config.gnu.exe.release.1134740757/append=true
+environment/project/cdt.managedbuild.config.gnu.exe.release.1134740757/appendContributed=true

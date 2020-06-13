@@ -15,6 +15,7 @@ uint32_t ID = 0;
 
 int main(void) {
 
+	start_cache();
 	t_log* logger;
 	t_config* config;
 
@@ -412,6 +413,5 @@ uint32_t message_administrator_get_amountACK(t_message_administrator* self){
 void signaltHandler(int sig_num){
 	printf("Proceso interrunpido \n");
 }
-
 
 

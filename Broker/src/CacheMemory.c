@@ -208,8 +208,8 @@ void compact_memory(void){
     bool _is_empty_partition(t_partition* partition){ return partition->free; }
     bool _filter_busy_partition(t_partition* partition){ return !partition->free;}
 
-    t_partition* first_empty_partition = (t_partition*)malloc(sizeof(t_partition*));
-    first_empty_partition = list_find(partitions, (void*)_is_empty_partition);
+    //t_partition* first_empty_partition = (t_partition*)malloc(sizeof(t_partition*));
+    t_list* empty_partitions = list_filter(partitions, (void*)_is_empty_partition);
     t_list* occupied_partitions = list_filter(partitions, (void *) _filter_busy_partition);
 
     /*t_CacheMemory newCache;
@@ -262,7 +262,11 @@ void compact_memory(void){
     memcpy(cache.full_memory, backUp_memory, sizeof(backUp_memory));//v2
     list_iterate(occupied_partitions, (void*)_reasignPartitionPointers);//v2
     free(backUp_memory);
-    free(first_empty_partition);
+
+	list_remove_and_destroy_by_condition(partitions, (void*)_is_empty_partition, (void*)Free_CachedMessage);
+	list_clean(partitions);
+	free(partitions);
+	
     //TODO delete all empty partitions
     // Marquitos, te dejo esto aca, se me ocurrio una nueva version sobre la marcha no se que te parece, es lo que
     // tiene el coment 'v2', la idea es copiar en una memoria auxiliar, hacer un memcopy a la memoria principal y reubicar

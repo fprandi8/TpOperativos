@@ -212,11 +212,11 @@ void compact_memory(void){
 	t_partition first_empty_partition = list_find(partitions, (void *)_is_empty_partition);
     t_list* occupied_partitions = list_filter(partitions, (void *) _filter_busy_partition);
 
-	t_CacheMemory newCache;
+	/*t_CacheMemory newCache;
 	newCache.partition_minimum_size = cache.partition_minimum_size;
 	newCache.memory_size = cache.memory_size;
 	newCache.full_memory = (char) malloc(cache.memory_size * sizeof(char));
-
+*/
 	char* backUp_memory = (char) malloc(cache.memory_size * sizeof(char));//v2
 
 	//For each occupied partition, copy from the cache to the new memory, and re-asign begining of cache
@@ -255,9 +255,9 @@ void compact_memory(void){
 
     list_add(occupied_partitions, emptySpacePartition);
 
-    list_iterate(occupied_partitions, (void*)_asignPartitionOnNewCache);
+    /*list_iterate(occupied_partitions, (void*)_asignPartitionOnNewCache);
 	free(cache.full_memory); //The moment of truth
-
+*/
     list_iterate(occupied_partitions, (void*)_asignPartitionOnBackUpMem);//v2
     memcpy(cache.full_memory, backUp_memory, sizeof(backUp_memory));//v2
     list_iterate(occupied_partitions, (void*)_reasignPartitionPointers);//v2
@@ -268,8 +268,8 @@ void compact_memory(void){
     // los punteros cosas de que se pise lo viejo. Fijate que te parece; de esta forma la memoria reservada de la cache
     // siempre va a estar apuntando al mismo espacio en memoria
 
-    cache = newCache; //TODO consultar si necesitamos que siempre apunte al mismo espacio de memoria la cache original o tirar boludos
-
+   /* cache = newCache; //TODO consultar si necesitamos que siempre apunte al mismo espacio de memoria la cache original o tirar boludos
+*/
     partitions = occupied_partitions;
     //TODO add times compacting here or outside?
 }

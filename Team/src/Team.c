@@ -89,9 +89,12 @@ int getGlobalObjetivesCount(t_trainer* trainers, int trainersCount){
 //TODO Consultar con marcos como importar las comons de delibird, meter en threads
 void subscribeToBroker(struct Broker broker,pthread_t* subs){
 
-	pthread_create(&(subs[0]),NULL,subscribeToBrokerLocalized,(void*)&broker);
+	pthread_create(&(subs[0]),NULL,subscribeToBrokerCaught,(void*)&broker);
+	sleep(10);
 	pthread_create(&(subs[1]),NULL,subscribeToBrokerAppeared,(void*)&broker);
-	pthread_create(&(subs[2]),NULL,subscribeToBrokerCaught,(void*)&broker);
+	sleep(10);
+	pthread_create(&(subs[2]),NULL,subscribeToBrokerLocalized,(void*)&broker);
+	sleep(10);
 	//Dejar para pruebas
 	/*subscribeToBrokerLocalized((void*)&broker);
 	subscribeToBrokerLocalized((void*)&broker);
@@ -103,25 +106,33 @@ void* subscribeToBrokerLocalized(void *brokerAdress){
 	struct Broker broker = *((struct Broker*) brokerAdress);
 	int socketLocalized = startClient(broker.ip,broker.port,logger);
 	if (-1==SendSubscriptionRequest(LOCALIZED_POKEMON,socketLocalized)){
-		printf("Error en subscripcion de Localized\n");
+		log_debug(logger,"Error en subscripcion de Localized");
+	}else{
+		log_debug(logger,"Se subscribió a Localized");
 	}
 	pthread_exit(NULL);
 }
 
 void* subscribeToBrokerAppeared(void *brokerAdress){
+	log_debug(logger,"Creando thread Appeared Subscriptions Handler");
 	struct Broker broker = *((struct Broker*) brokerAdress);
 	int socketAppeared = startClient(broker.ip,broker.port,logger);
 	if(-1==SendSubscriptionRequest(APPEARED_POKEMON,socketAppeared)){
-		printf("Error en subscripcion de Appeared\n");
+		log_debug(logger,"Error en subscripcion de Appeared");
+	}else{
+		log_debug(logger,"Se subscribió a Appeared");
 	}
 	pthread_exit(NULL);
 }
 
 void* subscribeToBrokerCaught(void *brokerAdress){
+	log_debug(logger,"Creando thread Caught Subscriptions Handler");
 	struct Broker broker = *((struct Broker*) brokerAdress);
 	int socketCaught = startClient(broker.ip,broker.port,logger);
 	if(-1==SendSubscriptionRequest(CAUGHT_POKEMON,socketCaught)){
-		printf("Error en subscripcion de Caught\n");
+		log_debug(logger,"Error en subscripcion de Caught");
+	}else{
+		log_debug(logger,"Se subscribió a Caught");
 	}
 	pthread_exit(NULL);
 }

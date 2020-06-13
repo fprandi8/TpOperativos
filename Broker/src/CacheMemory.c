@@ -42,8 +42,6 @@ void start_cache(void)
     list_add(partitions, first_partition);
 	sem_post(mutex_partitions);
 
-
-    uint32_t i; // random variable to use for breakpoints
 }
 
 t_config* get_config(){
@@ -140,7 +138,7 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
 
 
 t_partition* find_empty_partition_of_size(uint32_t size){
-//	if(size > cache.memory_size); //TODO decide what to do when message is too big
+//	if(size > cache.memory_size); //TODO imprimir se pico, no deberia pasar que llegue algo mas grande que la memoria
     t_partition* partition = select_partition(size);
     int compaction_frequency =  config_get_int_value(config, FRECUENCIA_COMPACTACION);
     if(partition != NULL) return partition;
@@ -228,35 +226,19 @@ void compact_memory(void){
     bool _is_empty_partition(t_partition* partition){ return partition->free; }
     bool _filter_busy_partition(t_partition* partition){ return !partition->free;}
 
-    //t_partition* first_empty_partition = (t_partition*)malloc(sizeof(t_partition*));
-    //t_list* empty_partitions = list_filter(partitions, (void*)_is_empty_partition);
     t_list* occupied_partitions = list_filter(partitions, (void *) _filter_busy_partition);
 
-    /*t_CacheMemory newCache;
-    newCache.partition_minimum_size = cache.partition_minimum_size;
-    newCache.memory_size = cache.memory_size;
-    newCache.full_memory = (char) malloc(cache.memory_size * sizeof(char));
-*/
-    char* backUp_memory = (char*) malloc(cache.memory_size * sizeof(char));//v2
+    char* backUp_memory = (char*) malloc(cache.memory_size * sizeof(char));
 
-    //For each occupied partition, copy from the cache to the new memory, and re-asign begining of cache
-    /*int offset = 0;
-    void _asignPartitionOnNewCache(t_partition* partition)
-    {
-        memcpy(newCache.full_memory + offset, partition->begining, partition->size);
-        partition->begining = cache.full_memory + offset;
-        offset += partition->size;
-    }*/
-
-    int offsetMem = 0;//v2
-    void _asignPartitionOnBackUpMem(t_partition* partition)//v2
+    int offsetMem = 0;
+    void _asignPartitionOnBackUpMem(t_partition* partition)
     {
         memcpy(backUp_memory + offsetMem, partition->begining, partition->size);
         offsetMem += partition->size;
     }
 
-    int offsetPointerMem = 0;//v2
-    void _reasignPartitionPointers(t_partition* partition)//v2
+    int offsetPointerMem = 0;
+    void _reasignPartitionPointers(t_partition* partition)
     {
         partition->begining = cache.full_memory + offsetPointerMem;
         offsetPointerMem += partition->size;
@@ -275,26 +257,15 @@ void compact_memory(void){
 
     list_add(occupied_partitions, emptySpacePartition);
 
-    /*list_iterate(occupied_partitions, (void*)_asignPartitionOnNewCache);
-	free(cache.full_memory); //The moment of truth
-*/
-    list_iterate(occupied_partitions, (void*)_asignPartitionOnBackUpMem);//v2
-    memcpy(cache.full_memory, backUp_memory, sizeof(cache.memory_size));//v2
-    list_iterate(occupied_partitions, (void*)_reasignPartitionPointers);//v2
+    list_iterate(occupied_partitions, (void*)_asignPartitionOnBackUpMem);
+    memcpy(cache.full_memory, backUp_memory, sizeof(cache.memory_size));
+    list_iterate(occupied_partitions, (void*)_reasignPartitionPointers);
     free(backUp_memory);
 
 	list_remove_and_destroy_by_condition(partitions, (void*)_is_empty_partition, (void*)Free_CachedMessage);
 	list_clean(partitions);
 	free(partitions);
 
-    //TODO delete all empty partitions
-    // Marquitos, te dejo esto aca, se me ocurrio una nueva version sobre la marcha no se que te parece, es lo que
-    // tiene el coment 'v2', la idea es copiar en una memoria auxiliar, hacer un memcopy a la memoria principal y reubicar
-    // los punteros cosas de que se pise lo viejo. Fijate que te parece; de esta forma la memoria reservada de la cache
-    // siempre va a estar apuntando al mismo espacio en memoria
-
-    /* cache = newCache; //TODO consultar si necesitamos que siempre apunte al mismo espacio de memoria la cache original o tirar boludos
- */
     partitions = occupied_partitions;
     //TODO add times compacting here or outside?
 }

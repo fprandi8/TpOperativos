@@ -28,6 +28,7 @@
 #include "utils.h"
 #include "delibird/comms/messages.h"
 #include "delibird/comms/serialization.h"
+#include <limits.h>
 
 /*
 	******************STRUCTS***********************
@@ -93,7 +94,10 @@ t_partition* select_partition_ff(uint32_t size); //select by first fit
 char* select_partition_bf(uint32_t size); //select by best fit
 void delete_partition_fifo(void); //delete by fifo
 int delete_partition_lru(void); //delete by lru
-
-
+t_list* GetMessagesFromQueue(queue_type);
+t_cachedMessage* GetMessage(int);
+void* GetMessageContent(int);
+t_partition* CreateNewPartition();
+void Free_CachedMessage(t_message*);
 
 #endif /* CACHEMEMORY_H_ */

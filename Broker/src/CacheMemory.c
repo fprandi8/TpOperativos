@@ -223,15 +223,12 @@ void delete_partition(void){
 	}
 
 	
-	bool _message_in_partition(t_cachedMessage* message)
+	bool _message_to_delete(t_cachedMessage* message)
 	{
 		if(message->partitionId == deletedParitionId) return true; else return false;
 	}
-	t_cachedMessage* message = (t_cachedMessage*)list_remove_by_condition(cached_messages, (void*)_message_in_partition);
 
-	message->partitionId = 0;
-	
-	//TODO Remove cached message
+	list_remove_and_destroy_by_condition(cached_messages, (void*)_message_to_delete, (void*)Free_CachedMessage);
 }
 
 int delete_partition_fifo(void){
@@ -272,4 +269,60 @@ int GetBusyParitionsCount()
 	int busyPartitionsCount = list_size(filteredList);
 	list_clean(busyPartitions);
 	return busyPartitionsCount;
+}
+
+void Free_CachedMessage(t_message* message) 
+{
+	void _free_sendOrAck(void* sendOrAck)
+	{
+		free(sendOrAck);
+	}
+	list_clean_and_destroy_elements(message->sent_to_subscribers, (void*)_free_sendOrAck)
+	list_clean_and_destroy_elements(message->ack_by_subscribers, (void*)_free_sendOrAck)
+	free(message->sent_to_subscribers);
+	free(message->ack_by_subscribers);
+	free(message);
+}
+
+t_partition* CreateNewPartition()
+{
+	t_partition paritition;
+	paritition.id = nextPartitionId;
+	nextPartitionId++;
+	if(nextPartition = INT_MAX) nextPartition = 0;
+	return t_partition;
+}
+
+t_list* GetMessagesFromQueue(queue_type type)
+{
+	bool _message_by_queue(t_cachedMessage* message)
+	{
+		if(message->queue == type) return true: else return false;
+	}
+	return list_filter(cached_messages, (void*)_message_by_queue);
+}
+
+t_cachedMessage* GetMessage(int messageId)
+{
+	bool _message_by_id(t_cachedMessage* message)
+	{
+		if(message->id == messageId) return true: else return false;
+	}
+	return (t_cachedMessage*)list_find(cached_messages, (void*)_message_by_id);
+}
+
+t_paritition* GetPartition(int partitionId)
+{
+	bool _partition_by_id(t_partition* partition)
+	{
+		if(partition->id == partitionId) return true: else return false;
+	}
+	return (t_paritition*)list_find(partitions, (void*)_partition_by_id);
+}
+
+void* GetMessageContent(int messageId)
+{
+	t_cachedMessage* message = GetMessage(messageId);
+	t_partition* partition = GetPartition(message->partitionId);
+	return DeserializeMessageContent(partition->queue_type, partition->begining);
 }

@@ -140,7 +140,7 @@ void broker_initialize(t_Broker* broker, int server, t_log* logger){
 	t_list* aux;
 	aux= list_create();
 
-	for (int i=0; i < 6; i++){
+	for (int i=1; i < 7; i++){
 		t_queue_handler* queue_handler;
 		queue_handler= queue_handler_initialize((message_type)i);
 		list_add(aux,queue_handler);
@@ -246,7 +246,7 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 
 	t_message_administrator* messageAdmnistrator = message_administrator_initialize(message->id);
 
-	list_add(&(queue->messagesAdministrator),messageAdmnistrator);
+	list_add(queue->messagesAdministrator,messageAdmnistrator);
 
 	t_args_queue* args= (t_args_queue*) malloc (sizeof(t_args_queue*));
 	args->messageAdministrator = (t_message_administrator*) malloc(sizeof(t_message_administrator*));
@@ -342,6 +342,7 @@ t_queue_handler* queue_handler_initialize(message_type type){
 	aux->queue = queue_create();
 	aux->suscriptors = list_create();
 	aux->type=type;
+	printf("El tipo es:%d \n" , type);
 	aux->messagesAdministrator = list_create();
 	return aux;
 }

@@ -43,7 +43,7 @@ typedef struct{
 
 typedef struct{
     //partition number would be generated when iterating the list
-    uint32_t id; //check if partition id or message id
+    uint32_t id; //its message id
     char* begining;
     uint32_t size;
     message_type queue_type;

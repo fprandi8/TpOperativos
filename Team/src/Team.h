@@ -88,12 +88,12 @@ void readConfigBrokerValues(t_config*,t_log*,struct Broker*);
 void readConfigSchedulerValues(t_config*, t_log*, struct SchedulingAlgorithm*);
 void readConfigTrainersValues(t_config*,t_log*,char***,char***,char***);
 void initScheduler(struct SchedulingAlgorithm*);
-void addToReady(t_trainer*,t_trainer*,int*,struct SchedulingAlgorithm,t_log*);
+void addToReady(t_trainer*,t_trainer*,int*,struct SchedulingAlgorithm,t_log*,t_trainer*);
 void addToExec(t_trainer*,int*,t_trainer*,t_log*);
-void scheduleFifo(t_trainer*,int*);
-void scheduleRR(t_trainer*,int*,struct SchedulingAlgorithm);
-void scheduleSJFSD(t_trainer*,int*,struct SchedulingAlgorithm);
-void scheduleSJFCD(t_trainer*,int*,struct SchedulingAlgorithm);
+void scheduleFifo(t_trainer*,int*, t_trainer*,t_log*);
+void scheduleRR(t_trainer*,int*,struct SchedulingAlgorithm, t_trainer*,t_log*);
+void scheduleSJFSD(t_trainer*,int*,struct SchedulingAlgorithm, t_trainer*,t_log*);
+void scheduleSJFCD(t_trainer*,int*,struct SchedulingAlgorithm, t_trainer*,t_log*);
 void scheduleDistance(pthread_t**);
 void startInitMatrix(char *);
 void assignMatrixValues(void *);
@@ -132,10 +132,10 @@ void initScheduler(struct SchedulingAlgorithm *schedulingAlgorithm){
 	schedulingAlgorithm->initEstimationKey="ESTIMACION_INICIAL";
 }
 
-void moveTrainerToTarget(t_trainerParameters* trainer, int distanceToMoveInX, int distanceToMoveInY);
-
-void moveTrainerToObjective(t_trainerParameters* trainer,  t_pokemon pokemonTargeted);
+void moveTrainerToTarget(t_trainer* trainer, int distanceToMoveInX, int distanceToMoveInY);
+void moveTrainerToObjective(t_trainer* trainer,  t_pokemon* pokemonTargeted);
 int calculateDifference(int, int);
-int getDistanceToPokemonTarget(t_trainerParameters*, t_pokemon*);
+int getDistanceToPokemonTarget(t_trainer*, t_pokemon*);
+void moveTrainetToObjective(t_trainer*, t_pokemon*);
 
 #endif /* TEAM_H_ */

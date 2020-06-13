@@ -7,7 +7,6 @@
  Description : Team Process
  ============================================================================
  */
-
 #include "Team.h"
 
 t_log* logger;
@@ -17,14 +16,14 @@ int main(void) {
 	int teamSocket;
 	char* ip;
 	char* port;
-	void* mensaje = "Mensaje de prueba";
 	t_trainer* new;
 	int trainersCount;
-	pthread_t* ready,exec;
-	pthread_t* subs;
+    pthread_t* subs;
+	t_trainer* ready,exec;
 	int readyCount,execCount;
 	t_objetive* missingPkms;
-	int globalObjetivesDistinctCount=0,globalObjetivesCount=0;
+    int globalObjetivesDistinctCount=0,globalObjetivesCount=0;
+
 	//Init de config y logger
 	createConfig(&config);
 	startLogger(config,&logger);
@@ -72,14 +71,11 @@ int main(void) {
 	for(int objCount=0;objCount<globalObjetivesDistinctCount;objCount++){
 		log_debug(logger,"Missing Pokemon %i: %i %s",objCount,missingPkms[objCount].count,missingPkms[objCount].pokemon.name);
 	}
-
-
-	//startScheduler(new,logger);
+    //startScheduler(new,logger);
 
 	deleteLogger(&logger);
 	return EXIT_SUCCESS;
 }
-
 
 int getGlobalObjetivesCount(t_trainer* trainers, int trainersCount){
 	int objcount = 0;
@@ -96,6 +92,10 @@ void subscribeToBroker(struct Broker broker,pthread_t* subs){
 	pthread_create(&(subs[0]),NULL,subscribeToBrokerLocalized,(void*)&broker);
 	pthread_create(&(subs[1]),NULL,subscribeToBrokerAppeared,(void*)&broker);
 	pthread_create(&(subs[2]),NULL,subscribeToBrokerCaught,(void*)&broker);
+	//Dejar para pruebas
+	/*subscribeToBrokerLocalized((void*)&broker);
+	subscribeToBrokerLocalized((void*)&broker);
+	subscribeToBrokerLocalized((void*)&broker);*/
 }
 
 void* subscribeToBrokerLocalized(void *brokerAdress){
@@ -103,7 +103,7 @@ void* subscribeToBrokerLocalized(void *brokerAdress){
 	struct Broker broker = *((struct Broker*) brokerAdress);
 	int socketLocalized = startClient(broker.ip,broker.port,logger);
 	if (-1==SendSubscriptionRequest(LOCALIZED_POKEMON,socketLocalized)){
-		printf("Error en subscripcion de Localized");
+		printf("Error en subscripcion de Localized\n");
 	}
 	pthread_exit(NULL);
 }
@@ -112,7 +112,7 @@ void* subscribeToBrokerAppeared(void *brokerAdress){
 	struct Broker broker = *((struct Broker*) brokerAdress);
 	int socketAppeared = startClient(broker.ip,broker.port,logger);
 	if(-1==SendSubscriptionRequest(APPEARED_POKEMON,socketAppeared)){
-		printf("Error en subscripcion de Appeared");
+		printf("Error en subscripcion de Appeared\n");
 	}
 	pthread_exit(NULL);
 }
@@ -121,7 +121,7 @@ void* subscribeToBrokerCaught(void *brokerAdress){
 	struct Broker broker = *((struct Broker*) brokerAdress);
 	int socketCaught = startClient(broker.ip,broker.port,logger);
 	if(-1==SendSubscriptionRequest(CAUGHT_POKEMON,socketCaught)){
-		printf("Error en subscripcion de Caught");
+		printf("Error en subscripcion de Caught\n");
 	}
 	pthread_exit(NULL);
 }
@@ -132,7 +132,7 @@ void requestNewPokemons(t_objetive* pokemons,int globalObjetivesDistinctCount,t_
 	}
 }
 
-//TODO debería usar la shared cuando este implementado para mandar
+//TODO debería usar la shared cuando este implementado para mandar.
 void requestNewPokemon(t_pokemon missingPkm,t_log* logger){
 	log_debug(logger,"Pokemon requested: %s",missingPkm.name);
 }
@@ -317,7 +317,7 @@ void startTrainers(t_trainer* trainers,int trainersCount,t_config *config,t_log*
 void startTrainer(t_trainer* trainer,t_log *logger){
 
 	trainer->trainer=(pthread_t)malloc(sizeof(pthread_t));
-	pthread_create(&(trainer->trainer),NULL,startThread,trainer);
+	pthread_create(&(trainer->trainer),NULL,(void*)startThread,(void*)trainer);
 	//pthread_join(trainer->trainer,NULL);
 	log_debug(logger,"5. Se creó un entrenador");
 }
@@ -462,9 +462,9 @@ void getTrainerAttrObj(char** trainersObjetives,t_trainer* trainers, int trainer
 	log_debug(logger,"4.3. Finaliza el proceso de carga de objetivos de entrenadores");
 }
 
-//TODO SACAR SEM_WAIT
+//TODO Agregar el cast de trainer (en realidad viene como void*)
 void startThread(t_trainer* trainer){
-	sem_wait(&(trainer->semaphore));
+	//sem_wait(&(trainer->semaphore));
 	printf("\nTrainer Thread created\n");
 
 }
@@ -496,19 +496,19 @@ int getTrainersCount(t_config *config,t_log* logger) {
 	return count;
 }
 
-void schedule(t_trainer* trainers,int* readyCount,struct SchedulingAlgorithm schedulingAlgorithm,t_log* logger){//Para el caso de FIFO y RR no hace nada, ya que las listas están ordenadas por FIFO y RR solo cambia como se procesa.
+void schedule(t_trainer* trainers,int* readyCount,struct SchedulingAlgorithm schedulingAlgorithm,t_trainer* exec, t_log* logger){//Para el caso de FIFO y RR no hace nada, ya que las listas están ordenadas por FIFO y RR solo cambia como se procesa.
 	if (strcmp(schedulingAlgorithm.algorithm,"FIFO")==0){
-		scheduleFifo(trainers,readyCount);
+		scheduleFifo(trainers,readyCount, exec, logger);
 	}else if(strcmp(schedulingAlgorithm.algorithm,"RR")==0){
-		scheduleRR(trainers,readyCount,schedulingAlgorithm);
+		scheduleRR(trainers,readyCount,schedulingAlgorithm, exec, logger);
 	}else if(strcmp(schedulingAlgorithm.algorithm,"SJF-SD")==0){
-		scheduleSJFSD(trainers,readyCount,schedulingAlgorithm);
+		scheduleSJFSD(trainers,readyCount,schedulingAlgorithm, exec, logger);
 	}else if(strcmp(schedulingAlgorithm.algorithm,"SJF-CD")==0){
-		scheduleSJFCD(trainers,readyCount,schedulingAlgorithm);
+		scheduleSJFCD(trainers,readyCount,schedulingAlgorithm, exec, logger);
 	}
 }
 
-void addToReady(t_trainer* trainer,t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm,t_log* logger){
+void addToReady(t_trainer* trainer,t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm,t_log* logger, t_trainer* exec){
 	void* temp = realloc(trainers,sizeof(t_trainer)*((*countReady)+1));
 	if (!temp){
 		log_debug(logger,"error en realloc");
@@ -517,12 +517,12 @@ void addToReady(t_trainer* trainer,t_trainer* trainers,int* countReady,struct Sc
 	(trainers)=temp;
 	(trainers)[(*countReady)]=(*trainer);
 	(*countReady)++;
-	schedule(trainers,countReady,schedulingAlgorithm,logger);
+	schedule(trainers,countReady,schedulingAlgorithm,exec, logger);
 }
 
 //TODO - No debería hacer nada; siempre se agregan cosas al final de ready y se sacan del HEAD de ready
-void scheduleFifo(t_trainer* trainer,int* count){
-;
+void scheduleFifo(t_trainer* trainers,int* count, t_trainer* exec, t_log* logger){
+
 }
 
 void addToExec(t_trainer* ready,int* countReady,t_trainer* exec,t_log* logger){
@@ -539,56 +539,75 @@ void addToExec(t_trainer* ready,int* countReady,t_trainer* exec,t_log* logger){
 		ready=temp;
 }
 
-//TODO - No debería hacer nada; siempre se agregan cosas al final de ready y se sacan del HEAD de ready
-void scheduleRR(t_trainer* trainer,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm){
-	;
+//TODO - cuando termina el quantum mandar al final de la lista de ready.
+void scheduleRR(t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_trainer* exec, t_log* logger){
+	while(*countReady){
+		int i=0;
+		t_trainer* trainer;
+		trainer = ((&trainers)[i]);
+		addToExec(trainer, countReady, exec, logger);
+		for(int j=0;j<=(int)(schedulingAlgorithm.quantum);j++){
+			//TODO executeClock(*countReady, exec, localized_pokemon);
+		}
+		(*countReady)--;
+	}
 }
 
 //TODO
-void scheduleSJFSD(t_trainer* trainer,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm){
+void scheduleSJFSD(t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_trainer* exec, t_log* logger){
 ;
 }
 
 //TODO
-void scheduleSJFCD(t_trainer* trainer,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm){
+void scheduleSJFCD(t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_trainer* exec, t_log* logger){
 ;
 }
 
 
+//TODO - Cómo hacemos para pasarle el targetedPokemon
+int executeClock(int countReady, t_trainer* trainer, t_pokemon* pokemonTargeted){
 
+	if(getDistanceToPokemonTarget(trainer,pokemonTargeted)!=0){
+		moveTrainerToObjective(trainer, pokemonTargeted);
+		return 1;
+	}else if(getDistanceToPokemonTarget(trainer,pokemonTargeted)==0){
+		//CATCH_POKEMON(localized_pokemon)
+		return 0;
+	}else{
+		return -1;
+	}
+}
 
 
 //TODO - Función que mueve al entrenador - Falta ver como implementaremos los semáforos
-void moveTrainerToObjective(t_trainerParameters* trainer,  t_pokemon pokemonTargeted){
+void moveTrainerToObjective(t_trainer* trainer,  t_pokemon* pokemonTargeted){
 
 	//t_trainerParameters* trainerToMove;
 	//trainerToMove = *trainer;
 	int difference_x;
-	difference_x = calculateDifference(trainer->position.x, pokemonTargeted.position.x);
+	difference_x = calculateDifference(trainer->parameters.position.x, pokemonTargeted->position.x);
 	int difference_y;
-	difference_y = calculateDifference(trainer->position.y, pokemonTargeted.position.y);
+	difference_y = calculateDifference(trainer->parameters.position.y, pokemonTargeted->position.y);
 	//meter semáforos acá
 	moveTrainerToTarget(trainer, difference_x, difference_y);
 	//fin semáforos;
 }
 
 //TODO - funcion que mueve una posición al entrenador - Falta Definir como haremos el CATCH
-void moveTrainerToTarget(t_trainerParameters* trainer, int distanceToMoveInX, int distanceToMoveInY){
+void moveTrainerToTarget(t_trainer* trainer, int distanceToMoveInX, int distanceToMoveInY){
 	if(distanceToMoveInX > 0){
-		trainer->position.x++;
+		trainer->parameters.position.x++;
 	}
 	else if(distanceToMoveInX < 0){
-		trainer->position.x--;
+		trainer->parameters.position.x--;
 	}
 	else if(distanceToMoveInY > 0){
-		trainer->position.y++;
+		trainer->parameters.position.y++;
 	}
 	else if(distanceToMoveInY < 0){
-		trainer->position.y--;
+		trainer->parameters.position.y--;
 	}
-	else{
-		//CATCH_POKEMON
-	}
+
 }
 
 
@@ -608,9 +627,9 @@ int getClockTimeToNewPosition(int difference_x, int difference_y){
 }
 
 //Función que devuelve la distancia hacia el pokemon.  TODO hay que hacer una funcion target generica,porque el target puede ser un trainer tambien (deadlock)
-int getDistanceToPokemonTarget(t_trainerParameters* trainer,  t_pokemon* targetPokemon){
-	int distanceInX = calculateDifference(trainer->position.x, targetPokemon->position.x);
-	int distanceInY = calculateDifference(trainer->position.y, targetPokemon->position.y);
+int getDistanceToPokemonTarget(t_trainer* trainer,  t_pokemon* targetPokemon){
+	int distanceInX = calculateDifference(trainer->parameters.position.x, targetPokemon->position.x);
+	int distanceInY = calculateDifference(trainer->parameters.position.y, targetPokemon->position.y);
 	int distance = getClockTimeToNewPosition(distanceInX, distanceInY);
 	return distance;
 }

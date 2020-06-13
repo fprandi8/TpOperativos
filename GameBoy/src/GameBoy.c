@@ -249,7 +249,7 @@ int main(int argc, char **argv) {
 		case BROKER:
 				switch(messageType){
 					case NEW_POKEMON:
-						new_pokemon new = {[],0,0,0};
+						new_pokemon new = {"",0,0,0};
 						new.pokemonName = malloc(sizeof(argv[3]));
 						new.pokemonName = argv[3];
 						new.horizontalCoordinate = argv[4];

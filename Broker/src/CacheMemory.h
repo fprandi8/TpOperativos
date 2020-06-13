@@ -28,6 +28,7 @@
 #include "delibird/comms/messages.h"
 #include "delibird/comms/serialization.h"
 #include <limits.h>
+#include <semaphore.h>
 
 /*
 	******************STRUCTS***********************
@@ -62,8 +63,11 @@ typedef struct{
 */
 t_CacheMemory cache;
 t_config* config;
+semt_t* mutex_cached_messages;
 t_list* cached_messages;
+semt_t* mutex_partitions;
 t_list* partitions;
+sem_t* mutex_nextPartitionId;
 int nextPartitionId;
 
 /*

@@ -15,18 +15,20 @@ void start_cache(void)
     define_cache_maximum_size();
     set_full_memory();
 
+	sem_init(mutex_nextPartitionId, 1)
+	sem_init(mutex_partitions, 1);
+	sem_init(mutex_cached_messages, 1);
 
-    t_partition first_partition;
-    first_partition.id = 1;
+    t_partition first_partition = CreateNewPartition();
     first_partition.begining = cache.full_memory;
     first_partition.size = cache.memory_size;
     first_partition.queue_type = 0;
     first_partition.free = 1;
     first_partition.timestap = clock();
 
+	sem_wait(mutex_partitions);
     list_add(partitions, &(first_partition));
-
-    nextPartitionId++; //TODO create a function to wrap the id asignation, so that we only modify it in one place
+	sem_post()mutex_partitions;
 
     uint32_t i; // random variable to use for breakpoints
 }
@@ -66,13 +68,18 @@ t_cachedMessage create_cached_from_message(deli_message message){
 }
 
 void add_to_cached_messages(t_cachedMessage new_message){
+	sem_wait(mutex_cached_messages);
     list_add(cached_messages, &new_message);
+	sem_post(mutex_cached_messages);
 }
 
 int save_message_body(void* messageContent, message_type queue){
     t_buffer* messageBuffer = SerializeMessageContent(queue, messageContent);
+	sem_wait(mutex_partitions);
     t_partition* partition = find_empty_partition_of_size(sizeof(messageBuffer->bufferSize));
-    return save_body_in_partition(messageBuffer, partition, queue);
+    int savedPartitionId = save_body_in_partition(messageBuffer, partition, queue);
+	sem_post(mutex_partitions);
+	return savedPartitionId;
 }
 
 uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition, message_type queue)
@@ -95,15 +102,12 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
         int newPartitionSize = config_get_int_value(config, TAMANO_MINIMO_PARTICION);
         if(messageBuffer->bufferSize > newPartitionSize) newPartitionSize = messageBuffer->bufferSize;
 
-        t_partition newPartition;
-        newPartition.id = nextPartitionId;
+        t_partition newPartition = CreateNewPartition();
         newPartition.begining = partition->begining;
         newPartition.size = newPartitionSize;
         newPartition.queue_type = queue;
         newPartition.free = 0;
         newPartition.timestap = clock();
-
-        nextPartitionId++;
 
         list_add(partitions, &newPartition);
 
@@ -266,7 +270,7 @@ void compact_memory(void){
 	list_remove_and_destroy_by_condition(partitions, (void*)_is_empty_partition, (void*)Free_CachedMessage);
 	list_clean(partitions);
 	free(partitions);
-	
+
     //TODO delete all empty partitions
     // Marquitos, te dejo esto aca, se me ocurrio una nueva version sobre la marcha no se que te parece, es lo que
     // tiene el coment 'v2', la idea es copiar en una memoria auxiliar, hacer un memcopy a la memoria principal y reubicar
@@ -367,8 +371,10 @@ void Free_CachedMessage(t_cachedMessage* message)
 t_partition* CreateNewPartition()
 {
     t_partition* partition;
+	sem_wait(mutex_nextPartitionId);
     partition->id = nextPartitionId;
     nextPartitionId++;
+	sem_post(mutex_nextPartitionId);
     if(nextPartitionId== INT_MAX) nextPartitionId = 0;
     return partition;
 }
@@ -406,3 +412,5 @@ void* GetMessageContent(int messageId)
     t_partition* partition = GetPartition(message->partitionId);
     return DeserializeMessageContent(partition->queue_type, partition->begining);
 }
+
+

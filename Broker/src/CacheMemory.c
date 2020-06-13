@@ -12,11 +12,8 @@ void start_cache(void)
 	//Receives config from Broker
 	config = get_config();
 	define_partition_size();
-	printf("Partition size %d: ", cache.partition_minimum_size);
 	define_cache_maximum_size();
-	printf("memory size %d: ", cache.memory_size);
 	set_full_memory();
-	printf("Memory starting at %d: ", &cache.full_memory);
 
 
 	t_partition first_partition;
@@ -69,7 +66,7 @@ t_cachedMessage create_cached_from_message(deli_message message){
 }
 
 void add_to_cached_messages(t_cachedMessage new_message){
-	list_add(cached_messages, (void*)new_message);
+	list_add(cached_messages, &new_message);
 }
 
 int save_message_body(void* messageContent, message_type queue){
@@ -108,7 +105,7 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
 
 		nextPartitionId++;
 
-		list_add(partitions, newPartition);
+		list_add(partitions, &newPartition);
 
 		partition->begining += newPartitionSize + 1;
 		partition->timestap = clock();
@@ -211,7 +208,8 @@ void compact_memory(void){
     bool _is_empty_partition(t_partition* partition){ return partition->free; }
     bool _filter_busy_partition(t_partition* partition){ return !partition->free;}
 
-	t_partition first_empty_partition = list_find(partitions, (void *)_is_empty_partition);
+	t_partition* first_empty_partition = (t_partition*)malloc(sizeof(t_partition*));
+	first_empty_partition = list_find(partitions, (void*)_is_empty_partition);
     t_list* occupied_partitions = list_filter(partitions, (void *) _filter_busy_partition);
 
 	/*t_CacheMemory newCache;
@@ -251,7 +249,7 @@ void compact_memory(void){
     t_partition* emptySpacePartition = CreateNewPartition();
     emptySpacePartition->begining = NULL;
     emptySpacePartition->size = cache.memory_size - occupied_size;
-    emptySpacePartition->queue_type = NULL;
+    emptySpacePartition->queue_type = 0;
     emptySpacePartition->free = true;
     emptySpacePartition->timestap = clock();
 
@@ -264,6 +262,7 @@ void compact_memory(void){
     memcpy(cache.full_memory, backUp_memory, sizeof(backUp_memory));//v2
     list_iterate(occupied_partitions, (void*)_reasignPartitionPointers);//v2
     free(backUp_memory);
+    free(first_empty_partition);
     //TODO delete all empty partitions
     // Marquitos, te dejo esto aca, se me ocurrio una nueva version sobre la marcha no se que te parece, es lo que
     // tiene el coment 'v2', la idea es copiar en una memoria auxiliar, hacer un memcopy a la memoria principal y reubicar
@@ -276,12 +275,14 @@ void compact_memory(void){
     //TODO add times compacting here or outside?
 }
 
-uint32_t add_occupied_size_from(t_list* list){
+uint32_t add_occupied_size_from(t_list* occupied){
     uint32_t sum = 0;
-    for (int i = 0; i < sizeof(list); ++i) {
-        t_partition partition = list_get(list, i);
-        sum += partition.size;
+    t_partition* partition = (t_partition*) malloc(sizeof(t_partition*));
+    for (int i = 0; i < sizeof(occupied); ++i) {
+        partition = list_get(occupied, i);
+        sum += partition->size;
     }
+    free(partition);
     return sum;
 }
 

@@ -93,12 +93,13 @@ t_partition* select_partition_ff(uint32_t size); //select by first fit
 char* select_partition_bf(uint32_t size); //select by best fit
 int delete_partition_fifo(void); //delete by fifo
 int delete_partition_lru(void); //delete by lru
-t_list* GetMessagesFromQueue(queue_type);
+t_list* GetMessagesFromQueue(message_type queue_type);
 t_cachedMessage* GetMessage(int);
 void* GetMessageContent(int);
 t_partition* CreateNewPartition();
 t_cachedMessage create_cached_from_message(deli_message);
 void Free_CachedMessage(t_cachedMessage*);
 void add_to_cached_messages(t_cachedMessage);
+uint32_t add_occupied_size_from(t_list* occupied);
 
 #endif /* CACHEMEMORY_H_ */

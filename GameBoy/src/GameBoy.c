@@ -200,7 +200,6 @@ int main(int argc, char **argv) {
 
 	//Get IP from config
 	t_config* config = config_create("gameboy.config");
-
 	initBroker(&broker);
 	readConfigBrokerValues(config,&broker);
 
@@ -247,14 +246,14 @@ int main(int argc, char **argv) {
 	void* message = NULL;
 	//For the message, try to create the message
 	switch(reciver){
-		case BROKER:{
+		case BROKER:
 				switch(messageType){
 					case NEW_POKEMON:
-						new_pokemon new = malloc(sizeof(new_pokemon));
+						new_pokemon new = {[],0,0,0};
 						new.pokemonName = malloc(sizeof(argv[3]));
 						new.pokemonName = argv[3];
 						new.horizontalCoordinate = argv[4];
-						new.verticalCoordinate = argv[5];;
+						new.verticalCoordinate = argv[5];
 						new.ammount = argv[6];
 						message = &new;
 						break;
@@ -263,7 +262,7 @@ int main(int argc, char **argv) {
 						app.pokemonName = malloc(sizeof(argv[3]));
 						memcpy(app.pokemonName,argv[3]);
 						app.horizontalCoordinate = argv[4];
-						app.verticalCoordinate = argv[5];;
+						app.verticalCoordinate = argv[5];
 						//TODO ver con marcos por el correlation id
 						//app.cid = argv[6];
 						message = &app;
@@ -273,29 +272,89 @@ int main(int argc, char **argv) {
 						cat.pokemonName = malloc(sizeof(argv[3]));
 						memcpy(cat.pokemonName,argv[3]);
 						cat.horizontalCoordinate = argv[4];
-						cat.verticalCoordinate = argv[5];;
+						cat.verticalCoordinate = argv[5];
 						message = &cat;
 						break;
 					case CAUGHT_POKEMON:
-						caught_pokemon cau = malloc(sizeof(caught_pokemon ));
-						cau.pokemonName = malloc(sizeof(argv[3]));
-						memcpy(cau.pokemonName,argv[3]);
-						cau.horizontalCoordinate = argv[4];
-						cau.verticalCoordinate = argv[5];;
+						caught_pokemon cau = malloc(sizeof(caught_pokemon));
+						//TODO ver con marcos por el correlation id
+						//cau.cid = argv[3];
+						cau.caught = argv[4];
 						message = &cau;
 						break;
-			}
+					case GET_POKEMON:
+						get_pokemon get = malloc(sizeof(get_pokemon));
+						get.pokemonName = malloc(sizeof(argv[3]));
+						memcpy(cat.pokemonName,argv[3]);
+						message = &cat;
+						break;
+					default:
+						return -1;
+				}
+				break;
+			case TEAM:
+				switch(messageType){
+					case APPEARED_POKEMON:
+						appeared_pokemon app = malloc(sizeof(appeared_pokemon));
+						app.pokemonName = malloc(sizeof(argv[3]));
+						memcpy(app.pokemonName,argv[3]);
+						app.horizontalCoordinate = argv[4];
+						app.verticalCoordinate = argv[5];
+						message = &app;
+						break;
+				default:
+					return -1;
+				}
+				break;
+			case GAMECARD:
+				switch(messageType){
+					case NEW_POKEMON:
+						new_pokemon new = malloc(sizeof(new_pokemon));
+						new.pokemonName = malloc(sizeof(argv[3]));
+						new.pokemonName = argv[3];
+						new.horizontalCoordinate = argv[4];
+						new.verticalCoordinate = argv[5];
+						new.ammount = argv[6];
+						//TODO ver con marcos por el correlation id
+						//new.cid = argv[7];
+						message = &new;
+						break;
+					case CATCH_POKEMON:
+						catch_pokemon cat = malloc(sizeof(catch_pokemon));
+						cat.pokemonName = malloc(sizeof(argv[3]));
+						memcpy(cat.pokemonName,argv[3],sizeof(argv[3]));
+						memcpy
+						cat.horizontalCoordinate = argv[4];
+						cat.verticalCoordinate = argv[5];
+						//TODO ver con marcos por el correlation id
+						//cat.cid = argv[6];
+						message = &cat;
+						break;
+					case GET_POKEMON:
+						get_pokemon get = malloc(sizeof(get_pokemon));
+						get.pokemonName = malloc(sizeof(argv[3]));
+						memcpy(cat.pokemonName,argv[3]);
+						//TODO ver con marcos por el correlation id
+						//get.cid = argv[4];
+						message = &cat;
+						break;
+					default:
+						return -1;
+				}
+				break;
+				case SUSCRIPTOR:
+					//TODO
+
 			default:
 				printf("Message type not supported\n");
 				return 1;
 			}
-	}
 
 
 	/// Test Sending, TODO Remove
-	Vector2 coordinates[] = {{1,2},{89,34},{75,13}};
-	localized_pokemon localized = {"squirtle", 3, coordinates};
-	Send_LOCALIZED(localized, server_socket);
+	//Vector2 coordinates[] = {{1,2},{89,34},{75,13}};
+	//localized_pokemon localized = {"squirtle", 3, coordinates};
+	//Send_LOCALIZED(localized, server_socket);
 	//SendSubscriptionRequest(APPEARED_POKEMON, server_socket);
 	//SendMessageAcknowledge(319, server_socket);
 

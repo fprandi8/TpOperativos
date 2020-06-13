@@ -246,7 +246,7 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 
 	t_message_administrator* messageAdmnistrator = message_administrator_initialize(message->id);
 
-	list_add(queue->messagesAdministrator,messageAdmnistrator);
+	list_add(&(queue->messagesAdministrator),messageAdmnistrator);
 
 	t_args_queue* args= (t_args_queue*) malloc (sizeof(t_args_queue*));
 	args->messageAdministrator = (t_message_administrator*) malloc(sizeof(t_message_administrator*));

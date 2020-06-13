@@ -181,7 +181,7 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	char* pokemonName = argv[3];
+	/*char* pokemonName = argv[3];
 	printf("%s \n",pokemonName);
 	int numberOfIntegerArguments = argc-4;
 	printf("%i \n",numberOfIntegerArguments);
@@ -195,7 +195,7 @@ int main(int argc, char **argv) {
 			return 1;
 		}
 		messageIntegerArguments[u] = argument;
-	}
+	}*/
 
 
 	//Get IP from config
@@ -243,21 +243,47 @@ int main(int argc, char **argv) {
 	//TODO Create message as requested and send
 
 
-/*
+
 	void* message = NULL;
 	//For the message, try to create the message
 	switch(reciver){
 		case BROKER:{
 				switch(messageType){
 					case NEW_POKEMON:
-						new_pokemon new = { "", 0, 0, 0};
-						new.pokemonName = pokemonName;
-						new.horizontalCoordinate = messageIntegerArguments[0];
-						new.verticalCoordinate = messageIntegerArguments[1];
-						new.ammount = messageIntegerArguments[2];
+						new_pokemon new = malloc(sizeof(new_pokemon));
+						new.pokemonName = malloc(sizeof(argv[3]));
+						new.pokemonName = argv[3];
+						new.horizontalCoordinate = argv[4];
+						new.verticalCoordinate = argv[5];;
+						new.ammount = argv[6];
 						message = &new;
 						break;
-					case
+					case APPEARED_POKEMON:
+						appeared_pokemon app = malloc(sizeof(appeared_pokemon));
+						app.pokemonName = malloc(sizeof(argv[3]));
+						memcpy(app.pokemonName,argv[3]);
+						app.horizontalCoordinate = argv[4];
+						app.verticalCoordinate = argv[5];;
+						//TODO ver con marcos por el correlation id
+						//app.cid = argv[6];
+						message = &app;
+						break;
+					case CATCH_POKEMON:
+						catch_pokemon cat = malloc(sizeof(catch_pokemon));
+						cat.pokemonName = malloc(sizeof(argv[3]));
+						memcpy(cat.pokemonName,argv[3]);
+						cat.horizontalCoordinate = argv[4];
+						cat.verticalCoordinate = argv[5];;
+						message = &cat;
+						break;
+					case CAUGHT_POKEMON:
+						caught_pokemon cau = malloc(sizeof(caught_pokemon ));
+						cau.pokemonName = malloc(sizeof(argv[3]));
+						memcpy(cau.pokemonName,argv[3]);
+						cau.horizontalCoordinate = argv[4];
+						cau.verticalCoordinate = argv[5];;
+						message = &cau;
+						break;
 			}
 			default:
 				printf("Message type not supported\n");
@@ -265,7 +291,6 @@ int main(int argc, char **argv) {
 			}
 	}
 
-	*/
 
 	/// Test Sending, TODO Remove
 	Vector2 coordinates[] = {{1,2},{89,34},{75,13}};

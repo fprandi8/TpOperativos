@@ -7,6 +7,16 @@
 
 #include "CacheMemory.h"
 
+
+void signal_handler(int signum)
+{
+    if (signum == SIGUSR1)
+    {
+        printf("Received SIGUSR1!\n");
+    }
+}
+
+
 void start_cache(void)
 {
     //Receives config from Broker
@@ -15,20 +25,23 @@ void start_cache(void)
     define_cache_maximum_size();
     set_full_memory();
 
-	sem_init(mutex_nextPartitionId, 1)
-	sem_init(mutex_partitions, 1);
-	sem_init(mutex_cached_messages, 1);
+	sem_init(mutex_nextPartitionId, 0, 1);
+	sem_init(mutex_partitions, 0, 1);
+	sem_init(mutex_cached_messages, 0, 1);
 
-    t_partition first_partition = CreateNewPartition();
-    first_partition.begining = cache.full_memory;
-    first_partition.size = cache.memory_size;
-    first_partition.queue_type = 0;
-    first_partition.free = 1;
-    first_partition.timestap = clock();
+	signal(SIGUSR1, signal_handler);
+
+    t_partition* first_partition = CreateNewPartition();
+    first_partition->begining = cache.full_memory;
+    first_partition->size = cache.memory_size;
+    first_partition->queue_type = 0;
+    first_partition->free = 1;
+    first_partition->timestap = clock();
 
 	sem_wait(mutex_partitions);
-    list_add(partitions, &(first_partition));
-	sem_post()mutex_partitions;
+    list_add(partitions, first_partition);
+	sem_post(mutex_partitions);
+
 
     uint32_t i; // random variable to use for breakpoints
 }
@@ -46,7 +59,7 @@ void define_cache_maximum_size(void){
 }
 
 void set_full_memory(void){
-    cache.full_memory = (char) malloc(cache.memory_size * sizeof(char));
+    cache.full_memory = (char*) malloc(cache.memory_size * sizeof(char));
 }
 
 void save_message(deli_message message){
@@ -97,30 +110,30 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
         return partition->id;
     }
 
-    if(config_get_string_value(config, ALGORITMO_MEMORIA) == "DYNAMIC")
+    if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC"))
     {
         int newPartitionSize = config_get_int_value(config, TAMANO_MINIMO_PARTICION);
         if(messageBuffer->bufferSize > newPartitionSize) newPartitionSize = messageBuffer->bufferSize;
 
-        t_partition newPartition = CreateNewPartition();
-        newPartition.begining = partition->begining;
-        newPartition.size = newPartitionSize;
-        newPartition.queue_type = queue;
-        newPartition.free = 0;
-        newPartition.timestap = clock();
+        t_partition* newPartition = CreateNewPartition();
+        newPartition->begining = partition->begining;
+        newPartition->size = newPartitionSize;
+        newPartition->queue_type = queue;
+        newPartition->free = 0;
+        newPartition->timestap = clock();
 
-        list_add(partitions, &newPartition);
+        list_add(partitions, newPartition);
 
         partition->begining += newPartitionSize + 1;
         partition->timestap = clock();
 
         memcpy(partition->begining, messageBuffer->stream, sizeof(messageBuffer->bufferSize));
-        return newPartition.id;
+        return newPartition->id;
     }
     else
     {
         //TODO Handle buddy creation
-        uint32_t var;
+        uint32_t var = 0;
         return var;
     }
 }
@@ -137,7 +150,7 @@ t_partition* find_empty_partition_of_size(uint32_t size){
         do
         {
             delete_partition();
-            busyPartitions = GetBusyParitionsCount();
+            busyPartitions = GetBusyPartitionsCount();
             partition = select_partition(size);
         }
         while(partition == NULL && busyPartitions > 0);
@@ -146,9 +159,12 @@ t_partition* find_empty_partition_of_size(uint32_t size){
             compact_memory();
             partition = select_partition(size);
             return partition;
+        } else
+        {
+        	return partition;
         }
     }
-    else if(compaction_frequency > 0)
+    else
     {
         //TODO maybe add a validator for config at the start so compaction_frequency == 0 or < -1 cannot be a case
         do
@@ -171,9 +187,9 @@ t_partition* find_empty_partition_of_size(uint32_t size){
     }
 }
 
-char* select_partition(uint32_t size){
-    char *partition;
-    if(config_get_string_value(config, ALGORITMO_REEMPLAZO) == "FF"){ //compare dif algoritmos
+t_partition* select_partition(uint32_t size){
+	t_partition *partition;
+    if(strcmp(config_get_string_value(config, ALGORITMO_REEMPLAZO),"FF")){ //compare dif algoritmos
         partition = select_partition_ff(size);
     }else{
         partition = select_partition_bf(size);
@@ -191,7 +207,7 @@ t_partition* select_partition_ff(uint32_t size){
 }
 
 
-char* select_partition_bf(uint32_t size){
+t_partition* select_partition_bf(uint32_t size){
 
     t_partition* bestFitPartition = NULL;
     void _get_best_fit(t_partition* partition)
@@ -213,7 +229,7 @@ void compact_memory(void){
     bool _filter_busy_partition(t_partition* partition){ return !partition->free;}
 
     //t_partition* first_empty_partition = (t_partition*)malloc(sizeof(t_partition*));
-    t_list* empty_partitions = list_filter(partitions, (void*)_is_empty_partition);
+    //t_list* empty_partitions = list_filter(partitions, (void*)_is_empty_partition);
     t_list* occupied_partitions = list_filter(partitions, (void *) _filter_busy_partition);
 
     /*t_CacheMemory newCache;
@@ -221,7 +237,7 @@ void compact_memory(void){
     newCache.memory_size = cache.memory_size;
     newCache.full_memory = (char) malloc(cache.memory_size * sizeof(char));
 */
-    char* backUp_memory = (char) malloc(cache.memory_size * sizeof(char));//v2
+    char* backUp_memory = (char*) malloc(cache.memory_size * sizeof(char));//v2
 
     //For each occupied partition, copy from the cache to the new memory, and re-asign begining of cache
     /*int offset = 0;
@@ -263,7 +279,7 @@ void compact_memory(void){
 	free(cache.full_memory); //The moment of truth
 */
     list_iterate(occupied_partitions, (void*)_asignPartitionOnBackUpMem);//v2
-    memcpy(cache.full_memory, backUp_memory, sizeof(backUp_memory));//v2
+    memcpy(cache.full_memory, backUp_memory, sizeof(cache.memory_size));//v2
     list_iterate(occupied_partitions, (void*)_reasignPartitionPointers);//v2
     free(backUp_memory);
 
@@ -300,7 +316,7 @@ void check_compact_restrictions(void){
 
 void delete_partition(void){
     int deletedParitionId;
-    if(config_get_string_value(config, ALGORITMO_REEMPLAZO) == "FIFO"){//compare dif algoritmos
+    if(strcmp(config_get_string_value(config, ALGORITMO_REEMPLAZO),"FIFO")){//compare dif algoritmos
         deletedParitionId = delete_partition_fifo();
     }else{
         deletedParitionId = delete_partition_lru();
@@ -343,7 +359,7 @@ int delete_partition_lru(void){
     return leastUsedPartition->id;
 }
 
-int GetBusyParitionsCount()
+int GetBusyPartitionsCount()
 {
     bool _filter_busy_parittion(t_partition* partition)
     {
@@ -370,9 +386,9 @@ void Free_CachedMessage(t_cachedMessage* message)
 
 t_partition* CreateNewPartition()
 {
-    t_partition* partition;
+    t_partition* partition = (t_partition*)malloc(sizeof(t_partition));
 	sem_wait(mutex_nextPartitionId);
-    partition->id = nextPartitionId;
+	partition->id = nextPartitionId;
     nextPartitionId++;
 	sem_post(mutex_nextPartitionId);
     if(nextPartitionId== INT_MAX) nextPartitionId = 0;
@@ -388,7 +404,7 @@ t_list* GetMessagesFromQueue(message_type type)
     return list_filter(cached_messages, (void*)_message_by_queue);
 }
 
-t_cachedMessage* GetMessage(int messageId)
+t_cachedMessage* GetCachedMessage(int messageId)
 {
     bool _message_by_id(t_cachedMessage* message)
     {
@@ -408,9 +424,15 @@ t_partition* GetPartition(int partitionId)
 
 void* GetMessageContent(int messageId)
 {
-    t_cachedMessage* message = GetMessage(messageId);
+    t_cachedMessage* message = GetCachedMessage(messageId);
     t_partition* partition = GetPartition(message->partitionId);
     return DeserializeMessageContent(partition->queue_type, partition->begining);
 }
 
+
+
+void PrintDumpOfCache()
+{
+
+}
 

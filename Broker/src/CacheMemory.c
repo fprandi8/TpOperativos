@@ -20,12 +20,12 @@ void start_cache(void)
 
 
 	t_partition first_partition;
-	first_parition.id = 1;
-	first_parition.begining = cache.full_memory;
-	first_parition.size = cache.memory_size;
-	first_parition.queue_type = NULL;
-	first_parition.free = 1;
-	first_parition.timestap = clock();
+	first_partition.id = 1;
+	first_partition.begining = cache.full_memory;
+	first_partition.size = cache.memory_size;
+	first_partition.queue_type = NULL;
+	first_partition.free = 1;
+	first_partition.timestap = clock();
 
 	list_add(partitions, first_partition);
 
@@ -52,16 +52,16 @@ void set_full_memory(void){
 
 void save_message(deli_message message){
 	t_cachedMessage new_message = create_cached_from_message(message);
-	new_message.partitionId = save_message_body(message.messageContent, message.queue_type);
+	new_message.partitionId = save_message_body(message.messageContent, message.messageType);
 	add_to_cached_messages(new_message);
 
 }
 
 t_cachedMessage create_cached_from_message(deli_message message){
 	t_cachedMessage new_message;
-	new_message.id = m.id;
-	new_message.corelationid = m.correlationId;
-	new_message.queue_type = m.messageType;
+	new_message.id = message.id;
+	new_message.corelationId = message.correlationId;
+	new_message.queue_type = message.messageType;
 	new_message.sent_to_subscribers = NULL;
 	new_message.ack_by_subscribers = NULL;
 	new_message.partitionId = 0;
@@ -72,25 +72,25 @@ void add_to_cached_messages(t_cachedMessage new_message){
 	list_add(cached_messages, new_message);
 }
 
-int save_message_body(void* messageContent, queue_type queue){
+int save_message_body(void* messageContent, message_type queue){
 	t_buffer* messageBuffer = SerializeMessageContent(queue, messageContent);
-	t_partition* partition = find_empty_partition_of_size(sizeof(t_buffer->bufferSize));
+	t_partition* partition = find_empty_partition_of_size(sizeof(messageBuffer->bufferSize));
 	return save_body_in_partition(messageBuffer, partition, queue);
 }
 
-void save_body_in_partition(t_buffer* messageBuffer, t_partition* partition, queue_type queue)
+uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition, message_type queue)
 {
 
 	if(partition->size == messageBuffer->bufferSize)
 	{
-		partition.queue_type = queue;
-		partition.free = 0;
-		partition.timestap = clock();
+		partition->queue_type = queue;
+		partition->free = 0;
+		partition->timestap = clock();
 
 		nextPartitionId++;
 
 		memcpy(partition->begining, messageBuffer->stream, sizeof(messageBuffer->bufferSize));
-		return partitionid;
+		return partition->id;
 	}
 
 	if(config_get_string_value(config, ALGORITMO_MEMORIA) == "DYNAMIC")
@@ -110,8 +110,8 @@ void save_body_in_partition(t_buffer* messageBuffer, t_partition* partition, que
 
 		list_add(partitions, newPartition);
 
-		partition.begining += newPartitionSize + 1;
-		partition.timestap = clock();
+		partition->begining += newPartitionSize + 1;
+		partition->timestap = clock();
 
 		memcpy(partition->begining, messageBuffer->stream, sizeof(messageBuffer->bufferSize));
 		return newPartition.id;
@@ -119,15 +119,17 @@ void save_body_in_partition(t_buffer* messageBuffer, t_partition* partition, que
 	else
 	{
 		//TODO Handle buddy creation
+		uint32_t var;
+		return var;
 	}
 }
 
 
 t_partition* find_empty_partition_of_size(uint32_t size){
-	if(size > cache.memory_size) //TODO decide what to do when message is too big
+//	if(size > cache.memory_size); //TODO decide what to do when message is too big
 	t_partition* partition = select_partition(size);
 	int compaction_frequency =  config_get_int_value(config, FRECUENCIA_COMPACTACION);
-	if(partition != null) return partition;
+	if(partition != NULL) return partition;
 	if(compaction_frequency == -1)
 	{
 		int busyPartitions = 0;
@@ -309,7 +311,7 @@ int delete_partition_fifo(void){
 	{
 		if(partition->free == 0) return true; else return false;
 	}
-	t_partition* partition = (t_parition*)list_find(partitions, (void*)_first_busy_partition);
+	t_partition* partition = (t_partition*)list_find(partitions, (void*)_first_busy_partition);
 	partition->free = 1;
 	return partition->id;
 }
@@ -321,13 +323,13 @@ int delete_partition_lru(void){
 		if(leastUsedPartition == NULL) leastUsedPartition = partition;
 		else
 		{
-			if(clock() - leastUsedPartition->timestamp < clock() -  partition->timestamp) leastUsedPartition = partition;
+			if(clock() - leastUsedPartition->timestap < clock() -  partition->timestap) leastUsedPartition = partition;
 		}
 	}
 
 	list_iterate(t_list *, (void)_get_least_used);
 	leastUsedPartition->free = 1;
-	leastUsedPartition->timestamp = clock();
+	leastUsedPartition->timestap = clock();
 
 	return leastUsedPartition->id;
 }
@@ -339,7 +341,7 @@ int GetBusyParitionsCount()
 		if(partition->free == 0) return true; else return false;
 	}
 	t_list* busyPartitions = list_filter(paritions, (void*)_filter_busy_parittion);
-	int busyPartitionsCount = list_size(filteredList);
+	int busyPartitionsCount = list_size(busyPartitions);
 	list_clean(busyPartitions);
 	return busyPartitionsCount;
 }
@@ -359,18 +361,18 @@ void Free_CachedMessage(t_message* message)
 
 t_partition* CreateNewPartition()
 {
-	t_partition paritition;
-	paritition.id = nextPartitionId;
+	t_partition partition;
+	partition.id = nextPartitionId;
 	nextPartitionId++;
-	if(nextPartition = INT_MAX) nextPartition = 0;
-	return t_partition;
+	if(nextPartitionId== INT_MAX) nextPartitionId = 0;
+	return partition;
 }
 
-t_list* GetMessagesFromQueue(queue_type type)
+t_list* GetMessagesFromQueue(message_type type)
 {
 	bool _message_by_queue(t_cachedMessage* message)
 	{
-		if(message->queue == type) return true: else return false;
+		if(message->queue_type == type) return true; else return false;
 	}
 	return list_filter(cached_messages, (void*)_message_by_queue);
 }
@@ -379,18 +381,18 @@ t_cachedMessage* GetMessage(int messageId)
 {
 	bool _message_by_id(t_cachedMessage* message)
 	{
-		if(message->id == messageId) return true: else return false;
+		if(message->id == messageId) return true; else return false;
 	}
 	return (t_cachedMessage*)list_find(cached_messages, (void*)_message_by_id);
 }
 
-t_paritition* GetPartition(int partitionId)
+t_partition* GetPartition(int partitionId)
 {
 	bool _partition_by_id(t_partition* partition)
 	{
-		if(partition->id == partitionId) return true: else return false;
+		if(partition->id == partitionId) return true; else return false;
 	}
-	return (t_paritition*)list_find(partitions, (void*)_partition_by_id);
+	return (t_partition*)list_find(partitions, (void*)_partition_by_id);
 }
 
 void* GetMessageContent(int messageId)

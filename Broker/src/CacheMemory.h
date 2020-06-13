@@ -19,7 +19,6 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include <stdbool.h>
-#include<stduint32_t.h>
 #include<unistd.h>
 #include <time.h>
 #include<commons/log.h>
@@ -85,7 +84,7 @@ t_buffer* get_message_body(); //implement if needed
 int save_message_body(t_buffer* messageBuffer); //see if we need to return a value
 //partition handlers
 t_partition* find_empty_partition_of_size(uint32_t size);
-void save_body_in_partition(t_buffer* messageBuffer, char* position); //check if this is needed
+uint32_t save_body_in_partition(t_buffer* messageBuffer, char* position); //check if this is needed
 void compact_memory(void);
 void check_compact_restrictions(void);
 void delete_partition(void);

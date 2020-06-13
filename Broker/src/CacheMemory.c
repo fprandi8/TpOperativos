@@ -202,7 +202,7 @@ char* select_partition_bf(uint32_t size){
 			if(partition->size >= size && partition->size < bestFitPartition->size) bestFitPartition = partition;
 		}
 	}
-	list_iterate(t_list *, (void*)_get_best_fit);
+	list_iterate(partitions, (void*)_get_best_fit);
 	return bestFitPartition;
 }
 
@@ -222,13 +222,13 @@ void compact_memory(void){
 	char* backUp_memory = (char) malloc(cache.memory_size * sizeof(char));//v2
 
 	//For each occupied partition, copy from the cache to the new memory, and re-asign begining of cache
-	int offset = 0;
+	/*int offset = 0;
 	void _asignPartitionOnNewCache(t_partition* partition)
 	{
 		memcpy(newCache.full_memory + offset, partition->begining, partition->size);
 		partition->begining = cache.full_memory + offset;
 		offset += partition->size;
-	}
+	}*/
 
 	int offsetMem = 0;//v2
     void _asignPartitionOnBackUpMem(t_partition* partition)//v2
@@ -346,7 +346,7 @@ int GetBusyParitionsCount()
 	return busyPartitionsCount;
 }
 
-void Free_CachedMessage(t_message* message)
+void Free_CachedMessage(t_cachedMessage* message)
 {
 	void _free_sendOrAck(void* sendOrAck)
 	{

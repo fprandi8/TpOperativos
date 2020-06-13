@@ -183,7 +183,7 @@ t_partition* select_partition_ff(uint32_t size){
 	{
 		if(partition->free && partition->size >= size) return true; else return false;
 	}
-	t_partition* partition = (t_parition*)list_find(partitions, (void*)_does_partition_fit);
+	t_partition* partition = (t_partition*)list_find(partitions, (void*)_does_partition_fit);
 	return partition;
 }
 
@@ -206,8 +206,42 @@ char* select_partition_bf(uint32_t size){
 
 
 void compact_memory(void){
-	check_compact_restrictions();
-	//TODO compact logic
+    bool _is_empty_partition(t_partition* partition){ return partition->free; }
+    bool _filter_busy_partition(t_partition* partition){ return !partition->free;}
+
+	t_partition first_empty_partition = list_find(partitions, (void *)_is_empty_partition);
+    t_list* occupied_partitions = list_filter(partitions, (void *) _filter_busy_partition);
+    //TODO check if needed to change partitions beginnings
+    uint32_t occupied_size = add_occupied_size_from(occupied_partitions);
+
+    t_partition available_space_partition;
+    available_space_partition.id = sizeof(occupied_partitions) + 1;
+    t_partition last_occupied_partition = list_get(occupied_partitions, sizeof(occupied_partitions));
+    available_space_partition.begining = last_occupied_partition.begining + last_occupied_partition.size;
+    available_space_partition.size = cache.memory_size - occupied_size;
+    available_space_partition.queue_type = NULL;
+    available_space_partition.free = true;
+    available_space_partition.timestap = clock();
+
+    list_add(occupied_partitions, available_space_partition);
+
+    for (int i = 0; i < sizeof(occupied_partitions); ++i) {
+        t_partition partition = list_get(occupied_partitions, partition);
+        partition.id = i + 1;
+        list_replace(occupied_partitions, i, partition);
+    }
+
+    partitions = occupied_partitions;
+    //TODO add times compacting here or outside?
+}
+
+uint32_t add_occupied_size_from(t_list* list){
+    uint32_t sum = 0;
+    for (int i = 0; i < sizeof(list); ++i) {
+        t_partition partition = list_get(list, i);
+        sum += partition.size;
+    }
+    return sum;
 }
 
 void check_compact_restrictions(void){

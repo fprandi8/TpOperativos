@@ -15,7 +15,7 @@ uint32_t ID = 0;
 
 int main(void) {
 
-	start_cache();
+	//start_cache();
 	t_log* logger;
 	t_config* config;
 
@@ -57,7 +57,7 @@ int main(void) {
 
 		cliente = esperar_cliente(server);
 
-		t_args* args= (t_args*) malloc (sizeof (t_args*));
+		t_args* args= (t_args*) malloc (sizeof (t_args));
 
 		args->cliente = &cliente;
 		args->broker = broker;
@@ -249,15 +249,15 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 
 	list_add(queue->messagesAdministrator,messageAdmnistrator);
 
-	t_args_queue* args= (t_args_queue*) malloc (sizeof(t_args_queue*));
-	args->messageAdministrator = (t_message_administrator*) malloc(sizeof(t_message_administrator*));
+	t_args_queue* args= (t_args_queue*) malloc (sizeof(t_args_queue));
+	args->messageAdministrator = (t_message_administrator*) malloc(sizeof(t_message_administrator));
 	args->message =message;
 	args->queue = queue;
 	args->broker = broker;
 
 	int index = 0;
 
-	t_suscriptor* suscriptor = (t_suscriptor*) malloc (sizeof(t_suscriptor*));
+	t_suscriptor* suscriptor = (t_suscriptor*) malloc (sizeof(t_suscriptor));
 
 	while(list_get(queue->suscriptors, index) != NULL){
 		suscriptor=(t_suscriptor*)list_get(queue->suscriptors, index);
@@ -360,7 +360,7 @@ t_suscriptor* queue_handler_get_suscriptor(t_queue_handler* self,int pos){
 // Messege admnistrator logic
 t_message_administrator* message_administrator_initialize(uint32_t id)
 {
-	t_message_administrator* aux =(t_message_administrator*) malloc(sizeof(t_message_administrator*));
+	t_message_administrator* aux =(t_message_administrator*) malloc(sizeof(t_message_administrator));
 
 	aux->messageId = id;
 	sem_init(&(aux->semaphoreACK),0,1);
@@ -373,7 +373,7 @@ t_message_administrator* messege_administrator_get_administrator(t_list* list, u
 	int index = 0;
 	int match = 0 ;
 
-	t_message_administrator* aux = (t_message_administrator*)malloc(sizeof(t_message_administrator*));
+	t_message_administrator* aux = (t_message_administrator*)malloc(sizeof(t_message_administrator));
 
 	while((list_get(list, index) != NULL)&&(!match)){
 

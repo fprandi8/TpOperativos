@@ -71,7 +71,7 @@ t_cachedMessage create_cached_from_message(deli_message message){
 void add_to_cached_messages(t_cachedMessage new_message){
 	list_add(cached_messages, new_message);
 }
-//todo refactor this with the new partition structure
+
 int save_message_body(void* messageContent, queue_type queue){
 	t_buffer* messageBuffer = SerializeMessageContent(queue, messageContent);	
 	t_partition* partition = find_empty_partition_of_size(sizeof(t_buffer->bufferSize));
@@ -217,45 +217,58 @@ void compact_memory(void){
 	newCache.memory_size = cache.memory_size;
 	newCache.full_memory = (char) malloc(cache.memory_size * sizeof(char));
 
+	char* backUp_memory = (char) malloc(cache.memory_size * sizeof(char));//v2
+
 	//For each occupied partition, copy from the cache to the new memory, and re-asign begining of cache
 	int offset = 0;
 	void _asignPartitionOnNewCache(t_partition* partition)
 	{
 		memcpy(newCache.full_memory + offset, partition->begining, partition->size);
-		partition->begining = newCache.full_memory + offset;
+		partition->begining = cache.full_memory + offset;
 		offset += partition->size;
 	}
-	list_iterate(occupied_partitions, (void*)_asignPartitionOnNewCache);
-	free(cache.full_memory); //The moment of truth
-	cache = newCache;
 
-	t_partition* emptySpacePartition = CreateNewPartition();
+	int offsetMem = 0;//v2
+    void _asignPartitionOnBackUpMem(t_partition* partition)//v2
+	{
+		memcpy(backUp_memory + offsetMem, partition->begining, partition->size);
+		offsetMem += partition->size;
+	}
 
-	//TODO
-	//- delete all empty partitions
-	//- create big empty paritition
+	int offsetPointerMem = 0;//v2
+    void _reasignPartitionPointers(t_partition* partition)//v2
+	{
+        partition->begining = cache.full_memory + offsetPointerMem;
+        offsetPointerMem += partition->size;
+	}
 
-    //TODO check if needed to change partitions beginnings
+
+    //- create big empty paritition
     uint32_t occupied_size = add_occupied_size_from(occupied_partitions);
 
-	//TODO crear nueva cache, ir por cada particion ocupada y moverla a la nueva cache
+    t_partition* emptySpacePartition = CreateNewPartition();
+    emptySpacePartition->begining = NULL;
+    emptySpacePartition->size = cache.memory_size - occupied_size;
+    emptySpacePartition->queue_type = NULL;
+    emptySpacePartition->free = true;
+    emptySpacePartition->timestap = clock();
 
-    t_partition available_space_partition;
-    available_space_partition.id = sizeof(occupied_partitions) + 1;
-    t_partition last_occupied_partition = list_get(occupied_partitions, sizeof(occupied_partitions));
-    available_space_partition.begining = last_occupied_partition.begining + last_occupied_partition.size;
-    available_space_partition.size = cache.memory_size - occupied_size;
-    available_space_partition.queue_type = NULL;
-    available_space_partition.free = true;
-    available_space_partition.timestap = clock();
+    list_add(occupied_partitions, emptySpacePartition);
 
-    list_add(occupied_partitions, available_space_partition);
+    list_iterate(occupied_partitions, (void*)_asignPartitionOnNewCache);
+	free(cache.full_memory); //The moment of truth
 
-    for (int i = 0; i < sizeof(occupied_partitions); ++i) {
-        t_partition partition = list_get(occupied_partitions, partition);
-        partition.id = i + 1;
-        list_replace(occupied_partitions, i, partition);
-    }
+    list_iterate(occupied_partitions, (void*)_asignPartitionOnBackUpMem);//v2
+    memcpy(cache.full_memory, backUp_memory, sizeof(backUp_memory));//v2
+    list_iterate(occupied_partitions, (void*)_reasignPartitionPointers);//v2
+    free(backUp_memory);
+    //TODO delete all empty partitions
+    // Marquitos, te dejo esto aca, se me ocurrio una nueva version sobre la marcha no se que te parece, es lo que
+    // tiene el coment 'v2', la idea es copiar en una memoria auxiliar, hacer un memcopy a la memoria principal y reubicar
+    // los punteros cosas de que se pise lo viejo. Fijate que te parece; de esta forma la memoria reservada de la cache
+    // siempre va a estar apuntando al mismo espacio en memoria
+
+    cache = newCache; //TODO consultar si necesitamos que siempre apunte al mismo espacio de memoria la cache original o tirar boludos
 
     partitions = occupied_partitions;
     //TODO add times compacting here or outside?

@@ -327,7 +327,7 @@ int delete_partition_lru(void){
 		}
 	}
 
-	list_iterate(t_list *, (void)_get_least_used);
+	list_iterate(partitions, (void)_get_least_used);
 	leastUsedPartition->free = 1;
 	leastUsedPartition->timestap = clock();
 
@@ -340,7 +340,7 @@ int GetBusyParitionsCount()
 	{
 		if(partition->free == 0) return true; else return false;
 	}
-	t_list* busyPartitions = list_filter(paritions, (void*)_filter_busy_parittion);
+	t_list* busyPartitions = list_filter(partitions, (void*)_filter_busy_parittion);
 	int busyPartitionsCount = list_size(busyPartitions);
 	list_clean(busyPartitions);
 	return busyPartitionsCount;
@@ -352,8 +352,8 @@ void Free_CachedMessage(t_cachedMessage* message)
 	{
 		free(sendOrAck);
 	}
-	list_clean_and_destroy_elements(message->sent_to_subscribers, (void*)_free_sendOrAck)
-	list_clean_and_destroy_elements(message->ack_by_subscribers, (void*)_free_sendOrAck)
+	list_clean_and_destroy_elements(message->sent_to_subscribers, (void*)_free_sendOrAck);
+	list_clean_and_destroy_elements(message->ack_by_subscribers, (void*)_free_sendOrAck);
 	free(message->sent_to_subscribers);
 	free(message->ack_by_subscribers);
 	free(message);

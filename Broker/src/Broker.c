@@ -342,7 +342,6 @@ t_queue_handler* queue_handler_initialize(message_type type){
 	aux->queue = queue_create();
 	aux->suscriptors = list_create();
 	aux->type=type;
-	printf("El tipo es:%d \n" , type);
 	aux->messagesAdministrator = list_create();
 	return aux;
 }

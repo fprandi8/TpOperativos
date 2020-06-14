@@ -12,6 +12,7 @@
 
 
 uint32_t ID = 0;
+t_Broker* broker;
 
 int main(void) {
 
@@ -25,7 +26,7 @@ int main(void) {
 	int server,cliente;
 //	char* tam_men, tam_min_part, algo_mem, algo_reem, algo_part, frec_comp;
 
-//	signal(SIGINT,signaltHandler);
+	signal(SIGINT,signaltHandler);
 
 	pthread_t* thread;
 
@@ -45,7 +46,7 @@ int main(void) {
 //	algo_part=  obtener_valor_config(config,logger,ALGORITMO_PARTICION_LIBRE);
 //	frec_comp=  obtener_valor_config(config,logger,FRECUENCIA_COMPACTACION);
 
-	t_Broker* broker= (t_Broker*) malloc(sizeof(t_Broker));
+	broker= (t_Broker*) malloc(sizeof(t_Broker));
 
 	server = iniciar_servidor(ip, puerto);
 
@@ -62,7 +63,7 @@ int main(void) {
 		args->cliente = &cliente;
 		args->broker = broker;
 
-		printf("Crea un hilo para el cliente %d \n", cliente);
+		log_debug(logger,"Va a atender un cliente");
 
 		pthread_create(thread,NULL,(void*)serve_client,args);
 		pthread_detach(*thread);
@@ -81,15 +82,17 @@ void serve_client(void* variables)
 	t_args* args= (t_args*)variables;
 	int cliente = *((t_args*)variables)->cliente;
 	t_Broker* broker = ((t_args*)variables)->broker;
-	log_info(broker->logger,"NUEVO PROCESO CONECTADO");
+	log_info(broker->logger,"NUEVO PROCESO CONECTADO CLIENTE %d", cliente);
 
-	puts("espera el paquete");
 	uint32_t type;
 	void* content = malloc(sizeof(void*));
 
 	int resultado= RecievePackage(cliente,&type,&content);
 
-	recive_message(type, cliente, broker, content);
+	if (!resultado)
+		recive_message(type, cliente, broker, content);
+	else
+		log_debug(broker->logger,"Resultado de envio del mensaje: %d", resultado);
 
 	free(args);
 
@@ -98,18 +101,23 @@ void serve_client(void* variables)
 
 void recive_message(uint32_t type, int cliente, t_Broker* broker, void* content ){
 
-	puts("recibió el mensaje");
+	log_debug(broker->logger,"Tipo de mensaje recibido; %d", type);
 	switch (type){
 		case SUBSCRIPTION:
-			puts("Va a suscribir al cliente");
+			log_debug(broker->logger, "Suscripción");
 			broker_suscribe_process(content, cliente, broker);
 			break;
 		case MESSAGE:
+			log_debug(broker->logger, "Mensaje");
 			broker_process_message(content, cliente, broker);
 			break;
 		case ACKNOWLEDGE:
 			broker_get_acknowledge(content, cliente, broker);
 			break;
+		default:
+		{
+			log_info(broker->logger,"Tipo de mensaje invalido: %d", type);
+		}
 	}
 	free(content);
 }
@@ -182,10 +190,6 @@ t_queue_handler* broker_get_specific_Queue(t_Broker broker, message_type queueTy
 void broker_suscribe_process(void* buffer, int cliente, t_Broker* broker){
 
 	message_type* QueueType = (message_type*)buffer;
-	printf("Prueba Type %d \n", *QueueType);
-
-	printf("Cola a la que se quiere suscribir %d \n", *QueueType );
-
 
 	t_queue_handler* queueToSuscribe = broker_get_specific_Queue(*(broker), *QueueType);
 
@@ -193,7 +197,7 @@ void broker_suscribe_process(void* buffer, int cliente, t_Broker* broker){
 		t_suscriptor* aux= (t_suscriptor*)malloc(sizeof(t_suscriptor));
 		aux->suscripted = cliente;
 		list_add(queueToSuscribe->suscriptors,aux);
-		log_info(broker->logger,"NUEVA SUSCRIPCIÓN AL BROKER");
+		log_info(broker->logger,"NUEVA SUSCRIPCIÓN AL BROKER QUEUE: %d", *QueueType);
 	}
 
 }
@@ -217,7 +221,7 @@ void broker_process_message(void* buffer, int cliente, t_Broker* broker){
 
 	broker_assign_id(broker, message);
 
-	printf("El ID del mensaje es %d \n", message->id);
+	log_debug(broker->logger, "El ID del mensaje es %d", message->id);
 
 	//TODO ver que hacer con el correlation ID, podríamos saber si es necesario hacer algo por el tipo de mensaje
 
@@ -235,7 +239,7 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 	//TODO estructura para administrar mensajes, a quienes se enviaron si fueron recibidos
 
 
-	log_info(broker->logger,"NUEVO MENSAJE PARA UNA QUEUE");
+	log_info(broker->logger,"NUEVO MENSAJE PARA LA QUEUE: %d", queue->type);
 
 	pthread_t* thread;
 
@@ -261,10 +265,9 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 
 	while(list_get(queue->suscriptors, index) != NULL){
 		suscriptor=(t_suscriptor*)list_get(queue->suscriptors, index);
-		printf("obtuve el suscriptor \n");
-
-		//t_message_administrator* messageAdministrator = messege_administrator_get_administrator(queue->messagesAdministrator, message->id);
-		message_administrator_pending_acknowledge(messageAdmnistrator);
+		log_debug(broker->logger, "Envio mensaje al suscriptor: %d", suscriptor->suscripted);
+		t_message_administrator* messageAdministrator = messege_administrator_get_administrator(queue->messagesAdministrator, message->id);
+		message_administrator_pending_acknowledge(messageAdministrator);
 
 		args->cliente = suscriptor->suscripted;
 		args->messageAdministrator = messageAdmnistrator;
@@ -314,14 +317,19 @@ void queue_handler_send_message(void* args){
 	}
 
 	int result = SendMessage(*message,client);
+	log_debug(broker->logger, "SE ENVIO EL MENSAJE AL CLIENTE %d", client);
+	log_debug(broker->logger, "RESULTADO DEL ENVIO: %d", result);
 	uint32_t op_code;
 	void* content =malloc(sizeof(void*));
 
 	if (!result){
+		log_debug(broker->logger,"ESPERA EN ACKNOWLEDGE");
 		result = RecievePackage(client,&op_code,&content);
+		log_debug(broker->logger,"RESULTADO DEL ACKNOWLEDGE: %d", result);
 		if (op_code == ACKNOWLEDGE ){
 			message_administrator_receive_acknowledge(messageAdministrator);
 			if (messageAdministrator->amountPendingAcknowledge == 0){
+				log_debug(broker->logger,"TODOS LOS SUSCRIPTORE RESCIBIERON EL MENSAJE SE ELININA");
 				void* element = queue_pop(queue->queue);
 				free(element);
 			}
@@ -411,7 +419,9 @@ uint32_t message_administrator_get_amountACK(t_message_administrator* self){
 
 // Manage an interupt or segmentation fault
 void signaltHandler(int sig_num){
-	printf("Proceso interrunpido \n");
+	log_debug(broker->logger, "SE INTERRUMPIO EL PROCESO");
+	broker_destroy(broker);
+	exit(-5);
 }
 
 

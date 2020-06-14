@@ -149,10 +149,12 @@ void requestNewPokemon(t_pokemon missingPkm,t_log* logger, struct Broker broker)
 	log_debug(logger,"Se solicitarán el pokemon %s", missingPkm.name);
 	int client_socket = connectBroker(broker.ip, broker.port,logger);
 	get_pokemon get;
+	get.pokemonName = (char*)malloc(strlen(missingPkm.name));
 	strcpy(get.pokemonName,missingPkm.name);
 	log_debug(logger,"Se enviará el send para el pokemon %s", missingPkm.name);
 	Send_GET(get, client_socket);
 	log_debug(logger,"Pokemon requested: %s",missingPkm.name);
+	free(get.pokemonName);
 }
 
 

@@ -18,6 +18,9 @@ int iniciar_servidor(char* ip, char* puerto)
         if ((socket_servidor = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) == -1)
             continue;
 
+        uint32_t flag=1;
+        setsockopt(socket_servidor,SOL_SOCKET,SO_REUSEPORT,&(flag),sizeof(flag));
+
         if (bind(socket_servidor, p->ai_addr, p->ai_addrlen) == -1) {
             close(socket_servidor);
             continue;

@@ -48,12 +48,12 @@ int esperar_cliente(int socket_servidor)
 
 t_log* iniciar_logger(void)
 {
-	return log_create("Broker.log","Broker",1,LOG_LEVEL_DEBUG);
+	return log_create("GameCard.log","Broker",1,LOG_LEVEL_DEBUG);
 }
 
 t_config* leer_config(void)
 {
-	return config_create("/home/utnso/workspace/tp-2020-1c-MATE-OS/Broker/Broker.config");
+	return config_create("/home/utnso/workspace/tp-2020-1c-MATE-OS/GameCard/GameCard.config");
 
 }
 
@@ -62,8 +62,9 @@ char* obtener_valor_config(t_config* config, t_log* logger, char* propiedad){
 	if (config_has_property(config,propiedad)){
 		log_info(logger,config_get_string_value(config,propiedad));
 		return config_get_string_value(config, propiedad);
+	} else {
+		log_debug(logger,"Error al obtener el atributo");
+		return NULL;
 	}
-	return NULL;
 }
-
 

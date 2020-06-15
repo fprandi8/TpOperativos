@@ -1,0 +1,570 @@
+[INFO] 15:21:39:271 Broker/(11030:11030): PROCESO GAMECARD ONLINE
+[INFO] 15:21:39:279 Broker/(11030:11030): 127.0.0.1
+[INFO] 15:21:39:279 Broker/(11030:11030): 6009
+[INFO] 15:21:39:279 Broker/(11030:11030): /home/utnso/desktop/tall-grass
+[INFO] 15:22:25:86 Broker/(11046:11046): PROCESO GAMECARD ONLINE
+[INFO] 15:22:25:86 Broker/(11046:11046): 127.0.0.1
+[INFO] 15:22:25:87 Broker/(11046:11046): 6009
+[INFO] 15:22:25:87 Broker/(11046:11046): /home/utnso/desktop/tall-grass
+[INFO] 15:23:39:265 Broker/(11124:11124): PROCESO GAMECARD ONLINE
+[INFO] 15:23:39:266 Broker/(11124:11124): 127.0.0.1
+[INFO] 15:23:39:266 Broker/(11124:11124): 6009
+[INFO] 15:23:39:266 Broker/(11124:11124): /home/utnso/desktop/tall-grass
+[DEBUG] 15:23:39:266 Broker/(11124:11124): Inicializa la GameCard
+[INFO] 15:26:01:227 Broker/(11319:11319): PROCESO GAMECARD ONLINE
+[INFO] 15:26:01:227 Broker/(11319:11319): 127.0.0.1
+[INFO] 15:26:01:227 Broker/(11319:11319): 6009
+[INFO] 15:26:01:227 Broker/(11319:11319): /home/utnso/desktop/tall-grass
+[DEBUG] 15:26:01:227 Broker/(11319:11319): Inicializa la GameCard
+[INFO] 15:26:32:620 Broker/(11355:11355): PROCESO GAMECARD ONLINE
+[INFO] 15:26:32:620 Broker/(11355:11355): 127.0.0.1
+[INFO] 15:26:32:620 Broker/(11355:11355): 6009
+[INFO] 15:26:32:620 Broker/(11355:11355): /home/utnso/desktop/tall-grass
+[DEBUG] 15:27:08:855 Broker/(11355:11355): Inicializa la GameCard
+[INFO] 15:27:25:634 Broker/(11396:11396): PROCESO GAMECARD ONLINE
+[INFO] 15:27:25:635 Broker/(11396:11396): 127.0.0.1
+[INFO] 15:27:25:635 Broker/(11396:11396): 6009
+[INFO] 15:27:25:635 Broker/(11396:11396): /home/utnso/desktop/tall-grass
+[DEBUG] 15:27:37:298 Broker/(11396:11396): Inicializa la GameCard
+[INFO] 15:28:59:118 Broker/(11469:11469): PROCESO GAMECARD ONLINE
+[INFO] 15:28:59:120 Broker/(11469:11469): 127.0.0.1
+[INFO] 15:28:59:121 Broker/(11469:11469): 6009
+[INFO] 15:28:59:121 Broker/(11469:11469): /home/utnso/desktop/tall-grass
+[DEBUG] 15:28:59:121 Broker/(11469:11469): Inicializa la GameCard
+[INFO] 15:29:33:792 Broker/(11512:11512): PROCESO GAMECARD ONLINE
+[INFO] 15:29:33:793 Broker/(11512:11512): 127.0.0.1
+[INFO] 15:29:33:793 Broker/(11512:11512): 6009
+[INFO] 15:29:33:793 Broker/(11512:11512): /home/utnso/desktop/tall-grass
+[DEBUG] 15:29:55:336 Broker/(11512:11512): Inicializa la GameCard
+[INFO] 15:36:54:7 Broker/(11727:11727): PROCESO GAMECARD ONLINE
+[INFO] 15:36:54:7 Broker/(11727:11727): 127.0.0.1
+[INFO] 15:36:54:7 Broker/(11727:11727): 6009
+[INFO] 15:36:54:7 Broker/(11727:11727): /home/utnso/desktop/tall-grass
+[DEBUG] 15:36:54:7 Broker/(11727:11727): Inicializa la GameCard
+[DEBUG] 15:36:54:7 Broker/(11727:11727): Resultado de la creacion del directorio 0
+[DEBUG] 15:36:54:7 Broker/(11727:11727): Error en la creacion del directorio 2 No such file or directory
+[INFO] 15:43:34:508 Broker/(11960:11960): PROCESO GAMECARD ONLINE
+[INFO] 15:43:34:509 Broker/(11960:11960): 127.0.0.1
+[INFO] 15:43:34:510 Broker/(11960:11960): 6009
+[INFO] 15:43:34:510 Broker/(11960:11960): /home/utnso/desktop/tall-grass
+[DEBUG] 15:43:34:511 Broker/(11960:11960): Inicializa la GameCard
+[INFO] 15:44:06:870 Broker/(12002:12002): PROCESO GAMECARD ONLINE
+[INFO] 15:44:06:873 Broker/(12002:12002): 127.0.0.1
+[INFO] 15:44:06:873 Broker/(12002:12002): 6009
+[INFO] 15:44:06:873 Broker/(12002:12002): /home/utnso/desktop/tall-grass
+[DEBUG] 15:44:06:873 Broker/(12002:12002): Inicializa la GameCard
+[INFO] 15:44:35:925 Broker/(12053:12053): PROCESO GAMECARD ONLINE
+[INFO] 15:44:35:925 Broker/(12053:12053): 127.0.0.1
+[INFO] 15:44:35:925 Broker/(12053:12053): 6009
+[INFO] 15:44:35:925 Broker/(12053:12053): /home/utnso/desktop/tall-grass
+[DEBUG] 15:44:46:144 Broker/(12053:12053): Inicializa la GameCard
+[INFO] 15:48:04:728 Broker/(12179:12179): PROCESO GAMECARD ONLINE
+[INFO] 15:48:04:739 Broker/(12179:12179): 127.0.0.1
+[INFO] 15:48:04:739 Broker/(12179:12179): 6009
+[INFO] 15:48:04:739 Broker/(12179:12179): /home/utnso/desktop/tall-grass
+[DEBUG] 15:48:04:739 Broker/(12179:12179): Inicializa la GameCard
+[INFO] 15:48:37:338 Broker/(12220:12220): PROCESO GAMECARD ONLINE
+[INFO] 15:48:37:339 Broker/(12220:12220): 127.0.0.1
+[INFO] 15:48:37:339 Broker/(12220:12220): 6009
+[INFO] 15:48:37:339 Broker/(12220:12220): /home/utnso/desktop/tall-grass
+[DEBUG] 15:48:37:339 Broker/(12220:12220): Inicializa la GameCard
+[INFO] 15:49:39:751 Broker/(12270:12270): PROCESO GAMECARD ONLINE
+[INFO] 15:49:39:752 Broker/(12270:12270): 127.0.0.1
+[INFO] 15:49:39:752 Broker/(12270:12270): 6009
+[INFO] 15:49:39:752 Broker/(12270:12270): /home/utnso/desktop/tall-grass
+[DEBUG] 15:49:44:964 Broker/(12270:12270): Inicializa la GameCard
+[INFO] 15:51:35:270 Broker/(12382:12382): PROCESO GAMECARD ONLINE
+[INFO] 15:51:35:270 Broker/(12382:12382): 127.0.0.1
+[INFO] 15:51:35:270 Broker/(12382:12382): 6009
+[INFO] 15:51:35:271 Broker/(12382:12382): /home/utnso/desktop/tall-grass
+[DEBUG] 15:51:35:271 Broker/(12382:12382): Inicializa la GameCard
+[DEBUG] 15:51:35:271 Broker/(12382:12382): Error en la creacion del directorio 2 No such file or directory
+[DEBUG] 15:51:35:271 Broker/(12382:12382): Resultado de la creacion del directorio 2
+[INFO] 15:52:22:364 Broker/(12433:12433): PROCESO GAMECARD ONLINE
+[INFO] 15:52:22:367 Broker/(12433:12433): 127.0.0.1
+[INFO] 15:52:22:367 Broker/(12433:12433): 6009
+[INFO] 15:52:22:367 Broker/(12433:12433): /home/utnso/desktop/tall-grass
+[DEBUG] 15:52:22:368 Broker/(12433:12433): Inicializa la GameCard
+[DEBUG] 15:52:22:368 Broker/(12433:12433): Error en la creacion del directorio- ErrorCode: 2 Description: No such file or directory
+[DEBUG] 15:52:22:368 Broker/(12433:12433): Resultado de la creacion del directorio 2
+[INFO] 15:57:13:274 Broker/(12595:12595): PROCESO GAMECARD ONLINE
+[INFO] 15:57:13:281 Broker/(12595:12595): 127.0.0.1
+[INFO] 15:57:13:281 Broker/(12595:12595): 6009
+[INFO] 15:57:13:281 Broker/(12595:12595): /home/utnso/desktop/tall-grass
+[DEBUG] 15:57:13:281 Broker/(12595:12595): Inicializa la GameCard
+[DEBUG] 15:57:13:281 Broker/(12595:12595): Directorio /home/utnso/desktop/ -- Creado
+[DEBUG] 15:57:13:281 Broker/(12595:12595): Directorio /home/utnso/desktop/tall-grass -- Creado
+[DEBUG] 15:57:13:281 Broker/(12595:12595): Resultado de la creacion del directorio 0
+[INFO] 15:57:34:945 Broker/(12608:12608): PROCESO GAMECARD ONLINE
+[INFO] 15:57:34:945 Broker/(12608:12608): 127.0.0.1
+[INFO] 15:57:34:946 Broker/(12608:12608): 6009
+[INFO] 15:57:34:946 Broker/(12608:12608): /home/utnso/desktop/tall-grass
+[DEBUG] 15:57:34:946 Broker/(12608:12608): Inicializa la GameCard
+[DEBUG] 15:57:34:946 Broker/(12608:12608): El directorio ya existe
+[DEBUG] 15:57:34:946 Broker/(12608:12608): El directorio ya existe
+[DEBUG] 15:57:34:946 Broker/(12608:12608): Resultado de la creacion del directorio 2
+[INFO] 16:57:45:999 Broker/(14209:14209): PROCESO GAMECARD ONLINE
+[INFO] 16:57:45:1 Broker/(14209:14209): 127.0.0.1
+[INFO] 16:57:45:1 Broker/(14209:14209): 6009
+[INFO] 16:57:45:1 Broker/(14209:14209): /home/utnso/desktop/tall-grass
+[DEBUG] 16:57:45:1 Broker/(14209:14209): Inicializa la GameCard
+[DEBUG] 16:57:45:1 Broker/(14209:14209): El directorio ya existe
+[DEBUG] 16:57:45:1 Broker/(14209:14209): El directorio ya existe
+[DEBUG] 16:57:45:1 Broker/(14209:14209): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:57:45:1 Broker/(14209:14209): Directorio /home/utnso/desktop/tall-grassmetadata/ -- Creado
+[DEBUG] 16:57:45:1 Broker/(14209:14209): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grassmetadata/ - 0
+[INFO] 16:59:46:92 Broker/(14310:14310): PROCESO GAMECARD ONLINE
+[INFO] 16:59:46:98 Broker/(14310:14310): 127.0.0.1
+[INFO] 16:59:46:103 Broker/(14310:14310): 6009
+[INFO] 16:59:46:103 Broker/(14310:14310): /home/utnso/desktop/tall-grass
+[DEBUG] 16:59:46:103 Broker/(14310:14310): Inicializa la GameCard
+[DEBUG] 16:59:46:104 Broker/(14310:14310): El directorio ya existe
+[DEBUG] 16:59:46:104 Broker/(14310:14310): El directorio ya existe
+[DEBUG] 16:59:46:104 Broker/(14310:14310): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:59:46:105 Broker/(14310:14310): Directorio /home/utnso/desktop/tall-grass/metadata/ -- Creado
+[DEBUG] 16:59:46:105 Broker/(14310:14310): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 0
+[INFO] 17:00:42:980 Broker/(14366:14366): PROCESO GAMECARD ONLINE
+[INFO] 17:00:42:981 Broker/(14366:14366): 127.0.0.1
+[INFO] 17:00:42:982 Broker/(14366:14366): 6009
+[INFO] 17:00:42:982 Broker/(14366:14366): /home/utnso/desktop/tall-grass
+[DEBUG] 17:00:44:579 Broker/(14366:14366): Inicializa la GameCard
+[DEBUG] 17:00:44:579 Broker/(14366:14366): El directorio ya existe
+[DEBUG] 17:00:44:579 Broker/(14366:14366): El directorio ya existe
+[DEBUG] 17:00:44:579 Broker/(14366:14366): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:00:44:579 Broker/(14366:14366): El directorio ya existe
+[DEBUG] 17:00:44:579 Broker/(14366:14366): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 17:01:44:680 Broker/(14445:14445): PROCESO GAMECARD ONLINE
+[INFO] 17:01:44:680 Broker/(14445:14445): 127.0.0.1
+[INFO] 17:01:44:680 Broker/(14445:14445): 6009
+[INFO] 17:01:44:680 Broker/(14445:14445): /home/utnso/desktop/tall-grass
+[DEBUG] 17:01:45:898 Broker/(14445:14445): Inicializa la GameCard
+[DEBUG] 17:01:45:899 Broker/(14445:14445): El directorio ya existe
+[DEBUG] 17:01:45:899 Broker/(14445:14445): El directorio ya existe
+[DEBUG] 17:01:45:899 Broker/(14445:14445): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:01:45:899 Broker/(14445:14445): El directorio ya existe
+[DEBUG] 17:01:45:899 Broker/(14445:14445): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 17:13:39:306 Broker/(14702:14702): PROCESO GAMECARD ONLINE
+[INFO] 17:13:39:306 Broker/(14702:14702): 127.0.0.1
+[INFO] 17:13:39:306 Broker/(14702:14702): 6009
+[INFO] 17:13:39:306 Broker/(14702:14702): /home/utnso/desktop/tall-grass
+[DEBUG] 17:13:39:306 Broker/(14702:14702): Inicializa la GameCard
+[DEBUG] 17:13:39:306 Broker/(14702:14702): El directorio ya existe
+[DEBUG] 17:13:39:306 Broker/(14702:14702): El directorio ya existe
+[DEBUG] 17:13:39:306 Broker/(14702:14702): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:13:39:306 Broker/(14702:14702): El directorio ya existe
+[DEBUG] 17:13:39:306 Broker/(14702:14702): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 17:14:11:139 Broker/(14755:14755): PROCESO GAMECARD ONLINE
+[INFO] 17:14:11:139 Broker/(14755:14755): 127.0.0.1
+[INFO] 17:14:11:139 Broker/(14755:14755): 6009
+[INFO] 17:14:11:139 Broker/(14755:14755): /home/utnso/desktop/tall-grass
+[DEBUG] 17:14:12:575 Broker/(14755:14755): Inicializa la GameCard
+[DEBUG] 17:14:12:575 Broker/(14755:14755): El directorio ya existe
+[DEBUG] 17:14:12:575 Broker/(14755:14755): El directorio ya existe
+[DEBUG] 17:14:12:575 Broker/(14755:14755): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:14:12:575 Broker/(14755:14755): El directorio ya existe
+[DEBUG] 17:14:12:575 Broker/(14755:14755): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 17:14:46:659 Broker/(14827:14827): PROCESO GAMECARD ONLINE
+[INFO] 17:14:46:659 Broker/(14827:14827): 127.0.0.1
+[INFO] 17:14:46:659 Broker/(14827:14827): 6009
+[INFO] 17:14:46:659 Broker/(14827:14827): /home/utnso/desktop/tall-grass
+[DEBUG] 17:14:47:316 Broker/(14827:14827): Inicializa la GameCard
+[DEBUG] 17:14:47:316 Broker/(14827:14827): El directorio ya existe
+[DEBUG] 17:14:47:316 Broker/(14827:14827): El directorio ya existe
+[DEBUG] 17:14:47:316 Broker/(14827:14827): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:14:47:316 Broker/(14827:14827): El directorio ya existe
+[DEBUG] 17:14:47:316 Broker/(14827:14827): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 17:15:30:849 Broker/(14904:14904): PROCESO GAMECARD ONLINE
+[INFO] 17:15:30:849 Broker/(14904:14904): 127.0.0.1
+[INFO] 17:15:30:849 Broker/(14904:14904): 6009
+[INFO] 17:15:30:849 Broker/(14904:14904): /home/utnso/desktop/tall-grass
+[DEBUG] 17:15:31:939 Broker/(14904:14904): Inicializa la GameCard
+[DEBUG] 17:15:31:939 Broker/(14904:14904): El directorio ya existe
+[DEBUG] 17:15:31:939 Broker/(14904:14904): El directorio ya existe
+[DEBUG] 17:15:31:939 Broker/(14904:14904): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:15:31:939 Broker/(14904:14904): El directorio ya existe
+[DEBUG] 17:15:31:939 Broker/(14904:14904): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 17:16:30:402 Broker/(14992:14992): PROCESO GAMECARD ONLINE
+[INFO] 17:16:30:410 Broker/(14992:14992): 127.0.0.1
+[INFO] 17:16:30:410 Broker/(14992:14992): 6009
+[INFO] 17:16:30:410 Broker/(14992:14992): /home/utnso/desktop/tall-grass
+[DEBUG] 17:16:30:410 Broker/(14992:14992): Inicializa la GameCard
+[DEBUG] 17:16:30:410 Broker/(14992:14992): El directorio ya existe
+[DEBUG] 17:16:30:411 Broker/(14992:14992): El directorio ya existe
+[DEBUG] 17:16:30:411 Broker/(14992:14992): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:16:30:411 Broker/(14992:14992): El directorio ya existe
+[DEBUG] 17:16:30:411 Broker/(14992:14992): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 17:16:48:446 Broker/(15020:15020): PROCESO GAMECARD ONLINE
+[INFO] 17:16:48:447 Broker/(15020:15020): 127.0.0.1
+[INFO] 17:16:48:447 Broker/(15020:15020): 6009
+[INFO] 17:16:48:447 Broker/(15020:15020): /home/utnso/desktop/tall-grass
+[DEBUG] 17:16:49:323 Broker/(15020:15020): Inicializa la GameCard
+[DEBUG] 17:16:49:323 Broker/(15020:15020): El directorio ya existe
+[DEBUG] 17:16:49:323 Broker/(15020:15020): El directorio ya existe
+[DEBUG] 17:16:49:323 Broker/(15020:15020): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:16:49:323 Broker/(15020:15020): El directorio ya existe
+[DEBUG] 17:16:49:323 Broker/(15020:15020): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 17:19:54:396 Broker/(15146:15146): PROCESO GAMECARD ONLINE
+[INFO] 17:19:54:402 Broker/(15146:15146): 127.0.0.1
+[INFO] 17:19:54:402 Broker/(15146:15146): 6009
+[INFO] 17:19:54:402 Broker/(15146:15146): /home/utnso/desktop/tall-grass
+[DEBUG] 17:19:54:402 Broker/(15146:15146): Inicializa la GameCard
+[DEBUG] 17:19:54:402 Broker/(15146:15146): El directorio ya existe
+[DEBUG] 17:19:54:402 Broker/(15146:15146): El directorio ya existe
+[DEBUG] 17:19:54:402 Broker/(15146:15146): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:19:54:402 Broker/(15146:15146): El directorio ya existe
+[DEBUG] 17:19:54:402 Broker/(15146:15146): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 17:21:00:347 Broker/(15201:15201): PROCESO GAMECARD ONLINE
+[INFO] 17:21:00:348 Broker/(15201:15201): 127.0.0.1
+[INFO] 17:21:00:348 Broker/(15201:15201): 6009
+[INFO] 17:21:00:348 Broker/(15201:15201): /home/utnso/desktop/tall-grass
+[DEBUG] 17:21:00:348 Broker/(15201:15201): Inicializa la GameCard
+[DEBUG] 17:21:00:348 Broker/(15201:15201): El directorio ya existe
+[DEBUG] 17:21:00:348 Broker/(15201:15201): El directorio ya existe
+[DEBUG] 17:21:00:349 Broker/(15201:15201): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:21:00:349 Broker/(15201:15201): El directorio ya existe
+[DEBUG] 17:21:00:349 Broker/(15201:15201): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 17:22:08:508 Broker/(15243:15243): PROCESO GAMECARD ONLINE
+[INFO] 17:22:08:509 Broker/(15243:15243): 127.0.0.1
+[INFO] 17:22:08:509 Broker/(15243:15243): 6009
+[INFO] 17:22:08:509 Broker/(15243:15243): /home/utnso/desktop/tall-grass
+[DEBUG] 17:22:08:509 Broker/(15243:15243): Inicializa la GameCard
+[DEBUG] 17:22:08:510 Broker/(15243:15243): El directorio ya existe
+[DEBUG] 17:22:08:510 Broker/(15243:15243): El directorio ya existe
+[DEBUG] 17:22:08:510 Broker/(15243:15243): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:22:08:510 Broker/(15243:15243): El directorio ya existe
+[DEBUG] 17:22:08:510 Broker/(15243:15243): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 17:23:40:472 Broker/(15308:15308): PROCESO GAMECARD ONLINE
+[INFO] 17:23:40:472 Broker/(15308:15308): 127.0.0.1
+[INFO] 17:23:40:472 Broker/(15308:15308): 6009
+[INFO] 17:23:40:472 Broker/(15308:15308): /home/utnso/desktop/tall-grass
+[DEBUG] 17:23:40:472 Broker/(15308:15308): Inicializa la GameCard
+[DEBUG] 17:23:40:472 Broker/(15308:15308): El directorio ya existe
+[DEBUG] 17:23:40:472 Broker/(15308:15308): El directorio ya existe
+[DEBUG] 17:23:40:472 Broker/(15308:15308): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:23:40:472 Broker/(15308:15308): El directorio ya existe
+[DEBUG] 17:23:40:472 Broker/(15308:15308): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[DEBUG] 17:23:50:369 Broker/(15308:15308): Error en la creacion del archivo -1209741191
+[INFO] 17:24:53:160 Broker/(15372:15372): PROCESO GAMECARD ONLINE
+[INFO] 17:24:53:164 Broker/(15372:15372): 127.0.0.1
+[INFO] 17:24:53:164 Broker/(15372:15372): 6009
+[INFO] 17:24:53:164 Broker/(15372:15372): /home/utnso/desktop/tall-grass
+[DEBUG] 17:24:53:165 Broker/(15372:15372): Inicializa la GameCard
+[DEBUG] 17:24:53:165 Broker/(15372:15372): El directorio ya existe
+[DEBUG] 17:24:53:165 Broker/(15372:15372): El directorio ya existe
+[DEBUG] 17:24:53:166 Broker/(15372:15372): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:24:53:166 Broker/(15372:15372): El directorio ya existe
+[DEBUG] 17:24:53:166 Broker/(15372:15372): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 17:27:15:750 Broker/(15476:15476): PROCESO GAMECARD ONLINE
+[INFO] 17:27:15:750 Broker/(15476:15476): 127.0.0.1
+[INFO] 17:27:15:751 Broker/(15476:15476): 6009
+[INFO] 17:27:15:751 Broker/(15476:15476): /home/utnso/desktop/tall-grass
+[DEBUG] 17:27:15:751 Broker/(15476:15476): Inicializa la GameCard
+[DEBUG] 17:27:15:751 Broker/(15476:15476): El directorio ya existe
+[DEBUG] 17:27:15:751 Broker/(15476:15476): El directorio ya existe
+[DEBUG] 17:27:15:751 Broker/(15476:15476): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:27:15:751 Broker/(15476:15476): El directorio ya existe
+[DEBUG] 17:27:15:751 Broker/(15476:15476): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 17:27:29:592 Broker/(15501:15501): PROCESO GAMECARD ONLINE
+[INFO] 17:27:29:592 Broker/(15501:15501): 127.0.0.1
+[INFO] 17:27:29:592 Broker/(15501:15501): 6009
+[INFO] 17:27:29:592 Broker/(15501:15501): /home/utnso/desktop/tall-grass
+[DEBUG] 17:27:29:592 Broker/(15501:15501): Inicializa la GameCard
+[DEBUG] 17:27:29:592 Broker/(15501:15501): El directorio ya existe
+[DEBUG] 17:27:29:592 Broker/(15501:15501): El directorio ya existe
+[DEBUG] 17:27:29:592 Broker/(15501:15501): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:27:29:592 Broker/(15501:15501): El directorio ya existe
+[DEBUG] 17:27:29:592 Broker/(15501:15501): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 17:28:25:312 Broker/(15570:15570): PROCESO GAMECARD ONLINE
+[INFO] 17:28:25:313 Broker/(15570:15570): 127.0.0.1
+[INFO] 17:28:25:313 Broker/(15570:15570): 6009
+[INFO] 17:28:25:313 Broker/(15570:15570): /home/utnso/desktop/tall-grass
+[DEBUG] 17:28:25:313 Broker/(15570:15570): Inicializa la GameCard
+[DEBUG] 17:28:25:313 Broker/(15570:15570): El directorio ya existe
+[DEBUG] 17:28:25:314 Broker/(15570:15570): El directorio ya existe
+[DEBUG] 17:28:25:314 Broker/(15570:15570): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:28:25:314 Broker/(15570:15570): El directorio ya existe
+[DEBUG] 17:28:25:314 Broker/(15570:15570): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 17:31:15:156 Broker/(15684:15684): PROCESO GAMECARD ONLINE
+[INFO] 17:31:15:157 Broker/(15684:15684): 127.0.0.1
+[INFO] 17:31:15:157 Broker/(15684:15684): 6009
+[INFO] 17:31:15:157 Broker/(15684:15684): /home/utnso/desktop/tall-grass
+[DEBUG] 17:31:15:157 Broker/(15684:15684): Inicializa la GameCard
+[DEBUG] 17:31:15:157 Broker/(15684:15684): El directorio ya existe
+[DEBUG] 17:31:15:158 Broker/(15684:15684): El directorio ya existe
+[DEBUG] 17:31:15:158 Broker/(15684:15684): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:31:15:158 Broker/(15684:15684): El directorio ya existe
+[DEBUG] 17:31:15:158 Broker/(15684:15684): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[DEBUG] 17:31:15:158 Broker/(15684:15684): °·v·°·v·
+[INFO] 17:31:49:882 Broker/(15715:15715): PROCESO GAMECARD ONLINE
+[INFO] 17:31:49:882 Broker/(15715:15715): 127.0.0.1
+[INFO] 17:31:49:882 Broker/(15715:15715): 6009
+[INFO] 17:31:49:882 Broker/(15715:15715): /home/utnso/desktop/tall-grass
+[DEBUG] 17:31:49:882 Broker/(15715:15715): Inicializa la GameCard
+[DEBUG] 17:31:49:882 Broker/(15715:15715): El directorio ya existe
+[DEBUG] 17:31:49:882 Broker/(15715:15715): El directorio ya existe
+[DEBUG] 17:31:49:883 Broker/(15715:15715): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:31:49:883 Broker/(15715:15715): El directorio ya existe
+[DEBUG] 17:31:49:883 Broker/(15715:15715): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[DEBUG] 17:33:49:241 Broker/(15715:15715): °ù·°ù·
+[INFO] 17:36:57:954 Broker/(15819:15819): PROCESO GAMECARD ONLINE
+[INFO] 17:36:57:954 Broker/(15819:15819): 127.0.0.1
+[INFO] 17:36:57:954 Broker/(15819:15819): 6009
+[INFO] 17:36:57:954 Broker/(15819:15819): /home/utnso/desktop/tall-grass
+[DEBUG] 17:36:57:955 Broker/(15819:15819): Inicializa la GameCard
+[DEBUG] 17:36:57:955 Broker/(15819:15819): El directorio ya existe
+[DEBUG] 17:36:57:955 Broker/(15819:15819): El directorio ya existe
+[DEBUG] 17:36:57:955 Broker/(15819:15819): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:36:57:955 Broker/(15819:15819): El directorio ya existe
+[DEBUG] 17:36:57:955 Broker/(15819:15819): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 17:56:57:763 Broker/(17041:17041): PROCESO GAMECARD ONLINE
+[INFO] 17:56:57:764 Broker/(17041:17041): 127.0.0.1
+[INFO] 17:56:57:764 Broker/(17041:17041): 6009
+[INFO] 17:56:57:764 Broker/(17041:17041): /home/utnso/desktop/tall-grass
+[DEBUG] 17:56:57:764 Broker/(17041:17041): Inicializa la GameCard
+[DEBUG] 17:56:57:764 Broker/(17041:17041): El directorio ya existe
+[DEBUG] 17:56:57:764 Broker/(17041:17041): El directorio ya existe
+[DEBUG] 17:56:57:764 Broker/(17041:17041): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:56:57:764 Broker/(17041:17041): El directorio ya existe
+[DEBUG] 17:56:57:764 Broker/(17041:17041): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[DEBUG] 17:58:56:186 Broker/(17041:17041): °ù·°ù·
+[INFO] 18:01:20:150 Broker/(17199:17199): PROCESO GAMECARD ONLINE
+[INFO] 18:01:20:150 Broker/(17199:17199): 127.0.0.1
+[INFO] 18:01:20:150 Broker/(17199:17199): 6009
+[INFO] 18:01:20:150 Broker/(17199:17199): /home/utnso/desktop/tall-grass
+[DEBUG] 18:01:20:150 Broker/(17199:17199): Inicializa la GameCard
+[DEBUG] 18:01:20:150 Broker/(17199:17199): El directorio ya existe
+[DEBUG] 18:01:20:150 Broker/(17199:17199): El directorio ya existe
+[DEBUG] 18:01:20:150 Broker/(17199:17199): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:01:20:150 Broker/(17199:17199): El directorio ya existe
+[DEBUG] 18:01:20:150 Broker/(17199:17199): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 18:05:29:514 Broker/(17341:17341): PROCESO GAMECARD ONLINE
+[INFO] 18:05:29:514 Broker/(17341:17341): 127.0.0.1
+[INFO] 18:05:29:514 Broker/(17341:17341): 6009
+[INFO] 18:05:29:514 Broker/(17341:17341): /home/utnso/desktop/tall-grass
+[DEBUG] 18:05:29:514 Broker/(17341:17341): Inicializa la GameCard
+[DEBUG] 18:05:29:514 Broker/(17341:17341): El directorio ya existe
+[DEBUG] 18:05:29:514 Broker/(17341:17341): El directorio ya existe
+[DEBUG] 18:05:29:514 Broker/(17341:17341): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:05:29:514 Broker/(17341:17341): El directorio ya existe
+[DEBUG] 18:05:29:514 Broker/(17341:17341): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 18:07:19:770 Broker/(17459:17459): PROCESO GAMECARD ONLINE
+[INFO] 18:07:19:771 Broker/(17459:17459): 127.0.0.1
+[INFO] 18:07:19:771 Broker/(17459:17459): 6009
+[INFO] 18:07:19:771 Broker/(17459:17459): /home/utnso/desktop/tall-grass
+[DEBUG] 18:07:19:771 Broker/(17459:17459): Inicializa la GameCard
+[DEBUG] 18:07:19:771 Broker/(17459:17459): El directorio ya existe
+[DEBUG] 18:07:19:771 Broker/(17459:17459): El directorio ya existe
+[DEBUG] 18:07:19:771 Broker/(17459:17459): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:07:19:771 Broker/(17459:17459): El directorio ya existe
+[DEBUG] 18:07:19:771 Broker/(17459:17459): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 18:10:29:161 Broker/(17597:17597): PROCESO GAMECARD ONLINE
+[INFO] 18:10:29:161 Broker/(17597:17597): 127.0.0.1
+[INFO] 18:10:29:161 Broker/(17597:17597): 6009
+[INFO] 18:10:29:161 Broker/(17597:17597): /home/utnso/desktop/tall-grass
+[DEBUG] 18:10:29:161 Broker/(17597:17597): Inicializa la GameCard
+[DEBUG] 18:10:29:161 Broker/(17597:17597): El directorio ya existe
+[DEBUG] 18:10:29:161 Broker/(17597:17597): El directorio ya existe
+[DEBUG] 18:10:29:161 Broker/(17597:17597): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:10:29:161 Broker/(17597:17597): El directorio ya existe
+[DEBUG] 18:10:29:161 Broker/(17597:17597): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[DEBUG] 18:10:56:281 Broker/(17597:17597): °ù·°ù·
+[INFO] 18:12:30:317 Broker/(17679:17679): PROCESO GAMECARD ONLINE
+[INFO] 18:12:30:326 Broker/(17679:17679): 127.0.0.1
+[INFO] 18:12:30:326 Broker/(17679:17679): 6009
+[INFO] 18:12:30:326 Broker/(17679:17679): /home/utnso/desktop/tall-grass
+[DEBUG] 18:12:30:326 Broker/(17679:17679): Inicializa la GameCard
+[DEBUG] 18:12:30:326 Broker/(17679:17679): El directorio ya existe
+[DEBUG] 18:12:30:326 Broker/(17679:17679): El directorio ya existe
+[DEBUG] 18:12:30:326 Broker/(17679:17679): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:12:30:327 Broker/(17679:17679): El directorio ya existe
+[DEBUG] 18:12:30:327 Broker/(17679:17679): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[DEBUG] 18:12:30:327 Broker/(17679:17679): °÷m·°÷m·
+[INFO] 18:16:25:900 Broker/(17845:17845): PROCESO GAMECARD ONLINE
+[INFO] 18:16:25:901 Broker/(17845:17845): 127.0.0.1
+[INFO] 18:16:25:901 Broker/(17845:17845): 6009
+[INFO] 18:16:25:901 Broker/(17845:17845): /home/utnso/desktop/tall-grass
+[DEBUG] 18:16:25:901 Broker/(17845:17845): Inicializa la GameCard
+[DEBUG] 18:16:25:901 Broker/(17845:17845): El directorio ya existe
+[DEBUG] 18:16:25:901 Broker/(17845:17845): El directorio ya existe
+[DEBUG] 18:16:25:901 Broker/(17845:17845): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:16:25:901 Broker/(17845:17845): El directorio ya existe
+[DEBUG] 18:16:25:901 Broker/(17845:17845): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[DEBUG] 18:16:25:901 Broker/(17845:17845): Linea del archivo : BLOCK_SIZE=LL_GRASS
+[DEBUG] 18:16:25:901 Broker/(17845:17845): Linea del archivo : BLOCKS=GRASS
+[DEBUG] 18:16:25:901 Broker/(17845:17845): Linea del archivo : MAGIC_NUMBER=
+[DEBUG] 18:16:25:901 Broker/(17845:17845): À÷k·À÷k· existe
+[INFO] 18:17:43:445 Broker/(17894:17894): PROCESO GAMECARD ONLINE
+[INFO] 18:17:43:447 Broker/(17894:17894): 127.0.0.1
+[INFO] 18:17:43:447 Broker/(17894:17894): 6009
+[INFO] 18:17:43:447 Broker/(17894:17894): /home/utnso/desktop/tall-grass
+[DEBUG] 18:17:43:447 Broker/(17894:17894): Inicializa la GameCard
+[DEBUG] 18:17:43:447 Broker/(17894:17894): El directorio ya existe
+[DEBUG] 18:17:43:456 Broker/(17894:17894): El directorio ya existe
+[DEBUG] 18:17:43:456 Broker/(17894:17894): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:17:43:456 Broker/(17894:17894): El directorio ya existe
+[DEBUG] 18:17:43:456 Broker/(17894:17894): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[DEBUG] 18:17:43:456 Broker/(17894:17894): Linea del archivo : BLOCK_SIZE=LL_GRASS
+[DEBUG] 18:17:43:456 Broker/(17894:17894): Linea del archivo : BLOCKS=GRASS
+[DEBUG] 18:17:43:456 Broker/(17894:17894): Linea del archivo : MAGIC_NUMBER=
+[DEBUG] 18:17:43:456 Broker/(17894:17894): Àwr·Àwr· existe
+[INFO] 18:18:30:808 Broker/(17942:17942): PROCESO GAMECARD ONLINE
+[INFO] 18:18:30:811 Broker/(17942:17942): 127.0.0.1
+[INFO] 18:18:30:811 Broker/(17942:17942): 6009
+[INFO] 18:18:30:812 Broker/(17942:17942): /home/utnso/desktop/tall-grass
+[DEBUG] 18:18:30:812 Broker/(17942:17942): Inicializa la GameCard
+[DEBUG] 18:18:30:812 Broker/(17942:17942): El directorio ya existe
+[DEBUG] 18:18:30:812 Broker/(17942:17942): El directorio ya existe
+[DEBUG] 18:18:30:812 Broker/(17942:17942): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:18:30:812 Broker/(17942:17942): El directorio ya existe
+[DEBUG] 18:18:30:812 Broker/(17942:17942): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[DEBUG] 18:18:30:815 Broker/(17942:17942): Linea del archivo : BLOCK_SIZE=LL_GRASS
+[INFO] 18:19:11:499 Broker/(17979:17979): PROCESO GAMECARD ONLINE
+[INFO] 18:19:11:499 Broker/(17979:17979): 127.0.0.1
+[INFO] 18:19:11:499 Broker/(17979:17979): 6009
+[INFO] 18:19:11:499 Broker/(17979:17979): /home/utnso/desktop/tall-grass
+[DEBUG] 18:19:11:499 Broker/(17979:17979): Inicializa la GameCard
+[DEBUG] 18:19:11:499 Broker/(17979:17979): El directorio ya existe
+[DEBUG] 18:19:11:499 Broker/(17979:17979): El directorio ya existe
+[DEBUG] 18:19:11:499 Broker/(17979:17979): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:19:11:499 Broker/(17979:17979): El directorio ya existe
+[DEBUG] 18:19:11:499 Broker/(17979:17979): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[DEBUG] 18:19:34:54 Broker/(17979:17979): Linea del archivo : BLOCK_SIZE=LL_GRASS
+[INFO] 18:20:50:647 Broker/(18085:18085): PROCESO GAMECARD ONLINE
+[INFO] 18:20:50:648 Broker/(18085:18085): 127.0.0.1
+[INFO] 18:20:50:648 Broker/(18085:18085): 6009
+[INFO] 18:20:50:648 Broker/(18085:18085): /home/utnso/desktop/tall-grass
+[DEBUG] 18:20:50:648 Broker/(18085:18085): Inicializa la GameCard
+[DEBUG] 18:20:50:648 Broker/(18085:18085): El directorio ya existe
+[DEBUG] 18:20:50:648 Broker/(18085:18085): El directorio ya existe
+[DEBUG] 18:20:50:648 Broker/(18085:18085): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:20:50:648 Broker/(18085:18085): El directorio ya existe
+[DEBUG] 18:20:50:648 Broker/(18085:18085): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 18:22:51:859 Broker/(18182:18182): PROCESO GAMECARD ONLINE
+[INFO] 18:22:51:859 Broker/(18182:18182): 127.0.0.1
+[INFO] 18:22:51:859 Broker/(18182:18182): 6009
+[INFO] 18:22:51:859 Broker/(18182:18182): /home/utnso/desktop/tall-grass
+[DEBUG] 18:22:51:859 Broker/(18182:18182): Inicializa la GameCard
+[DEBUG] 18:22:51:859 Broker/(18182:18182): El directorio ya existe
+[DEBUG] 18:22:51:859 Broker/(18182:18182): El directorio ya existe
+[DEBUG] 18:22:51:859 Broker/(18182:18182): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:22:51:859 Broker/(18182:18182): El directorio ya existe
+[DEBUG] 18:22:51:859 Broker/(18182:18182): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 18:25:36:194 Broker/(18307:18307): PROCESO GAMECARD ONLINE
+[INFO] 18:25:36:194 Broker/(18307:18307): 127.0.0.1
+[INFO] 18:25:36:194 Broker/(18307:18307): 6009
+[INFO] 18:25:36:194 Broker/(18307:18307): /home/utnso/desktop/tall-grass
+[DEBUG] 18:25:36:194 Broker/(18307:18307): Inicializa la GameCard
+[DEBUG] 18:25:36:194 Broker/(18307:18307): El directorio ya existe
+[DEBUG] 18:25:36:194 Broker/(18307:18307): El directorio ya existe
+[DEBUG] 18:25:36:194 Broker/(18307:18307): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:25:36:194 Broker/(18307:18307): El directorio ya existe
+[DEBUG] 18:25:36:194 Broker/(18307:18307): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[INFO] 18:28:11:643 Broker/(18424:18424): PROCESO GAMECARD ONLINE
+[INFO] 18:28:11:644 Broker/(18424:18424): 127.0.0.1
+[INFO] 18:28:11:644 Broker/(18424:18424): 6009
+[INFO] 18:28:11:644 Broker/(18424:18424): /home/utnso/desktop/tall-grass
+[DEBUG] 18:28:11:644 Broker/(18424:18424): Inicializa la GameCard
+[DEBUG] 18:28:11:644 Broker/(18424:18424): El directorio ya existe
+[DEBUG] 18:28:11:644 Broker/(18424:18424): El directorio ya existe
+[DEBUG] 18:28:11:644 Broker/(18424:18424): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:28:11:644 Broker/(18424:18424): El directorio ya existe
+[DEBUG] 18:28:11:644 Broker/(18424:18424): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[DEBUG] 18:28:24:707 Broker/(18424:18424): Linea del archivo : BLOCK_SIZE=64
+6009
+[INFO] 18:31:28:730 Broker/(18552:18552): PROCESO GAMECARD ONLINE
+[INFO] 18:31:28:730 Broker/(18552:18552): 127.0.0.1
+[INFO] 18:31:28:730 Broker/(18552:18552): 6009
+[INFO] 18:31:28:730 Broker/(18552:18552): /home/utnso/desktop/tall-grass
+[DEBUG] 18:31:28:730 Broker/(18552:18552): Inicializa la GameCard
+[DEBUG] 18:31:28:730 Broker/(18552:18552): El directorio ya existe
+[DEBUG] 18:31:28:730 Broker/(18552:18552): El directorio ya existe
+[DEBUG] 18:31:28:730 Broker/(18552:18552): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:31:28:730 Broker/(18552:18552): El directorio ya existe
+[DEBUG] 18:31:28:730 Broker/(18552:18552): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[DEBUG] 18:31:39:808 Broker/(18552:18552): Linea del archivo : BLOCK_SIZE=64
+[INFO] 18:36:00:66 Broker/(18923:18923): PROCESO GAMECARD ONLINE
+[INFO] 18:36:00:66 Broker/(18923:18923): 127.0.0.1
+[INFO] 18:36:00:66 Broker/(18923:18923): 6009
+[INFO] 18:36:00:66 Broker/(18923:18923): /home/utnso/desktop/tall-grass
+[DEBUG] 18:36:00:66 Broker/(18923:18923): Inicializa la GameCard
+[DEBUG] 18:36:00:66 Broker/(18923:18923): El directorio ya existe
+[DEBUG] 18:36:00:66 Broker/(18923:18923): El directorio ya existe
+[DEBUG] 18:36:00:66 Broker/(18923:18923): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:36:00:66 Broker/(18923:18923): El directorio ya existe
+[DEBUG] 18:36:00:66 Broker/(18923:18923): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[DEBUG] 18:36:13:531 Broker/(18923:18923): Linea del archivo : BLOCK_SIZE=64
+[DEBUG] 18:36:21:379 Broker/(18923:18923): Linea del archivo : BLOCKS=5192
+[INFO] 18:36:43:728 Broker/(18994:18994): PROCESO GAMECARD ONLINE
+[INFO] 18:36:43:729 Broker/(18994:18994): 127.0.0.1
+[INFO] 18:36:43:729 Broker/(18994:18994): 6009
+[INFO] 18:36:43:729 Broker/(18994:18994): /home/utnso/desktop/tall-grass
+[DEBUG] 18:36:43:729 Broker/(18994:18994): Inicializa la GameCard
+[DEBUG] 18:36:43:729 Broker/(18994:18994): El directorio ya existe
+[DEBUG] 18:36:43:729 Broker/(18994:18994): El directorio ya existe
+[DEBUG] 18:36:43:729 Broker/(18994:18994): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:36:43:729 Broker/(18994:18994): El directorio ya existe
+[DEBUG] 18:36:43:729 Broker/(18994:18994): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[DEBUG] 18:36:43:729 Broker/(18994:18994): Linea del archivo : BLOCK_SIZE=64
+[DEBUG] 18:36:43:729 Broker/(18994:18994): Linea del archivo : BLOCKS=5192
+[DEBUG] 18:36:43:729 Broker/(18994:18994): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 18:36:43:729 Broker/(18994:18994): ¸×u·¸×u·
+[INFO] 18:38:27:24 Broker/(19072:19072): PROCESO GAMECARD ONLINE
+[INFO] 18:38:27:26 Broker/(19072:19072): 127.0.0.1
+[INFO] 18:38:27:26 Broker/(19072:19072): 6009
+[INFO] 18:38:27:26 Broker/(19072:19072): /home/utnso/desktop/tall-grass
+[DEBUG] 18:38:27:26 Broker/(19072:19072): Inicializa la GameCard
+[DEBUG] 18:38:27:27 Broker/(19072:19072): El directorio ya existe
+[DEBUG] 18:38:27:27 Broker/(19072:19072): El directorio ya existe
+[DEBUG] 18:38:27:27 Broker/(19072:19072): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:38:27:27 Broker/(19072:19072): El directorio ya existe
+[DEBUG] 18:38:27:27 Broker/(19072:19072): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[DEBUG] 18:38:27:34 Broker/(19072:19072): Nombre de archivo: /home/utnso/desktop/tall-grass/metadata/metadata.bin
+[DEBUG] 18:38:27:34 Broker/(19072:19072): Linea del archivo : BLOCK_SIZE=64
+[DEBUG] 18:38:27:34 Broker/(19072:19072): Linea del archivo : BLOCKS=5192
+[DEBUG] 18:38:27:36 Broker/(19072:19072): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 18:38:27:36 Broker/(19072:19072): ¸—l·¸—l·
+[INFO] 18:39:13:652 Broker/(19112:19112): PROCESO GAMECARD ONLINE
+[INFO] 18:39:13:652 Broker/(19112:19112): 127.0.0.1
+[INFO] 18:39:13:653 Broker/(19112:19112): 6009
+[INFO] 18:39:13:653 Broker/(19112:19112): /home/utnso/desktop/tall-grass
+[DEBUG] 18:39:13:653 Broker/(19112:19112): Inicializa la GameCard
+[DEBUG] 18:39:13:653 Broker/(19112:19112): El directorio ya existe
+[DEBUG] 18:39:13:653 Broker/(19112:19112): El directorio ya existe
+[DEBUG] 18:39:13:653 Broker/(19112:19112): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:39:13:653 Broker/(19112:19112): El directorio ya existe
+[DEBUG] 18:39:13:653 Broker/(19112:19112): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[DEBUG] 18:39:13:653 Broker/(19112:19112): Nombre de archivo: /home/utnso/desktop/tall-grass/metadata/metadata.bin
+[DEBUG] 18:39:13:653 Broker/(19112:19112): Linea del archivo : BLOCK_SIZE=64
+[DEBUG] 18:39:13:653 Broker/(19112:19112): Linea del archivo : BLOCKS=5192
+[DEBUG] 18:39:13:653 Broker/(19112:19112): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 18:39:13:653 Broker/(19112:19112): ¸—i·¸—i·
+[INFO] 18:39:32:169 Broker/(19146:19146): PROCESO GAMECARD ONLINE
+[INFO] 18:39:32:169 Broker/(19146:19146): 127.0.0.1
+[INFO] 18:39:32:169 Broker/(19146:19146): 6009
+[INFO] 18:39:32:169 Broker/(19146:19146): /home/utnso/desktop/tall-grass
+[DEBUG] 18:39:32:169 Broker/(19146:19146): Inicializa la GameCard
+[DEBUG] 18:39:32:170 Broker/(19146:19146): El directorio ya existe
+[DEBUG] 18:39:32:170 Broker/(19146:19146): El directorio ya existe
+[DEBUG] 18:39:32:170 Broker/(19146:19146): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:39:32:170 Broker/(19146:19146): El directorio ya existe
+[DEBUG] 18:39:32:170 Broker/(19146:19146): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[DEBUG] 18:39:32:170 Broker/(19146:19146): Nombre de archivo: /home/utnso/desktop/tall-grass/metadata/metadata.bin
+[DEBUG] 18:39:32:172 Broker/(19146:19146): Linea del archivo : BLOCK_SIZE=64
+[DEBUG] 18:39:32:177 Broker/(19146:19146): Linea del archivo : BLOCKS=5192
+[DEBUG] 18:39:32:177 Broker/(19146:19146): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 18:39:32:178 Broker/(19146:19146): Archivo:
+[INFO] 18:40:32:189 Broker/(19198:19198): PROCESO GAMECARD ONLINE
+[INFO] 18:40:32:192 Broker/(19198:19198): 127.0.0.1
+[INFO] 18:40:32:192 Broker/(19198:19198): 6009
+[INFO] 18:40:32:192 Broker/(19198:19198): /home/utnso/desktop/tall-grass
+[DEBUG] 18:40:32:192 Broker/(19198:19198): Inicializa la GameCard
+[DEBUG] 18:40:32:192 Broker/(19198:19198): El directorio ya existe
+[DEBUG] 18:40:32:192 Broker/(19198:19198): El directorio ya existe
+[DEBUG] 18:40:32:192 Broker/(19198:19198): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 18:40:32:192 Broker/(19198:19198): El directorio ya existe
+[DEBUG] 18:40:32:192 Broker/(19198:19198): Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/metadata/ - 2
+[DEBUG] 18:40:32:192 Broker/(19198:19198): Nombre de archivo: /home/utnso/desktop/tall-grass/metadata/metadata.bin
+[DEBUG] 18:40:32:192 Broker/(19198:19198): Linea del archivo : BLOCK_SIZE=64
+[DEBUG] 18:40:32:192 Broker/(19198:19198): Linea del archivo : BLOCKS=5192
+[DEBUG] 18:40:32:192 Broker/(19198:19198): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 18:40:32:192 Broker/(19198:19198): Archivo: /home/utnso/desktop/tall-grass/metadata/metadata.bin

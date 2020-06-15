@@ -49,14 +49,31 @@ typedef struct
 	int objetivesCount;
 } t_trainerParameters;
 
+typedef enum
+{
+	AVAILABLE = 1,
+	DEADLOCK = 2,
+	WAITING = 3
+} t_blockState;
 
  typedef struct
 {
 	pthread_t trainer;
 	t_trainerParameters parameters;
 	sem_t semaphore;
+	t_blockState blockState;
+
 } t_trainer;
 
+typedef struct
+{
+	t_trainer* new;
+	t_trainer* blocked;
+	t_trainer* ready;
+	t_trainer* exec;
+	t_trainer* exit;
+
+} t_stateLists;
 
 struct Broker
 {
@@ -118,6 +135,7 @@ int connectBroker(char*, char*,t_log*);
 void requestNewPokemons(t_objetive*,int,t_log*,struct Broker broker);
 void requestNewPokemon(t_pokemon,t_log*,struct Broker broker);
 int getGlobalObjetivesCount(t_trainer*, int);
+void initStateLists(t_stateLists,t_trainer*,t_trainer*,t_trainer*,t_trainer*,t_trainer*);
 
 
 void initBroker(struct Broker *broker){

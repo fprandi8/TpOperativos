@@ -16,13 +16,18 @@ int main(void) {
 	int teamSocket;
 	char* ip;
 	char* port;
-	t_trainer* new;
-	int trainersCount;
+	t_trainer* l_new;
+	t_trainer* l_ready;
+	t_trainer* l_blocked;
+	t_trainer* l_exec;
+	t_trainer* l_exit;
+	t_stateLists stateLists;
+	int trainersCount,readyCount,execCount;
     pthread_t* subs;
-	t_trainer* ready,exec;
-	int readyCount,execCount;
 	t_objetive* missingPkms;
     int globalObjetivesDistinctCount=0,globalObjetivesCount=0;
+    pthread_t closeScheduler,readyScheduler;
+
 
 	//Init de config y logger
 	createConfig(&config);
@@ -46,11 +51,11 @@ int main(void) {
 	trainersCount=getTrainersCount(config,logger);
 	log_debug(logger,"4. Se contaron %i entrenadores",trainersCount);
 	log_debug(logger,"5.Se alocó memoria para el array de threads");
-	new = (t_trainer*)malloc(sizeof(t_trainer)*trainersCount);
-	startTrainers(new,trainersCount,config,logger);
-	globalObjetivesCount = getGlobalObjetivesCount(new,trainersCount);
+	l_new = (t_trainer*)malloc(sizeof(t_trainer)*trainersCount);
+	startTrainers(l_new,trainersCount,config,logger);
+	globalObjetivesCount = getGlobalObjetivesCount(l_new,trainersCount);
 	missingPkms=(t_objetive*)malloc(sizeof(t_objetive)*globalObjetivesCount);
-	missingPokemons(new,missingPkms,trainersCount,&globalObjetivesCount,&globalObjetivesDistinctCount,logger);
+	missingPokemons(l_new,missingPkms,trainersCount,&globalObjetivesCount,&globalObjetivesDistinctCount,logger);
 	void* temp = realloc(missingPkms,sizeof(t_objetive)*globalObjetivesDistinctCount);
 	if (!temp){
 		log_debug(logger,"error en realloc");
@@ -63,19 +68,37 @@ int main(void) {
 	requestNewPokemons(missingPkms,globalObjetivesDistinctCount,logger,broker);
 	log_debug(logger,"\n\n");
 	log_debug(logger,"Test de parametros");
-	log_debug(logger,"Entrenador 0 está en la posición (x,y)=(%i,%i), tiene %i pokemons: %s, %s y %s y tiene %i objetivos %s, %s, %s y %s",new[0].parameters.position.x,new[0].parameters.position.y,new[0].parameters.pokemonsCount,new[0].parameters.pokemons[0].name,new[0].parameters.pokemons[1].name,new[0].parameters.pokemons[2].name,new[0].parameters.objetivesCount,new[0].parameters.objetives[0].name,new[0].parameters.objetives[1].name,new[0].parameters.objetives[2].name,new[0].parameters.objetives[3].name);
-	log_debug(logger,"Entrenador 1 está en la posición (x,y)=(%i,%i), tiene %i pokemons: %s y %s y tiene %i objetivos %s, %s y %s",new[1].parameters.position.x,new[1].parameters.position.y,new[1].parameters.pokemonsCount,new[1].parameters.pokemons[0].name,new[1].parameters.pokemons[1].name,new[1].parameters.objetivesCount,new[1].parameters.objetives[0].name,new[1].parameters.objetives[1].name,new[1].parameters.objetives[2].name);
-	log_debug(logger,"Entrenador 2 está  en la posición (x,y)=(%i,%i), tiene %i pokemons: %s y tiene %i objetivos %s y %s",new[2].parameters.position.x,new[2].parameters.position.y,new[2].parameters.pokemonsCount,new[2].parameters.pokemons[0].name,new[2].parameters.objetivesCount,new[2].parameters.objetives[0].name,new[2].parameters.objetives[1].name);
+	log_debug(logger,"Entrenador 0 está en la posición (x,y)=(%i,%i), tiene %i pokemons: %s, %s y %s y tiene %i objetivos %s, %s, %s y %s",l_new[0].parameters.position.x,l_new[0].parameters.position.y,l_new[0].parameters.pokemonsCount,l_new[0].parameters.pokemons[0].name,l_new[0].parameters.pokemons[1].name,l_new[0].parameters.pokemons[2].name,l_new[0].parameters.objetivesCount,l_new[0].parameters.objetives[0].name,l_new[0].parameters.objetives[1].name,l_new[0].parameters.objetives[2].name,l_new[0].parameters.objetives[3].name);
+	log_debug(logger,"Entrenador 1 está en la posición (x,y)=(%i,%i), tiene %i pokemons: %s y %s y tiene %i objetivos %s, %s y %s",l_new[1].parameters.position.x,l_new[1].parameters.position.y,l_new[1].parameters.pokemonsCount,l_new[1].parameters.pokemons[0].name,l_new[1].parameters.pokemons[1].name,l_new[1].parameters.objetivesCount,l_new[1].parameters.objetives[0].name,l_new[1].parameters.objetives[1].name,l_new[1].parameters.objetives[2].name);
+	log_debug(logger,"Entrenador 2 está  en la posición (x,y)=(%i,%i), tiene %i pokemons: %s y tiene %i objetivos %s y %s",l_new[2].parameters.position.x,l_new[2].parameters.position.y,l_new[2].parameters.pokemonsCount,l_new[2].parameters.pokemons[0].name,l_new[2].parameters.objetivesCount,l_new[2].parameters.objetives[0].name,l_new[2].parameters.objetives[1].name);
 	log_debug(logger,"globalObjetivesCount: %i",globalObjetivesCount);
 	log_debug(logger,"globalObjetivesDistinctCount: %i",globalObjetivesDistinctCount);
 	for(int objCount=0;objCount<globalObjetivesDistinctCount;objCount++){
 		log_debug(logger,"Missing Pokemon %i: %i %s",objCount,missingPkms[objCount].count,missingPkms[objCount].pokemon.name);
 	}
-    //startScheduler(new,logger);
+	initStateLists(stateLists,l_new,l_blocked,l_ready,l_exec,l_exit);
+    //startClosePlanning(new,blocked,ready);
+	//startReadyPlaning(ready,exec);
 
 	deleteLogger(&logger);
 	return EXIT_SUCCESS;
 }
+//FIX
+void initStateLists(stateLists,new,blocked,ready,exec,l_exit){
+	stateLists.new = new;
+	stateLists.blocked=blocked;
+	stateLists[1]=ready;
+	stateLists[1]=new;
+	stateLists[1]=new;
+}
+
+//TODO
+/*void startClosePlanning(closeScheduler,new,blocked,ready){
+	t_trainet
+	pthread_create(&(closeScheduler),NULL,(void*)startThread,(void*)trainer);
+}
+*/
+
 
 int getGlobalObjetivesCount(t_trainer* trainers, int trainersCount){
 	int objcount = 0;
@@ -335,6 +358,7 @@ void startTrainers(t_trainer* trainers,int trainersCount,t_config *config,t_log*
 void startTrainer(t_trainer* trainer,t_log *logger){
 
 	trainer->trainer=(pthread_t)malloc(sizeof(pthread_t));
+	trainer->blockState=AVAILABLE;
 	pthread_create(&(trainer->trainer),NULL,(void*)startThread,(void*)trainer);
 	//pthread_join(trainer->trainer,NULL);
 	log_debug(logger,"5. Se creó un entrenador");

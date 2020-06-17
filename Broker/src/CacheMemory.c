@@ -407,3 +407,27 @@ void PrintDumpOfCache()
 
 }
 
+int check_consolidate(t_partition freed_partition){
+    t_list  free_neighbors = get_free_neighbors(freed_partition);
+    
+    if(!has_free_neighbor(free_neighbors)){
+        free(free_neighbors);
+        return 0;
+    }
+
+    free_neighbors = filter_same_size_neighbors(freed_partition, free_neighbors);
+
+    if(!has_same_size_neighbor(free_neighbors)){
+        free(free_neighbors);
+        return 0;
+    }
+
+    free_neighbors = filter_same_parent_neighbors(freed_partition, free_neighbors);
+
+    if(!has_same_parent_neighbor(free_neighbors){
+        free(free_neighbors);
+        return 0;
+    }
+
+    return consolidate(free_neighbors, freed_partition);
+}

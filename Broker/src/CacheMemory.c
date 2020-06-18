@@ -414,10 +414,10 @@ int check_consolidate(t_partition freed_partition){
         free(free_neighbors);
         return 0;
     }
-
+//impls hasta aca
     free_neighbors = filter_same_size_neighbors(freed_partition, free_neighbors);
 
-    if(!has_same_size_neighbor(free_neighbors)){
+    if(has_same_size_neighbor(free_neighbors) == 0){
         free(free_neighbors);
         return 0;
     }
@@ -458,4 +458,8 @@ int find_index_in_list(t_partition partition){
     }
     free(aux_partition);
     return index;
+}
+
+int has_free_neighbor(t_list neighbors){
+    return list_is_empty(neighbors) != 0;
 }

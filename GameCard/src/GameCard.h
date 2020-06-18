@@ -27,7 +27,7 @@
 #include<string.h>
 #include "utils.h"
 #include<commons/log.h>
-#include<commons/collections/queue.h>
+#include<commons/bitarray.h>
 #include<commons/collections/list.h>
 #include <semaphore.h>
 #include <fcntl.h>
@@ -43,14 +43,37 @@
 typedef struct {
 	t_log* logger;
 	char* ptoMnt;
+	char* filePath;
+	char* metadataPath;
+	int blocks;
+	int block_size;
+	char* blocksPath;
+	t_bitarray* bitArray;
 } t_GameCard;
+
+struct Broker
+{
+	char* ipKey;
+	char* ip;
+	char* portKey;
+	char* port;
+} broker;
 
 typedef enum{
 	METADATA,
+	METADATA_DIRECTORY,
 	POKE_METADATA,
 	POKE_FILE,
 	BITMAP
 } fileType;
+
+typedef struct{
+	char* directory;
+	char* size;
+	t_list* block;
+	char* open;
+
+}t_file_metadata;
 
 typedef struct {
 	t_list* values;
@@ -58,7 +81,27 @@ typedef struct {
 
 
 t_GameCard* GameCard_initialize(t_log*, char*);
+int GameCard_mountFS(t_config*);
+void GameCard_Process_Message(deli_message*);
+void GameCard_Process_Message_New(deli_message*);
+void GameCard_Initialize_bitarray();
 int create_directory(char*);
 int create_file(char*, fileType, t_values*);
+int create_file_bitmap(FILE*);
+void initBroker(struct Broker *broker){
+	broker->ipKey=IP_BROKER;
+	broker->portKey=PUERTO_BROKER;
+
+}
+
+int create_file_metadata(FILE*, t_values* );
+int create_file_metadata_directory(FILE* , t_values* );
+
+void readConfigBrokerValues(t_config*,t_log* ,struct Broker*);
+void subscribeToBroker(struct Broker broker,pthread_t* subs);
+void* subscribeToBrokerNew(void *brokerAdress);
+void* subscribeToBrokerCatch(void *brokerAdress);
+void* subscribeToBrokerGet(void *brokerAdress);
+int connectBroker(char* , char* ,t_log* );
 
 #endif /* GAMECARD_H_ */

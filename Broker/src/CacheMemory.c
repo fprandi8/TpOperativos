@@ -431,3 +431,31 @@ int check_consolidate(t_partition freed_partition){
 
     return consolidate(free_neighbors, freed_partition);
 }
+
+t_list get_free_neighbors(t_partition partition){
+    bool _filter_free_partition(t_partition* p){ return p->free;}
+    //TODO manage malloc
+    t_list free_partitions;
+    int index = find_index_in_list(partition);
+
+    if(index > 0)
+        list.add(free_partitions, list_get(partitions, index-1));
+    if(index < sizeof(partitions))
+        list.add(free_partitions, list_get(partitions, index+1));
+
+    return list_filter(free_partitions, (void*)_filter_free_partition);
+}
+
+int find_index_in_list(t_partition partition){
+    int index = 0;
+    int wanted_id = partition.id;
+    t_partition* aux_partition = (t_partition*)malloc(t_partition));
+    while(index < sizeof(partitions)){
+        aux_partition = list_get(partitions, index);
+        if(aux_partition.id == wanted_id)
+            break;
+        index++;
+    }
+    free(aux_partition);
+    return index;
+}

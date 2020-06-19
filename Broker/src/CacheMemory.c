@@ -32,11 +32,22 @@ void start_cache(void)
 	signal(SIGUSR1, signal_handler);
 
     t_partition* first_partition = CreateNewPartition();
-    first_partition->begining = cache.full_memory;
-    first_partition->size = cache.memory_size;
     first_partition->queue_type = 0;
     first_partition->free = 1;
     first_partition->timestap = clock();
+	first_partition->begining = cache.full_memory;
+
+	if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC"))
+	{
+    	first_partition->size = cache.memory_size;
+	}
+	else
+	{
+		//Get the power of two nearest to the memory size we have
+		double powerOfTwo = CalculateNearestPowerOfTwo(cache.memory_size);
+		first_partition->size = (int)pow(2, powerOfTwo);
+	}
+
 
 	sem_wait(mutex_partitions);
     list_add(partitions, first_partition);
@@ -87,7 +98,15 @@ void add_to_cached_messages(t_cachedMessage new_message){
 int save_message_body(void* messageContent, message_type queue){
     t_buffer* messageBuffer = SerializeMessageContent(queue, messageContent);
 	sem_wait(mutex_partitions);
-    t_partition* partition = find_empty_partition_of_size(sizeof(messageBuffer->bufferSize));
+	t_partition* partition;
+	if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC"))
+	{
+    	partition = find_empty_partition_of_size(sizeof(messageBuffer->bufferSize));
+	} 
+	else 
+	{
+		partition = select_partition_bf(size);
+	}
     int savedPartitionId = save_body_in_partition(messageBuffer, partition, queue);
 	sem_post(mutex_partitions);
 	return savedPartitionId;
@@ -122,7 +141,7 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
 
         list_add(partitions, newPartition);
 
-        partition->begining += newPartitionSize + 1;
+        partition->begining += newPartitionSize;
         partition->timestap = clock();
 
         memcpy(partition->begining, messageBuffer->stream, sizeof(messageBuffer->bufferSize));
@@ -130,9 +149,40 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
     }
     else
     {
-        //TODO Handle buddy creation
-        uint32_t var = 0;
-        return var;
+		int run = 1;
+		while(run == 1)
+		{
+			if(
+				(partition->size / 2 < messageBuffer->bufferSize && partition->size > messageBuffer->bufferSize) || 
+				partition->size / 2 >= config_get_int_value(config, TAMANO_MINIMO_PARTICION)
+			)
+			{
+				partition->queue_type = queue;
+				partition->free = 0;
+				partition->timestap = clock();
+
+				nextPartitionId++;
+
+				memcpy(partition->begining, messageBuffer->stream, sizeof(messageBuffer->bufferSize));
+				return partition->id;	
+			} 
+			else 
+			{
+				t_partition* newPartition = CreateNewPartition();
+				newPartition->begining = partition->begining;
+				newPartition->size = partition->size / 2 ;
+				newPartition->queue_type = queue;
+				newPartition->free = 0;
+				newPartition->timestap = clock();
+
+				partition->begining += newPartitionSize;
+				partition->timestap = clock();
+
+				list_add(partitions, newPartition);
+
+				partition = newPartition;
+			}
+		}
     }
 }
 
@@ -462,4 +512,17 @@ int find_index_in_list(t_partition partition){
 
 int has_free_neighbor(t_list neighbors){
     return list_is_empty(neighbors) != 0;
+}
+
+double CalculateNearestPowerOfTwo(int x)
+{
+	double evenSize = x - (x % 2);
+	return powerOfTwo = (int)floor(log10(evenSize) / log10(2));
+}
+
+double CalculateNearestPowerOfTwoRelativeToCache(int memoryLocation)
+{
+		int relativeMemory = memoryLocation - cache.full_memory;
+		double evenSize = relativeMemory - (relativeMemory % 2);
+		return powerOfTwo = (int)floor(log10(evenSize) / log10(2));
 }

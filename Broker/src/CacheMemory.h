@@ -31,6 +31,7 @@
 #include <semaphore.h>
 #include <signal.h>
 #include <string.h>
+#include <math.h>
 
 /*
 	******************STRUCTS***********************
@@ -108,5 +109,7 @@ void Free_CachedMessage(t_cachedMessage*);
 void add_to_cached_messages(t_cachedMessage);
 uint32_t add_occupied_size_from(t_list* occupied);
 int GetBusyPartitionsCount();
+double CalculateNearestPowerOfTwo(int x);
+double CalculateNearestPowerOfTwoRelativeToCache(int memoryLocation);
 
 #endif /* CACHEMEMORY_H_ */

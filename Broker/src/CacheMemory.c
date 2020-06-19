@@ -219,16 +219,16 @@ t_partition* find_empty_partition_of_size(uint32_t size){
         {
             if(partition == NULL)
             {
-                compact_memory();
-                partition = select_partition(size);
-            }
-            if(partition == NULL)
-            {
                 for(int i = 0; i < compaction_frequency; i++)
                 {
                     delete_partition(); //TODO we need to know we run out of partitions to delete
                     partition = select_partition(size);
                 }
+            }
+            if(partition == NULL)
+            {
+                compact_memory();
+                partition = select_partition(size);
             }
         } while(partition == NULL);
         return partition;

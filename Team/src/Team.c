@@ -84,12 +84,12 @@ int main(void) {
 	return EXIT_SUCCESS;
 }
 //FIX
-void initStateLists(stateLists,new,blocked,ready,exec,l_exit){
+void initStateLists(t_stateLists stateLists,t_trainer* new, t_trainer* blocked,t_trainer* ready, t_trainer* exec, t_trainer* l_exit){
 	stateLists.new = new;
-	stateLists.blocked=blocked;
-	stateLists[1]=ready;
-	stateLists[1]=new;
-	stateLists[1]=new;
+	stateLists.blocked= blocked;
+	stateLists.ready = ready;
+	stateLists.exec = exec;
+	stateLists.exit = l_exit;
 }
 
 //TODO

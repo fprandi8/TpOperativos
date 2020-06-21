@@ -48,7 +48,7 @@ int esperar_cliente(int socket_servidor)
 
 t_log* iniciar_logger(void)
 {
-	return log_create("GameCard.log","Broker",1,LOG_LEVEL_DEBUG);
+	return log_create("GameCard.log","GameCard",1,LOG_LEVEL_DEBUG);
 }
 
 t_config* leer_config(void)

@@ -28,10 +28,12 @@
 #include "utils.h"
 #include<commons/log.h>
 #include<commons/bitarray.h>
+#include<commons/string.h>
 #include<commons/collections/list.h>
 #include <semaphore.h>
 #include <fcntl.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
 #include "delibird/comms/messages.h"
 #include "delibird/comms/serialization.h"
 #include "delibird/comms/pokeio.h"
@@ -49,6 +51,7 @@ typedef struct {
 	int block_size;
 	char* blocksPath;
 	t_bitarray* bitArray;
+	char* fileMapped;
 } t_GameCard;
 
 struct Broker
@@ -62,16 +65,16 @@ struct Broker
 typedef enum{
 	METADATA,
 	METADATA_DIRECTORY,
-	POKE_METADATA,
-	POKE_FILE,
-	BITMAP
+	BIN_FILE,
+	BITMAP,
+	POKE_METADATA
 } fileType;
 
 typedef struct{
-	char* directory;
+	char directory;
 	char* size;
 	t_list* block;
-	char* open;
+	char open;
 
 }t_file_metadata;
 
@@ -85,23 +88,32 @@ int GameCard_mountFS(t_config*);
 void GameCard_Process_Message(deli_message*);
 void GameCard_Process_Message_New(deli_message*);
 void GameCard_Initialize_bitarray();
+
 int create_directory(char*);
-int create_file(char*, fileType, t_values*);
-int create_file_bitmap(FILE*);
-void initBroker(struct Broker *broker){
-	broker->ipKey=IP_BROKER;
-	broker->portKey=PUERTO_BROKER;
+int create_file(fileType, t_values*);
+int create_file_bitmap();
+int create_file_bin(t_values*);
+int create_file_metadata(t_values* );
+int create_file_metadata_directory(t_values* );
+int create_file_metadata_poke(t_values*);
 
-}
+int create_poke_file(t_values*);
 
-int create_file_metadata(FILE*, t_values* );
-int create_file_metadata_directory(FILE* , t_values* );
+void turn_a_set_of_bits_on(int,int);
+int get_first_free_block();
 
 void readConfigBrokerValues(t_config*,t_log* ,struct Broker*);
 void subscribeToBroker(struct Broker broker,pthread_t* subs);
 void* subscribeToBrokerNew(void *brokerAdress);
 void* subscribeToBrokerCatch(void *brokerAdress);
 void* subscribeToBrokerGet(void *brokerAdress);
+
+void initBroker(struct Broker *broker){
+	broker->ipKey=IP_BROKER;
+	broker->portKey=PUERTO_BROKER;
+
+}
+
 int connectBroker(char* , char* ,t_log* );
 
 #endif /* GAMECARD_H_ */

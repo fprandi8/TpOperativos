@@ -458,42 +458,29 @@ void PrintDumpOfCache()
 }
 
 int check_consolidate(t_partition freed_partition){
-    t_list  free_neighbors = get_free_neighbors(freed_partition);
-    
-    if(!has_free_neighbor(free_neighbors)){
-        free(free_neighbors);
-        return 0;
-    }
-//impls hasta aca
-    free_neighbors = filter_same_size_neighbors(freed_partition, free_neighbors);
 
-    if(has_same_size_neighbor(free_neighbors) == 0){
-        free(free_neighbors);
-        return 0;
+    int index = find_index_in_list(partition);
+    t_partition possible_partition = (t_partition*)malloc(sizeof(t_partition));
+
+    if(is_pair(index)){
+        possible_partition = list_get(partitions, index+1);
+    }else{
+        possible_partition = list_get(partitions, index-1);
     }
 
-    free_neighbors = filter_same_parent_neighbors(freed_partition, free_neighbors);
-
-    if(!has_same_parent_neighbor(free_neighbors){
-        free(free_neighbors);
+    if(!possible_partition.free){
+        free(possible_partition);
         return 0;
     }
+
+    if(possible_partition.size != freed_partition)
+        return 0;
 
     return consolidate(free_neighbors, freed_partition);
 }
 
-t_list get_free_neighbors(t_partition partition){
-    bool _filter_free_partition(t_partition* p){ return p->free;}
-    //TODO manage malloc
-    t_list free_partitions;
-    int index = find_index_in_list(partition);
-
-    if(index > 0)
-        list.add(free_partitions, list_get(partitions, index-1));
-    if(index < sizeof(partitions))
-        list.add(free_partitions, list_get(partitions, index+1));
-
-    return list_filter(free_partitions, (void*)_filter_free_partition);
+int is_pair(int index){
+    return (index % 2) == 0;
 }
 
 int find_index_in_list(t_partition partition){
@@ -508,10 +495,6 @@ int find_index_in_list(t_partition partition){
     }
     free(aux_partition);
     return index;
-}
-
-int has_free_neighbor(t_list neighbors){
-    return list_is_empty(neighbors) != 0;
 }
 
 double CalculateNearestPowerOfTwo(int x)

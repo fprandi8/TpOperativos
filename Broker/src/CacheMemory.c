@@ -476,7 +476,7 @@ int check_consolidate(t_partition freed_partition){
     if(possible_partition.size != freed_partition)
         return 0;
 
-    return consolidate(free_neighbors, freed_partition);
+    return consolidate(possible_partition, freed_partition);
 }
 
 int is_pair(int index){

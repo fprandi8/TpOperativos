@@ -457,26 +457,42 @@ void PrintDumpOfCache()
 
 }
 
-int check_consolidate(t_partition freed_partition){
+/**
+ *
+ * @param freed_partition
+ * @return index of the partition after consolidation, if >= 0 then call again with the partition
+ * at index, if < 0 then break the cycle.
+ */
+int check_validations_and_consolidate(t_partition freed_partition){
 
     int index = find_index_in_list(partition);
     t_partition possible_partition = (t_partition*)malloc(sizeof(t_partition));
+    int first_partition = 1;
+    int possible_index;
 
     if(is_pair(index)){
-        possible_partition = list_get(partitions, index+1);
+        possible_index = index + 1;
     }else{
-        possible_partition = list_get(partitions, index-1);
+        possible_index = index - 1;
+        first_partition = 2;
     }
+
+    possible_partition = list_get(partitions, possible_index);
 
     if(!possible_partition.free){
         free(possible_partition);
-        return 0;
+        return -1;
     }
 
-    if(possible_partition.size != freed_partition)
-        return 0;
+    if(possible_partition.size != freed_partition){
+        free(freed_partition);
+        return -1;
+    }
 
-    return consolidate(possible_partition, freed_partition);
+    int result_index = consolidate(possible_partition, possible_index, freed_partition, index, first_partition);
+
+    free(possible_partition);
+    return result_index;
 }
 
 int is_pair(int index){
@@ -508,4 +524,19 @@ double CalculateNearestPowerOfTwoRelativeToCache(int memoryLocation)
 		int relativeMemory = memoryLocation - cache.full_memory;
 		double evenSize = relativeMemory - (relativeMemory % 2);
 		return powerOfTwo = (int)floor(log10(evenSize) / log10(2));
+}
+
+int consolidate(t_partition one_partition,int one_index, t_partition another_partition,int another_index, int first_partition){
+    int consolidation_ok = -1;
+
+    if(first_partition == 2){
+        one_partition.size *= 2;
+        free(list_remove(partitions, another_index));
+        consolidation_ok = one_index;
+    }else{
+        another_partition.size *= 2;
+        free(list_remove(partitions, one_index));
+        consolidation_ok = another_index;
+    }
+    return consolidation_ok;
 }

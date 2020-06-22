@@ -105,6 +105,7 @@ int save_message_body(void* messageContent, message_type queue){
 	} 
 	else 
 	{
+		int size;
 		partition = select_partition_bf(size);
 	}
     int savedPartitionId = save_body_in_partition(messageBuffer, partition, queue);
@@ -175,7 +176,7 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
 				newPartition->free = 0;
 				newPartition->timestap = clock();
 
-				partition->begining += newPartitionSize;
+				partition->begining += 0;//newPartitionSize;
 				partition->timestap = clock();
 
 				list_add(partitions, newPartition);
@@ -465,8 +466,8 @@ void PrintDumpOfCache()
  */
 int check_validations_and_consolidate(t_partition freed_partition){
 
-    int index = find_index_in_list(partition);
-    t_partition possible_partition = (t_partition*)malloc(sizeof(t_partition));
+    int index = find_index_in_list(freed_partition);
+    t_partition* possible_partition = (t_partition*)malloc(sizeof(t_partition));
     int first_partition = 1;
     int possible_index;
 
@@ -479,13 +480,13 @@ int check_validations_and_consolidate(t_partition freed_partition){
 
     possible_partition = list_get(partitions, possible_index);
 
-    if(!possible_partition.free){
+    if(!possible_partition->free){
         free(possible_partition);
         return -1;
     }
 
-    if(possible_partition.size != freed_partition){
-        free(freed_partition);
+    if(possible_partition->size != freed_partition.size){
+        free(possible_partition);
         return -1;
     }
 
@@ -502,10 +503,10 @@ int is_pair(int index){
 int find_index_in_list(t_partition partition){
     int index = 0;
     int wanted_id = partition.id;
-    t_partition* aux_partition = (t_partition*)malloc(t_partition));
+    t_partition* aux_partition = (t_partition*)malloc(sizeof(t_partition));
     while(index < sizeof(partitions)){
         aux_partition = list_get(partitions, index);
-        if(aux_partition.id == wanted_id)
+        if(aux_partition->id == wanted_id)
             break;
         index++;
     }
@@ -516,14 +517,14 @@ int find_index_in_list(t_partition partition){
 double CalculateNearestPowerOfTwo(int x)
 {
 	double evenSize = x - (x % 2);
-	return powerOfTwo = (int)floor(log10(evenSize) / log10(2));
+	return 1;//powerOfTwo = (int)floor(log10(evenSize) / log10(2));
 }
 
 double CalculateNearestPowerOfTwoRelativeToCache(int memoryLocation)
 {
-		int relativeMemory = memoryLocation - cache.full_memory;
+		int relativeMemory = memoryLocation; //- cache.full_memory;
 		double evenSize = relativeMemory - (relativeMemory % 2);
-		return powerOfTwo = (int)floor(log10(evenSize) / log10(2));
+		return 1;//powerOfTwo = (int)floor(log10(evenSize) / log10(2));
 }
 
 int consolidate(t_partition one_partition,int one_index, t_partition another_partition,int another_index, int first_partition){

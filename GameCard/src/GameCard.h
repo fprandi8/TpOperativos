@@ -101,6 +101,7 @@ int create_poke_file(t_values*);
 
 void turn_a_set_of_bits_on(int,int);
 int get_first_free_block();
+void write_blocks(t_file_metadata*, int, new_pokemon*);
 
 void readConfigBrokerValues(t_config*,t_log* ,struct Broker*);
 void subscribeToBroker(struct Broker broker,pthread_t* subs);

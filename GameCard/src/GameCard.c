@@ -16,13 +16,13 @@ int main(void) {
 
 	t_log* logger;
 	t_config* config;
-	pthread_t* subs;
+//	pthread_t* subs;
 
-	char* ip,puerto;
+//	char* ip,puerto;
 	char* ptoMnt = (char*)malloc(sizeof(char)*255);
 	//	char* ptoMnt, retryConnection, retryOperation, delayTime;
 
-	int server,client;
+//	int server,client;
 
 	logger = iniciar_logger();
 	log_info(logger,"PROCESO GAMECARD ONLINE");
@@ -30,8 +30,8 @@ int main(void) {
 
 	config = leer_config();
 
-	ip= obtener_valor_config(config,logger,IP_BROKER);
-	puerto = obtener_valor_config(config,logger,PUERTO_BROKER);
+//	ip= obtener_valor_config(config,logger,IP_BROKER);
+//	puerto = obtener_valor_config(config,logger,PUERTO_BROKER);
 	ptoMnt = obtener_valor_config(config,logger,PUNTO_MONTAJE_TALLGRASS);
 	// retryConnection = obtener_valor_config(config.logger,TIEMPO_DE_REINTENTO_CONEXION);
 	// retryOperation = obtener_valor_config(config.logger,TIEMPO_DE_REINTENTO_OPERACION);
@@ -63,8 +63,10 @@ int main(void) {
 
 	GameCard_Process_Message(message);
 
-	munmap(GameCard->fileMapped, (GameCard->block_size*GameCard->blocks));
+//	munmap(GameCard->fileMapped, (GameCard->block_size*GameCard->blocks));
 
+	bitarray_destroy(GameCard->bitArray);
+//	free(GameCard->bitArray);
 	free(ptoMnt);
 	free(message);
 
@@ -306,42 +308,26 @@ int create_poke_file(t_values* values){
 
 	int amountOfBlocks;
 
-	int aux = (sizeof(newPokemon->horizontalCoordinate)
-			+ sizeof(newPokemon->verticalCoordinate)
-			+sizeof(newPokemon->ammount));
+	//Sumo 2 por el \n
+	int auxSize = (strlen(string_itoa(newPokemon->horizontalCoordinate))) + 1
+			 + (strlen(string_itoa(newPokemon->verticalCoordinate))) + 1
+			 + (strlen(string_itoa(newPokemon->ammount))) + 1;
 
-	if (aux % GameCard->block_size == 0)
-	    amountOfBlocks = aux/GameCard->block_size;
+	metadataFile->size =  string_itoa(auxSize);
+
+
+	if (auxSize % GameCard->block_size == 0)
+	    amountOfBlocks = auxSize/GameCard->block_size;
 	else
-	    amountOfBlocks = (aux/GameCard->block_size) + 1;
+	    amountOfBlocks = (auxSize/GameCard->block_size) + 1;
 
 
 	log_debug(GameCard->logger, "Amout of blocks needed %d", amountOfBlocks);
 
 	int result;
-	for (int i = 0; i<amountOfBlocks; i++){
 
-		int bitBlock=get_first_free_block();
-		int specificBlock = bitBlock/(8*GameCard->block_size);
+	write_blocks(metadataFile, amountOfBlocks, newPokemon);
 
-		char* charblock=(char*)malloc(strlen(string_itoa(specificBlock))+1);
-		charblock = string_itoa(specificBlock);
-
-//		log_debug(GameCard->logger,"Bloque donde va a guardar los datos %s" , charblock);
-		list_add(metadataFile->block,(void*)charblock);
-
-		list_add(values->values,(void*)bitBlock);
-		result=create_file(BIN_FILE,values);
-		log_debug(GameCard->logger,"Creo el archivo de bloque del Pokemon %d" , specificBlock);
-
-		list_remove(values->values,1);
-
-		//TODO:MARCAR EL BITMAP
-	}
-
-	metadataFile->size =  string_itoa((sizeof(newPokemon->horizontalCoordinate)
-									 + sizeof(newPokemon->verticalCoordinate)
-									 + sizeof(newPokemon->ammount) + 3));
 	metadataFile->directory='N';
 	metadataFile->open='N';
 
@@ -383,11 +369,6 @@ int create_file_metadata_poke(t_values* values){
 	fwrite(&(metadataFile->directory),sizeof(char),1,f);
 	fwrite(&rc,sizeof(char),1,f);
 
-//	fprintf(f,"%s",DIRECTORY);
-//	fprintf(f,"%c",'=');
-//	fprintf(f,"%c",metadataFile->directory);
-//	fprintf(f,"%c",'\n');
-
 	free(line);
 
 	line=(char*)malloc(strlen(SIZE) + strlen(metadataFile->size) + 2 + 1);
@@ -397,29 +378,17 @@ int create_file_metadata_poke(t_values* values){
 	fwrite(line, strlen(line),1,f);
 	fwrite(&rc,sizeof(char),1,f);
 
-//	fprintf(f,"%s",SIZE);
-//	fprintf(f,"%c",'=');
-//	fprintf(f,"%s",metadataFile->size);
-//	fprintf(f,"%c",'\n');
-
-
-//	fprintf(f,"%s",BLOCKS);
 	fwrite(&BLOCKS,strlen(BLOCKS),1,f);
-//	fprintf(f,"%c", '[');
 	fwrite(&sepLeft,sizeof(char),1,f);
 
 	int index = 0;
 	while(list_get(metadataFile->block, index) != NULL){
-//		fprintf(f,"%s", (char*)list_get(metadataFile->block, index));
 		fwrite(list_get(metadataFile->block, index), strlen(list_get(metadataFile->block, index)),1,f);
-		if (index > 0)
-//			fprintf(f,"%c", ',');
-			fwrite(&comma,sizeof(char),1,f);
 		index++;
+		if (list_get(metadataFile->block, index) != NULL)
+			fwrite(&comma,sizeof(char),1,f);
 	}
-//	fprintf(f,"%c", ']');
 	fwrite(&sepRight,sizeof(char),1,f);
-//	fprintf(f,"%c",'\n');
 	fwrite(&rc,sizeof(char),1,f);
 
 	free(line);
@@ -431,10 +400,6 @@ int create_file_metadata_poke(t_values* values){
 	fwrite(&(metadataFile->open),sizeof(char),1,f);
 	fwrite(&rc,sizeof(char),1,f);
 
-//	fprintf(f,"%s",OPEN);
-//	fprintf(f,"%c",'=');
-//	fprintf(f,"%c",metadataFile->open);
-//	fprintf(f,"%c",'\n');
 	free(line);
 
 	fclose(f);
@@ -443,14 +408,12 @@ int create_file_metadata_poke(t_values* values){
 
 int create_file_bin(t_values* values){
 
-	char rc='\n';
-	char dash = '-';
-	char equal = '=';
-	int bit = (int)list_get(values->values,1);
-	char* blockChar =(char*)malloc(strlen(string_itoa((bit/GameCard->block_size))) + 1 );
-	blockChar=string_itoa(bit/GameCard->block_size);
+	int bit = (int)list_get(values->values,0);
 
-	char* filename = (char*)malloc(strlen(GameCard->blocksPath) + strlen(blockChar) + strlen(".bin") +1 );
+	char* blockChar =(char*)malloc(strlen(string_itoa((bit/GameCard->block_size))) + 1 );
+	strcpy(blockChar,string_itoa(bit/(GameCard->block_size*8)));
+
+	char* filename = (char*)malloc(strlen(GameCard->blocksPath) + strlen(blockChar) + strlen(".bin") + 1 );
 	strcpy(filename,GameCard->blocksPath);
 	strcat(filename,blockChar);
 	strcat(filename,".bin");
@@ -462,27 +425,25 @@ int create_file_bin(t_values* values){
 		return -1;
 	}
 
-	new_pokemon* newPokemon = (new_pokemon*)list_get(values->values,0);
+	char* bytes = (char*)list_get(values->values,1);
+	int tam =(int)list_get(values->values,2);
+	fwrite(bytes,tam, 1, f);
+
+
+//	new_pokemon* newPokemon = (new_pokemon*)list_get(values->values,0);
 	//Se suman 3 más por el = , el - y el salto de línea;
-	int bytes = strlen(string_itoa(newPokemon->horizontalCoordinate))	+
-				strlen(string_itoa(newPokemon->verticalCoordinate))		+
-				strlen(string_itoa(newPokemon->ammount)) + 3;
+//	int bytes = strlen(string_itoa(newPokemon->horizontalCoordinate))	+
+//				strlen(string_itoa(newPokemon->verticalCoordinate))		+
+//				strlen(string_itoa(newPokemon->ammount)) + 3;
 
-	fwrite((string_itoa(newPokemon->horizontalCoordinate)), strlen(string_itoa(newPokemon->horizontalCoordinate)), 1, f);
-	fwrite(&dash,sizeof(char),1,f);
-	fwrite((string_itoa(newPokemon->verticalCoordinate)), strlen(string_itoa(newPokemon->verticalCoordinate)), 1, f);
-	fwrite(&equal,sizeof(char),1,f);
-	fwrite((string_itoa(newPokemon->ammount)), strlen(string_itoa(newPokemon->ammount)), 1, f);
-	fwrite(&rc,sizeof(char),1,f);
+//	fwrite((string_itoa(newPokemon->horizontalCoordinate)), strlen(string_itoa(newPokemon->horizontalCoordinate)), 1, f);
+//	fwrite(&dash,sizeof(char),1,f);
+//	fwrite((string_itoa(newPokemon->verticalCoordinate)), strlen(string_itoa(newPokemon->verticalCoordinate)), 1, f);
+//	fwrite(&equal,sizeof(char),1,f);
+//	fwrite((string_itoa(newPokemon->ammount)), strlen(string_itoa(newPokemon->ammount)), 1, f);
+//	fwrite(&rc,sizeof(char),1,f);
 
-//	fprintf(f,"%s",(string_itoa(newPokemon->horizontalCoordinate)));
-//	fprintf(f,"%c",'-');
-//	fprintf(f,"%s",(string_itoa(newPokemon->verticalCoordinate)));
-//	fprintf(f,"%c",'=');
-//	fprintf(f,"%s",(string_itoa(newPokemon->ammount)));
-//	fprintf(f,"%c",'\n');
-
-	turn_a_set_of_bits_on(bit,bytes);
+	turn_a_set_of_bits_on(bit,(int)list_get(values->values,2));
 	free(filename);
 	free(blockChar);
 
@@ -501,7 +462,7 @@ int create_file_bitmap(){
 	strcpy(filename,GameCard->metadataPath);
 	strcat(filename,"bitmap.bin");
 
-	FILE* f= fopen(filename,"wb");
+	FILE* f= fopen(filename,"ab");
 
 	if (f==NULL){
 		log_debug(GameCard->logger,"Error en la creacion del archivo %s", filename);
@@ -513,21 +474,22 @@ int create_file_bitmap(){
 
 	for (int i = 0; i <= max; i= i + 1*8*GameCard->block_size){
 		if(bitarray_test_bit(GameCard->bitArray,i)){
-//			fprintf(f,"%c",'1');
 			fwrite(&one,sizeof(char),1,f);
 		}else{
 			fwrite(&zero,sizeof(char),1,f);
-//			fprintf(f,"%c",'0');
 		}
 	}
 
-//	fprintf(f,"%c",'\n');
 	fwrite(&rc,sizeof(char),1,f);
 
-	GameCard->fileMapped = (char*)malloc(sizeof(char));
-	if ((GameCard->fileMapped = mmap(0,(GameCard->blocks*GameCard->block_size),PROT_READ,MAP_SHARED,(int)f,0)) ==  MAP_FAILED)
-		 log_debug(GameCard->logger, "Error mapping the file");
-
+//	GameCard->fileMapped = (char*)malloc(sizeof(char));
+//	if ((GameCard->fileMapped = mmap(0,(GameCard->blocks*GameCard->block_size),PROT_READ,MAP_SHARED,(int)f,0)) ==  MAP_FAILED)
+//		{
+//			log_debug(GameCard->logger, "Error mapping the file");
+//			log_debug(GameCard->logger, "Mensaje de error %s", perror("nmap");
+//		}
+//
+//	log_debug(GameCard->logger,"Archivo Mapeado: %s ", GameCard->fileMapped);
 	free(filename);
 	fclose(f);
 	return 0;
@@ -546,39 +508,33 @@ int create_file_metadata(t_values* values){
 		return -1;
 	}
 
-	char* line=(char*)malloc(strlen(BLOCK_SIZE) + strlen("=") + strlen((char*)list_get(values->values,0)) + 1) ;
+	char* line=(char*)malloc(strlen(BLOCK_SIZE) + strlen("=") + strlen((char*)list_get(values->values,0)) + 1 ) ;
 	strcpy(line,BLOCK_SIZE);
 	strcat(line, "=");
 	strcat(line, (char*)list_get(values->values,0));
 	fwrite(line, strlen(line), 1, f);
-//	fprintf(f,"%s",line);
-//	fprintf(f,"%c",'\n');
 	fwrite(&salto, 1, 1, f);
-
 	log_debug(GameCard->logger,"Linea del archivo : %s", line);
 	free(line);
 
-	line=(char*)malloc(strlen(BLOCKS) + strlen("=") + strlen((char*)list_get(values->values,1)) + 1);
+	line = (char*)malloc(strlen(BLOCKS) + strlen("=") + strlen((char*)list_get(values->values,1)));
 	strcpy(line,BLOCKS);
-	strcat(line,"=");
+	strcat(line, "=");
 	strcat(line, (char*)list_get(values->values,1));
 	fwrite(line, strlen(line), 1, f);
-//	fprintf(f,"%s",line);
-//	fprintf(f,"%c",'\n');
 	fwrite(&salto, 1, 1, f);
 	log_debug(GameCard->logger,"Linea del archivo : %s", line);
 	free(line);
 
-	line =(char*)malloc(strlen(MAGIC_NUMBER) + strlen("=") + strlen((char*)list_get(values->values,2)) + 1 );
+	line = (char*)malloc(strlen(MAGIC_NUMBER) + strlen("=") + strlen((char*)list_get(values->values,2)));
 	strcpy(line,MAGIC_NUMBER);
-	strcat(line,"=");
+	strcat(line, "=");
 	strcat(line, (char*)list_get(values->values,2));
 	fwrite(line, strlen(line), 1, f);
-//	fprintf(f,"%s",line);
-//	fprintf(f,"%c",'\n');
 	fwrite(&salto, 1, 1, f);
 	log_debug(GameCard->logger,"Linea del archivo : %s", line);
 	free(line);
+
 
 	fclose(f);
 	return 0;
@@ -631,6 +587,79 @@ void turn_a_set_of_bits_on(int from,int bytes){
 			bitarray_set_bit(GameCard->bitArray, x + from);
 	}
 }
+
+void write_blocks(t_file_metadata* metadataFile, int amountOfBlocks,new_pokemon* newPokemon ){
+
+	int cantBytes=0;
+	int result=0;
+	int index=0;
+	int tam;
+
+	char* buffer=(char*)malloc(atoi(metadataFile->size));
+	char* bufferAux=(char*)malloc(GameCard->block_size);
+	strcpy(buffer,string_itoa(newPokemon->horizontalCoordinate));
+	strcat(buffer,"-");
+	strcat(buffer,string_itoa(newPokemon->verticalCoordinate));
+	strcat(buffer,"=");
+	strcat(buffer,string_itoa(newPokemon->ammount));;
+	tam = strlen(buffer);
+	printf("tamaño del buffer % d \n", strlen(buffer));
+	buffer[strlen(buffer)] ='\n';
+	printf("tamaño del buffer %d \n", strlen(buffer));
+	buffer[tam + 1]='\0';
+	printf("tamaño del buffer %d \n", strlen(buffer));
+
+
+	t_values* values = (t_values*)malloc(sizeof(t_values));
+	values->values =list_create();
+
+
+	for (int i = 0; i<amountOfBlocks; i++){
+
+		int bitBlock=get_first_free_block();
+		int specificBlock = bitBlock/(8*GameCard->block_size);
+
+		char* charblock=(char*)malloc(strlen(string_itoa(specificBlock))+1);
+		charblock = string_itoa(specificBlock);
+
+//		log_debug(GameCard->logger,"Bloque donde va a guardar los datos %s" , charblock);
+		list_add(metadataFile->block,(void*)charblock);
+
+		list_add(values->values,(void*)bitBlock);
+
+		index = 0;
+		while((GameCard->block_size > index) && (index < tam)){
+			printf("Bloque a grabar : %c \n",buffer[cantBytes]);
+			bufferAux[index]=buffer[cantBytes];
+			cantBytes++;
+			index++;
+		}
+
+		list_add(values->values,bufferAux);
+		list_add(values->values,(void*)index);
+
+		result=create_file(BIN_FILE,values);
+
+		log_debug(GameCard->logger,"Creo el archivo de bloque del Pokemon %d" , specificBlock);
+
+		list_remove(values->values,2);
+		list_remove(values->values,1);
+		list_remove(values->values,0);
+
+
+		free(bufferAux);
+		bufferAux=(char*)malloc(GameCard->block_size);
+
+		//TODO:MARCAR EL BITMAP
+//		GameCard->fileMapped[specificBlock]=1;
+//		log_debug(GameCard->logger, "Archivo mapeado : %s", GameCard->fileMapped);
+	}
+
+	list_destroy(values->values);
+	free(values);
+}
+
+
 
 //BROKER LOGIC
 void readConfigBrokerValues(t_config *config,t_log *logger,struct Broker *broker){

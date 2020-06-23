@@ -462,8 +462,7 @@ void start_consolidation_for(t_partition freed_partition){
 
     int index = find_index_in_list(freed_partition);
 
-    //check if buddy system or dynamic partition
-    if(BS){
+    if(strcmp(ALGORITMO_MEMORIA, "BS") == 0){
         //check if pointer needed or wtf in c
         t_partition partition_to_consolidate = (t_partition)malloc(t_partition);
         partition_to_consolidate = freed_partition;

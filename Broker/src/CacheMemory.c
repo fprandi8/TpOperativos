@@ -458,15 +458,30 @@ void PrintDumpOfCache()
 
 }
 
+void start_consolidation_for(t_partition freed_partition){
+
+    int index = find_index_in_list(freed_partition);
+    //check if pointer needed or wtf in c
+    t_partition partition_to_consolidate = (t_partition)malloc(t_partition);
+    partition_to_consolidate = freed_partition;
+
+    while(index >= 0 ){
+        if(partition_to_consolidate.size >= cache.full_memory)
+            break;
+        index = check_validations_and_consolidate(freed_partition, index);
+        partition_to_consolidate = list_get(partitions, index);
+    }
+    free(partition_to_consolidate);
+}
+
 /**
  *
  * @param freed_partition
  * @return index of the partition after consolidation, if >= 0 then call again with the partition
  * at index, if < 0 then break the cycle.
  */
-int check_validations_and_consolidate(t_partition freed_partition){
+int check_validations_and_consolidate(t_partition freed_partition, int index){
 
-    int index = find_index_in_list(freed_partition);
     t_partition* possible_partition = (t_partition*)malloc(sizeof(t_partition));
     int first_partition = 1;
     int possible_index;

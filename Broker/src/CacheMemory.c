@@ -461,26 +461,68 @@ void PrintDumpOfCache()
 void start_consolidation_for(t_partition freed_partition){
 
     int index = find_index_in_list(freed_partition);
-    //check if pointer needed or wtf in c
-    t_partition partition_to_consolidate = (t_partition)malloc(t_partition);
-    partition_to_consolidate = freed_partition;
 
-    while(index >= 0 ){
-        if(partition_to_consolidate.size >= cache.full_memory)
+    //check if buddy system or dynamic partition
+    if(BS){
+        //check if pointer needed or wtf in c
+        t_partition partition_to_consolidate = (t_partition)malloc(t_partition);
+        partition_to_consolidate = freed_partition;
+
+        while(index >= 0 ){
+            if(partition_to_consolidate.size == cache.full_memory)
+                break;
+            index = check_validations_and_consolidate_BS(freed_partition, index);
+            partition_to_consolidate = list_get(partitions, index);
+        }
+        free(partition_to_consolidate);
+     }else{
+        if(freed_partition.size == cache.full_memory)
             break;
-        index = check_validations_and_consolidate(freed_partition, index);
-        partition_to_consolidate = list_get(partitions, index);
+        check_validations_and_consolidate_PD(freed_partition, index);
+     }
+}
+
+/**
+ * This function gets the freed partition an checks whether it's neighbours are free; if positive increments the size of the
+ * first one and deletes the other for the partitions list.
+ * @param freed_partition, index of such partition in partitions
+ * @return void
+ */
+void check_validations_and_consolidate_PD(t_partition freed_partition, int index){
+
+    t_partition left_partition = (t_partition)malloc(t_partition);
+    t_partition right_partition = (t_partition)malloc(t_partition);
+    int new_size = 0;
+
+    if(index > 0){
+        left_partition = list_get(partitions, index - 1);
+        new_size += freed_partition.size;
+        free(list_remove(partitions, index));
+    }else{
+        left_partition = freed_partition;
     }
-    free(partition_to_consolidate);
+
+    if(index == sizeof(partitions)){
+        new_size += freed_partition.size;
+        free(list_remove(partitions, index));
+    }else{
+        right_partition = list_get(partitions, index + 1);
+        new_size += right_partition.size;
+        free(list_remove(partitions, index));
+        free(list_remove(partitions, index+1));
+    }
+
+    left_partition.size += new_size;
+    free(right_partition);
 }
 
 /**
  *
- * @param freed_partition
+ * @param freed_partition, index of such partition in partitions
  * @return index of the partition after consolidation, if >= 0 then call again with the partition
  * at index, if < 0 then break the cycle.
  */
-int check_validations_and_consolidate(t_partition freed_partition, int index){
+int check_validations_and_consolidate_BS(t_partition freed_partition, int index){
 
     t_partition* possible_partition = (t_partition*)malloc(sizeof(t_partition));
     int first_partition = 1;

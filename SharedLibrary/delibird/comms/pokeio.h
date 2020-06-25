@@ -6,6 +6,18 @@
 #include "messages.h"
 #include "serialization.h"
 #include <string.h>
+#include <unistd.h>
+
+typedef enum
+{
+	TARGET_TEAM = 1,
+	TARGET_BROKER = 2,
+	TARGET_GAMECARD = 3,
+	TARGET_GAMEBOY = 4,
+} target_type;
+
+int DelibirdConnect();
+int DelibirdAccept();
 
 int SendMessageAcknowledge(int messageId, int client_socket);
 int SendSubscriptionRequest(message_type queueType, int client_socket);

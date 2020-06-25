@@ -1,6 +1,101 @@
 #include "pokeio.h"
 #include <stdio.h>
 
+int DelibirdConnect(target_type type, int sockfd, const struct sockaddr *addr, socklen_t addrlen)
+{
+	int result = connect(sockfd, addr, addrlen);
+	if(result == -1) { return -1; }
+	int connectResult = result;
+	//Connected to target, starting handshake
+
+	int server_socket = sockfd;
+	result = SendMessageAcknowledge((int)type, server_socket);
+	if(result == -1) 
+	{
+		//Failed to send handshake
+		close(server_socket); 
+		return -1; 
+	}
+	//Handshake sent
+
+	op_code op;
+	void* content;
+	result = RecievePackage(server_socket, &op, &content);
+	if(result == -1) 
+	{ 
+		//Failed recieve handshake awnser
+		close(server_socket); 
+		return -1; 
+	}
+
+	//Recieved handhsake awnser
+
+	if(op != ACKNOWLEDGE)
+	{
+		//Unkown response
+		close(server_socket);
+		connectResult = -1;
+	} 
+	else if(*((int*)content) != 1)
+	{
+		//Incorrect target
+		close(server_socket);
+		connectResult = -1;
+	} 
+	//Connection succesfull
+	free(content);
+	return connectResult;
+}
+
+int DelibirdAccept(target_type type, int sockfd, struct sockaddr *addr, socklen_t *addrlen)
+{
+	int result = accept(sockfd, addr, addrlen);
+	if(result == -1) { return -1; }
+	int client_socket = result;
+
+	//Acepted connection
+	//Waiting for handshake
+
+	op_code op;
+	void* content;
+	result = RecievePackage(client_socket, &op, &content);
+	if(result == -1) 
+	{
+		//Did not recieve handshake
+		close(client_socket); 
+		return -1; 
+	}
+
+	//Handshake recieved
+
+	if(op != ACKNOWLEDGE)
+	{
+		//Invalid handshake
+		free(content);
+		close(client_socket);
+		return -1;
+	} 
+	if(*((target_type*)content) != type)
+	{
+		//Recipient is not asking for us
+		free(content);
+		close(client_socket);
+		return -1;
+	} 
+
+	free(content);
+
+	result = SendMessageAcknowledge(1, client_socket);
+	if(result == -1) 
+	{
+		// Could not send confirmation of handshake
+		close(client_socket);
+		return -1;
+	}
+
+	//Conection Succesfull
+	return client_socket;	
+}
 
 int SendAll(int client_socket, char *stream, uint32_t *lenght)
 {

@@ -102,10 +102,17 @@ int modify_poke_file(t_values*, char*);
 
 void read_metadata_file(t_file_metadata*, t_config*);
 char* get_file_content(t_file_metadata*);
+int get_amount_of_blocks(int);
+int get_message_size(new_pokemon* );
+char* serialize_data(int, new_pokemon*);
+
 
 void turn_a_set_of_bits_on(int,int);
 int get_first_free_block();
-void write_blocks(t_file_metadata*, int, new_pokemon*);
+void write_blocks(t_file_metadata*, int, char*);
+int get_string_file_position(char*,char*);
+void increase_pokemon_amount(char*, int, int );
+void rewrite_blocks(t_file_metadata* , char*);
 
 void readConfigBrokerValues(t_config*,t_log* ,struct Broker*);
 void subscribeToBroker(struct Broker broker,pthread_t* subs);

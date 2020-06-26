@@ -37,8 +37,8 @@ int main(void) {
 
 	config = leer_config();
 
-	ip= obtener_valor_config(config,logger,IP_BROKER);
-	puerto = obtener_valor_config(config,logger,PUERTO_BROKER);
+	ip= get_config_value(config,logger,IP_BROKER);
+	puerto = get_config_value(config,logger,PUERTO_BROKER);
 //	tam_men = obtener_valor_config(config,logger,TAMANO_MEMORIA);
 //	tam_min_part =(char*) obtener_valor_config(config,logger,TAMANO_MINIMO_PARTICION);
 //	algo_mem=  obtener_valor_config(config,logger,ALGORITMO_MEMORIA);
@@ -134,7 +134,7 @@ t_config* leer_config(void)
 
 }
 
-char* obtener_valor_config(t_config* config, t_log* logger, char* propiedad){
+char* get_config_value(t_config* config, t_log* logger, char* propiedad){
 
 	if (config_has_property(config,propiedad)){
 		log_info(logger,config_get_string_value(config,propiedad));

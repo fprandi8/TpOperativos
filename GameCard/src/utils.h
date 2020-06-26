@@ -27,7 +27,9 @@ int iniciar_servidor(char*, char*);
 int esperar_cliente(int);
 int recibir_operacion(int);
 void process_request(int cod_op, int cliente_fd);
-t_config* leer_config(void);
+t_config* read_config(void);
+t_config* read_metadata(char*);
 t_log* iniciar_logger(void);
-char* obtener_valor_config(t_config*, t_log*, char*);
+char* get_config_value(t_config*, t_log*, char*);
+char** get_config_value_array(t_config* , t_log* , char*);
 #endif /* CONEXIONES_H_ */

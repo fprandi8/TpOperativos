@@ -51,17 +51,33 @@ t_log* iniciar_logger(void)
 	return log_create("GameCard.log","GameCard",1,LOG_LEVEL_DEBUG);
 }
 
-t_config* leer_config(void)
+t_config* read_config(void)
 {
 	return config_create("/home/utnso/workspace/tp-2020-1c-MATE-OS/GameCard/GameCard.config");
 
 }
 
-char* obtener_valor_config(t_config* config, t_log* logger, char* propiedad){
+t_config* read_metadata(char* file)
+{
+	return config_create(file);
+}
+
+char* get_config_value(t_config* config, t_log* logger, char* propiedad){
 
 	if (config_has_property(config,propiedad)){
 		log_info(logger,config_get_string_value(config,propiedad));
 		return config_get_string_value(config, propiedad);
+	} else {
+		log_debug(logger,"Error al obtener el atributo");
+		return NULL;
+	}
+}
+
+char ** get_config_value_array(t_config* config, t_log* logger, char* propiedad){
+
+	if (config_has_property(config,propiedad)){
+		log_info(logger,config_get_array_value(config,propiedad));
+		return config_get_array_value(config, propiedad);
 	} else {
 		log_debug(logger,"Error al obtener el atributo");
 		return NULL;

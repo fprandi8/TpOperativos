@@ -98,6 +98,10 @@ int create_file_metadata_directory(t_values* );
 int create_file_metadata_poke(t_values*);
 
 int create_poke_file(t_values*);
+int modify_poke_file(t_values*, char*);
+
+void read_metadata_file(t_file_metadata*, t_config*);
+char* get_file_content(t_file_metadata*);
 
 void turn_a_set_of_bits_on(int,int);
 int get_first_free_block();

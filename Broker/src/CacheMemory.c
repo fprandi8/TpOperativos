@@ -99,15 +99,7 @@ int save_message_body(void* messageContent, message_type queue){
     t_buffer* messageBuffer = SerializeMessageContent(queue, messageContent);
 	sem_wait(mutex_partitions);
 	t_partition* partition;
-	if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC"))
-	{
-    	partition = find_empty_partition_of_size(sizeof(messageBuffer->bufferSize));
-	} 
-	else 
-	{
-		int size;
-		partition = select_partition_bf(size);
-	}
+    partition = find_empty_partition_of_size(sizeof(messageBuffer->bufferSize));
     int savedPartitionId = save_body_in_partition(messageBuffer, partition, queue);
 	sem_post(mutex_partitions);
 	return savedPartitionId;
@@ -188,57 +180,41 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
 }
 
 
-t_partition* find_empty_partition_of_size(uint32_t size){
+t_partition* find_empty_partition_of_size(uint32_t size)
+{
 //	if(size > cache.memory_size); //TODO imprimir se pico, no deberia pasar que llegue algo mas grande que la memoria
     t_partition* partition = select_partition(size);
     int compaction_frequency =  config_get_int_value(config, FRECUENCIA_COMPACTACION);
     if(partition != NULL) return partition;
-    if(compaction_frequency == -1)
+    int busyPartitions = GetBusyPartitionsCount();
+    //If its not dynamic, we set compaction_frequency to the same as busy partitions we have
+    //0 frequency does not make sense, so we de-activate compaction_frequency also on 0
+    if(compaction_frequency <= 0 || !strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC")) compaction_frequency = busyPartitions;
+    do
     {
-        int busyPartitions = 0;
-        do
-        {
-            delete_partition();
-            busyPartitions = GetBusyPartitionsCount();
-            partition = select_partition(size);
-        }
-        while(partition == NULL && busyPartitions > 0);
         if(partition == NULL)
+        {
+            for(int i = 0; i < compaction_frequency; i++)
+            {
+                delete_partition();
+                partition = select_partition(size);
+                if(partition != NULL) break;
+                if(busyPartitions - i <= 0) break;
+            }
+        }
+        if(partition == NULL) //Reached compaction frequency, or run out of busy partitions to delete. Should never reach here on buddy system setting.
         {
             compact_memory();
             partition = select_partition(size);
-            return partition;
-        } else
-        {
-        	return partition;
         }
-    }
-    else
-    {
-        //TODO maybe add a validator for config at the start so compaction_frequency == 0 or < -1 cannot be a case
-        do
-        {
-            if(partition == NULL)
-            {
-                for(int i = 0; i < compaction_frequency; i++)
-                {
-                    delete_partition(); //TODO we need to know we run out of partitions to delete
-                    partition = select_partition(size);
-                }
-            }
-            if(partition == NULL)
-            {
-                compact_memory();
-                partition = select_partition(size);
-            }
-        } while(partition == NULL);
-        return partition;
-    }
+    } while(partition == NULL);
+    return partition;
+    
 }
 
 t_partition* select_partition(uint32_t size){
 	t_partition *partition;
-    if(strcmp(config_get_string_value(config, ALGORITMO_REEMPLAZO),"FF")){ //compare dif algoritmos
+    if(strcmp(config_get_string_value(config, ALGORITMO_REEMPLAZO),"FF") && strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC")){ //compare dif algoritmos
         partition = select_partition_ff(size);
     }else{
         partition = select_partition_bf(size);
@@ -345,6 +321,7 @@ void delete_partition(void){
     }
 
 
+
     bool _message_to_delete(t_cachedMessage* message)
     {
         if(message->partitionId == deletedParitionId) return true; else return false;
@@ -409,12 +386,19 @@ void Free_CachedMessage(t_cachedMessage* message)
 t_partition* CreateNewPartition()
 {
     t_partition* partition = (t_partition*)malloc(sizeof(t_partition));
-	sem_wait(mutex_nextPartitionId);
-	partition->id = nextPartitionId;
-    nextPartitionId++;
-	sem_post(mutex_nextPartitionId);
+	partition->id = GetNewId()
     if(nextPartitionId== INT_MAX) nextPartitionId = 0;
     return partition;
+}
+
+int GetNewId()
+{
+    int result;
+	sem_wait(mutex_nextPartitionId);
+	result = nextPartitionId;
+    nextPartitionId++;
+	sem_post(mutex_nextPartitionId);
+    return result;    
 }
 
 t_list* GetMessagesFromQueue(message_type type)
@@ -462,16 +446,16 @@ void start_consolidation_for(t_partition freed_partition){
 
     int index = find_index_in_list(freed_partition);
 
-    if(strcmp(ALGORITMO_MEMORIA, "BS") == 0){
+    if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") != 0){
         //check if pointer needed or wtf in c
-        t_partition partition_to_consolidate = (t_partition)malloc(t_partition);
-        partition_to_consolidate = freed_partition;
+        //t_partition partition_to_consolidate = (t_partition*)malloc(sizeof(t_partition));
+        t_partition partition_to_consolidate = freed_partition;
 
         while(index >= 0 ){
             if(partition_to_consolidate.size == cache.full_memory)
                 break;
             index = check_validations_and_consolidate_BS(freed_partition, index);
-            partition_to_consolidate = list_get(partitions, index);
+            partition_to_consolidate = (t_partition*)list_get(partitions, index);
         }
         free(partition_to_consolidate);
      }else{
@@ -523,7 +507,7 @@ void check_validations_and_consolidate_PD(t_partition freed_partition, int index
  */
 int check_validations_and_consolidate_BS(t_partition freed_partition, int index){
 
-    t_partition* possible_partition = (t_partition*)malloc(sizeof(t_partition));
+    t_partition* possible_partition;
     int first_partition = 1;
     int possible_index;
 
@@ -534,7 +518,7 @@ int check_validations_and_consolidate_BS(t_partition freed_partition, int index)
         first_partition = 2;
     }
 
-    possible_partition = list_get(partitions, possible_index);
+    possible_partition = (t_partition*)list_get(partitions, possible_index);
 
     if(!possible_partition->free){
         free(possible_partition);
@@ -556,19 +540,20 @@ int is_pair(int index){
     return (index % 2) == 0;
 }
 
+
 int find_index_in_list(t_partition partition){
     int index = 0;
     int wanted_id = partition.id;
-    t_partition* aux_partition = (t_partition*)malloc(sizeof(t_partition));
+    t_partition* aux_partition;
     while(index < sizeof(partitions)){
-        aux_partition = list_get(partitions, index);
+        aux_partition = (t_partition*)list_get(partitions, index);
         if(aux_partition->id == wanted_id)
             break;
         index++;
     }
-    free(aux_partition);
     return index;
 }
+
 
 double CalculateNearestPowerOfTwo(int x)
 {

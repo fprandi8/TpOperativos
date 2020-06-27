@@ -107,7 +107,7 @@ int get_message_size(new_pokemon* );
 char* serialize_data(int, new_pokemon*);
 
 
-void turn_a_set_of_bits_on(int,int);
+void turn_bit_on(int);
 int get_first_free_block();
 void write_blocks(t_file_metadata*, int, char*);
 int get_string_file_position(char*,char*);

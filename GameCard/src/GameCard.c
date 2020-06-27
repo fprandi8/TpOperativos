@@ -63,11 +63,8 @@ int main(void) {
 
 	GameCard_Process_Message(message);
 
-	newPokemon->verticalCoordinate = 10;
-
-	GameCard_Process_Message(message);
-
-//	munmap(GameCard->fileMapped, (GameCard->block_size*GameCard->blocks));
+//	GameCard_Process_Message(message);
+	munmap(GameCard->fileMapped, (GameCard->blocks/8));
 
 	bitarray_destroy(GameCard->bitArray);
 //	free(GameCard->bitArray);
@@ -230,12 +227,11 @@ void GameCard_Process_Message_New(deli_message* message){
 void GameCard_Initialize_bitarray(){
 	t_bitarray* aux = (t_bitarray*)malloc(sizeof(t_bitarray*));
 
-	int size = (GameCard->blocks*GameCard->block_size);
+	int size = (GameCard->blocks/8);
 
 	log_debug(GameCard->logger,"Se crea el bit array con una memoria de %d", size);
 
-	//TODO: revisar el +1 lo puse por valgrin
-	char* bytes = (char*)malloc(sizeof(char)*size+1);
+	char* bytes = (char*)malloc(sizeof(char)*size);
 	aux = bitarray_create_with_mode(bytes, size, LSB_FIRST);
 
 	log_debug(GameCard->logger,"Bitarray Creado");
@@ -469,8 +465,8 @@ int create_file_bin(t_values* values){
 
 	int bit = (int)list_get(values->values,0);
 
-	char* blockChar =(char*)malloc(strlen(string_itoa((bit/GameCard->block_size))) + 1 );
-	strcpy(blockChar,string_itoa(bit/(GameCard->block_size*8)));
+	char* blockChar =(char*)malloc(strlen(string_itoa(bit)) + 1 );
+	strcpy(blockChar,string_itoa(bit));
 
 	char* filename = (char*)malloc(strlen(GameCard->blocksPath) + strlen(blockChar) + strlen(".bin") + 1 );
 	strcpy(filename,GameCard->blocksPath);
@@ -488,7 +484,7 @@ int create_file_bin(t_values* values){
 	int tam =(int)list_get(values->values,2);
 	fwrite(bytes,tam, 1, f);
 
-	turn_a_set_of_bits_on(bit,(int)list_get(values->values,2));
+	turn_bit_on(bit);
 	free(filename);
 	free(blockChar);
 
@@ -499,17 +495,15 @@ int create_file_bin(t_values* values){
 
 int create_file_bitmap(){
 
-	char zero = '0';
-	char one = '1';
-	char rc='\n';
-
 	char* filename = (char*)malloc(strlen(GameCard->metadataPath) + strlen("bitmap.bin") + 1);
 	strcpy(filename,GameCard->metadataPath);
 	strcat(filename,"bitmap.bin");
 
-	FILE* f= fopen(filename,"ab");
+	int f = open(filename, O_RDWR | O_CREAT, (mode_t)0600);
 
-	if (f==NULL){
+//	FILE* f= fopen(filename,"ab");
+
+	if (f==-1){
 		log_debug(GameCard->logger,"Error en la creacion del archivo %s", filename);
 		return -1;
 	}
@@ -517,26 +511,23 @@ int create_file_bitmap(){
 	int max = bitarray_get_max_bit(GameCard->bitArray);
 	log_debug(GameCard->logger,"El último bit es %d", max);
 
-	for (int i = 0; i <= max; i= i + 1*8*GameCard->block_size){
-		if(bitarray_test_bit(GameCard->bitArray,i)){
-			fwrite(&one,sizeof(char),1,f);
-		}else{
-			fwrite(&zero,sizeof(char),1,f);
-		}
+	for (int i = 0; i <= max ; i++){
+
+		write(f,&GameCard->bitArray->bitarray[i],1);
 	}
 
-	fwrite(&rc,sizeof(char),1,f);
+	GameCard->fileMapped = (char*)malloc(sizeof(char));
+	if ((GameCard->fileMapped = mmap(0,(GameCard->blocks/8),PROT_READ|PROT_WRITE,MAP_SHARED,f,0)) ==  MAP_FAILED)
+		{
+			log_debug(GameCard->logger, "Error mapping the file");
+			perror("nmap");
+			printf("\n");
+			close(f);
+		}
 
-//	GameCard->fileMapped = (char*)malloc(sizeof(char));
-//	if ((GameCard->fileMapped = mmap(0,(GameCard->blocks*GameCard->block_size),PROT_READ,MAP_SHARED,(int)f,0)) ==  MAP_FAILED)
-//		{
-//			log_debug(GameCard->logger, "Error mapping the file");
-//			log_debug(GameCard->logger, "Mensaje de error %s", perror("nmap");
-//		}
-//
-//	log_debug(GameCard->logger,"Archivo Mapeado: %s ", GameCard->fileMapped);
+	log_debug(GameCard->logger,"Archivo Mapeado: %s ", GameCard->fileMapped);
 	free(filename);
-	fclose(f);
+//	fclose(f);
 	return 0;
 }
 
@@ -618,16 +609,20 @@ int create_file_metadata_directory(t_values* values){
 //METADATA
 
 void read_metadata_file(t_file_metadata* fileMetadata, t_config* metadataConfig){
-	fileMetadata->directory = get_config_value(metadataConfig,GameCard->logger,DIRECTORY);
+
+	//TODO: agregar logica de diccionario de semaforos, wait,
+	//      revisar el flag, si aplica cambiar flag y signal,
+	//      sino signal y manejo de archivo no disponible
 
 	fileMetadata->open = get_config_value(metadataConfig,GameCard->logger,OPEN);
 
+	fileMetadata->directory = get_config_value(metadataConfig,GameCard->logger,DIRECTORY);
 	fileMetadata->size= (char*)malloc(strlen(get_config_value(metadataConfig,GameCard->logger,SIZE))+1);
 	fileMetadata->size = get_config_value(metadataConfig,GameCard->logger,SIZE);
 
 	fileMetadata->block = list_create();
 
-	int blocksAmount = (atoi(fileMetadata->size)/GameCard->block_size);
+	int blocksAmount = get_amount_of_blocks(atoi(fileMetadata->size));
 
 	char** blocks = (char**)malloc(sizeof(char*)*blocksAmount);
 
@@ -658,7 +653,7 @@ char* get_file_content(t_file_metadata* fileMetadata){
 
 		if (f==NULL){
 			log_debug(GameCard->logger,"Error en la creacion del archivo %s", blockFile);
-			return '-1';
+			return '1';
 		}
 
 		char* buffer=malloc(GameCard->block_size);
@@ -704,7 +699,14 @@ void increase_pokemon_amount(char* fileContent, int pos, int amount){
 	newAmount = string_itoa(auxAmount);
 
 	if (chars < strlen(newAmount)){
-		// Tratamiento para el archivo desplazar los espacios necesarios y ver el tema memoria
+		// Tratamiento para el archivo desplazar los espacios necesarios
+		// Debería pedir un bloque mas si excede e insertarlo en la metadata en el medio? eso resolveria pero me queda un bloque con
+		// los bytes que exceden y todo basura...
+		char* auxBuffer=(char*)malloc(strlen(fileContent) + (strlen(newAmount) - chars));
+		memcpy(auxBuffer,fileContent,(pos+index1));
+		memcpy(auxBuffer+(pos+index1)+strlen(newAmount),fileContent + pos +index1 + chars,strlen(fileContent)-pos +index1 + chars);
+		free(fileContent);
+		fileContent = auxBuffer;
 	}
 
 	for(int i=0; i<strlen(newAmount); i++)
@@ -718,16 +720,14 @@ void increase_pokemon_amount(char* fileContent, int pos, int amount){
 int get_first_free_block(){
 	int max = bitarray_get_max_bit(GameCard->bitArray);
 	int i = 0;
-	while((bitarray_test_bit(GameCard->bitArray,i)) && (i<=max))
-		i = i + 1*8*GameCard->block_size;
+	while((bitarray_test_bit(GameCard->bitArray,i)) && (i<=max)) i++;
 	return i;
 }
 
-void turn_a_set_of_bits_on(int from,int bytes){
-	for (int i=0; i<bytes; i++){
-		for (int x=0; x < 8; x++)
-			bitarray_set_bit(GameCard->bitArray, x + from);
-	}
+void turn_bit_on(int block){
+	bitarray_set_bit(GameCard->bitArray, block);
+	//TODO:MARCAR EL BITMAP
+	GameCard->fileMapped[block]='1';
 }
 
 int get_amount_of_blocks(int size){
@@ -779,12 +779,10 @@ void write_blocks(t_file_metadata* metadataFile, int amountOfBlocks, char* buffe
 
 	for (int i = 0; i<amountOfBlocks; i++){
 
-		//TODO: Revisar bit array que no está funcionando
 		int bitBlock=get_first_free_block();
-		int specificBlock = bitBlock/(8*GameCard->block_size);
 
-		char* charblock=(char*)malloc(strlen(string_itoa(specificBlock))+1);
-		charblock = string_itoa(specificBlock);
+		char* charblock=(char*)malloc(strlen(string_itoa(bitBlock))+1);
+		charblock = string_itoa(bitBlock);
 
 		log_debug(GameCard->logger,"Bloque donde va a guardar los datos %s" , charblock);
 		list_add(metadataFile->block,(void*)charblock);
@@ -806,7 +804,7 @@ void write_blocks(t_file_metadata* metadataFile, int amountOfBlocks, char* buffe
 
 		if (result) log_debug(GameCard->logger, "BIN FILE CREADO");
 
-		log_debug(GameCard->logger,"Creo el archivo de bloque del Pokemon %d" , specificBlock);
+		log_debug(GameCard->logger,"Creo el archivo de bloque del Pokemon %d" , bitBlock);
 
 		list_remove(values->values,2);
 		list_remove(values->values,1);
@@ -815,10 +813,6 @@ void write_blocks(t_file_metadata* metadataFile, int amountOfBlocks, char* buffe
 
 		free(bufferAux);
 		bufferAux=(char*)malloc(GameCard->block_size);
-
-		//TODO:MARCAR EL BITMAP
-//		GameCard->fileMapped[specificBlock]=1;
-//		log_debug(GameCard->logger, "Archivo mapeado : %s", GameCard->fileMapped);
 	}
 
 	list_destroy(values->values);

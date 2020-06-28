@@ -5446,3 +5446,526 @@ wl
 [DEBUG] 19:16:24:486 GameCard/(26908:26908): Contenido del archivo 4-8=90
 
 [DEBUG] 19:16:24:486 GameCard/(26908:26908): Re escribio el block 0
+[INFO] 12:28:08:327 GameCard/(29983:29983): PROCESO GAMECARD ONLINE
+[INFO] 12:28:08:330 GameCard/(29983:29983): /home/utnso/desktop/tall-grass
+[DEBUG] 12:28:08:331 GameCard/(29983:29983): Inicializa la GameCard
+[DEBUG] 12:28:08:331 GameCard/(29983:29983): El directorio ya existe
+[DEBUG] 12:28:08:331 GameCard/(29983:29983): El directorio ya existe
+[DEBUG] 12:28:08:331 GameCard/(29983:29983): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 12:28:08:332 GameCard/(29983:29983): El directorio ya existe
+[DEBUG] 12:28:08:333 GameCard/(29983:29983): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 12:28:08:333 GameCard/(29983:29983): Linea del archivo : DIRECTORY=Y
+[DEBUG] 12:28:08:333 GameCard/(29983:29983): El directorio ya existe
+[DEBUG] 12:28:08:333 GameCard/(29983:29983): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 12:28:08:334 GameCard/(29983:29983): El directorio ya existe
+[DEBUG] 12:28:08:334 GameCard/(29983:29983): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 12:28:08:334 GameCard/(29983:29983): 3
+[INFO] 12:28:08:334 GameCard/(29983:29983): 1024
+[INFO] 12:28:08:334 GameCard/(29983:29983): TALL_GRASS
+[DEBUG] 12:28:08:335 GameCard/(29983:29983): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 12:28:08:335 GameCard/(29983:29983): Linea del archivo : BLOCKS=1024
+[DEBUG] 12:28:08:335 GameCard/(29983:29983): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 12:28:08:335 GameCard/(29983:29983): Se crea el bit array con una memoria de 128
+[DEBUG] 12:28:08:335 GameCard/(29983:29983): Bitarray Creado
+[DEBUG] 12:28:08:336 GameCard/(29983:29983): El Ãºltimo bit es 1024
+[DEBUG] 12:28:08:339 GameCard/(29983:29983): Archivo Mapeado 
+[DEBUG] 12:28:08:339 GameCard/(29983:29983): Directorio de Pokemon a crear: /home/utnso/desktop/tall-grass/Files/Pikachu
+[DEBUG] 12:28:08:339 GameCard/(29983:29983): El directorio ya existe
+[DEBUG] 12:28:08:339 GameCard/(29983:29983): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 12:28:08:341 GameCard/(29983:29983): N
+[INFO] 12:28:08:341 GameCard/(29983:29983): N
+[INFO] 12:28:08:342 GameCard/(29983:29983): 7
+[INFO] 12:28:08:342 GameCard/(29983:29983): 7
+[INFO] 12:28:08:342 GameCard/(29983:29983): øíHíXí
+[DEBUG] 12:28:08:342 GameCard/(29983:29983): Cantidad de bloques necesarios 3 
+[DEBUG] 12:28:08:345 GameCard/(29983:29983): Contenido del archivo 4-8=30
+
+[DEBUG] 12:28:08:345 GameCard/(29983:29983): Re escribio el block 0
+[DEBUG] 12:28:08:345 GameCard/(29983:29983): Re escribio el block 1
+[DEBUG] 12:28:08:345 GameCard/(29983:29983): Re escribio el block 2
+[DEBUG] 12:28:08:346 GameCard/(29983:29983): Resultado del procesamiento del mensaje: 0
+[DEBUG] 12:28:08:346 GameCard/(29983:29983): Directorio de Pokemon a crear: /home/utnso/desktop/tall-grass/Files/Pikachu
+[DEBUG] 12:28:08:346 GameCard/(29983:29983): El directorio ya existe
+[DEBUG] 12:28:08:346 GameCard/(29983:29983): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 12:28:08:346 GameCard/(29983:29983): N
+[INFO] 12:28:08:346 GameCard/(29983:29983): N
+[INFO] 12:28:08:346 GameCard/(29983:29983): 7
+[INFO] 12:28:08:346 GameCard/(29983:29983): 7
+[INFO] 12:28:08:346 GameCard/(29983:29983): 0íèí(í
+[DEBUG] 12:28:08:346 GameCard/(29983:29983): Cantidad de bloques necesarios 3 
+[DEBUG] 12:28:08:346 GameCard/(29983:29983): Contenido del archivo 4-8=40
+
+[DEBUG] 12:28:08:346 GameCard/(29983:29983): Re escribio el block 0
+[DEBUG] 12:28:08:347 GameCard/(29983:29983): Re escribio el block 1
+[DEBUG] 12:28:08:347 GameCard/(29983:29983): Re escribio el block 2
+[DEBUG] 12:28:08:347 GameCard/(29983:29983): Resultado del procesamiento del mensaje: 0
+[INFO] 12:29:10:927 GameCard/(30032:30032): PROCESO GAMECARD ONLINE
+[INFO] 12:29:10:931 GameCard/(30032:30032): /home/utnso/desktop/tall-grass
+[DEBUG] 12:29:10:931 GameCard/(30032:30032): Inicializa la GameCard
+[DEBUG] 12:29:10:931 GameCard/(30032:30032): El directorio ya existe
+[DEBUG] 12:29:10:931 GameCard/(30032:30032): El directorio ya existe
+[DEBUG] 12:29:10:931 GameCard/(30032:30032): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 12:29:10:933 GameCard/(30032:30032): El directorio ya existe
+[DEBUG] 12:29:10:933 GameCard/(30032:30032): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 12:29:10:934 GameCard/(30032:30032): Linea del archivo : DIRECTORY=Y
+[DEBUG] 12:29:10:934 GameCard/(30032:30032): El directorio ya existe
+[DEBUG] 12:29:10:934 GameCard/(30032:30032): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 12:29:10:934 GameCard/(30032:30032): El directorio ya existe
+[DEBUG] 12:29:10:934 GameCard/(30032:30032): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 12:29:10:934 GameCard/(30032:30032): 3
+[INFO] 12:29:10:934 GameCard/(30032:30032): 1024
+[INFO] 12:29:10:934 GameCard/(30032:30032): TALL_GRASS
+[DEBUG] 12:29:10:936 GameCard/(30032:30032): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 12:29:10:936 GameCard/(30032:30032): Linea del archivo : BLOCKS=1024
+[DEBUG] 12:29:10:936 GameCard/(30032:30032): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 12:29:10:936 GameCard/(30032:30032): Se crea el bit array con una memoria de 128
+[DEBUG] 12:29:10:936 GameCard/(30032:30032): Bitarray Creado
+[DEBUG] 12:29:10:936 GameCard/(30032:30032): El Ãºltimo bit es 1024
+[DEBUG] 12:29:10:940 GameCard/(30032:30032): Archivo Mapeado 
+[DEBUG] 12:29:10:940 GameCard/(30032:30032): Directorio de Pokemon a crear: /home/utnso/desktop/tall-grass/Files/Pikachu
+[DEBUG] 12:29:10:940 GameCard/(30032:30032): El directorio ya existe
+[DEBUG] 12:29:10:940 GameCard/(30032:30032): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 12:29:10:944 GameCard/(30032:30032): N
+[INFO] 12:29:10:944 GameCard/(30032:30032): N
+[INFO] 12:29:10:944 GameCard/(30032:30032): 7
+[INFO] 12:29:10:944 GameCard/(30032:30032): 7
+[INFO] 12:29:10:945 GameCard/(30032:30032): ø<Æ	H;Æ	X;Æ	
+[DEBUG] 12:29:10:945 GameCard/(30032:30032): Cantidad de bloques necesarios 3 
+[DEBUG] 12:29:10:951 GameCard/(30032:30032): Contenido del archivo 4-8=50
+
+[DEBUG] 12:29:10:951 GameCard/(30032:30032): Re escribio el block 0
+[DEBUG] 12:29:10:951 GameCard/(30032:30032): Re escribio el block 1
+[DEBUG] 12:29:10:951 GameCard/(30032:30032): Re escribio el block 2
+[DEBUG] 12:29:10:951 GameCard/(30032:30032): Resultado del procesamiento del mensaje: 0
+[DEBUG] 12:29:10:951 GameCard/(30032:30032): Directorio de Pokemon a crear: /home/utnso/desktop/tall-grass/Files/Pikachu
+[DEBUG] 12:29:10:952 GameCard/(30032:30032): El directorio ya existe
+[DEBUG] 12:29:10:952 GameCard/(30032:30032): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 12:29:10:952 GameCard/(30032:30032): N
+[INFO] 12:29:10:952 GameCard/(30032:30032): N
+[INFO] 12:29:10:952 GameCard/(30032:30032): 7
+[INFO] 12:29:10:952 GameCard/(30032:30032): 7
+[INFO] 12:29:10:952 GameCard/(30032:30032): 0=Æ	è<Æ	(;Æ	
+[DEBUG] 12:29:10:952 GameCard/(30032:30032): Cantidad de bloques necesarios 3 
+[DEBUG] 12:29:10:952 GameCard/(30032:30032): Contenido del archivo 4-8=60
+
+[DEBUG] 12:29:10:952 GameCard/(30032:30032): Bloque donde va a guardar los datos 0
+[DEBUG] 12:29:10:952 GameCard/(30032:30032): Creo el archivo de bloque del Pokemon 0
+[DEBUG] 12:29:10:952 GameCard/(30032:30032): Resultado del test del bit 0:  -  
+[DEBUG] 12:29:10:953 GameCard/(30032:30032): Bloque donde va a guardar los datos 1
+[DEBUG] 12:29:10:953 GameCard/(30032:30032): Creo el archivo de bloque del Pokemon 1
+[DEBUG] 12:29:10:953 GameCard/(30032:30032): Resultado del test del bit 0:  -  
+[DEBUG] 12:29:10:953 GameCard/(30032:30032): Resultado del test del bit 1:  -  
+[DEBUG] 12:29:10:953 GameCard/(30032:30032): Bloque donde va a guardar los datos 2
+[DEBUG] 12:29:10:953 GameCard/(30032:30032): Creo el archivo de bloque del Pokemon 2
+[DEBUG] 12:29:10:953 GameCard/(30032:30032): Resultado del procesamiento del mensaje: 0
+[INFO] 12:55:29:856 GameCard/(30770:30770): PROCESO GAMECARD ONLINE
+[INFO] 12:55:29:862 GameCard/(30770:30770): /home/utnso/desktop/tall-grass
+[DEBUG] 12:55:29:862 GameCard/(30770:30770): Inicializa la GameCard
+[DEBUG] 12:55:29:862 GameCard/(30770:30770): El directorio ya existe
+[DEBUG] 12:55:29:862 GameCard/(30770:30770): El directorio ya existe
+[DEBUG] 12:55:29:862 GameCard/(30770:30770): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 12:55:29:864 GameCard/(30770:30770): El directorio ya existe
+[DEBUG] 12:55:29:864 GameCard/(30770:30770): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 12:55:29:868 GameCard/(30770:30770): Linea del archivo : DIRECTORY=Y
+[DEBUG] 12:55:29:869 GameCard/(30770:30770): El directorio ya existe
+[DEBUG] 12:55:29:869 GameCard/(30770:30770): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 12:55:29:869 GameCard/(30770:30770): El directorio ya existe
+[DEBUG] 12:55:29:870 GameCard/(30770:30770): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 12:55:29:870 GameCard/(30770:30770): 3
+[INFO] 12:55:29:870 GameCard/(30770:30770): 1024
+[INFO] 12:55:29:870 GameCard/(30770:30770): TALL_GRASS
+[DEBUG] 12:55:29:871 GameCard/(30770:30770): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 12:55:29:871 GameCard/(30770:30770): Linea del archivo : BLOCKS=1024
+[DEBUG] 12:55:29:871 GameCard/(30770:30770): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 12:55:29:872 GameCard/(30770:30770): Se crea el bit array con una memoria de 128
+[DEBUG] 12:55:29:872 GameCard/(30770:30770): Bitarray Creado
+[DEBUG] 12:55:53:316 GameCard/(30770:30770): Archivo Mapeado 
+[DEBUG] 12:55:59:367 GameCard/(30770:30770): Directorio de Pokemon a crear: /home/utnso/desktop/tall-grass/Files/Pikachu
+[DEBUG] 12:55:59:367 GameCard/(30770:30770): El directorio ya existe
+[DEBUG] 12:55:59:367 GameCard/(30770:30770): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 12:55:59:369 GameCard/(30770:30770): N
+[INFO] 12:56:00:481 GameCard/(30770:30770): N
+[INFO] 12:56:00:481 GameCard/(30770:30770): 7
+[INFO] 12:56:00:481 GameCard/(30770:30770): 7
+[INFO] 12:56:00:481 GameCard/(30770:30770): 
+[DEBUG] 12:56:00:481 GameCard/(30770:30770): Cantidad de bloques necesarios 3 
+[DEBUG] 12:56:00:487 GameCard/(30770:30770): Contenido del archivo 4-8=10
+ù
+[DEBUG] 12:56:01:545 GameCard/(30770:30770): Re escribio el block 0
+[DEBUG] 12:56:01:546 GameCard/(30770:30770): Re escribio el block 1
+[DEBUG] 12:56:01:546 GameCard/(30770:30770): Re escribio el block 2
+[DEBUG] 12:56:01:546 GameCard/(30770:30770): Resultado del procesamiento del mensaje: 0
+[DEBUG] 12:56:05:268 GameCard/(30770:30770): Directorio de Pokemon a crear: /home/utnso/desktop/tall-grass/Files/Pikachu
+[DEBUG] 12:56:05:268 GameCard/(30770:30770): El directorio ya existe
+[DEBUG] 12:56:05:268 GameCard/(30770:30770): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 12:56:05:268 GameCard/(30770:30770): N
+[INFO] 12:56:07:302 GameCard/(30770:30770): N
+[INFO] 12:56:07:302 GameCard/(30770:30770): 7
+[INFO] 12:56:07:302 GameCard/(30770:30770): 7
+[INFO] 12:56:07:302 GameCard/(30770:30770): °`p€P
+[DEBUG] 12:56:07:302 GameCard/(30770:30770): Cantidad de bloques necesarios 3 
+[DEBUG] 12:56:07:302 GameCard/(30770:30770): Contenido del archivo 4-8=20
+ù
+[DEBUG] 12:56:07:302 GameCard/(30770:30770): Bloque donde va a guardar los datos 0
+[DEBUG] 12:56:07:302 GameCard/(30770:30770): Creo el archivo de bloque del Pokemon 0
+[DEBUG] 12:56:07:302 GameCard/(30770:30770): Resultado del test del bit 0:  -  
+[DEBUG] 12:56:07:302 GameCard/(30770:30770): Bloque donde va a guardar los datos 1
+[DEBUG] 12:56:07:302 GameCard/(30770:30770): Creo el archivo de bloque del Pokemon 1
+[DEBUG] 12:56:07:302 GameCard/(30770:30770): Resultado del test del bit 0:  -  
+[DEBUG] 12:56:07:302 GameCard/(30770:30770): Resultado del test del bit 1:  -  
+[DEBUG] 12:56:07:302 GameCard/(30770:30770): Bloque donde va a guardar los datos 2
+[DEBUG] 12:56:07:303 GameCard/(30770:30770): Creo el archivo de bloque del Pokemon 2
+[DEBUG] 12:56:07:303 GameCard/(30770:30770): Resultado del procesamiento del mensaje: 0
+[INFO] 15:54:30:611 GameCard/(1930:1930): PROCESO GAMECARD ONLINE
+[INFO] 15:54:32:345 GameCard/(1930:1930): /home/utnso/desktop/tall-grass
+[DEBUG] 15:54:32:935 GameCard/(1930:1930): Inicializa la GameCard
+[DEBUG] 15:54:33:471 GameCard/(1930:1930): El directorio ya existe
+[DEBUG] 15:54:33:471 GameCard/(1930:1930): El directorio ya existe
+[DEBUG] 15:54:33:471 GameCard/(1930:1930): El directorio ya existe
+[DEBUG] 15:54:33:471 GameCard/(1930:1930): El directorio ya existe
+[DEBUG] 15:54:33:471 GameCard/(1930:1930): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 15:54:33:472 GameCard/(1930:1930): El directorio ya existe
+[DEBUG] 15:54:33:472 GameCard/(1930:1930): El directorio ya existe
+[DEBUG] 15:54:33:472 GameCard/(1930:1930): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 15:54:33:474 GameCard/(1930:1930): Linea del archivo : DIRECTORY=Y
+[DEBUG] 15:54:33:475 GameCard/(1930:1930): El directorio ya existe
+[DEBUG] 15:54:33:475 GameCard/(1930:1930): El directorio ya existe
+[DEBUG] 15:54:33:475 GameCard/(1930:1930): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 15:54:33:475 GameCard/(1930:1930): El directorio ya existe
+[DEBUG] 15:54:33:475 GameCard/(1930:1930): El directorio ya existe
+[DEBUG] 15:54:33:475 GameCard/(1930:1930): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 15:54:33:475 GameCard/(1930:1930): 3
+[INFO] 15:54:33:475 GameCard/(1930:1930): 1024
+[INFO] 15:54:33:475 GameCard/(1930:1930): TALL_GRASS
+[DEBUG] 15:54:33:477 GameCard/(1930:1930): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 15:54:33:477 GameCard/(1930:1930): Linea del archivo : BLOCKS=1024
+[DEBUG] 15:54:33:477 GameCard/(1930:1930): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 15:54:33:477 GameCard/(1930:1930): Se crea el bit array con una memoria de 128
+[DEBUG] 15:54:33:477 GameCard/(1930:1930): Bitarray Creado
+[DEBUG] 15:54:45:6 GameCard/(1930:1930): Archivo Mapeado 
+[DEBUG] 15:55:03:297 GameCard/(1930:1930): Directorio de Pokemon a crear: /home/utnso/desktop/tall-grass/Files/Pikachu
+[DEBUG] 15:55:03:624 GameCard/(1930:1930): El directorio ya existe
+[DEBUG] 15:55:03:624 GameCard/(1930:1930): El directorio ya existe
+[DEBUG] 15:55:09:21 GameCard/(1930:1930): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 15:55:11:490 GameCard/(1930:1930): N
+[INFO] 15:55:14:498 GameCard/(1930:1930): N
+[INFO] 15:55:15:395 GameCard/(1930:1930): 7
+[INFO] 15:55:15:826 GameCard/(1930:1930): 7
+[INFO] 15:55:16:733 GameCard/(1930:1930): p--ø€-0
+[DEBUG] 15:55:23:858 GameCard/(1930:1930): Cantidad de bloques necesarios 3 
+[DEBUG] 15:55:24:457 GameCard/(1930:1930): Contenido del archivo 4-8=10
+ù
+[DEBUG] 15:56:25:903 GameCard/(1930:1930): Re escribio el block 0
+[DEBUG] 15:56:25:903 GameCard/(1930:1930): Re escribio el block 1
+[DEBUG] 15:56:25:903 GameCard/(1930:1930): Re escribio el block 2
+[DEBUG] 15:56:28:514 GameCard/(1930:1930): Resultado del procesamiento del mensaje: 0
+[DEBUG] 15:56:36:356 GameCard/(1930:1930): Directorio de Pokemon a crear: /home/utnso/desktop/tall-grass/Files/Pikachu
+[DEBUG] 15:56:36:356 GameCard/(1930:1930): El directorio ya existe
+[DEBUG] 15:56:36:356 GameCard/(1930:1930): El directorio ya existe
+[DEBUG] 15:56:36:356 GameCard/(1930:1930): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 15:56:36:356 GameCard/(1930:1930): N
+[INFO] 15:56:36:857 GameCard/(1930:1930): N
+[INFO] 15:56:36:857 GameCard/(1930:1930): 7
+[INFO] 15:56:36:857 GameCard/(1930:1930): 7
+[INFO] 15:56:36:857 GameCard/(1930:1930): Øøè(
+[DEBUG] 15:56:36:857 GameCard/(1930:1930): Cantidad de bloques necesarios 3 
+[DEBUG] 15:56:36:857 GameCard/(1930:1930): Contenido del archivo 420=10
+ù
+[DEBUG] 15:56:36:857 GameCard/(1930:1930): Bloque donde va a guardar los datos 0
+[DEBUG] 15:56:36:857 GameCard/(1930:1930): Creo el archivo de bloque del Pokemon 0
+[DEBUG] 15:56:36:857 GameCard/(1930:1930): Resultado del test del bit 0:  -  
+[DEBUG] 15:56:36:857 GameCard/(1930:1930): Bloque donde va a guardar los datos 1
+[DEBUG] 15:56:36:858 GameCard/(1930:1930): Creo el archivo de bloque del Pokemon 1
+[DEBUG] 15:56:36:858 GameCard/(1930:1930): Resultado del test del bit 0:  -  
+[DEBUG] 15:56:36:858 GameCard/(1930:1930): Resultado del test del bit 1:  -  
+[DEBUG] 15:56:36:858 GameCard/(1930:1930): Bloque donde va a guardar los datos 2
+[DEBUG] 15:56:36:858 GameCard/(1930:1930): Creo el archivo de bloque del Pokemon 2
+[DEBUG] 15:56:36:858 GameCard/(1930:1930): Resultado del procesamiento del mensaje: 0
+[INFO] 15:58:03:863 GameCard/(2167:2167): PROCESO GAMECARD ONLINE
+[INFO] 15:58:03:864 GameCard/(2167:2167): /home/utnso/desktop/tall-grass
+[DEBUG] 15:58:03:864 GameCard/(2167:2167): Inicializa la GameCard
+[DEBUG] 15:58:03:864 GameCard/(2167:2167): El directorio ya existe
+[DEBUG] 15:58:03:864 GameCard/(2167:2167): El directorio ya existe
+[DEBUG] 15:58:03:867 GameCard/(2167:2167): Directorio /home/utnso/desktop/tall-grass -- Creado
+[DEBUG] 15:58:03:867 GameCard/(2167:2167): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 0
+[DEBUG] 15:58:03:867 GameCard/(2167:2167): Directorio /home/utnso/desktop/tall-grass/Files/ -- Creado
+[DEBUG] 15:58:03:867 GameCard/(2167:2167): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 0
+[DEBUG] 15:58:03:868 GameCard/(2167:2167): Linea del archivo : DIRECTORY=Y
+[DEBUG] 15:58:03:868 GameCard/(2167:2167): Directorio /home/utnso/desktop/tall-grass/Blocks/ -- Creado
+[DEBUG] 15:58:03:868 GameCard/(2167:2167): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 0
+[DEBUG] 15:58:03:868 GameCard/(2167:2167): Directorio /home/utnso/desktop/tall-grass/Metadata/ -- Creado
+[DEBUG] 15:58:03:868 GameCard/(2167:2167): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 0
+[INFO] 15:58:03:868 GameCard/(2167:2167): 3
+[INFO] 15:58:03:868 GameCard/(2167:2167): 1024
+[INFO] 15:58:03:868 GameCard/(2167:2167): TALL_GRASS
+[DEBUG] 15:58:03:868 GameCard/(2167:2167): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 15:58:03:872 GameCard/(2167:2167): Linea del archivo : BLOCKS=1024
+[DEBUG] 15:58:03:872 GameCard/(2167:2167): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 15:58:03:872 GameCard/(2167:2167): Se crea el bit array con una memoria de 128
+[DEBUG] 15:58:03:872 GameCard/(2167:2167): Bitarray Creado
+[DEBUG] 15:58:03:872 GameCard/(2167:2167): El Ãºltimo bit es 1024
+[DEBUG] 15:58:03:872 GameCard/(2167:2167): Error mapping the file
+[DEBUG] 15:58:03:872 GameCard/(2167:2167): Archivo Mapeado 
+[DEBUG] 15:58:03:872 GameCard/(2167:2167): Directorio de Pokemon a crear: /home/utnso/desktop/tall-grass/Files/Pikachu
+[DEBUG] 15:58:03:872 GameCard/(2167:2167): Directorio /home/utnso/desktop/tall-grass/Files/Pikachu -- Creado
+[DEBUG] 15:58:03:872 GameCard/(2167:2167): Amout of blocks needed 3
+[DEBUG] 15:58:03:872 GameCard/(2167:2167): Bloque donde va a guardar los datos 0
+[DEBUG] 15:58:03:872 GameCard/(2167:2167): Creo el archivo de bloque del Pokemon 0
+[DEBUG] 15:58:03:872 GameCard/(2167:2167): Resultado del test del bit 0:  -  
+[DEBUG] 15:58:03:873 GameCard/(2167:2167): Bloque donde va a guardar los datos 1
+[DEBUG] 15:58:03:873 GameCard/(2167:2167): Creo el archivo de bloque del Pokemon 1
+[DEBUG] 15:58:03:873 GameCard/(2167:2167): Resultado del test del bit 0:  -  
+[DEBUG] 15:58:03:873 GameCard/(2167:2167): Resultado del test del bit 1:  -  
+[DEBUG] 15:58:03:873 GameCard/(2167:2167): Bloque donde va a guardar los datos 2
+[DEBUG] 15:58:03:873 GameCard/(2167:2167): Creo el archivo de bloque del Pokemon 2
+[DEBUG] 15:58:03:873 GameCard/(2167:2167): Resultado del procesamiento del mensaje: 0
+[DEBUG] 15:58:03:873 GameCard/(2167:2167): Directorio de Pokemon a crear: /home/utnso/desktop/tall-grass/Files/Pikachu
+[DEBUG] 15:58:03:873 GameCard/(2167:2167): El directorio ya existe
+[DEBUG] 15:58:03:873 GameCard/(2167:2167): El directorio ya existe
+[DEBUG] 15:58:03:873 GameCard/(2167:2167): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 15:58:03:873 GameCard/(2167:2167): N
+[INFO] 15:58:03:873 GameCard/(2167:2167): N
+[INFO] 15:58:03:873 GameCard/(2167:2167): 7
+[INFO] 15:58:03:873 GameCard/(2167:2167): 7
+[INFO] 15:58:03:873 GameCard/(2167:2167): (\	H\	X\	
+[DEBUG] 15:58:03:874 GameCard/(2167:2167): Cantidad de bloques necesarios 3 
+[DEBUG] 15:58:03:874 GameCard/(2167:2167): Contenido del archivo 4-8=10
+7x
+[DEBUG] 15:58:03:874 GameCard/(2167:2167): Resultado del test del bit 0:  -  
+[DEBUG] 15:58:03:874 GameCard/(2167:2167): Resultado del test del bit 1:  -  
+[DEBUG] 15:58:03:874 GameCard/(2167:2167): Resultado del test del bit 2:  -  
+[DEBUG] 15:58:03:875 GameCard/(2167:2167): Bloque donde va a guardar los datos 3
+[DEBUG] 15:58:03:900 GameCard/(2167:2167): Creo el archivo de bloque del Pokemon 3
+[DEBUG] 15:58:03:900 GameCard/(2167:2167): Resultado del test del bit 0:  -  
+[DEBUG] 15:58:03:900 GameCard/(2167:2167): Resultado del test del bit 1:  -  
+[DEBUG] 15:58:03:900 GameCard/(2167:2167): Resultado del test del bit 2:  -  
+[DEBUG] 15:58:03:900 GameCard/(2167:2167): Resultado del test del bit 3:  -  
+[DEBUG] 15:58:03:900 GameCard/(2167:2167): Bloque donde va a guardar los datos 4
+[DEBUG] 15:58:03:901 GameCard/(2167:2167): Creo el archivo de bloque del Pokemon 4
+[DEBUG] 15:58:03:901 GameCard/(2167:2167): Resultado del test del bit 0:  -  
+[DEBUG] 15:58:03:901 GameCard/(2167:2167): Resultado del test del bit 1:  -  
+[DEBUG] 15:58:03:901 GameCard/(2167:2167): Resultado del test del bit 2:  -  
+[DEBUG] 15:58:03:901 GameCard/(2167:2167): Resultado del test del bit 3:  -  
+[DEBUG] 15:58:03:901 GameCard/(2167:2167): Resultado del test del bit 4:  -  
+[DEBUG] 15:58:03:902 GameCard/(2167:2167): Bloque donde va a guardar los datos 5
+[DEBUG] 15:58:03:902 GameCard/(2167:2167): Creo el archivo de bloque del Pokemon 5
+[DEBUG] 15:58:03:902 GameCard/(2167:2167): Resultado del procesamiento del mensaje: 0
+[INFO] 16:00:10:720 GameCard/(2235:2235): PROCESO GAMECARD ONLINE
+[INFO] 16:00:10:724 GameCard/(2235:2235): /home/utnso/desktop/tall-grass
+[DEBUG] 16:00:10:724 GameCard/(2235:2235): Inicializa la GameCard
+[DEBUG] 16:00:10:724 GameCard/(2235:2235): El directorio ya existe
+[DEBUG] 16:00:10:724 GameCard/(2235:2235): El directorio ya existe
+[DEBUG] 16:00:10:724 GameCard/(2235:2235): El directorio ya existe
+[DEBUG] 16:00:10:725 GameCard/(2235:2235): El directorio ya existe
+[DEBUG] 16:00:10:725 GameCard/(2235:2235): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:00:10:726 GameCard/(2235:2235): El directorio ya existe
+[DEBUG] 16:00:10:726 GameCard/(2235:2235): El directorio ya existe
+[DEBUG] 16:00:10:726 GameCard/(2235:2235): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 16:00:10:727 GameCard/(2235:2235): Linea del archivo : DIRECTORY=Y
+[DEBUG] 16:00:10:728 GameCard/(2235:2235): El directorio ya existe
+[DEBUG] 16:00:10:728 GameCard/(2235:2235): El directorio ya existe
+[DEBUG] 16:00:10:728 GameCard/(2235:2235): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 16:00:10:728 GameCard/(2235:2235): El directorio ya existe
+[DEBUG] 16:00:10:729 GameCard/(2235:2235): El directorio ya existe
+[DEBUG] 16:00:10:729 GameCard/(2235:2235): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 16:00:10:729 GameCard/(2235:2235): 3
+[INFO] 16:00:10:729 GameCard/(2235:2235): 1024
+[INFO] 16:00:10:731 GameCard/(2235:2235): TALL_GRASS
+[DEBUG] 16:00:10:732 GameCard/(2235:2235): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 16:00:10:732 GameCard/(2235:2235): Linea del archivo : BLOCKS=1024
+[DEBUG] 16:00:10:732 GameCard/(2235:2235): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 16:00:10:732 GameCard/(2235:2235): Se crea el bit array con una memoria de 128
+[DEBUG] 16:00:10:733 GameCard/(2235:2235): Bitarray Creado
+[DEBUG] 16:00:10:734 GameCard/(2235:2235): Archivo Mapeado 
+[DEBUG] 16:00:10:735 GameCard/(2235:2235): Directorio de Pokemon a crear: /home/utnso/desktop/tall-grass/Files/Pikachu
+[DEBUG] 16:00:10:736 GameCard/(2235:2235): El directorio ya existe
+[DEBUG] 16:00:10:737 GameCard/(2235:2235): El directorio ya existe
+[DEBUG] 16:00:10:737 GameCard/(2235:2235): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:00:10:739 GameCard/(2235:2235): N
+[INFO] 16:00:10:740 GameCard/(2235:2235): N
+[INFO] 16:00:10:740 GameCard/(2235:2235): 7
+[INFO] 16:00:10:741 GameCard/(2235:2235): 7
+[INFO] 16:00:10:741 GameCard/(2235:2235): pÍ÷	Í÷	øº÷	»÷	€Í÷	0»÷	
+[DEBUG] 16:00:10:741 GameCard/(2235:2235): Cantidad de bloques necesarios 3 
+[DEBUG] 16:00:10:743 GameCard/(2235:2235): Contenido del archivo 4-8=10
+gp
+[DEBUG] 16:00:10:743 GameCard/(2235:2235): Re escribio el block 0
+[DEBUG] 16:00:10:744 GameCard/(2235:2235): Re escribio el block 1
+[DEBUG] 16:00:10:745 GameCard/(2235:2235): Re escribio el block 2
+[DEBUG] 16:00:10:745 GameCard/(2235:2235): Resultado del procesamiento del mensaje: 0
+[DEBUG] 16:00:10:745 GameCard/(2235:2235): Directorio de Pokemon a crear: /home/utnso/desktop/tall-grass/Files/Pikachu
+[DEBUG] 16:00:10:745 GameCard/(2235:2235): El directorio ya existe
+[DEBUG] 16:00:10:746 GameCard/(2235:2235): El directorio ya existe
+[DEBUG] 16:00:10:746 GameCard/(2235:2235): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:00:10:746 GameCard/(2235:2235): N
+[INFO] 16:00:10:746 GameCard/(2235:2235): N
+[INFO] 16:00:10:746 GameCard/(2235:2235): 7
+[INFO] 16:00:10:746 GameCard/(2235:2235): 7
+[INFO] 16:00:10:746 GameCard/(2235:2235): Ø½÷	ø½÷	¾÷	¾÷	è½÷	(¾÷	
+[DEBUG] 16:00:10:747 GameCard/(2235:2235): Cantidad de bloques necesarios 3 
+[DEBUG] 16:00:10:747 GameCard/(2235:2235): Contenido del archivo 420=10
+gp
+[DEBUG] 16:00:10:747 GameCard/(2235:2235): Bloque donde va a guardar los datos 0
+[DEBUG] 16:00:10:747 GameCard/(2235:2235): Creo el archivo de bloque del Pokemon 0
+[DEBUG] 16:00:10:748 GameCard/(2235:2235): Resultado del test del bit 0:  -  
+[DEBUG] 16:00:10:748 GameCard/(2235:2235): Bloque donde va a guardar los datos 1
+[DEBUG] 16:00:10:749 GameCard/(2235:2235): Creo el archivo de bloque del Pokemon 1
+[DEBUG] 16:00:10:749 GameCard/(2235:2235): Resultado del test del bit 0:  -  
+[DEBUG] 16:00:10:750 GameCard/(2235:2235): Resultado del test del bit 1:  -  
+[DEBUG] 16:00:10:750 GameCard/(2235:2235): Bloque donde va a guardar los datos 2
+[DEBUG] 16:00:10:750 GameCard/(2235:2235): Creo el archivo de bloque del Pokemon 2
+[DEBUG] 16:00:10:754 GameCard/(2235:2235): Resultado del procesamiento del mensaje: 0
+[INFO] 16:04:28:733 GameCard/(2455:2455): PROCESO GAMECARD ONLINE
+[INFO] 16:04:28:736 GameCard/(2455:2455): /home/utnso/desktop/tall-grass
+[DEBUG] 16:04:28:736 GameCard/(2455:2455): Inicializa la GameCard
+[DEBUG] 16:04:28:736 GameCard/(2455:2455): El directorio ya existe
+[DEBUG] 16:04:28:736 GameCard/(2455:2455): El directorio ya existe
+[DEBUG] 16:04:28:736 GameCard/(2455:2455): El directorio ya existe
+[DEBUG] 16:04:28:737 GameCard/(2455:2455): El directorio ya existe
+[DEBUG] 16:04:28:737 GameCard/(2455:2455): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:04:28:738 GameCard/(2455:2455): El directorio ya existe
+[DEBUG] 16:04:28:738 GameCard/(2455:2455): El directorio ya existe
+[DEBUG] 16:04:28:738 GameCard/(2455:2455): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 16:04:28:740 GameCard/(2455:2455): Linea del archivo : DIRECTORY=Y
+[DEBUG] 16:04:28:740 GameCard/(2455:2455): El directorio ya existe
+[DEBUG] 16:04:28:740 GameCard/(2455:2455): El directorio ya existe
+[DEBUG] 16:04:28:740 GameCard/(2455:2455): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 16:04:28:740 GameCard/(2455:2455): El directorio ya existe
+[DEBUG] 16:04:28:740 GameCard/(2455:2455): El directorio ya existe
+[DEBUG] 16:04:28:740 GameCard/(2455:2455): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 16:04:28:741 GameCard/(2455:2455): 3
+[INFO] 16:04:28:741 GameCard/(2455:2455): 1024
+[INFO] 16:04:28:741 GameCard/(2455:2455): TALL_GRASS
+[DEBUG] 16:04:28:742 GameCard/(2455:2455): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 16:04:28:742 GameCard/(2455:2455): Linea del archivo : BLOCKS=1024
+[DEBUG] 16:04:28:742 GameCard/(2455:2455): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 16:04:28:742 GameCard/(2455:2455): Se crea el bit array con una memoria de 128
+[DEBUG] 16:04:28:743 GameCard/(2455:2455): Bitarray Creado
+[DEBUG] 16:04:28:743 GameCard/(2455:2455): Archivo Mapeado 
+[DEBUG] 16:04:28:743 GameCard/(2455:2455): Directorio de Pokemon a crear: /home/utnso/desktop/tall-grass/Files/Pikachu
+[DEBUG] 16:04:28:743 GameCard/(2455:2455): El directorio ya existe
+[DEBUG] 16:04:28:743 GameCard/(2455:2455): El directorio ya existe
+[DEBUG] 16:04:28:743 GameCard/(2455:2455): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:04:28:745 GameCard/(2455:2455): N
+[INFO] 16:04:28:745 GameCard/(2455:2455): N
+[INFO] 16:04:28:745 GameCard/(2455:2455): 7
+[INFO] 16:04:28:745 GameCard/(2455:2455): 7
+[INFO] 16:04:28:745 GameCard/(2455:2455): p­¸­¸øš¸›¸€­¸0›¸
+[DEBUG] 16:04:28:745 GameCard/(2455:2455): Cantidad de bloques necesarios 3 
+[DEBUG] 16:04:28:748 GameCard/(2455:2455): Contenido del archivo 2-8=10
+·i
+[DEBUG] 16:04:28:748 GameCard/(2455:2455): Bloque donde va a guardar los datos 0
+[DEBUG] 16:04:28:749 GameCard/(2455:2455): Creo el archivo de bloque del Pokemon 0
+[DEBUG] 16:04:28:749 GameCard/(2455:2455): Resultado del test del bit 0:  -  
+[DEBUG] 16:04:28:749 GameCard/(2455:2455): Bloque donde va a guardar los datos 1
+[DEBUG] 16:04:28:749 GameCard/(2455:2455): Creo el archivo de bloque del Pokemon 1
+[DEBUG] 16:04:28:749 GameCard/(2455:2455): Resultado del test del bit 0:  -  
+[DEBUG] 16:04:28:749 GameCard/(2455:2455): Resultado del test del bit 1:  -  
+[DEBUG] 16:04:28:749 GameCard/(2455:2455): Bloque donde va a guardar los datos 2
+[DEBUG] 16:04:28:749 GameCard/(2455:2455): Creo el archivo de bloque del Pokemon 2
+[DEBUG] 16:04:28:750 GameCard/(2455:2455): Resultado del procesamiento del mensaje: 0
+[DEBUG] 16:04:28:750 GameCard/(2455:2455): Directorio de Pokemon a crear: /home/utnso/desktop/tall-grass/Files/Pikachu
+[DEBUG] 16:04:28:750 GameCard/(2455:2455): El directorio ya existe
+[DEBUG] 16:04:28:750 GameCard/(2455:2455): El directorio ya existe
+[DEBUG] 16:04:28:750 GameCard/(2455:2455): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:04:28:750 GameCard/(2455:2455): N
+[INFO] 16:04:28:750 GameCard/(2455:2455): N
+[INFO] 16:04:28:750 GameCard/(2455:2455): 7
+[INFO] 16:04:28:750 GameCard/(2455:2455): 7
+[INFO] 16:04:28:751 GameCard/(2455:2455): ¸¸œ¸ œ¸0œ¸Xž¸@œ¸
+[DEBUG] 16:04:28:751 GameCard/(2455:2455): Cantidad de bloques necesarios 3 
+[DEBUG] 16:04:28:751 GameCard/(2455:2455): Contenido del archivo 4-8=10
+·i
+[DEBUG] 16:04:28:751 GameCard/(2455:2455): Resultado del test del bit 0:  -  
+[DEBUG] 16:04:28:751 GameCard/(2455:2455): Resultado del test del bit 1:  -  
+[DEBUG] 16:04:28:751 GameCard/(2455:2455): Resultado del test del bit 2:  -  
+[DEBUG] 16:04:28:751 GameCard/(2455:2455): Resultado del test del bit 3:  -  
+[DEBUG] 16:04:28:751 GameCard/(2455:2455): Bloque donde va a guardar los datos 4
+[DEBUG] 16:04:28:751 GameCard/(2455:2455): Creo el archivo de bloque del Pokemon 4
+[DEBUG] 16:04:28:751 GameCard/(2455:2455): Resultado del test del bit 0:  -  
+[DEBUG] 16:04:28:751 GameCard/(2455:2455): Resultado del test del bit 1:  -  
+[DEBUG] 16:04:28:751 GameCard/(2455:2455): Resultado del test del bit 2:  -  
+[DEBUG] 16:04:28:751 GameCard/(2455:2455): Resultado del test del bit 3:  -  
+[DEBUG] 16:04:28:751 GameCard/(2455:2455): Resultado del test del bit 4:  -  
+[DEBUG] 16:04:28:752 GameCard/(2455:2455): Bloque donde va a guardar los datos 5
+[DEBUG] 16:04:28:752 GameCard/(2455:2455): Creo el archivo de bloque del Pokemon 5
+[DEBUG] 16:04:28:752 GameCard/(2455:2455): Resultado del test del bit 0:  -  
+[DEBUG] 16:04:28:752 GameCard/(2455:2455): Resultado del test del bit 1:  -  
+[DEBUG] 16:04:28:752 GameCard/(2455:2455): Resultado del test del bit 2:  -  
+[DEBUG] 16:04:28:752 GameCard/(2455:2455): Resultado del test del bit 3:  -  
+[DEBUG] 16:04:28:752 GameCard/(2455:2455): Resultado del test del bit 4:  -  
+[DEBUG] 16:04:28:752 GameCard/(2455:2455): Resultado del test del bit 5:  -  
+[DEBUG] 16:04:28:752 GameCard/(2455:2455): Resultado del test del bit 6:  -  
+[DEBUG] 16:04:28:752 GameCard/(2455:2455): Resultado del test del bit 7:  -  
+[DEBUG] 16:04:28:753 GameCard/(2455:2455): Bloque donde va a guardar los datos 8
+[DEBUG] 16:04:28:754 GameCard/(2455:2455): Creo el archivo de bloque del Pokemon 8
+[DEBUG] 16:04:28:755 GameCard/(2455:2455): Resultado del procesamiento del mensaje: 0
+[INFO] 16:07:41:586 GameCard/(2765:2765): PROCESO GAMECARD ONLINE
+[INFO] 16:07:41:591 GameCard/(2765:2765): /home/utnso/desktop/tall-grass
+[DEBUG] 16:07:41:591 GameCard/(2765:2765): Inicializa la GameCard
+[DEBUG] 16:07:41:591 GameCard/(2765:2765): El directorio ya existe
+[DEBUG] 16:07:41:591 GameCard/(2765:2765): El directorio ya existe
+[DEBUG] 16:07:41:608 GameCard/(2765:2765): Directorio /home/utnso/desktop/tall-grass -- Creado
+[DEBUG] 16:07:41:609 GameCard/(2765:2765): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 0
+[DEBUG] 16:07:41:609 GameCard/(2765:2765): Directorio /home/utnso/desktop/tall-grass/Files/ -- Creado
+[DEBUG] 16:07:41:609 GameCard/(2765:2765): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 0
+[DEBUG] 16:07:41:609 GameCard/(2765:2765): Linea del archivo : DIRECTORY=Y
+[DEBUG] 16:07:41:609 GameCard/(2765:2765): Directorio /home/utnso/desktop/tall-grass/Blocks/ -- Creado
+[DEBUG] 16:07:41:609 GameCard/(2765:2765): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 0
+[DEBUG] 16:07:41:609 GameCard/(2765:2765): Directorio /home/utnso/desktop/tall-grass/Metadata/ -- Creado
+[DEBUG] 16:07:41:609 GameCard/(2765:2765): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 0
+[INFO] 16:07:41:609 GameCard/(2765:2765): 3
+[INFO] 16:07:41:609 GameCard/(2765:2765): 1024
+[INFO] 16:07:41:609 GameCard/(2765:2765): TALL_GRASS
+[DEBUG] 16:07:41:609 GameCard/(2765:2765): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 16:07:41:609 GameCard/(2765:2765): Linea del archivo : BLOCKS=1024
+[DEBUG] 16:07:41:609 GameCard/(2765:2765): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 16:07:41:611 GameCard/(2765:2765): Se crea el bit array con una memoria de 128
+[DEBUG] 16:07:41:611 GameCard/(2765:2765): Bitarray Creado
+[DEBUG] 16:07:41:611 GameCard/(2765:2765): El Ãºltimo bit es 1024
+[DEBUG] 16:07:41:611 GameCard/(2765:2765): Error mapping the file
+[DEBUG] 16:07:41:612 GameCard/(2765:2765): Archivo Mapeado 
+[DEBUG] 16:07:41:612 GameCard/(2765:2765): Directorio de Pokemon a crear: /home/utnso/desktop/tall-grass/Files/Pikachu
+[DEBUG] 16:07:41:612 GameCard/(2765:2765): Directorio /home/utnso/desktop/tall-grass/Files/Pikachu -- Creado
+[DEBUG] 16:07:41:612 GameCard/(2765:2765): Amout of blocks needed 3
+[DEBUG] 16:07:41:612 GameCard/(2765:2765): Bloque donde va a guardar los datos 0
+[DEBUG] 16:07:41:621 GameCard/(2765:2765): Creo el archivo de bloque del Pokemon 0
+[DEBUG] 16:07:41:621 GameCard/(2765:2765): Resultado del test del bit 0:  -  
+[DEBUG] 16:07:41:621 GameCard/(2765:2765): Bloque donde va a guardar los datos 1
+[DEBUG] 16:07:41:621 GameCard/(2765:2765): Creo el archivo de bloque del Pokemon 1
+[DEBUG] 16:07:41:621 GameCard/(2765:2765): Resultado del test del bit 0:  -  
+[DEBUG] 16:07:41:621 GameCard/(2765:2765): Resultado del test del bit 1:  -  
+[DEBUG] 16:07:41:621 GameCard/(2765:2765): Bloque donde va a guardar los datos 2
+[DEBUG] 16:07:41:622 GameCard/(2765:2765): Creo el archivo de bloque del Pokemon 2
+[DEBUG] 16:07:41:623 GameCard/(2765:2765): Resultado del procesamiento del mensaje: 0
+[DEBUG] 16:07:41:623 GameCard/(2765:2765): Directorio de Pokemon a crear: /home/utnso/desktop/tall-grass/Files/Pikachu
+[DEBUG] 16:07:41:623 GameCard/(2765:2765): El directorio ya existe
+[DEBUG] 16:07:41:623 GameCard/(2765:2765): El directorio ya existe
+[DEBUG] 16:07:41:623 GameCard/(2765:2765): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:07:41:623 GameCard/(2765:2765): N
+[INFO] 16:07:41:623 GameCard/(2765:2765): N
+[INFO] 16:07:41:623 GameCard/(2765:2765): 7
+[INFO] 16:07:41:623 GameCard/(2765:2765): 7
+[INFO] 16:07:41:623 GameCard/(2765:2765): (¼ÛH¼ÛX¼Û
+[DEBUG] 16:07:41:624 GameCard/(2765:2765): Cantidad de bloques necesarios 3 
+[DEBUG] 16:07:41:624 GameCard/(2765:2765): Contenido del archivo 4-8=10
+çu
+[DEBUG] 16:07:41:625 GameCard/(2765:2765): Resultado del test del bit 0:  -  
+[DEBUG] 16:07:41:625 GameCard/(2765:2765): Resultado del test del bit 1:  -  
+[DEBUG] 16:07:41:626 GameCard/(2765:2765): Resultado del test del bit 2:  -  
+[DEBUG] 16:07:41:626 GameCard/(2765:2765): Bloque donde va a guardar los datos 3
+[DEBUG] 16:07:41:626 GameCard/(2765:2765): Creo el archivo de bloque del Pokemon 3
+[DEBUG] 16:07:41:626 GameCard/(2765:2765): Resultado del test del bit 0:  -  
+[DEBUG] 16:07:41:626 GameCard/(2765:2765): Resultado del test del bit 1:  -  
+[DEBUG] 16:07:41:626 GameCard/(2765:2765): Resultado del test del bit 2:  -  
+[DEBUG] 16:07:41:626 GameCard/(2765:2765): Resultado del test del bit 3:  -  
+[DEBUG] 16:07:41:626 GameCard/(2765:2765): Bloque donde va a guardar los datos 4
+[DEBUG] 16:07:41:626 GameCard/(2765:2765): Creo el archivo de bloque del Pokemon 4
+[DEBUG] 16:07:41:626 GameCard/(2765:2765): Resultado del test del bit 0:  -  
+[DEBUG] 16:07:41:626 GameCard/(2765:2765): Resultado del test del bit 1:  -  
+[DEBUG] 16:07:41:626 GameCard/(2765:2765): Resultado del test del bit 2:  -  
+[DEBUG] 16:07:41:627 GameCard/(2765:2765): Resultado del test del bit 3:  -  
+[DEBUG] 16:07:41:627 GameCard/(2765:2765): Resultado del test del bit 4:  -  
+[DEBUG] 16:07:41:627 GameCard/(2765:2765): Bloque donde va a guardar los datos 5
+[DEBUG] 16:07:41:627 GameCard/(2765:2765): Creo el archivo de bloque del Pokemon 5
+[DEBUG] 16:07:41:627 GameCard/(2765:2765): Resultado del procesamiento del mensaje: 0

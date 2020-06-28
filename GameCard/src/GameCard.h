@@ -88,6 +88,7 @@ t_GameCard* GameCard_initialize(t_log*, char*);
 int GameCard_mountFS(t_config*);
 void GameCard_Process_Message(deli_message*);
 void GameCard_Process_Message_New(deli_message*);
+deli_message* GameCard_Process_Message_Get(deli_message*);
 void GameCard_Initialize_bitarray();
 void GameCard_Destroy(t_GameCard*);
 
@@ -101,6 +102,9 @@ int create_file_metadata_poke(t_values*);
 
 int create_poke_file(t_values*);
 int modify_poke_file(t_values*, char*);
+void create_localized_message(localized_pokemon*, char*,char*);
+
+int check_directory(char*);
 
 void read_metadata_file(t_file_metadata*, t_config*);
 void Metadata_File_Destroy(t_file_metadata*);
@@ -115,6 +119,11 @@ int get_first_free_block();
 void write_blocks(t_file_metadata*, int, char*);
 int get_string_file_position(char*,char*);
 void increase_pokemon_amount(char*, int, int );
+char* get_amount_of_pokemons(char*);
+
+char* get_x_coordinate(char*);
+char* get_y_coordinate(char*);
+
 void rewrite_blocks(t_file_metadata* , char*);
 
 void readConfigBrokerValues(t_config*,t_log* ,struct Broker*);

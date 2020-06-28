@@ -30,6 +30,7 @@
 #include<commons/bitarray.h>
 #include<commons/string.h>
 #include<commons/collections/list.h>
+#include<commons/collections/dictionary.h>
 #include <semaphore.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -88,6 +89,7 @@ int GameCard_mountFS(t_config*);
 void GameCard_Process_Message(deli_message*);
 void GameCard_Process_Message_New(deli_message*);
 void GameCard_Initialize_bitarray();
+void GameCard_Destroy(t_GameCard*);
 
 int create_directory(char*);
 int create_file(fileType, t_values*);
@@ -101,6 +103,7 @@ int create_poke_file(t_values*);
 int modify_poke_file(t_values*, char*);
 
 void read_metadata_file(t_file_metadata*, t_config*);
+void Metadata_File_Destroy(t_file_metadata*);
 char* get_file_content(t_file_metadata*);
 int get_amount_of_blocks(int);
 int get_message_size(new_pokemon* );

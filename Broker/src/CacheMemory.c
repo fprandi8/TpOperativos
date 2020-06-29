@@ -583,6 +583,21 @@ int consolidate(t_partition related_partition){
     return parent->id;
 }
 
+void create_childrens_from(t_partition* parent){
+    
+    t_partition* one_children = CreateNewPartition();
+    one_children->parentId = parent->id;
+
+    list_add(partitions, one_children);
+
+    t_partition* another_children = CreateNewPartition();
+    another_children->parentId = parent->id;
+
+    list_add(partitions, another_children);
+    list_add(parent_partitions, parent);
+    list_remove(partitions ,find_index_in_list(parent));
+}
+
 
 
 

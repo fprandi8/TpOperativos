@@ -16,14 +16,16 @@
 #define PUERTO_BROKER "PUERTO_BROKER"
 #define FRECUENCIA_COMPACTACION "FRECUENCIA_COMPACTACION"
 
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
-#include<unistd.h>
+#include <unistd.h>
 #include <time.h>
-#include<commons/log.h>
-#include<commons/collections/queue.h>
-#include<commons/collections/list.h>
+#include <commons/log.h>
+#include <commons/collections/queue.h>
+#include <commons/collections/list.h>
+#include <commons/memory.h>
+#include "commons/temporal.h"
 #include "utils.h"
 #include "delibird/comms/messages.h"
 #include "delibird/comms/serialization.h"
@@ -37,7 +39,7 @@
 	******************STRUCTS***********************
 */
 typedef struct{
-    char* full_memory;
+    void* full_memory;
     uint32_t partition_minimum_size;
     uint32_t memory_size;
 }t_CacheMemory;
@@ -45,7 +47,7 @@ typedef struct{
 typedef struct{
     //partition number would be generated when iterating the list
     uint32_t id; //its message id
-    char* begining;
+    void* begining;
     uint32_t size;
     message_type queue_type;
     bool free;
@@ -66,18 +68,18 @@ typedef struct{
 */
 t_CacheMemory cache;
 t_config* config;
-sem_t* mutex_cached_messages;
+sem_t mutex_cached_messages;
 t_list* cached_messages;
-sem_t* mutex_partitions;
+sem_t mutex_partitions;
 t_list* partitions;
-sem_t* mutex_nextPartitionId;
+sem_t mutex_nextPartitionId;
 int nextPartitionId;
 
 /*
 	********************CONTRACTS***********************
 */
 
-void start_cache(void);
+void start_cache();
 
 //size configuration
 t_config* get_config(void);
@@ -111,5 +113,6 @@ uint32_t add_occupied_size_from(t_list* occupied);
 int GetBusyPartitionsCount();
 double CalculateNearestPowerOfTwo(int x);
 double CalculateNearestPowerOfTwoRelativeToCache(int memoryLocation);
+void PrintDumpOfCache();
 
 #endif /* CACHEMEMORY_H_ */

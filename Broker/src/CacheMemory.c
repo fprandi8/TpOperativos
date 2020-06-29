@@ -17,7 +17,7 @@ void signal_handler(int signum)
 }
 
 
-void start_cache(void)
+void start_cache()
 {
     //Receives config from Broker
     config = get_config();
@@ -25,11 +25,11 @@ void start_cache(void)
     define_cache_maximum_size();
     set_full_memory();
 
-	sem_init(mutex_nextPartitionId, 0, 1);
-	sem_init(mutex_partitions, 0, 1);
-	sem_init(mutex_cached_messages, 0, 1);
+	sem_init(&mutex_nextPartitionId, 0, 1);
+	sem_init(&mutex_partitions, 0, 1);
+	sem_init(&mutex_cached_messages, 0, 1);
 
-	signal(SIGUSR1, signal_handler);
+	//signal(SIGUSR1, signal_handler);
 
     t_partition* first_partition = CreateNewPartition();
     first_partition->queue_type = 0;
@@ -49,9 +49,12 @@ void start_cache(void)
 	}
 
 
-	sem_wait(mutex_partitions);
+	sem_wait(&mutex_partitions);
+	partitions = list_create();
     list_add(partitions, first_partition);
-	sem_post(mutex_partitions);
+	sem_post(&mutex_partitions);
+
+    PrintDumpOfCache();
 
 }
 
@@ -90,18 +93,18 @@ t_cachedMessage create_cached_from_message(deli_message message){
 }
 
 void add_to_cached_messages(t_cachedMessage new_message){
-	sem_wait(mutex_cached_messages);
+	sem_wait(&mutex_cached_messages);
     list_add(cached_messages, &new_message);
-	sem_post(mutex_cached_messages);
+	sem_post(&mutex_cached_messages);
 }
 
 int save_message_body(void* messageContent, message_type queue){
     t_buffer* messageBuffer = SerializeMessageContent(queue, messageContent);
-	sem_wait(mutex_partitions);
+	sem_wait(&mutex_partitions);
 	t_partition* partition;
     partition = find_empty_partition_of_size(sizeof(messageBuffer->bufferSize));
     int savedPartitionId = save_body_in_partition(messageBuffer, partition, queue);
-	sem_post(mutex_partitions);
+	sem_post(&mutex_partitions);
 	return savedPartitionId;
 }
 
@@ -383,23 +386,24 @@ void Free_CachedMessage(t_cachedMessage* message)
     free(message);
 }
 
-t_partition* CreateNewPartition()
-{
-    t_partition* partition = (t_partition*)malloc(sizeof(t_partition));
-	partition->id = GetNewId()
-    if(nextPartitionId== INT_MAX) nextPartitionId = 0;
-    return partition;
-}
-
 int GetNewId()
 {
     int result;
-	sem_wait(mutex_nextPartitionId);
+	sem_wait(&mutex_nextPartitionId);
 	result = nextPartitionId;
     nextPartitionId++;
-	sem_post(mutex_nextPartitionId);
+	sem_post(&mutex_nextPartitionId);
     return result;    
 }
+
+t_partition* CreateNewPartition()
+{
+    t_partition* partition = (t_partition*)malloc(sizeof(t_partition));
+	partition->id = GetNewId();
+    if(nextPartitionId == INT_MAX) nextPartitionId = 0;
+    return partition;
+}
+
 
 t_list* GetMessagesFromQueue(message_type type)
 {
@@ -417,6 +421,15 @@ t_cachedMessage* GetCachedMessage(int messageId)
         if(message->id == messageId) return true; else return false;
     }
     return (t_cachedMessage*)list_find(cached_messages, (void*)_message_by_id);
+}
+
+t_cachedMessage* GetCachedMessageInPartition(int partitionId)
+{
+    bool _message_by_partition_id(t_cachedMessage* message)
+    {
+        if(message->partitionId == partitionId) return true; else return false;
+    }
+    return (t_cachedMessage*)list_find(cached_messages, (void*)_message_by_partition_id);
 }
 
 t_partition* GetPartition(int partitionId)
@@ -439,9 +452,60 @@ void* GetMessageContent(int messageId)
 
 void PrintDumpOfCache()
 {
+//Imprimir:
+//  -----------------------------------------------------------------------------------------------------------------------------
+//  Dump: dd/mm/yy hh:mm:ss
+//Por cada particion:
+//  Particion <Id>: <memoryStart-MemoryEnd>. <asignada [x] o libre [l]>   Size:<xxxxb>  LRU:<Valor>  Cola:<COLA>   ID:<ID>
+//Fin de por cada particion
+//  -----------------------------------------------------------------------------------------------------------------------------
+   time_t rawtime;
+   struct tm *info;
+   time( &rawtime );
+   info = localtime( &rawtime );
 
+    printf("\n-----------------------------------------------------------------------------------------------------------------------------\n");
+    //printf("Dump: %d/%d/%d %s\n", info.tm_sec, dt.da_mon, dt.da_year, temporal_get_string_time());
+    printf("Dump: %d/%d/%d %s\n", info->tm_mday, info->tm_mon, info->tm_year, temporal_get_string_time());
+
+    void _print_partition_info(t_partition* partition)
+    {
+        char* busyStatus;
+        //char* memoryLocation = mem_hexstring(partition->begining, partition->size);
+        char* memoryLocation = "asdf";
+        if(partition->free == 1)
+        {
+            busyStatus = "L";
+            printf("Partición %d: <%s>. [%s] Size:%db\n",
+            	(int)partition->id,
+				memoryLocation,
+                busyStatus, 
+                (int)partition->size
+            );
+
+        } 
+        else 
+        {
+            busyStatus = "X";
+            t_cachedMessage* message = GetCachedMessageInPartition(partition->id);
+            char* queue = GetStringFromMessageType(message->queue_type);
+            printf("Partición %d: <%s>. [%s] Size:%db LRU:%ld Cola:%s ID:%d\n",
+                partition->id,
+				memoryLocation,
+                busyStatus,
+                partition->size,
+                partition->timestap,
+                queue,
+                message->id
+            );
+        }
+    }
+
+    list_iterate(partitions, (void*)_print_partition_info);
+
+    printf("-----------------------------------------------------------------------------------------------------------------------------\n");
 }
-
+/*
 void start_consolidation_for(t_partition freed_partition){
 
     int index = find_index_in_list(freed_partition);

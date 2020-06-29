@@ -447,17 +447,11 @@ void start_consolidation_for(t_partition freed_partition){
     int index = find_index_in_list(freed_partition);
 
     if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") != 0){
-        //check if pointer needed or wtf in c
-        //t_partition partition_to_consolidate = (t_partition*)malloc(sizeof(t_partition));
-        t_partition partition_to_consolidate = freed_partition;
+        uint32_t partitionId = freed_partition.id;
 
-        while(index >= 0 ){
-            if(partition_to_consolidate.size == cache.full_memory)
-                break;
-            index = check_validations_and_consolidate_BS(freed_partition, index);
-            partition_to_consolidate = (t_partition*)list_get(partitions, index);
+        while(partitionId >= 0 ){
+            partitionId = check_validations_and_consolidate_BS(partitionId);
         }
-        free(partition_to_consolidate);
      }else{
         if(freed_partition.size == cache.full_memory)
             break;
@@ -501,43 +495,32 @@ void check_validations_and_consolidate_PD(t_partition freed_partition, int index
 
 /**
  *
- * @param freed_partition, index of such partition in partitions
- * @return index of the partition after consolidation, if >= 0 then call again with the partition
- * at index, if < 0 then break the cycle.
+ * @param freed_partition_id
+ * @return id of the parent that replaced both children to continue the recursion, if >= 0 then call again with the partition
+ * id, if < 0 then break the cycle.
  */
-int check_validations_and_consolidate_BS(t_partition freed_partition, int index){
+int check_validations_and_consolidate_BS(uint32_t freed_partition_id){
 
-    t_partition* possible_partition;
-    int first_partition = 1;
-    int possible_index;
-
-    if(is_pair(index)){
-        possible_index = index + 1;
-    }else{
-        possible_index = index - 1;
-        first_partition = 2;
+    bool _is_related_partition(t_partition* partition){
+        return ( partition->free
+                && partition->size == bs_freed_partition->size
+                && partition -> parentId == bs_freed_partition->parentId);
     }
 
-    possible_partition = (t_partition*)list_get(partitions, possible_index);
+    bool _has_wanted_id(t_partition* partition){ return partition->id == freed_partition_id;}
 
-    if(!possible_partition->free){
-        free(possible_partition);
+    bs_freed_partition = list_find(partitions, (void*) _has_wanted_id);
+
+    if(bs_freed_partition->size >= cache.memory_size)
         return -1;
-    }
 
-    if(possible_partition->size != freed_partition.size){
-        free(possible_partition);
+    t_partition* related_partition = list_find(partitions, (void*) _is_related_partition);
+
+    if(related_partition != NULL)
         return -1;
-    }
 
-    int result_index = consolidate(possible_partition, possible_index, freed_partition, index, first_partition);
+    return consolidate(related_partition);
 
-    free(possible_partition);
-    return result_index;
-}
-
-int is_pair(int index){
-    return (index % 2) == 0;
 }
 
 
@@ -568,17 +551,50 @@ double CalculateNearestPowerOfTwoRelativeToCache(int memoryLocation)
 		return 1;//powerOfTwo = (int)floor(log10(evenSize) / log10(2));
 }
 
-int consolidate(t_partition one_partition,int one_index, t_partition another_partition,int another_index, int first_partition){
-    int consolidation_ok = -1;
-
-    if(first_partition == 2){
-        one_partition.size *= 2;
-        free(list_remove(partitions, another_index));
-        consolidation_ok = one_index;
-    }else{
-        another_partition.size *= 2;
-        free(list_remove(partitions, one_index));
-        consolidation_ok = another_index;
+int consolidate(t_partition related_partition){
+    bool _is_wanted_parent(t_partition* partition)
+    {
+        return(partition->id == related_partition.parentId);
     }
-    return consolidation_ok;
+
+    t_partition* left_partition = related_partition;
+
+    if(bs_freed_partition->begining < related_partition.begining)
+        left_partition = another_partition;
+
+    t_partition* parent = list_find(parent_partitions, (void*) _is_wanted_parent);
+
+    parent->begining = left_partition->begining;
+
+    return parent->id;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

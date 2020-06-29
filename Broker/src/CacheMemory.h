@@ -52,6 +52,7 @@ typedef struct{
     message_type queue_type;
     bool free;
     clock_t timestap; //use clock() get a stamp
+    uint32_t parentId; // indicates parent Id for buddy system
 }t_partition;
 
 typedef struct{
@@ -74,6 +75,8 @@ sem_t mutex_partitions;
 t_list* partitions;
 sem_t mutex_nextPartitionId;
 int nextPartitionId;
+t_list* parent_partitions;
+t_partition* bs_freed_partition;
 
 /*
 	********************CONTRACTS***********************

@@ -505,56 +505,57 @@ void PrintDumpOfCache()
 
     printf("-----------------------------------------------------------------------------------------------------------------------------\n");
 }
-/*
+
 void start_consolidation_for(t_partition freed_partition){
 
-    int index = find_index_in_list(freed_partition);
-
     if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") != 0){
-        uint32_t partitionId = freed_partition.id;
+        uint32_t partitionId = freed_partition->id;
 
         while(partitionId >= 0 ){
             partitionId = check_validations_and_consolidate_BS(partitionId);
         }
      }else{
-        if(freed_partition.size == cache.full_memory)
+        if(freed_partition->size == cache.full_memory)
             break;
-        check_validations_and_consolidate_PD(freed_partition, index);
+        check_validations_and_consolidate_PD(freed_partition);
      }
 }
 
 /**
- * This function gets the freed partition an checks whether it's neighbours are free; if positive increments the size of the
- * first one and deletes the other for the partitions list.
- * @param freed_partition, index of such partition in partitions
+ * This function gets the pointer to the freed partition an checks whether it's neighbours are free; if positive increments the size of the
+ * first one and deletes the other from the partitions list.
+ * @param freed_partition pointer
  * @return void
  */
-void check_validations_and_consolidate_PD(t_partition freed_partition, int index){
-
-    t_partition left_partition = (t_partition)malloc(t_partition);
-    t_partition right_partition = (t_partition)malloc(t_partition);
-    int new_size = 0;
-
-    if(index > 0){
-        left_partition = list_get(partitions, index - 1);
-        new_size += freed_partition.size;
-        free(list_remove(partitions, index));
-    }else{
-        left_partition = freed_partition;
+void check_validations_and_consolidate_PD(t_partition* freed_partition){
+    
+    bool _is_left_neighbor(t_partition* partition){
+        return (partition->begining + partition->size) == freed_partition->begining;
     }
 
-    if(index == sizeof(partitions)){
-        new_size += freed_partition.size;
-        free(list_remove(partitions, index));
-    }else{
-        right_partition = list_get(partitions, index + 1);
-        new_size += right_partition.size;
-        free(list_remove(partitions, index));
-        free(list_remove(partitions, index+1));
+    bool _is_right_neighbor(t_partition* partition){
+        return (freed_partition->begining + freed_partition->size) == partition.begining;
     }
+    
+    int new_size = freed_partition->size;
+
+    t_partition* left_partition = freed_partition;
+    if(freed_partition->begining != 0){
+        left_partition = list_find(partitions, (void*)_is_left_neighbor);
+        new_size += left_partition->size;
+    }
+
+    t_partition* right_partition = freed_partition;
+    if((freed_partition->begining + freed_partition->size) < cache.size){
+        right_partition = list_find(partitions, (void*)_is_right_neighbor);
+        new_size += right_partition->size;
+        find_index_in_list_and_destroy(right_partition);
+    }
+
+    if(left_partition != freed_partition)
+        find_index_in_list_and_destroy(freed_partition);
 
     left_partition.size += new_size;
-    free(right_partition);
 }
 
 /**
@@ -580,17 +581,21 @@ int check_validations_and_consolidate_BS(uint32_t freed_partition_id){
 
     t_partition* related_partition = list_find(partitions, (void*) _is_related_partition);
 
-    if(related_partition != NULL)
+    if(related_partition == NULL)
         return -1;
 
     return consolidate(related_partition);
 
 }
 
+void find_index_in_list_and_destroy(t_partition* partition){
+    int index = find_index_in_list(partition);
+    free(list_remove(partition, index));
+}
 
-int find_index_in_list(t_partition partition){
+int find_index_in_list(t_partition* partition){
     int index = 0;
-    int wanted_id = partition.id;
+    int wanted_id = partition->id;
     t_partition* aux_partition;
     while(index < sizeof(partitions)){
         aux_partition = (t_partition*)list_get(partitions, index);
@@ -616,21 +621,45 @@ double CalculateNearestPowerOfTwoRelativeToCache(int memoryLocation)
 }
 
 int consolidate(t_partition related_partition){
-    bool _is_wanted_parent(t_partition* partition)
-    {
-        return(partition->id == related_partition.parentId);
+    bool _is_wanted_parent(t_partition* partition){ return(partition->id == related_partition.parentId); }
+
+    bool _is_child_partition(t_partition* partition){ 
+        return (partition->id == related_partition.id) || (partition->id == bs_freed_partition->id);
+    }
+
+    void _free_partitions(t_partition* related_partition){
+        free(related_partition);
+        free(bs_freed_partition);
     }
 
     t_partition* left_partition = related_partition;
 
     if(bs_freed_partition->begining < related_partition.begining)
-        left_partition = another_partition;
+        left_partition = bs_freed_partition;
 
     t_partition* parent = list_find(parent_partitions, (void*) _is_wanted_parent);
 
     parent->begining = left_partition->begining;
 
+    list_remove_and_destroy_by_condition(partitions, (void*)_is_child_partition, (void*)_free_partitions);
+    list_remove_by_condition(parent_partitions, (void*) _is_wanted_parent);
+
     return parent->id;
+}
+
+void create_childrens_from(t_partition* parent){
+    
+    t_partition* one_children = CreateNewPartition();
+    one_children->parentId = parent->id;
+
+    list_add(partitions, one_children);
+
+    t_partition* another_children = CreateNewPartition();
+    another_children->parentId = parent->id;
+
+    list_add(partitions, another_children);
+    list_add(parent_partitions, parent);
+    list_remove(partitions ,find_index_in_list(parent));
 }
 
 

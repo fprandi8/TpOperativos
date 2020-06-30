@@ -123,4 +123,6 @@ void Free_catch_pokemon(catch_pokemon* catch);
 
 void Free_caught_pokemon(caught_pokemon* caught);
 
+char* GetStringFromMessageType(message_type type);
+
 #endif

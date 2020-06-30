@@ -57,6 +57,36 @@ void Free_caught_pokemon(caught_pokemon* caught)
 	free(caught);
 }
 
+char* GetStringFromMessageType(message_type type)
+{
+	char* result;
+	switch(type)
+	{
+		case NEW_POKEMON:
+			result = "NEW_POKEMON";
+			break;
+		case LOCALIZED_POKEMON:
+			result = "LOCALIZED_POKEMON";
+			break;
+		case GET_POKEMON:
+			result = "GET_POKEMON";
+			break;
+		case APPEARED_POKEMON:
+			result = "APPEARED_POKEMON";
+			break;
+		case CATCH_POKEMON:
+			result = "CATCH_POKEMON";
+			break;
+		case CAUGHT_POKEMON:
+			result = "CAUGHT_POKEMON";
+			break;
+		default:
+			result = "UNKNOWN";
+			break;
+	}
+	return result;
+}
+
 
 
 

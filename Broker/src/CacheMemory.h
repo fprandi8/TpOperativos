@@ -69,15 +69,21 @@ typedef struct{
 */
 t_CacheMemory cache;
 t_config* config;
-sem_t mutex_cached_messages;
+
 t_list* cached_messages;
-sem_t mutex_partitions;
 t_list* partitions;
-sem_t mutex_nextPartitionId;
-int nextPartitionId;
 t_list* parent_partitions;
 t_partition* bs_freed_partition;
 
+int nextPartitionId;
+
+sem_t mutex_cached_messages;
+sem_t mutex_nextPartitionId;
+sem_t mutex_partitions;
+sem_t mutex_parent_partitions;
+sem_t mutex_index_finder;
+sem_t mutex_index_finder_destroyer;
+sem_t mutex_occupied_partitions;
 /*
 	********************CONTRACTS***********************
 */

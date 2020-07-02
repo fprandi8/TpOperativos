@@ -34,12 +34,13 @@ int main(void) {
 //	ip= obtener_valor_config(config,logger,IP_BROKER);
 //	puerto = obtener_valor_config(config,logger,PUERTO_BROKER);
 	ptoMnt = get_config_value(config,logger,PUNTO_MONTAJE_TALLGRASS);
-// retryConnection = obtener_valor_config(config.logger,TIEMPO_DE_REINTENTO_CONEXION);
-// retryOperation = obtener_valor_config(config.logger,TIEMPO_DE_REINTENTO_OPERACION);
-// delayTime = obtener_valor_config(config.logger,TIEMPO_RETARDO_OPERACION);
+//  retryConnection = obtener_valor_config(config.logger,TIEMPO_DE_REINTENTO_CONEXION);
+//  retryOperation = obtener_valor_config(config.logger,TIEMPO_DE_REINTENTO_OPERACION);
+//  delayTime = obtener_valor_config(config.logger,TIEMPO_RETARDO_OPERACION);
 
 	GameCard=GameCard_initialize(logger,ptoMnt);
 	GameCard_mountFS(config);
+	config_destroy(config);
 
 // ESTO YA FUNCIONA PERO NO LO VOY A PROBAR POR AHORA
 //	initBroker(&broker);
@@ -49,43 +50,65 @@ int main(void) {
 //
 //	subscribeToBroker(broker,subs);
 
-	deli_message* message = (deli_message*)malloc(sizeof(deli_message));
-	message->id = 88;
-	message->correlationId=99;
-	message->messageType=NEW_POKEMON;
+	deli_message* message;
 
-	new_pokemon* newPokemon = (new_pokemon*)malloc(sizeof(new_pokemon));
-	newPokemon->ammount=10;
-	newPokemon->verticalCoordinate = 8;
-	newPokemon->horizontalCoordinate = 4;
-	newPokemon->pokemonName = "Pikachu";
+// -- PRUEBA DE NEW - BEGIN.
 
-	message->messageContent = (void*)newPokemon;
+//	deli_message* message = (deli_message*)malloc(sizeof(deli_message));
+//	message->id = 88;
+//	message->correlationId=99;
+//	message->messageType=NEW_POKEMON;
+//
+//	new_pokemon* newPokemon = (new_pokemon*)malloc(sizeof(new_pokemon));
+//	newPokemon->ammount=10;
+//	newPokemon->verticalCoordinate = 8;
+//	newPokemon->horizontalCoordinate = 4;
+//	newPokemon->pokemonName = "Pikachu";
+//
+//	message->messageContent = (void*)newPokemon;
+//
+//	GameCard_Process_Message(message);
+//	free(message->messageContent);
+//	free(message);
+//
+//	message = (deli_message*)malloc(sizeof(deli_message));
+//	message->id = 88;
+//	message->correlationId=99;
+//	message->messageType=NEW_POKEMON;
+//
+//	newPokemon = (new_pokemon*)malloc(sizeof(new_pokemon));
+//	newPokemon->ammount=10;
+//	newPokemon->verticalCoordinate = 8;
+//	newPokemon->horizontalCoordinate = 2;
+//	newPokemon->pokemonName = "Pikachu";
+//
+//	message->messageContent = (void*)newPokemon;
+//
+//	GameCard_Process_Message(message);
+//	free(message->messageContent);
+//	free(message);
+//
+// -- PRUEBA DE NEW - END.
 
-	GameCard_Process_Message(message);
-	free(message->messageContent);
-	free(message);
+// -- PRUEBA LOCALIZED - BEGIN.
 
 	message = (deli_message*)malloc(sizeof(deli_message));
 	message->id = 88;
 	message->correlationId=99;
-	message->messageType=NEW_POKEMON;
+	message->messageType=GET_POKEMON;
 
-	newPokemon = (new_pokemon*)malloc(sizeof(new_pokemon));
-	newPokemon->ammount=10;
-	newPokemon->verticalCoordinate = 8;
-	newPokemon->horizontalCoordinate = 2;
-	newPokemon->pokemonName = "Pikachu";
+	get_pokemon* getPokemon = (get_pokemon*)malloc(sizeof(get_pokemon));
+	getPokemon->pokemonName = "Pikachu";
 
-	message->messageContent = (void*)newPokemon;
+	message->messageContent = (void*)getPokemon;
 
 	GameCard_Process_Message(message);
 	free(message->messageContent);
 	free(message);
 
-	munmap(GameCard->fileMapped, (GameCard->blocks/8));
+// -- PRUEBA LOCALIZED - END.
 
-	config_destroy(config);
+	munmap(GameCard->fileMapped, (GameCard->blocks/8));
 
 	GameCard_Destroy(GameCard);
 
@@ -202,6 +225,7 @@ void GameCard_Process_Message(deli_message* message){
 
 		case GET_POKEMON:{
 			responseMessage= GameCard_Process_Message_Get(message);
+			free(responseMessage);
 			break;
 		}
 
@@ -244,8 +268,6 @@ deli_message* GameCard_Process_Message_Catch(deli_message* message){
 		metadataConfig = read_metadata(file);
 
 		read_metadata_file(metadataFile, metadataConfig);
-
-		config_destroy(metadataConfig);
 
 		// Levantar el archivo leyendo todos los bloques
 		char* fileContent = get_file_content(metadataFile);
@@ -327,25 +349,34 @@ deli_message* GameCard_Process_Message_Get(deli_message* message){
 
 		read_metadata_file(metadataFile, metadataConfig);
 
-		config_destroy(metadataConfig);
-
 		// Levantar el archivo leyendo todos los bloques
 		char* fileContent = get_file_content(metadataFile);
 
 		log_debug(GameCard->logger,"Contenido del archivo %s", fileContent);
 
-		create_localized_message(localizedPokemon, fileContent, getPokemon->pokemonName);
+		create_localized_message(localizedPokemon, fileContent, getPokemon->pokemonName, metadataFile);
 
 		free(fileContent);
 		free(file);
 		Metadata_File_Destroy(metadataFile);
 	}
 
-	deli_message* newMessage = (deli_message*)malloc(sizeof(deli_message));
-	newMessage->correlationId=message->id;
-	newMessage->messageType=LOCALIZED_POKEMON;
-	message->messageContent = (void*)localizedPokemon;
+	// REVISAR ESTO POSIBLEMENTE TENGA QUE ENVIAR EL MENSAJE NO DEVOLVERLO...
+		deli_message* newMessage = (deli_message*)malloc(sizeof(deli_message));
+	//	newMessage->correlationId=message->id;
+	//	newMessage->messageType=LOCALIZED_POKEMON;
+	//
+	//	int tam = sizeof(uint32_t) * 2 + strlen(localizedPokemon->pokemonName)+1 + sizeof(uint32_t) * localizedPokemon->ammount * 2;
+	//	message->messageContent= malloc(tam);
+	//	message->messageContent = (void*)localizedPokemon;
 
+	printf("Cantidad del pokemon %s encontradods %d \n" , localizedPokemon->pokemonName,localizedPokemon->ammount);
+	printf("Coordenadas donde se encuentran %d - %d \n", localizedPokemon->coordinates->x, localizedPokemon->coordinates->y);
+	printf("Coordenadas donde se encuentran %d - %d \n", (localizedPokemon->coordinates[1]).x, (localizedPokemon->coordinates[1]).y);
+
+	free(localizedPokemon->pokemonName);
+	free(localizedPokemon->coordinates);
+	free(localizedPokemon);
 	free(directory);
 
 	return newMessage;
@@ -459,16 +490,18 @@ int catch_a_pokemon(char* fileContent, t_file_metadata* metadataFile, char* coor
 	}
 }
 
-void create_localized_message(localized_pokemon* localizedPokemon, char* fileContent, char* pokemonName)
+void create_localized_message(localized_pokemon* localizedPokemon, char* fileContent, char* pokemonName, t_file_metadata* metadataFile)
 {
 	strcpy(localizedPokemon->pokemonName,pokemonName);
 
+	int times = 1;
 	int cursor = 0;
-	int tam = sizeof(fileContent);
+	int tam = atoi(metadataFile->size);
 	log_debug(GameCard->logger, "tamaño del archivo a leer: %d ", tam);
 	int vectorPosition=0;
 
 	localizedPokemon->coordinates =(Vector2*)malloc(sizeof(Vector2));
+	localizedPokemon->ammount = 0;
 
 
 	while(cursor < tam){
@@ -477,7 +510,7 @@ void create_localized_message(localized_pokemon* localizedPokemon, char* fileCon
 		while ((fileContent[cursor] != '\n') || (cursor > tam) ) cursor++;
 
 		if (cursor <= tam){
-			char* line = string_substring(fileContent,start,cursor);
+			char* line = string_substring(fileContent,start,cursor+1);
 			char* charAmount= get_amount_of_pokemons(line);
 
 			localizedPokemon->ammount = localizedPokemon->ammount + atoi(charAmount);
@@ -485,11 +518,12 @@ void create_localized_message(localized_pokemon* localizedPokemon, char* fileCon
 			char* xCoor = get_x_coordinate(line);
 			char* yCoor = get_y_coordinate(line);
 
-			localizedPokemon->coordinates[vectorPosition].x = atoi(xCoor);
-			localizedPokemon->coordinates[vectorPosition].y = atoi(yCoor);
+			(localizedPokemon->coordinates[vectorPosition]).x = atoi(xCoor);
+			(localizedPokemon->coordinates[vectorPosition]).y = atoi(yCoor);
 
-			vectorPosition = vectorPosition + sizeof(Vector2);
-			localizedPokemon->coordinates = realloc(localizedPokemon->coordinates, sizeof(Vector2));
+			times++;
+			vectorPosition++; // + sizeof(Vector2);
+			localizedPokemon->coordinates = (Vector2*)realloc(localizedPokemon->coordinates, sizeof(Vector2) * times);
 
 			free(line);
 			free(charAmount);
@@ -521,8 +555,6 @@ int modify_poke_file(t_values* values, char* directory){;
 
 	read_metadata_file(metadataFile, metadataConfig);
 
-	config_destroy(metadataConfig);
-
 	// Levantar el archivo leyendo todos los bloques
 	char* fileContent = get_file_content(metadataFile);
 
@@ -549,7 +581,6 @@ int modify_poke_file(t_values* values, char* directory){;
 	}
 	else
 	{
-		//TODO: Revisar si el último bloque tiene espacio libre en el bit array
 		//TODO: Si el bloque tiene espacio llenarlo primero
 		//TODO: Luego, si aún queda mensaje por grabar crearlo
 
@@ -943,11 +974,10 @@ void read_metadata_file(t_file_metadata* metadataFile, t_config* metadataConfig)
 	while (blocks[i]!='\0'){
 		char* aux = string_duplicate(blocks[i]);
 		list_add(metadataFile->block,aux);
-		free(blocks[i]);
 		i++;
 	}
 
-	free(blocks);
+	config_destroy(metadataConfig);
 
 }
 
@@ -1158,14 +1188,14 @@ char* get_amount_of_pokemons(char* line){
 char* get_x_coordinate(char* line){
 	int index1=0;
 	while (line[index1] != '-') index1++;
-	return string_substring(line,0,index1-1);
+	return string_substring(line,0,index1);
 }
 
 char* get_y_coordinate(char* line){
 	int index1=0;
 	int index2=0;
-	while (line[index2] != '-' ) index1++;
-	while (line[index1] != '=') index2++;
+	while (line[index1] != '-' ) index1++;
+	while (line[index2+index1] != '=') index2++;
 	return string_substring(line,index1+1,index2-1);
 
 }
@@ -1405,7 +1435,6 @@ int create_directory(char* directory){
 	}
 	else
 	{
-		log_debug(GameCard->logger,"El directorio ya existe");
 		return result;
 	}
 }

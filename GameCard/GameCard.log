@@ -6666,3 +6666,569 @@ gp
 [DEBUG] 15:40:48:93 GameCard/(24019:24019): Re escribio el block 4
 [DEBUG] 15:40:48:93 GameCard/(24019:24019): Re escribio el block 5
 [DEBUG] 15:40:48:94 GameCard/(24019:24019): Resultado del procesamiento del mensaje: 0
+[INFO] 16:05:08:979 GameCard/(24551:24551): PROCESO GAMECARD ONLINE
+[INFO] 16:05:10:493 GameCard/(24551:24551): /home/utnso/desktop/tall-grass
+[DEBUG] 16:05:11:508 GameCard/(24551:24551): Inicializa la GameCard
+[DEBUG] 16:05:12:39 GameCard/(24551:24551): El directorio ya existe
+[DEBUG] 16:05:12:40 GameCard/(24551:24551): El directorio ya existe
+[DEBUG] 16:05:12:40 GameCard/(24551:24551): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:05:12:40 GameCard/(24551:24551): El directorio ya existe
+[DEBUG] 16:05:12:40 GameCard/(24551:24551): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 16:05:12:40 GameCard/(24551:24551): Linea del archivo : DIRECTORY=Y
+[DEBUG] 16:05:12:40 GameCard/(24551:24551): El directorio ya existe
+[DEBUG] 16:05:12:40 GameCard/(24551:24551): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 16:05:12:40 GameCard/(24551:24551): El directorio ya existe
+[DEBUG] 16:05:12:40 GameCard/(24551:24551): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 16:05:12:40 GameCard/(24551:24551): 3
+[INFO] 16:05:12:40 GameCard/(24551:24551): 1024
+[INFO] 16:05:12:41 GameCard/(24551:24551): TALL_GRASS
+[DEBUG] 16:05:12:41 GameCard/(24551:24551): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 16:05:12:41 GameCard/(24551:24551): Linea del archivo : BLOCKS=1024
+[DEBUG] 16:05:12:41 GameCard/(24551:24551): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 16:05:12:41 GameCard/(24551:24551): Se crea el bit array con una memoria de 128
+[DEBUG] 16:05:12:41 GameCard/(24551:24551): Bitarray Creado
+[DEBUG] 16:05:20:578 GameCard/(24551:24551): Archivo Mapeado 
+[INFO] 16:06:29:647 GameCard/(24650:24650): PROCESO GAMECARD ONLINE
+[INFO] 16:06:29:647 GameCard/(24650:24650): /home/utnso/desktop/tall-grass
+[DEBUG] 16:06:29:647 GameCard/(24650:24650): Inicializa la GameCard
+[DEBUG] 16:06:29:647 GameCard/(24650:24650): El directorio ya existe
+[DEBUG] 16:06:29:647 GameCard/(24650:24650): El directorio ya existe
+[DEBUG] 16:06:29:648 GameCard/(24650:24650): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:06:29:648 GameCard/(24650:24650): El directorio ya existe
+[DEBUG] 16:06:29:648 GameCard/(24650:24650): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 16:06:29:648 GameCard/(24650:24650): Linea del archivo : DIRECTORY=Y
+[DEBUG] 16:06:29:648 GameCard/(24650:24650): El directorio ya existe
+[DEBUG] 16:06:29:648 GameCard/(24650:24650): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 16:06:29:648 GameCard/(24650:24650): El directorio ya existe
+[DEBUG] 16:06:29:648 GameCard/(24650:24650): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 16:06:29:648 GameCard/(24650:24650): 3
+[INFO] 16:06:29:648 GameCard/(24650:24650): 1024
+[INFO] 16:06:29:648 GameCard/(24650:24650): TALL_GRASS
+[DEBUG] 16:06:29:648 GameCard/(24650:24650): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 16:06:29:648 GameCard/(24650:24650): Linea del archivo : BLOCKS=1024
+[DEBUG] 16:06:29:648 GameCard/(24650:24650): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 16:06:29:648 GameCard/(24650:24650): Se crea el bit array con una memoria de 128
+[DEBUG] 16:06:29:649 GameCard/(24650:24650): Bitarray Creado
+[DEBUG] 16:06:30:652 GameCard/(24650:24650): Archivo Mapeado 
+[DEBUG] 16:06:46:79 GameCard/(24650:24650): El directorio ya existe
+[DEBUG] 16:06:53:24 GameCard/(24650:24650): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:06:54:593 GameCard/(24650:24650): N
+[INFO] 16:06:54:593 GameCard/(24650:24650): N
+[INFO] 16:06:54:593 GameCard/(24650:24650): 14
+[INFO] 16:06:54:594 GameCard/(24650:24650): 14
+[INFO] 16:06:56:214 GameCard/(24650:24650): @+`+p+Ä+P+ê+
+[DEBUG] 16:07:07:219 GameCard/(24650:24650): Cantidad de bloques necesarios 6 
+[DEBUG] 16:07:17:141 GameCard/(24650:24650): Contenido del archivo 4-8=30
+2-8=30
+
+[DEBUG] 16:07:23:772 GameCard/(24650:24650): tama√±o del archivo a leer: 4 
+[INFO] 16:11:59:202 GameCard/(24867:24867): PROCESO GAMECARD ONLINE
+[INFO] 16:11:59:202 GameCard/(24867:24867): /home/utnso/desktop/tall-grass
+[DEBUG] 16:11:59:202 GameCard/(24867:24867): Inicializa la GameCard
+[DEBUG] 16:11:59:202 GameCard/(24867:24867): El directorio ya existe
+[DEBUG] 16:11:59:202 GameCard/(24867:24867): El directorio ya existe
+[DEBUG] 16:11:59:202 GameCard/(24867:24867): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:11:59:202 GameCard/(24867:24867): El directorio ya existe
+[DEBUG] 16:11:59:202 GameCard/(24867:24867): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 16:11:59:202 GameCard/(24867:24867): Linea del archivo : DIRECTORY=Y
+[DEBUG] 16:11:59:202 GameCard/(24867:24867): El directorio ya existe
+[DEBUG] 16:11:59:202 GameCard/(24867:24867): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 16:11:59:203 GameCard/(24867:24867): El directorio ya existe
+[DEBUG] 16:11:59:203 GameCard/(24867:24867): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 16:11:59:203 GameCard/(24867:24867): 3
+[INFO] 16:11:59:203 GameCard/(24867:24867): 1024
+[INFO] 16:11:59:203 GameCard/(24867:24867): TALL_GRASS
+[DEBUG] 16:11:59:203 GameCard/(24867:24867): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 16:11:59:203 GameCard/(24867:24867): Linea del archivo : BLOCKS=1024
+[DEBUG] 16:11:59:203 GameCard/(24867:24867): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 16:11:59:203 GameCard/(24867:24867): Se crea el bit array con una memoria de 128
+[DEBUG] 16:11:59:203 GameCard/(24867:24867): Bitarray Creado
+[DEBUG] 16:12:01:219 GameCard/(24867:24867): Archivo Mapeado 
+[DEBUG] 16:12:05:165 GameCard/(24867:24867): El directorio ya existe
+[DEBUG] 16:12:05:165 GameCard/(24867:24867): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:12:05:167 GameCard/(24867:24867): N
+[INFO] 16:12:05:167 GameCard/(24867:24867): N
+[INFO] 16:12:05:167 GameCard/(24867:24867): 14
+[INFO] 16:12:05:167 GameCard/(24867:24867): 14
+[INFO] 16:12:08:506 GameCard/(24867:24867): –*∞<¿<†*†<∞*
+[DEBUG] 16:12:08:507 GameCard/(24867:24867): Cantidad de bloques necesarios 6 
+[DEBUG] 16:12:08:510 GameCard/(24867:24867): Contenido del archivo 4-8=30
+2-8=30
+
+[DEBUG] 16:12:30:877 GameCard/(24867:24867): tama√±o del archivo a leer: 14 
+[INFO] 16:14:22:288 GameCard/(24955:24955): PROCESO GAMECARD ONLINE
+[INFO] 16:14:22:288 GameCard/(24955:24955): /home/utnso/desktop/tall-grass
+[DEBUG] 16:14:22:288 GameCard/(24955:24955): Inicializa la GameCard
+[DEBUG] 16:14:22:288 GameCard/(24955:24955): El directorio ya existe
+[DEBUG] 16:14:22:288 GameCard/(24955:24955): El directorio ya existe
+[DEBUG] 16:14:22:288 GameCard/(24955:24955): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:14:22:288 GameCard/(24955:24955): El directorio ya existe
+[DEBUG] 16:14:22:288 GameCard/(24955:24955): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 16:14:22:288 GameCard/(24955:24955): Linea del archivo : DIRECTORY=Y
+[DEBUG] 16:14:22:288 GameCard/(24955:24955): El directorio ya existe
+[DEBUG] 16:14:22:288 GameCard/(24955:24955): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 16:14:22:288 GameCard/(24955:24955): El directorio ya existe
+[DEBUG] 16:14:22:288 GameCard/(24955:24955): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 16:14:22:288 GameCard/(24955:24955): 3
+[INFO] 16:14:22:288 GameCard/(24955:24955): 1024
+[INFO] 16:14:22:288 GameCard/(24955:24955): TALL_GRASS
+[DEBUG] 16:14:22:289 GameCard/(24955:24955): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 16:14:22:289 GameCard/(24955:24955): Linea del archivo : BLOCKS=1024
+[DEBUG] 16:14:22:289 GameCard/(24955:24955): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 16:14:22:289 GameCard/(24955:24955): Se crea el bit array con una memoria de 128
+[DEBUG] 16:14:22:289 GameCard/(24955:24955): Bitarray Creado
+[DEBUG] 16:14:23:940 GameCard/(24955:24955): Archivo Mapeado 
+[DEBUG] 16:14:24:196 GameCard/(24955:24955): El directorio ya existe
+[DEBUG] 16:14:24:196 GameCard/(24955:24955): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:14:24:196 GameCard/(24955:24955): N
+[INFO] 16:14:24:196 GameCard/(24955:24955): N
+[INFO] 16:14:24:196 GameCard/(24955:24955): 14
+[INFO] 16:14:24:196 GameCard/(24955:24955): 14
+[INFO] 16:14:25:318 GameCard/(24955:24955): –*∞<¿<†*†<∞*
+[DEBUG] 16:14:25:319 GameCard/(24955:24955): Cantidad de bloques necesarios 6 
+[DEBUG] 16:14:25:319 GameCard/(24955:24955): Contenido del archivo 4-8=30
+2-8=30
+
+[DEBUG] 16:14:38:784 GameCard/(24955:24955): tama√±o del archivo a leer: 14 
+[INFO] 16:16:06:700 GameCard/(25029:25029): PROCESO GAMECARD ONLINE
+[INFO] 16:16:06:700 GameCard/(25029:25029): /home/utnso/desktop/tall-grass
+[DEBUG] 16:16:06:701 GameCard/(25029:25029): Inicializa la GameCard
+[DEBUG] 16:16:06:701 GameCard/(25029:25029): El directorio ya existe
+[DEBUG] 16:16:06:701 GameCard/(25029:25029): El directorio ya existe
+[DEBUG] 16:16:06:701 GameCard/(25029:25029): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:16:06:701 GameCard/(25029:25029): El directorio ya existe
+[DEBUG] 16:16:06:701 GameCard/(25029:25029): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 16:16:06:701 GameCard/(25029:25029): Linea del archivo : DIRECTORY=Y
+[DEBUG] 16:16:06:701 GameCard/(25029:25029): El directorio ya existe
+[DEBUG] 16:16:06:701 GameCard/(25029:25029): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 16:16:06:701 GameCard/(25029:25029): El directorio ya existe
+[DEBUG] 16:16:06:701 GameCard/(25029:25029): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 16:16:06:701 GameCard/(25029:25029): 3
+[INFO] 16:16:06:701 GameCard/(25029:25029): 1024
+[INFO] 16:16:06:702 GameCard/(25029:25029): TALL_GRASS
+[DEBUG] 16:16:06:702 GameCard/(25029:25029): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 16:16:06:702 GameCard/(25029:25029): Linea del archivo : BLOCKS=1024
+[DEBUG] 16:16:06:702 GameCard/(25029:25029): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 16:16:06:702 GameCard/(25029:25029): Se crea el bit array con una memoria de 128
+[DEBUG] 16:16:06:702 GameCard/(25029:25029): Bitarray Creado
+[DEBUG] 16:16:07:817 GameCard/(25029:25029): Archivo Mapeado 
+[DEBUG] 16:16:09:452 GameCard/(25029:25029): El directorio ya existe
+[DEBUG] 16:16:09:453 GameCard/(25029:25029): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:16:09:453 GameCard/(25029:25029): N
+[INFO] 16:16:09:453 GameCard/(25029:25029): N
+[INFO] 16:16:09:453 GameCard/(25029:25029): 14
+[INFO] 16:16:09:453 GameCard/(25029:25029): 14
+[INFO] 16:16:10:760 GameCard/(25029:25029): –*∞<¿<†*†<∞*
+[DEBUG] 16:16:10:760 GameCard/(25029:25029): Cantidad de bloques necesarios 6 
+[DEBUG] 16:16:10:760 GameCard/(25029:25029): Contenido del archivo 4-8=30
+2-8=30
+
+[DEBUG] 16:16:19:449 GameCard/(25029:25029): tama√±o del archivo a leer: 14 
+[INFO] 16:18:33:761 GameCard/(25146:25146): PROCESO GAMECARD ONLINE
+[INFO] 16:18:33:763 GameCard/(25146:25146): /home/utnso/desktop/tall-grass
+[DEBUG] 16:18:33:763 GameCard/(25146:25146): Inicializa la GameCard
+[DEBUG] 16:18:33:763 GameCard/(25146:25146): El directorio ya existe
+[DEBUG] 16:18:33:763 GameCard/(25146:25146): El directorio ya existe
+[DEBUG] 16:18:33:763 GameCard/(25146:25146): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:18:33:763 GameCard/(25146:25146): El directorio ya existe
+[DEBUG] 16:18:33:763 GameCard/(25146:25146): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 16:18:33:763 GameCard/(25146:25146): Linea del archivo : DIRECTORY=Y
+[DEBUG] 16:18:33:763 GameCard/(25146:25146): El directorio ya existe
+[DEBUG] 16:18:33:763 GameCard/(25146:25146): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 16:18:33:763 GameCard/(25146:25146): El directorio ya existe
+[DEBUG] 16:18:33:764 GameCard/(25146:25146): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 16:18:33:764 GameCard/(25146:25146): 3
+[INFO] 16:18:33:764 GameCard/(25146:25146): 1024
+[INFO] 16:18:33:764 GameCard/(25146:25146): TALL_GRASS
+[DEBUG] 16:18:33:765 GameCard/(25146:25146): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 16:18:33:765 GameCard/(25146:25146): Linea del archivo : BLOCKS=1024
+[DEBUG] 16:18:33:765 GameCard/(25146:25146): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 16:18:33:765 GameCard/(25146:25146): Se crea el bit array con una memoria de 128
+[DEBUG] 16:18:33:765 GameCard/(25146:25146): Bitarray Creado
+[DEBUG] 16:18:34:879 GameCard/(25146:25146): Archivo Mapeado 
+[DEBUG] 16:18:35:785 GameCard/(25146:25146): El directorio ya existe
+[DEBUG] 16:18:35:785 GameCard/(25146:25146): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:18:35:785 GameCard/(25146:25146): N
+[INFO] 16:18:35:785 GameCard/(25146:25146): N
+[INFO] 16:18:35:785 GameCard/(25146:25146): 14
+[INFO] 16:18:35:785 GameCard/(25146:25146): 14
+[INFO] 16:18:37:366 GameCard/(25146:25146): –*∞<¿<†*†<∞*
+[DEBUG] 16:18:37:366 GameCard/(25146:25146): Cantidad de bloques necesarios 6 
+[DEBUG] 16:18:37:366 GameCard/(25146:25146): Contenido del archivo 4-8=30
+2-8=30
+
+[DEBUG] 16:18:41:25 GameCard/(25146:25146): tama√±o del archivo a leer: 14 
+[INFO] 16:19:52:97 GameCard/(25243:25243): PROCESO GAMECARD ONLINE
+[INFO] 16:19:55:584 GameCard/(25243:25243): /home/utnso/desktop/tall-grass
+[DEBUG] 16:19:55:585 GameCard/(25243:25243): Inicializa la GameCard
+[DEBUG] 16:19:55:585 GameCard/(25243:25243): El directorio ya existe
+[DEBUG] 16:19:55:585 GameCard/(25243:25243): El directorio ya existe
+[DEBUG] 16:19:55:585 GameCard/(25243:25243): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:19:55:585 GameCard/(25243:25243): El directorio ya existe
+[DEBUG] 16:19:55:585 GameCard/(25243:25243): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 16:19:55:585 GameCard/(25243:25243): Linea del archivo : DIRECTORY=Y
+[DEBUG] 16:19:55:585 GameCard/(25243:25243): El directorio ya existe
+[DEBUG] 16:19:55:585 GameCard/(25243:25243): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 16:19:55:585 GameCard/(25243:25243): El directorio ya existe
+[DEBUG] 16:19:55:586 GameCard/(25243:25243): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 16:19:55:607 GameCard/(25243:25243): 3
+[INFO] 16:19:55:607 GameCard/(25243:25243): 1024
+[INFO] 16:19:55:608 GameCard/(25243:25243): TALL_GRASS
+[DEBUG] 16:19:55:608 GameCard/(25243:25243): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 16:19:55:608 GameCard/(25243:25243): Linea del archivo : BLOCKS=1024
+[DEBUG] 16:19:55:608 GameCard/(25243:25243): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 16:19:55:610 GameCard/(25243:25243): Se crea el bit array con una memoria de 128
+[DEBUG] 16:19:55:615 GameCard/(25243:25243): Bitarray Creado
+[DEBUG] 16:19:56:688 GameCard/(25243:25243): Archivo Mapeado 
+[DEBUG] 16:19:57:993 GameCard/(25243:25243): El directorio ya existe
+[DEBUG] 16:19:57:993 GameCard/(25243:25243): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:19:57:993 GameCard/(25243:25243): N
+[INFO] 16:19:57:994 GameCard/(25243:25243): N
+[INFO] 16:19:57:994 GameCard/(25243:25243): 14
+[INFO] 16:19:57:994 GameCard/(25243:25243): 14
+[INFO] 16:20:00:789 GameCard/(25243:25243): h*Ä=ê=ê*p=†*
+[DEBUG] 16:20:00:790 GameCard/(25243:25243): Cantidad de bloques necesarios 6 
+[DEBUG] 16:20:00:790 GameCard/(25243:25243): Contenido del archivo 4-8=30
+2-8=30
+
+[DEBUG] 16:20:03:928 GameCard/(25243:25243): tama√±o del archivo a leer: 14 
+[INFO] 16:21:14:36 GameCard/(25318:25318): PROCESO GAMECARD ONLINE
+[INFO] 16:21:14:36 GameCard/(25318:25318): /home/utnso/desktop/tall-grass
+[DEBUG] 16:21:14:36 GameCard/(25318:25318): Inicializa la GameCard
+[DEBUG] 16:21:14:36 GameCard/(25318:25318): El directorio ya existe
+[DEBUG] 16:21:14:36 GameCard/(25318:25318): El directorio ya existe
+[DEBUG] 16:21:14:36 GameCard/(25318:25318): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:21:14:36 GameCard/(25318:25318): El directorio ya existe
+[DEBUG] 16:21:14:36 GameCard/(25318:25318): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 16:21:14:36 GameCard/(25318:25318): Linea del archivo : DIRECTORY=Y
+[DEBUG] 16:21:14:36 GameCard/(25318:25318): El directorio ya existe
+[DEBUG] 16:21:14:36 GameCard/(25318:25318): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 16:21:14:36 GameCard/(25318:25318): El directorio ya existe
+[DEBUG] 16:21:14:36 GameCard/(25318:25318): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 16:21:14:36 GameCard/(25318:25318): 3
+[INFO] 16:21:14:36 GameCard/(25318:25318): 1024
+[INFO] 16:21:14:36 GameCard/(25318:25318): TALL_GRASS
+[DEBUG] 16:21:14:37 GameCard/(25318:25318): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 16:21:14:37 GameCard/(25318:25318): Linea del archivo : BLOCKS=1024
+[DEBUG] 16:21:14:37 GameCard/(25318:25318): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 16:21:14:37 GameCard/(25318:25318): Se crea el bit array con una memoria de 128
+[DEBUG] 16:21:14:37 GameCard/(25318:25318): Bitarray Creado
+[DEBUG] 16:21:14:344 GameCard/(25318:25318): Archivo Mapeado 
+[DEBUG] 16:21:14:958 GameCard/(25318:25318): El directorio ya existe
+[DEBUG] 16:21:14:958 GameCard/(25318:25318): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:21:14:958 GameCard/(25318:25318): N
+[INFO] 16:21:14:958 GameCard/(25318:25318): N
+[INFO] 16:21:14:958 GameCard/(25318:25318): 14
+[INFO] 16:21:14:958 GameCard/(25318:25318): 14
+[INFO] 16:21:15:919 GameCard/(25318:25318): h*Ä=ê=ê*p=†*
+[DEBUG] 16:21:15:919 GameCard/(25318:25318): Cantidad de bloques necesarios 6 
+[DEBUG] 16:21:15:919 GameCard/(25318:25318): Contenido del archivo 4-8=30
+2-8=30
+
+[DEBUG] 16:21:19:157 GameCard/(25318:25318): tama√±o del archivo a leer: 14 
+[INFO] 16:22:27:288 GameCard/(25410:25410): PROCESO GAMECARD ONLINE
+[INFO] 16:22:27:288 GameCard/(25410:25410): /home/utnso/desktop/tall-grass
+[DEBUG] 16:22:27:288 GameCard/(25410:25410): Inicializa la GameCard
+[DEBUG] 16:22:27:288 GameCard/(25410:25410): El directorio ya existe
+[DEBUG] 16:22:27:288 GameCard/(25410:25410): El directorio ya existe
+[DEBUG] 16:22:27:288 GameCard/(25410:25410): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:22:27:288 GameCard/(25410:25410): El directorio ya existe
+[DEBUG] 16:22:27:288 GameCard/(25410:25410): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 16:22:27:288 GameCard/(25410:25410): Linea del archivo : DIRECTORY=Y
+[DEBUG] 16:22:27:288 GameCard/(25410:25410): El directorio ya existe
+[DEBUG] 16:22:27:288 GameCard/(25410:25410): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 16:22:27:288 GameCard/(25410:25410): El directorio ya existe
+[DEBUG] 16:22:27:288 GameCard/(25410:25410): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 16:22:27:289 GameCard/(25410:25410): 3
+[INFO] 16:22:27:289 GameCard/(25410:25410): 1024
+[INFO] 16:22:27:289 GameCard/(25410:25410): TALL_GRASS
+[DEBUG] 16:22:27:289 GameCard/(25410:25410): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 16:22:27:289 GameCard/(25410:25410): Linea del archivo : BLOCKS=1024
+[DEBUG] 16:22:27:289 GameCard/(25410:25410): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 16:22:27:289 GameCard/(25410:25410): Se crea el bit array con una memoria de 128
+[DEBUG] 16:22:27:289 GameCard/(25410:25410): Bitarray Creado
+[DEBUG] 16:22:28:315 GameCard/(25410:25410): Archivo Mapeado 
+[DEBUG] 16:22:28:784 GameCard/(25410:25410): El directorio ya existe
+[DEBUG] 16:22:28:784 GameCard/(25410:25410): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:22:28:784 GameCard/(25410:25410): N
+[INFO] 16:22:28:784 GameCard/(25410:25410): N
+[INFO] 16:22:28:784 GameCard/(25410:25410): 14
+[INFO] 16:22:28:784 GameCard/(25410:25410): 14
+[INFO] 16:22:30:307 GameCard/(25410:25410): –*∞<¿<†*†<∞*
+[DEBUG] 16:22:30:307 GameCard/(25410:25410): Cantidad de bloques necesarios 6 
+[DEBUG] 16:22:30:307 GameCard/(25410:25410): Contenido del archivo 4-8=30
+2-8=30
+
+[DEBUG] 16:22:33:190 GameCard/(25410:25410): tama√±o del archivo a leer: 14 
+[INFO] 16:28:32:820 GameCard/(25574:25574): PROCESO GAMECARD ONLINE
+[INFO] 16:28:32:820 GameCard/(25574:25574): /home/utnso/desktop/tall-grass
+[DEBUG] 16:28:32:820 GameCard/(25574:25574): Inicializa la GameCard
+[DEBUG] 16:28:32:820 GameCard/(25574:25574): El directorio ya existe
+[DEBUG] 16:28:32:823 GameCard/(25574:25574): El directorio ya existe
+[DEBUG] 16:28:32:823 GameCard/(25574:25574): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:28:32:825 GameCard/(25574:25574): El directorio ya existe
+[DEBUG] 16:28:32:825 GameCard/(25574:25574): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 16:28:32:826 GameCard/(25574:25574): Linea del archivo : DIRECTORY=Y
+[DEBUG] 16:28:32:826 GameCard/(25574:25574): El directorio ya existe
+[DEBUG] 16:28:32:827 GameCard/(25574:25574): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 16:28:32:827 GameCard/(25574:25574): El directorio ya existe
+[DEBUG] 16:28:32:827 GameCard/(25574:25574): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 16:28:32:827 GameCard/(25574:25574): 3
+[INFO] 16:28:32:827 GameCard/(25574:25574): 1024
+[INFO] 16:28:32:827 GameCard/(25574:25574): TALL_GRASS
+[DEBUG] 16:28:32:829 GameCard/(25574:25574): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 16:28:32:829 GameCard/(25574:25574): Linea del archivo : BLOCKS=1024
+[DEBUG] 16:28:32:829 GameCard/(25574:25574): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 16:28:32:829 GameCard/(25574:25574): Se crea el bit array con una memoria de 128
+[DEBUG] 16:28:32:830 GameCard/(25574:25574): Bitarray Creado
+[DEBUG] 16:28:32:830 GameCard/(25574:25574): Archivo Mapeado 
+[DEBUG] 16:28:32:830 GameCard/(25574:25574): El directorio ya existe
+[DEBUG] 16:28:32:830 GameCard/(25574:25574): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:28:32:830 GameCard/(25574:25574): N
+[INFO] 16:28:32:830 GameCard/(25574:25574): N
+[INFO] 16:28:32:830 GameCard/(25574:25574): 14
+[INFO] 16:28:32:830 GameCard/(25574:25574): 14
+[INFO] 16:28:32:830 GameCard/(25574:25574): – Ï	∞‹Ï	¿‹Ï	† Ï	†‹Ï	∞ Ï	
+[DEBUG] 16:28:32:830 GameCard/(25574:25574): Cantidad de bloques necesarios 6 
+[DEBUG] 16:28:32:832 GameCard/(25574:25574): Contenido del archivo 4-8=30
+2-8=30
+
+[DEBUG] 16:28:32:832 GameCard/(25574:25574): tama√±o del archivo a leer: 14 
+[INFO] 16:28:40:581 GameCard/(25559:25559): PROCESO GAMECARD ONLINE
+[INFO] 16:28:40:581 GameCard/(25559:25559): /home/utnso/desktop/tall-grass
+[DEBUG] 16:28:40:581 GameCard/(25559:25559): Inicializa la GameCard
+[DEBUG] 16:28:40:581 GameCard/(25559:25559): El directorio ya existe
+[DEBUG] 16:28:40:581 GameCard/(25559:25559): El directorio ya existe
+[DEBUG] 16:28:40:581 GameCard/(25559:25559): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:28:40:581 GameCard/(25559:25559): El directorio ya existe
+[DEBUG] 16:28:40:581 GameCard/(25559:25559): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 16:28:40:581 GameCard/(25559:25559): Linea del archivo : DIRECTORY=Y
+[DEBUG] 16:28:40:581 GameCard/(25559:25559): El directorio ya existe
+[DEBUG] 16:28:40:581 GameCard/(25559:25559): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 16:28:40:581 GameCard/(25559:25559): El directorio ya existe
+[DEBUG] 16:28:40:581 GameCard/(25559:25559): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 16:28:40:582 GameCard/(25559:25559): 3
+[INFO] 16:28:40:582 GameCard/(25559:25559): 1024
+[INFO] 16:28:40:582 GameCard/(25559:25559): TALL_GRASS
+[DEBUG] 16:28:40:582 GameCard/(25559:25559): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 16:28:40:582 GameCard/(25559:25559): Linea del archivo : BLOCKS=1024
+[DEBUG] 16:28:40:582 GameCard/(25559:25559): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 16:28:40:582 GameCard/(25559:25559): Se crea el bit array con una memoria de 128
+[DEBUG] 16:28:40:582 GameCard/(25559:25559): Bitarray Creado
+[DEBUG] 16:28:41:708 GameCard/(25559:25559): Archivo Mapeado 
+[DEBUG] 16:28:43:289 GameCard/(25559:25559): El directorio ya existe
+[DEBUG] 16:28:43:290 GameCard/(25559:25559): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:28:43:290 GameCard/(25559:25559): N
+[INFO] 16:28:43:290 GameCard/(25559:25559): N
+[INFO] 16:28:43:290 GameCard/(25559:25559): 14
+[INFO] 16:28:43:290 GameCard/(25559:25559): 14
+[INFO] 16:28:44:519 GameCard/(25559:25559): –*∞<¿<†*†<∞*
+[DEBUG] 16:28:44:519 GameCard/(25559:25559): Cantidad de bloques necesarios 6 
+[DEBUG] 16:28:44:519 GameCard/(25559:25559): Contenido del archivo 4-8=30
+2-8=30
+
+[DEBUG] 16:28:53:549 GameCard/(25559:25559): tama√±o del archivo a leer: 14 
+[INFO] 16:30:02:72 GameCard/(25694:25694): PROCESO GAMECARD ONLINE
+[INFO] 16:30:02:72 GameCard/(25694:25694): /home/utnso/desktop/tall-grass
+[DEBUG] 16:30:02:72 GameCard/(25694:25694): Inicializa la GameCard
+[DEBUG] 16:30:02:72 GameCard/(25694:25694): El directorio ya existe
+[DEBUG] 16:30:02:72 GameCard/(25694:25694): El directorio ya existe
+[DEBUG] 16:30:02:72 GameCard/(25694:25694): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:30:02:72 GameCard/(25694:25694): El directorio ya existe
+[DEBUG] 16:30:02:72 GameCard/(25694:25694): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 16:30:02:72 GameCard/(25694:25694): Linea del archivo : DIRECTORY=Y
+[DEBUG] 16:30:02:73 GameCard/(25694:25694): El directorio ya existe
+[DEBUG] 16:30:02:73 GameCard/(25694:25694): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 16:30:02:73 GameCard/(25694:25694): El directorio ya existe
+[DEBUG] 16:30:02:73 GameCard/(25694:25694): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 16:30:02:73 GameCard/(25694:25694): 3
+[INFO] 16:30:02:73 GameCard/(25694:25694): 1024
+[INFO] 16:30:02:73 GameCard/(25694:25694): TALL_GRASS
+[DEBUG] 16:30:02:73 GameCard/(25694:25694): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 16:30:02:73 GameCard/(25694:25694): Linea del archivo : BLOCKS=1024
+[DEBUG] 16:30:02:73 GameCard/(25694:25694): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 16:30:02:74 GameCard/(25694:25694): Se crea el bit array con una memoria de 128
+[DEBUG] 16:30:02:74 GameCard/(25694:25694): Bitarray Creado
+[DEBUG] 16:30:02:473 GameCard/(25694:25694): Archivo Mapeado 
+[DEBUG] 16:30:03:453 GameCard/(25694:25694): El directorio ya existe
+[DEBUG] 16:30:03:453 GameCard/(25694:25694): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:30:03:453 GameCard/(25694:25694): N
+[INFO] 16:30:03:453 GameCard/(25694:25694): N
+[INFO] 16:30:03:453 GameCard/(25694:25694): 14
+[INFO] 16:30:03:453 GameCard/(25694:25694): 14
+[INFO] 16:30:04:662 GameCard/(25694:25694): h*Ä=ê=ê*p=†*
+[DEBUG] 16:30:04:663 GameCard/(25694:25694): Cantidad de bloques necesarios 6 
+[DEBUG] 16:30:04:663 GameCard/(25694:25694): Contenido del archivo 4-8=30
+2-8=30
+
+[DEBUG] 16:30:09:816 GameCard/(25694:25694): tama√±o del archivo a leer: 14 
+[INFO] 16:31:41:767 GameCard/(25839:25839): PROCESO GAMECARD ONLINE
+[INFO] 16:31:41:767 GameCard/(25839:25839): /home/utnso/desktop/tall-grass
+[DEBUG] 16:31:41:767 GameCard/(25839:25839): Inicializa la GameCard
+[DEBUG] 16:31:41:767 GameCard/(25839:25839): El directorio ya existe
+[DEBUG] 16:31:41:767 GameCard/(25839:25839): El directorio ya existe
+[DEBUG] 16:31:41:768 GameCard/(25839:25839): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:31:41:768 GameCard/(25839:25839): El directorio ya existe
+[DEBUG] 16:31:41:768 GameCard/(25839:25839): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 16:31:41:768 GameCard/(25839:25839): Linea del archivo : DIRECTORY=Y
+[DEBUG] 16:31:41:768 GameCard/(25839:25839): El directorio ya existe
+[DEBUG] 16:31:41:768 GameCard/(25839:25839): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 16:31:41:768 GameCard/(25839:25839): El directorio ya existe
+[DEBUG] 16:31:41:768 GameCard/(25839:25839): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 16:31:41:768 GameCard/(25839:25839): 3
+[INFO] 16:31:41:768 GameCard/(25839:25839): 1024
+[INFO] 16:31:41:768 GameCard/(25839:25839): TALL_GRASS
+[DEBUG] 16:31:41:768 GameCard/(25839:25839): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 16:31:41:768 GameCard/(25839:25839): Linea del archivo : BLOCKS=1024
+[DEBUG] 16:31:41:768 GameCard/(25839:25839): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 16:31:41:768 GameCard/(25839:25839): Se crea el bit array con una memoria de 128
+[DEBUG] 16:31:41:768 GameCard/(25839:25839): Bitarray Creado
+[DEBUG] 16:31:42:904 GameCard/(25839:25839): Archivo Mapeado 
+[DEBUG] 16:31:45:49 GameCard/(25839:25839): El directorio ya existe
+[DEBUG] 16:31:45:49 GameCard/(25839:25839): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:31:45:49 GameCard/(25839:25839): N
+[INFO] 16:31:45:49 GameCard/(25839:25839): N
+[INFO] 16:31:45:49 GameCard/(25839:25839): 14
+[INFO] 16:31:45:49 GameCard/(25839:25839): 14
+[INFO] 16:31:45:581 GameCard/(25839:25839): –H<
+[DEBUG] 16:31:45:581 GameCard/(25839:25839): Cantidad de bloques necesarios 6 
+[DEBUG] 16:31:45:581 GameCard/(25839:25839): Contenido del archivo 4-8=30
+2-8=30
+
+[DEBUG] 16:31:45:890 GameCard/(25839:25839): tama√±o del archivo a leer: 14 
+[INFO] 16:32:14:381 GameCard/(25867:25867): PROCESO GAMECARD ONLINE
+[INFO] 16:32:14:388 GameCard/(25867:25867): /home/utnso/desktop/tall-grass
+[DEBUG] 16:32:14:388 GameCard/(25867:25867): Inicializa la GameCard
+[DEBUG] 16:32:14:388 GameCard/(25867:25867): El directorio ya existe
+[DEBUG] 16:32:14:388 GameCard/(25867:25867): El directorio ya existe
+[DEBUG] 16:32:14:388 GameCard/(25867:25867): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:32:14:388 GameCard/(25867:25867): El directorio ya existe
+[DEBUG] 16:32:14:388 GameCard/(25867:25867): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 16:32:14:388 GameCard/(25867:25867): Linea del archivo : DIRECTORY=Y
+[DEBUG] 16:32:14:388 GameCard/(25867:25867): El directorio ya existe
+[DEBUG] 16:32:14:388 GameCard/(25867:25867): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 16:32:14:389 GameCard/(25867:25867): El directorio ya existe
+[DEBUG] 16:32:14:389 GameCard/(25867:25867): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 16:32:14:389 GameCard/(25867:25867): 3
+[INFO] 16:32:14:389 GameCard/(25867:25867): 1024
+[INFO] 16:32:14:389 GameCard/(25867:25867): TALL_GRASS
+[DEBUG] 16:32:14:389 GameCard/(25867:25867): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 16:32:14:389 GameCard/(25867:25867): Linea del archivo : BLOCKS=1024
+[DEBUG] 16:32:14:389 GameCard/(25867:25867): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 16:32:14:389 GameCard/(25867:25867): Se crea el bit array con una memoria de 128
+[DEBUG] 16:32:14:389 GameCard/(25867:25867): Bitarray Creado
+[DEBUG] 16:32:14:389 GameCard/(25867:25867): Archivo Mapeado 
+[DEBUG] 16:32:14:389 GameCard/(25867:25867): El directorio ya existe
+[DEBUG] 16:32:14:390 GameCard/(25867:25867): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:32:14:390 GameCard/(25867:25867): N
+[INFO] 16:32:14:390 GameCard/(25867:25867): N
+[INFO] 16:32:14:390 GameCard/(25867:25867): 14
+[INFO] 16:32:14:390 GameCard/(25867:25867): 14
+[INFO] 16:32:14:390 GameCard/(25867:25867): –!ƒ	HLƒ	!ƒ	
+[DEBUG] 16:32:14:390 GameCard/(25867:25867): Cantidad de bloques necesarios 6 
+[DEBUG] 16:32:14:390 GameCard/(25867:25867): Contenido del archivo 4-8=30
+2-8=30
+
+[DEBUG] 16:32:14:397 GameCard/(25867:25867): tama√±o del archivo a leer: 14 
+[INFO] 16:45:31:638 GameCard/(26236:26236): PROCESO GAMECARD ONLINE
+[INFO] 16:45:31:640 GameCard/(26236:26236): /home/utnso/desktop/tall-grass
+[DEBUG] 16:45:31:640 GameCard/(26236:26236): Inicializa la GameCard
+[DEBUG] 16:45:31:640 GameCard/(26236:26236): El directorio ya existe
+[DEBUG] 16:45:31:640 GameCard/(26236:26236): El directorio ya existe
+[DEBUG] 16:45:31:641 GameCard/(26236:26236): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 16:45:31:641 GameCard/(26236:26236): El directorio ya existe
+[DEBUG] 16:45:31:641 GameCard/(26236:26236): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 16:45:31:641 GameCard/(26236:26236): Linea del archivo : DIRECTORY=Y
+[DEBUG] 16:45:31:641 GameCard/(26236:26236): El directorio ya existe
+[DEBUG] 16:45:31:643 GameCard/(26236:26236): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 16:45:31:643 GameCard/(26236:26236): El directorio ya existe
+[DEBUG] 16:45:31:643 GameCard/(26236:26236): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 16:45:31:643 GameCard/(26236:26236): 3
+[INFO] 16:45:31:643 GameCard/(26236:26236): 1024
+[INFO] 16:45:31:644 GameCard/(26236:26236): TALL_GRASS
+[DEBUG] 16:45:31:644 GameCard/(26236:26236): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 16:45:31:644 GameCard/(26236:26236): Linea del archivo : BLOCKS=1024
+[DEBUG] 16:45:31:644 GameCard/(26236:26236): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 16:45:31:644 GameCard/(26236:26236): Se crea el bit array con una memoria de 128
+[DEBUG] 16:45:31:644 GameCard/(26236:26236): Bitarray Creado
+[DEBUG] 16:45:31:644 GameCard/(26236:26236): Archivo Mapeado 
+[DEBUG] 16:45:31:644 GameCard/(26236:26236): El directorio ya existe
+[DEBUG] 16:45:31:644 GameCard/(26236:26236): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 16:45:31:646 GameCard/(26236:26236): N
+[INFO] 16:45:31:646 GameCard/(26236:26236): N
+[INFO] 16:45:31:646 GameCard/(26236:26236): 14
+[INFO] 16:45:31:646 GameCard/(26236:26236): 14
+[INFO] 16:45:31:646 GameCard/(26236:26236): –—BH¸B—B
+[DEBUG] 16:45:31:646 GameCard/(26236:26236): Cantidad de bloques necesarios 6 
+[DEBUG] 16:45:31:650 GameCard/(26236:26236): Contenido del archivo 4-8=30
+2-8=30
+
+[DEBUG] 16:45:31:650 GameCard/(26236:26236): tama√±o del archivo a leer: 14 
+[INFO] 17:29:52:476 GameCard/(27407:27407): PROCESO GAMECARD ONLINE
+[INFO] 17:29:52:478 GameCard/(27407:27407): /home/utnso/desktop/tall-grass
+[DEBUG] 17:29:52:478 GameCard/(27407:27407): Inicializa la GameCard
+[DEBUG] 17:29:52:478 GameCard/(27407:27407): El directorio ya existe
+[DEBUG] 17:29:52:478 GameCard/(27407:27407): El directorio ya existe
+[DEBUG] 17:29:52:478 GameCard/(27407:27407): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:29:52:478 GameCard/(27407:27407): El directorio ya existe
+[DEBUG] 17:29:52:478 GameCard/(27407:27407): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 17:29:52:478 GameCard/(27407:27407): Linea del archivo : DIRECTORY=Y
+[DEBUG] 17:29:52:479 GameCard/(27407:27407): El directorio ya existe
+[DEBUG] 17:29:52:479 GameCard/(27407:27407): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 17:29:52:479 GameCard/(27407:27407): El directorio ya existe
+[DEBUG] 17:29:52:479 GameCard/(27407:27407): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 17:29:52:479 GameCard/(27407:27407): 3
+[INFO] 17:29:52:479 GameCard/(27407:27407): 1024
+[INFO] 17:29:52:479 GameCard/(27407:27407): TALL_GRASS
+[DEBUG] 17:29:52:479 GameCard/(27407:27407): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 17:29:52:479 GameCard/(27407:27407): Linea del archivo : BLOCKS=1024
+[DEBUG] 17:29:52:479 GameCard/(27407:27407): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 17:29:52:479 GameCard/(27407:27407): Se crea el bit array con una memoria de 128
+[DEBUG] 17:29:52:479 GameCard/(27407:27407): Bitarray Creado
+[DEBUG] 17:29:53:701 GameCard/(27407:27407): Archivo Mapeado 
+[DEBUG] 17:30:22:73 GameCard/(27407:27407): El directorio ya existe
+[DEBUG] 17:30:22:73 GameCard/(27407:27407): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 17:30:22:73 GameCard/(27407:27407): N
+[INFO] 17:30:22:73 GameCard/(27407:27407): N
+[INFO] 17:30:22:73 GameCard/(27407:27407): 14
+[INFO] 17:30:22:73 GameCard/(27407:27407): 14
+[INFO] 17:30:23:645 GameCard/(27407:27407): –H<
+[DEBUG] 17:30:30:20 GameCard/(27407:27407): Cantidad de bloques necesarios 6 
+[DEBUG] 17:30:30:677 GameCard/(27407:27407): Contenido del archivo 4-8=30
+2-8=30
+
+[DEBUG] 17:30:32:305 GameCard/(27407:27407): tama√±o del archivo a leer: 14 
+[INFO] 17:39:19:430 GameCard/(27753:27753): PROCESO GAMECARD ONLINE
+[INFO] 17:39:19:433 GameCard/(27753:27753): /home/utnso/desktop/tall-grass
+[DEBUG] 17:39:19:433 GameCard/(27753:27753): Inicializa la GameCard
+[DEBUG] 17:39:19:433 GameCard/(27753:27753): El directorio ya existe
+[DEBUG] 17:39:19:433 GameCard/(27753:27753): El directorio ya existe
+[DEBUG] 17:39:19:434 GameCard/(27753:27753): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass - 2
+[DEBUG] 17:39:19:434 GameCard/(27753:27753): El directorio ya existe
+[DEBUG] 17:39:19:434 GameCard/(27753:27753): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Files/ - 2
+[DEBUG] 17:39:19:434 GameCard/(27753:27753): Linea del archivo : DIRECTORY=Y
+[DEBUG] 17:39:19:434 GameCard/(27753:27753): El directorio ya existe
+[DEBUG] 17:39:19:434 GameCard/(27753:27753): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Blocks/ - 2
+[DEBUG] 17:39:19:434 GameCard/(27753:27753): El directorio ya existe
+[DEBUG] 17:39:19:434 GameCard/(27753:27753): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/desktop/tall-grass/Metadata/ - 2
+[INFO] 17:39:19:434 GameCard/(27753:27753): 3
+[INFO] 17:39:19:434 GameCard/(27753:27753): 1024
+[INFO] 17:39:19:434 GameCard/(27753:27753): TALL_GRASS
+[DEBUG] 17:39:19:434 GameCard/(27753:27753): Linea del archivo : BLOCK_SIZE=3
+[DEBUG] 17:39:19:434 GameCard/(27753:27753): Linea del archivo : BLOCKS=1024
+[DEBUG] 17:39:19:435 GameCard/(27753:27753): Linea del archivo : MAGIC_NUMBER=TALL_GRASS
+[DEBUG] 17:39:19:435 GameCard/(27753:27753): Se crea el bit array con una memoria de 128
+[DEBUG] 17:39:19:435 GameCard/(27753:27753): Bitarray Creado
+[DEBUG] 17:39:19:435 GameCard/(27753:27753): Archivo Mapeado 
+[DEBUG] 17:39:19:435 GameCard/(27753:27753): El directorio ya existe
+[DEBUG] 17:39:19:435 GameCard/(27753:27753): Crea el config para leer el archivo /home/utnso/desktop/tall-grass/Files/Pikachu/metadata.bin
+[INFO] 17:39:19:435 GameCard/(27753:27753): N
+[INFO] 17:39:19:436 GameCard/(27753:27753): N
+[INFO] 17:39:19:436 GameCard/(27753:27753): 14
+[INFO] 17:39:19:436 GameCard/(27753:27753): 14
+[INFO] 17:39:19:436 GameCard/(27753:27753): –±u	H‹u	±u	
+[DEBUG] 17:39:19:436 GameCard/(27753:27753): Cantidad de bloques necesarios 6 
+[DEBUG] 17:39:19:436 GameCard/(27753:27753): Contenido del archivo 4-8=30
+2-8=30
+
+[DEBUG] 17:39:19:438 GameCard/(27753:27753): tama√±o del archivo a leer: 14 

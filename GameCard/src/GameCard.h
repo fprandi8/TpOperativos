@@ -104,7 +104,7 @@ int create_file_metadata_poke(t_values*);
 int create_poke_file(t_values*);
 int modify_poke_file(t_values*, char*);
 int catch_a_pokemon(char*,t_file_metadata*, char*, char*);
-void create_localized_message(localized_pokemon*, char*,char*);
+void create_localized_message(localized_pokemon*, char*,char*, t_file_metadata*);
 
 int check_directory(char*);
 
@@ -112,10 +112,11 @@ void read_metadata_file(t_file_metadata*, t_config*);
 void Metadata_File_Destroy(t_file_metadata*);
 void Metadata_File_Initialize_Block(t_file_metadata*);
 char* get_file_content(t_file_metadata*);
+void remove_line_from_file(char*,int, t_file_metadata*);
+
 int get_amount_of_blocks(int);
 int get_message_size(new_pokemon* );
 char* serialize_data(int, new_pokemon*);
-void remove_line_from_file(char*,int, t_file_metadata*);
 
 
 void turn_bit_on(int);

@@ -54,6 +54,7 @@ typedef struct {
 	t_bitarray* bitArray;
 	char* fileMapped;
 	int retryOperation;
+	int delayTime;
 } t_GameCard;
 
 struct Broker
@@ -85,7 +86,7 @@ typedef struct {
 }t_values;
 
 
-t_GameCard* GameCard_initialize(t_log*, char*,char*);
+t_GameCard* GameCard_initialize(t_log*, char*,char*,char*);
 int GameCard_mountFS(t_config*);
 void GameCard_Process_Message(deli_message*);
 void GameCard_Process_Message_New(deli_message*);

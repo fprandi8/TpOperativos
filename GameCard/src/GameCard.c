@@ -23,6 +23,7 @@ int main(void) {
 //	char* ip,puerto;
 	char* ptoMnt;
 	char* retryOperation;
+	char* delayTime;
 
 	//	char* retryConnection, delayTime;
 
@@ -39,9 +40,9 @@ int main(void) {
 	ptoMnt = get_config_value(config,logger,PUNTO_MONTAJE_TALLGRASS);
 //  retryConnection = obtener_valor_config(config.logger,TIEMPO_DE_REINTENTO_CONEXION);
 	retryOperation = get_config_value(config,logger,TIEMPO_DE_REINTENTO_OPERACION);
-//  delayTime = obtener_valor_config(config.logger,TIEMPO_RETARDO_OPERACION);
+	delayTime = get_config_value(config,logger,TIEMPO_RETARDO_OPERACION);
 
-	GameCard=GameCard_initialize(logger,ptoMnt,retryOperation);
+	GameCard=GameCard_initialize(logger,ptoMnt,retryOperation, delayTime);
 	GameCard_mountFS(config);
 	config_destroy(config);
 
@@ -131,7 +132,6 @@ int main(void) {
 
 	munmap(GameCard->fileMapped, (GameCard->blocks/8));
 
-
 	destroy_poke_dictionary(pokeSemaphore);
 
 	GameCard_Destroy(GameCard);
@@ -139,7 +139,7 @@ int main(void) {
 	return EXIT_SUCCESS;
 }
 
-t_GameCard* GameCard_initialize(t_log* logger, char* ptoMnt,char* retryOperation){
+t_GameCard* GameCard_initialize(t_log* logger, char* ptoMnt,char* retryOperation, char* delayTime){
 	log_debug(logger,"Inicializa la GameCard");
 	t_GameCard* aux = (t_GameCard*)malloc(sizeof(t_GameCard));
 
@@ -162,6 +162,7 @@ t_GameCard* GameCard_initialize(t_log* logger, char* ptoMnt,char* retryOperation
 	strcat(blocks,"/Blocks/");
 	aux->blocksPath = blocks;
 	aux->retryOperation = atoi(retryOperation);
+	aux->delayTime = atoi(delayTime);
 
 	return aux;
 }
@@ -328,6 +329,8 @@ deli_message* GameCard_Process_Message_Catch(deli_message* message){
 	else
 		caughtPokemon->caught = 0;
 
+	sleep(GameCard->delayTime);
+
 	deli_message* newMessage = (deli_message*)malloc(sizeof(deli_message));
 	newMessage->correlationId=message->id;
 	newMessage->messageType=CAUGHT_POKEMON;
@@ -391,6 +394,9 @@ deli_message* GameCard_Process_Message_Get(deli_message* message){
 		free(file);
 		Metadata_File_Destroy(metadataFile);
 	}
+
+	sleep(GameCard->delayTime);
+
 
 	// REVISAR ESTO POSIBLEMENTE TENGA QUE ENVIAR EL MENSAJE NO DEVOLVERLO...
 		deli_message* newMessage = (deli_message*)malloc(sizeof(deli_message));
@@ -491,13 +497,11 @@ int catch_a_pokemon(char* fileContent, t_file_metadata* metadataFile, char* coor
 
 			newFile = remove_line_from_file(fileContent,pos,metadataFile);
 
-			free(fileContent);
-
-			fileContent=newFile;
-
 			int amountOfBlocks=get_amount_of_blocks(atoi(metadataFile->size));
 
-			write_blocks(metadataFile, amountOfBlocks, fileContent);
+			write_blocks(metadataFile, amountOfBlocks, newFile);
+
+			free(newFile);
 
 			metadataFile->directory='N';
 			metadataFile->open='N';
@@ -653,6 +657,7 @@ int modify_poke_file(t_values* values, char* directory){;
 		free(buffer);
 	}
 
+	sleep(GameCard->delayTime);
 	metadataConfig = read_metadata(file);
 	Metadata_File_Open_Flag(metadataFile,metadataConfig,"N");
 
@@ -706,6 +711,8 @@ int create_poke_file(t_values* values){
 
 	list_remove(values->values,1);
 	list_remove(values->values,0);
+
+	sleep(GameCard->delayTime);
 
 	Metadata_File_Destroy(metadataFile);
 
@@ -1019,9 +1026,6 @@ void Metadata_File_Initialize_Block(t_file_metadata* metadataFile){
 
 void read_metadata_file(t_file_metadata* metadataFile, t_config* metadataConfig, char* pokemonName){
 
-	//TODO: agregar logica de diccionario de semaforos, wait,
-	//      revisar el flag, si aplica cambiar flag y signal,
-	//      sino signal y manejo de archivo no disponible
 	sem_t* pokeSem = dictionary_get(pokeSemaphore,pokemonName);
 	int fileAvailable =0;
 	while(!fileAvailable){
@@ -1121,6 +1125,7 @@ char* remove_line_from_file(char* fileContent,int pos,t_file_metadata* metadataF
 	char* line = string_substring(fileContent,pos,pos + index1+1);
 
 	int bytes = strlen(line);
+	free(line);
 
 	int auxIntSize = atoi(metadataFile->size) - bytes;
 
@@ -1134,11 +1139,13 @@ char* remove_line_from_file(char* fileContent,int pos,t_file_metadata* metadataF
 		memcpy(aux,fileContent,pos-1);
 		if(auxIntSize > 0){
 			memcpy(aux+pos-1,fileContent+pos+bytes-1,auxIntSize);
+			aux[auxIntSize+pos-1]='\0';
 		}
 	}
 	else
 	{
 		memcpy(aux,fileContent+bytes,auxIntSize);
+		aux[auxIntSize]='\0';
 	}
 
 	return aux;
@@ -1391,9 +1398,11 @@ void write_blocks(t_file_metadata* metadataFile, int amountOfBlocks, char* buffe
 		list_add(values->values,(void*)bitBlock);
 
 		index = 0;
-		while((GameCard->block_size > index) && (index < tam) && (buffer[cantBytes] != '\0')){
+		int eol =0;
+		while((GameCard->block_size > index) && (index < tam) && (!eol)){
 			printf("Bloque a grabar : %c \n",buffer[cantBytes]);
 			bufferAux[index]=buffer[cantBytes];
+			if (buffer[cantBytes]=='\n') eol=1;
 			cantBytes++;
 			index++;
 		}

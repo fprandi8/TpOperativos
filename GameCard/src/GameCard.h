@@ -53,6 +53,7 @@ typedef struct {
 	char* blocksPath;
 	t_bitarray* bitArray;
 	char* fileMapped;
+	int retryOperation;
 } t_GameCard;
 
 struct Broker
@@ -84,7 +85,7 @@ typedef struct {
 }t_values;
 
 
-t_GameCard* GameCard_initialize(t_log*, char*);
+t_GameCard* GameCard_initialize(t_log*, char*,char*);
 int GameCard_mountFS(t_config*);
 void GameCard_Process_Message(deli_message*);
 void GameCard_Process_Message_New(deli_message*);
@@ -103,16 +104,20 @@ int create_file_metadata_poke(t_values*);
 
 int create_poke_file(t_values*);
 int modify_poke_file(t_values*, char*);
+void create_poke_semaphore(char*);
+void destroy_poke_semaphore(char*);
+void destroy_poke_dictionary(t_dictionary*);
 int catch_a_pokemon(char*,t_file_metadata*, char*, char*);
 void create_localized_message(localized_pokemon*, char*,char*, t_file_metadata*);
 
 int check_directory(char*);
 
-void read_metadata_file(t_file_metadata*, t_config*);
+void read_metadata_file(t_file_metadata*, t_config*, char*);
+void Metadata_File_Open_Flag(t_file_metadata*,t_config*,char*);
 void Metadata_File_Destroy(t_file_metadata*);
 void Metadata_File_Initialize_Block(t_file_metadata*);
 char* get_file_content(t_file_metadata*);
-void remove_line_from_file(char*,int, t_file_metadata*);
+char* remove_line_from_file(char*,int, t_file_metadata*);
 
 int get_amount_of_blocks(int);
 int get_message_size(new_pokemon* );
@@ -122,7 +127,7 @@ char* serialize_data(int, new_pokemon*);
 void turn_bit_on(int);
 void turn_bit_off(int);
 int get_first_free_block();
-void write_blocks(t_file_metadata*, int, char*);
+
 int get_string_file_position(char*,char*);
 int delete_file_line(char* , int , t_file_metadata* );
 void increase_pokemon_amount(char*, int, int );
@@ -133,6 +138,7 @@ void delete_block_file(t_file_metadata*);
 char* get_x_coordinate(char*);
 char* get_y_coordinate(char*);
 
+void write_blocks(t_file_metadata*, int,char*);
 void rewrite_blocks(t_file_metadata* , char*);
 
 void readConfigBrokerValues(t_config*,t_log* ,struct Broker*);

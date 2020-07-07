@@ -109,8 +109,8 @@ void delete_partition(void);
 t_partition* select_partition(uint32_t size);
 t_partition* select_partition_ff(uint32_t size); //select by first fit
 t_partition* select_partition_bf(uint32_t size); //select by best fit
-int delete_partition_fifo(void); //delete by fifo
-int delete_partition_lru(void); //delete by lru
+t_partition* delete_partition_fifo(void); //delete by fifo
+t_partition* delete_partition_lru(void); //delete by lru
 t_list* GetMessagesFromQueue(message_type queue_type);
 t_cachedMessage* GetCachedMessage(int);
 void* GetMessageContent(int);
@@ -120,8 +120,13 @@ void Free_CachedMessage(t_cachedMessage*);
 void add_to_cached_messages(t_cachedMessage);
 uint32_t add_occupied_size_from(t_list* occupied);
 int GetBusyPartitionsCount();
-double CalculateNearestPowerOfTwo(int x);
+int CalculateNearestPowerOfTwo(int x);
 double CalculateNearestPowerOfTwoRelativeToCache(int memoryLocation);
 void PrintDumpOfCache();
+t_partition* create_childrens_from(t_partition* parent);
+void start_consolidation_for(t_partition* freed_partition);
+void check_validations_and_consolidate_PD(t_partition* freed_partition);
+int check_validations_and_consolidate_BS(uint32_t freed_partition_id);
+void find_index_in_list_and_destroy(t_partition* partition);
 
 #endif /* CACHEMEMORY_H_ */

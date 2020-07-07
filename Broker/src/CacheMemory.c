@@ -40,7 +40,7 @@ void start_cache()
     first_partition->timestap = clock();
 	first_partition->begining = cache.full_memory;
 
-	if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC"))
+	if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") == 0)
 	{
     	first_partition->size = cache.memory_size;
 	}
@@ -169,6 +169,7 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
 			}
 		}
     }
+    return -1;
 }
 
 
@@ -246,9 +247,9 @@ void compact_memory(void){
     bool _is_empty_partition(t_partition* partition){ return partition->free; }
     bool _filter_busy_partition(t_partition* partition){ return !partition->free;}
 
-    sem_wait(mutex_partitions);
+    sem_wait(&mutex_partitions);
     t_list* occupied_partitions = list_filter(partitions, (void *) _filter_busy_partition);
-    sem_post(mutex_partitions);
+    sem_post(&mutex_partitions);
 
     char* backUp_memory = (char*) malloc(cache.memory_size * sizeof(char));
 
@@ -268,9 +269,9 @@ void compact_memory(void){
 
 
     //- create big empty partition
-    sem_wait(mutex_occupied_partitions);
+    sem_wait(&mutex_occupied_partitions);
     uint32_t occupied_size = add_occupied_size_from(occupied_partitions);
-    sem_post(mutex_occupied_partitions);
+    sem_post(&mutex_occupied_partitions);
 
     t_partition* emptySpacePartition = CreateNewPartition();
     emptySpacePartition->begining = NULL;
@@ -278,22 +279,22 @@ void compact_memory(void){
     emptySpacePartition->queue_type = 0;
     emptySpacePartition->free = true;
 
-    sem_wait(mutex_occupied_partitions);
+    sem_wait(&mutex_occupied_partitions);
     list_add(occupied_partitions, emptySpacePartition);
-    sem_post(mutex_occupied_partitions);
+    sem_post(&mutex_occupied_partitions);
 
-    sem_wait(mutex_occupied_partitions);
+    sem_wait(&mutex_occupied_partitions);
     list_iterate(occupied_partitions, (void*)_asignPartitionOnBackUpMem);
-    sem_post(mutex_occupied_partitions);
+    sem_post(&mutex_occupied_partitions);
     memcpy(cache.full_memory, backUp_memory, sizeof(cache.memory_size));
-    sem_wait(mutex_occupied_partitions);
+    sem_wait(&mutex_occupied_partitions);
     list_iterate(occupied_partitions, (void*)_reasignPartitionPointers);
-    sem_post(mutex_occupied_partitions);
+    sem_post(&mutex_occupied_partitions);
     free(backUp_memory);
 
-    sem_wait(partitions);
+    sem_wait(&mutex_partitions);
 	list_remove_and_destroy_by_condition(partitions, (void*)_is_empty_partition, (void*)Free_CachedMessage);
-    sem_post(partitions);
+    sem_post(&mutex_partitions);
 
 	list_clean(partitions);
 	free(partitions);
@@ -330,9 +331,9 @@ void delete_partition(void){
         if(message->partitionId == deletedPartition->id) return true; else return false;
     }
 
-    sem_wait(mutex_cached_messages);
+    sem_wait(&mutex_cached_messages);
     list_remove_and_destroy_by_condition(cached_messages, (void*)_message_to_delete, (void*)Free_CachedMessage);
-    sem_post(mutex_cached_messages);
+    sem_post(&mutex_cached_messages);
 
     start_consolidation_for(deletedPartition);
 }
@@ -342,9 +343,9 @@ t_partition* delete_partition_fifo(void){
     {
         if(partition->free == 0) return true; else return false;
     }
-    sem_wait(mutex_partitions);
+    sem_wait(&mutex_partitions);
     t_partition* partition = (t_partition*)list_find(partitions, (void*)_first_busy_partition);
-    sem_post(mutex_partitions);
+    sem_post(&mutex_partitions);
     partition->free = 1;
     return partition;
 }
@@ -373,9 +374,9 @@ int GetBusyPartitionsCount()
     {
         if(partition->free == 0) return true; else return false;
     }
-    sem_wait(mutex_partitions);
+    sem_wait(&mutex_partitions);
     t_list* busyPartitions = list_filter(partitions, (void*)_filter_busy_parittion);
-    sem_post(mutex_partitions);
+    sem_post(&mutex_partitions);
     int busyPartitionsCount = list_size(busyPartitions);
     list_clean(busyPartitions);
     return busyPartitionsCount;
@@ -474,18 +475,17 @@ void PrintDumpOfCache()
    info = localtime( &rawtime );
 
     printf("\n-----------------------------------------------------------------------------------------------------------------------------\n");
-    //printf("Dump: %d/%d/%d %s\n", info.tm_sec, dt.da_mon, dt.da_year, temporal_get_string_time());
     printf("Dump: %d/%d/%d %s\n", info->tm_mday, info->tm_mon, info->tm_year, temporal_get_string_time());
 
     void _print_partition_info(t_partition* partition)
     {
         char* busyStatus;
-        //char* memoryLocation = mem_hexstring(partition->begining, partition->size);
-        char* memoryLocation = "asdf";
+        char* memoryLocation[20];
+        sprintf(memoryLocation, "0x%X - 0x%X", partition->begining, partition->begining + partition->size - 1);
         if(partition->free == 1)
         {
             busyStatus = "L";
-            printf("Partición %d: <%s>. [%s] Size:%db\n",
+            printf("Partición %d: %s. [%s] Size:%db\n",
             	(int)partition->id,
 				memoryLocation,
                 busyStatus, 
@@ -515,7 +515,7 @@ void PrintDumpOfCache()
     printf("-----------------------------------------------------------------------------------------------------------------------------\n");
 }
 
-void start_consolidation_for(t_partition freed_partition){
+void start_consolidation_for(t_partition* freed_partition){
 
     if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") != 0){
         uint32_t partitionId = freed_partition->id;
@@ -524,8 +524,8 @@ void start_consolidation_for(t_partition freed_partition){
             partitionId = check_validations_and_consolidate_BS(partitionId);
         }
      }else{
-        if(freed_partition->size == cache.full_memory)
-            break;
+        if(freed_partition->size == cache.memory_size)
+            return;
         check_validations_and_consolidate_PD(freed_partition);
      }
 }
@@ -550,27 +550,27 @@ void check_validations_and_consolidate_PD(t_partition* freed_partition){
 
     t_partition* left_partition = freed_partition;
     if(freed_partition->begining != 0){
-        sem_wait(mutex_partitions);
+        sem_wait(&mutex_partitions);
         left_partition = list_find(partitions, (void*)_is_left_neighbor);
-        sem_post(mutex_partitions);
+        sem_post(&mutex_partitions);
         new_size += left_partition->size;
     }
 
     t_partition* right_partition = freed_partition;
-    if((freed_partition->begining + freed_partition->size) < cache->memory_size){
-        sem_wait(mutex_partitions);
+    if((freed_partition->begining + freed_partition->size) < cache.full_memory){
+        sem_wait(&mutex_partitions);
         right_partition = list_find(partitions, (void*)_is_right_neighbor);
-        sem_post(mutex_partitions);
+        sem_post(&mutex_partitions);
         new_size += right_partition->size;
-        sem_wait(mutex_index_finder_destroyer);
+        sem_wait(&mutex_index_finder_destroyer);
         find_index_in_list_and_destroy(right_partition);
-        sem_post(mutex_index_finder_destroyer);
+        sem_post(&mutex_index_finder_destroyer);
     }
 
     if(left_partition != freed_partition){
-    	sem_wait(mutex_index_finder_destroyer);
+    	sem_wait(&mutex_index_finder_destroyer);
         find_index_in_list_and_destroy(freed_partition);
-        sem_post(mutex_index_finder_destroyer);
+        sem_post(&mutex_index_finder_destroyer);
     }
     left_partition->size = new_size;
 }
@@ -591,16 +591,16 @@ int check_validations_and_consolidate_BS(uint32_t freed_partition_id){
 
     bool _has_wanted_id(t_partition* partition){ return partition->id == freed_partition_id;}
 
-    sem_wait(mutex_partitions);
+    sem_wait(&mutex_partitions);
     bs_freed_partition = list_find(partitions, (void*) _has_wanted_id);
-    sem_post(mutex_partitions);
+    sem_post(&mutex_partitions);
         
     if(bs_freed_partition->size >= cache.memory_size)
         return -1;
 
-    sem_wait(mutex_partitions);
+    sem_wait(&mutex_partitions);
     t_partition* related_partition = list_find(partitions, (void*) _is_related_partition);
-    sem_post(mutex_partitions);
+    sem_post(&mutex_partitions);
         
     if(related_partition == NULL)
         return -1;
@@ -609,13 +609,13 @@ int check_validations_and_consolidate_BS(uint32_t freed_partition_id){
 }
 
 void find_index_in_list_and_destroy(t_partition* partition){
-    sem_wait(mutex_index_finder);
+    sem_wait(&mutex_index_finder);
     int index = find_index_in_list(partition);
-    sem_wait(mutex_index_finder);
+    sem_wait(&mutex_index_finder);
         
-    sem_wait(mutex_partitions);
+    sem_wait(&mutex_partitions);
     free(list_remove(partition, index));
-    sem_post(mutex_partitions);
+    sem_post(&mutex_partitions);
  }
 
 int find_index_in_list(t_partition* partition){
@@ -623,9 +623,9 @@ int find_index_in_list(t_partition* partition){
     int wanted_id = partition->id;
     t_partition* aux_partition;
     while(index < sizeof(partitions)){
-        sem_wait(mutex_partitions);
+        sem_wait(&mutex_partitions);
         aux_partition = (t_partition*)list_get(partitions, index);
-        sem_post(mutex_partitions);
+        sem_post(&mutex_partitions);
         if(aux_partition->id == wanted_id)
             break;
         index++;
@@ -634,10 +634,10 @@ int find_index_in_list(t_partition* partition){
 }
 
 
-double CalculateNearestPowerOfTwo(int x)
+int CalculateNearestPowerOfTwo(int x)
 {
 	double evenSize = x - (x % 2);
-	return 1;//powerOfTwo = (int)floor(log10(evenSize) / log10(2));
+	return (int)floor(log10(evenSize) / log10(2));
 }
 
 double CalculateNearestPowerOfTwoRelativeToCache(int memoryLocation)
@@ -651,14 +651,14 @@ int consolidate(t_partition related_partition){
 
     bool _is_wanted_parent(t_partition* partition){ return(partition->id == related_partition.parentId); }
 
-    t_partition* left_partition = related_partition;
+    t_partition* left_partition = &related_partition;
 
     if(bs_freed_partition->begining < related_partition.begining)
         left_partition = bs_freed_partition;
 
-    sem_wait(mutex_partitions);
+    sem_wait(&mutex_partitions);
     t_partition* parent = list_find(parent_partitions, (void*) _is_wanted_parent);
-    sem_post(mutex_partitions);
+    sem_post(&mutex_partitions);
 
     parent->begining = left_partition->begining;
 
@@ -672,17 +672,17 @@ int consolidate(t_partition related_partition){
         free(partition);
     }
 
-    sem_wait(mutex_partitions);
+    sem_wait(&mutex_partitions);
     list_remove_and_destroy_by_condition(partitions, (void*)_is_child_partition, (void*)_free_partitions);
-    sem_post(mutex_partitions);
+    sem_post(&mutex_partitions);
 
-    sem_wait(mutex_parent_partitions);
+    sem_wait(&mutex_parent_partitions);
     list_remove_by_condition(parent_partitions, (void*) _is_wanted_parent);
-    sem_post(mutex_parent_partitions);
+    sem_post(&mutex_parent_partitions);
 
-    sem_wait(mutex_partitions);
+    sem_wait(&mutex_partitions);
     list_add(partitions, parent);
-    sem_post(mutex_partitions);
+    sem_post(&mutex_partitions);
 
     return parent->id;
 }
@@ -697,9 +697,9 @@ t_partition* create_childrens_from(t_partition* parent){
     one_children->free = 1;
     one_children->size = newPartitionsSize;
 
-    sem_wait(mutex_partitions);
+    sem_wait(&mutex_partitions);
     list_add(partitions, one_children);
-    sem_post(mutex_partitions);
+    sem_post(&mutex_partitions);
 
     t_partition* another_children = CreateNewPartition();
     another_children->parentId = parent->id;
@@ -708,17 +708,17 @@ t_partition* create_childrens_from(t_partition* parent){
     one_children->free = 1;
     one_children->size = newPartitionsSize;
 
-    sem_wait(mutex_partitions);
+    sem_wait(&mutex_partitions);
     list_add(partitions, another_children);
-    sem_post(mutex_partitions);
+    sem_post(&mutex_partitions);
 
-    sem_wait(mutex_parent_partitions);
+    sem_wait(&mutex_parent_partitions);
     list_add(parent_partitions, parent);
-    sem_post(mutex_parent_partitions);
+    sem_post(&mutex_parent_partitions);
 
-    sem_wait(mutex_partitions);
+    sem_wait(&mutex_partitions);
     list_remove(partitions ,find_index_in_list(parent));
-    sem_post(mutex_partitions);
+    sem_post(&mutex_partitions);
 
     return one_children;
 }

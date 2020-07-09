@@ -497,7 +497,9 @@ int catch_a_pokemon(char* fileContent, t_file_metadata* metadataFile, char* coor
 
 			newFile = remove_line_from_file(fileContent,pos,metadataFile);
 
-			int amountOfBlocks=get_amount_of_blocks(atoi(metadataFile->size));
+			int amountOfBlocks=get_amount_of_blocks(atoi(metadataFile->size), metadataFile);
+
+			Metadata_File_Add_Blocks(metadataFile,amountOfBlocks);
 
 			write_blocks(metadataFile, amountOfBlocks, newFile);
 
@@ -627,19 +629,29 @@ int modify_poke_file(t_values* values, char* directory){;
 		int result;
 		int size = get_message_size(newPokemon);
 
-		int amountOfBlocks=get_amount_of_blocks(size);
+		int amountOfBlocks=get_amount_of_blocks(size,metadataFile);
 
 		int auxSize = atoi(metadataFile->size);
 
 		free(metadataFile->size);
 
+		Metadata_File_Add_Blocks(metadataFile,amountOfBlocks);
+
 		metadataFile->size =  string_itoa(auxSize + size);
 
 		log_debug(GameCard->logger, "Nuevo tamaño de la metadata %s", metadataFile->size);
 
-		char* buffer=serialize_data(atoi(metadataFile->size),newPokemon);
+//		char* buffer=serialize_data(atoi(metadataFile->size),newPokemon);
 
-		write_blocks(metadataFile, amountOfBlocks, buffer);
+		char*buffer = serialize_data(size,newPokemon);
+
+		string_append(&(fileContent),buffer);
+
+		log_debug(GameCard->logger, "Nuevo contenido del archivo %s", fileContent);
+
+		free(buffer);
+
+		write_blocks(metadataFile, amountOfBlocks, fileContent);
 
 		metadataFile->directory='N';
 		metadataFile->open='N';
@@ -654,7 +666,7 @@ int modify_poke_file(t_values* values, char* directory){;
 		if (!result)
 			log_debug(GameCard->logger, "Archivo de Metadata Actualizado Correctamente");
 
-		free(buffer);
+//		free(buffer);
 	}
 
 	sleep(GameCard->delayTime);
@@ -685,11 +697,13 @@ int create_poke_file(t_values* values){
 
 	int size = get_message_size(newPokemon);
 
-	int amountOfBlocks=get_amount_of_blocks(size);
+	int amountOfBlocks=get_amount_of_blocks(size,metadataFile);
+
+	log_debug(GameCard->logger, "Amout of blocks needed %d", amountOfBlocks);
 
 	metadataFile->size =  string_itoa(size);
 
-	log_debug(GameCard->logger, "Amout of blocks needed %d", amountOfBlocks);
+	Metadata_File_Add_Blocks(metadataFile,amountOfBlocks);
 
 	int result;
 
@@ -821,11 +835,14 @@ int create_file_bin(t_values* values){
 		return -1;
 	}
 
-	char* bytes = (char*)list_get(values->values,1);
+
 	int tam =(int)list_get(values->values,2);
+	char* bytes = malloc(tam);
+	memcpy(bytes,list_get(values->values,1),tam);
+//	char* bytes = (char*)list_get(values->values,1);
 	fwrite(bytes,tam, 1, f);
 
-	turn_bit_on(bit);
+	free(bytes);
 	free(filename);
 	free(blockChar);
 
@@ -1005,6 +1022,18 @@ int create_file(fileType fileType, t_values* values){
 
 
 //METADATA
+
+void Metadata_File_Add_Blocks(t_file_metadata* metadataFile,int amountOfBlocks){
+
+	for(int i = 0; i < amountOfBlocks; i++){
+		int block = get_first_free_block();
+		turn_bit_on(block);
+		log_debug(GameCard->logger,"Block %d agregado a la Metadata ", block);
+		char* charblock = string_itoa(block);
+		list_add(metadataFile->block,charblock);
+	}
+
+}
 
 void Metadata_File_Open_Flag(t_file_metadata* metadataFile,t_config* metadataConfig, char* value){
 	config_set_value(metadataConfig, OPEN, value);
@@ -1299,9 +1328,11 @@ int get_first_free_block(){
 	int i = 0;
 	while((bitarray_test_bit(GameCard->bitArray,i)) && (i<=max))
 	{
-//		log_debug(GameCard->logger, "Resultado del test del bit %d:  -  ", i,  bitarray_test_bit(GameCard->bitArray,i));
 		i++;
 	}
+	if (i>max)
+			log_debug(GameCard->logger,"Bitarray lleno");
+
 	return i;
 }
 
@@ -1336,12 +1367,26 @@ int get_message_size(new_pokemon* newPokemon){
 	return size;
 }
 
-int get_amount_of_blocks(int size){
+int get_amount_of_blocks(int size, t_file_metadata* metadataFile){
 
-	if (size % GameCard->block_size == 0)
-	    return size/GameCard->block_size;
+	int auxSize = 0;
+	int availableSpaceInblock =0;
+
+	int amountOfBlocks = list_size(metadataFile->block);
+
+	// Logica para usar el espacio restante del último bloque
+	if(amountOfBlocks != 0)
+		availableSpaceInblock = (GameCard->block_size)*amountOfBlocks - atoi(metadataFile->size);
+
+	if (availableSpaceInblock > 0)
+		auxSize = size - availableSpaceInblock;
 	else
-	    return (size/GameCard->block_size) + 1;
+		auxSize = size;
+
+	if (auxSize % GameCard->block_size == 0)
+	    return auxSize/GameCard->block_size;
+	else
+	    return (auxSize/GameCard->block_size) + 1;
 
 }
 
@@ -1384,28 +1429,32 @@ void write_blocks(t_file_metadata* metadataFile, int amountOfBlocks, char* buffe
 
 	t_values* values = (t_values*)malloc(sizeof(t_values));
 	values->values =list_create();
+	int i=0;
 
+	while(list_get(metadataFile->block, i) != NULL)
+	{
+//	for (int i = 0; i<amountOfBlocks; i++){
+//		int bitBlock=get_first_free_block();
+//		char* charblock = string_itoa(bitBlock);
 
-	for (int i = 0; i<amountOfBlocks; i++){
-
-		int bitBlock=get_first_free_block();
-
-		char* charblock = string_itoa(bitBlock);
-
+		char* charblock = string_duplicate((char*)list_get(metadataFile->block,i));
 		log_debug(GameCard->logger,"Bloque donde va a guardar los datos %s" , charblock);
-		list_add(metadataFile->block,(void*)charblock);
+//		list_add(metadataFile->block,(void*)charblock);
 
+		int bitBlock = atoi(charblock);
 		list_add(values->values,(void*)bitBlock);
 
 		index = 0;
-		int eol =0;
-		while((GameCard->block_size > index) && (index < tam) && (!eol)){
+//		int eol =0;
+//		while((GameCard->block_size > index) && (index < tam) && (!eol)){
+		while((GameCard->block_size > index) && (index < tam)){
 			printf("Bloque a grabar : %c \n",buffer[cantBytes]);
 			bufferAux[index]=buffer[cantBytes];
-			if (buffer[cantBytes]=='\n') eol=1;
+//			if (buffer[cantBytes]=='\n') eol=1;
 			cantBytes++;
 			index++;
 		}
+		tam=tam-GameCard->block_size;
 
 		list_add(values->values,bufferAux);
 		list_add(values->values,(void*)index);
@@ -1414,7 +1463,7 @@ void write_blocks(t_file_metadata* metadataFile, int amountOfBlocks, char* buffe
 
 		if (result) log_debug(GameCard->logger, "BIN FILE CREADO");
 
-		log_debug(GameCard->logger,"Creo el archivo de bloque del Pokemon %d" , bitBlock);
+		log_debug(GameCard->logger,"Creo el archivo de bloque del Pokemon %d" , atoi(charblock));
 
 		list_remove(values->values,2);
 		list_remove(values->values,1);
@@ -1422,7 +1471,9 @@ void write_blocks(t_file_metadata* metadataFile, int amountOfBlocks, char* buffe
 
 
 		free(bufferAux);
+		free(charblock);
 		bufferAux=(char*)malloc(GameCard->block_size);
+		i++;
 	}
 
 	free(bufferAux);

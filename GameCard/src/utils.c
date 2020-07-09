@@ -76,7 +76,7 @@ char* get_config_value(t_config* config, t_log* logger, char* propiedad){
 char ** get_config_value_array(t_config* config, t_log* logger, char* propiedad){
 
 	if (config_has_property(config,propiedad)){
-		log_info(logger,"Obtiene el array");
+		log_info(logger,"Obtiene el array de datos");
 		return config_get_array_value(config, propiedad);
 	} else {
 		log_debug(logger,"Error al obtener el atributo");

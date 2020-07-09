@@ -117,10 +117,11 @@ void read_metadata_file(t_file_metadata*, t_config*, char*);
 void Metadata_File_Open_Flag(t_file_metadata*,t_config*,char*);
 void Metadata_File_Destroy(t_file_metadata*);
 void Metadata_File_Initialize_Block(t_file_metadata*);
+void Metadata_File_Add_Blocks(t_file_metadata*,int);
 char* get_file_content(t_file_metadata*);
 char* remove_line_from_file(char*,int, t_file_metadata*);
 
-int get_amount_of_blocks(int);
+int get_amount_of_blocks(int, t_file_metadata*);
 int get_message_size(new_pokemon* );
 char* serialize_data(int, new_pokemon*);
 

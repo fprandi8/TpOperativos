@@ -1054,17 +1054,17 @@ void read_metadata_file(t_file_metadata* metadataFile, t_config* metadataConfig,
 
 	metadataFile->block = list_create();
 
-//	int blocksAmount = get_amount_of_blocks(atoi(metadataFile->size));
-
 	char** blocks = get_config_value_array(metadataConfig,GameCard->logger,BLOCKS);
 
-//	for(int i=0; i < blocksAmount; i++){
 	int i=0;
 	while (blocks[i]!='\0'){
 		char* aux = string_duplicate(blocks[i]);
 		list_add(metadataFile->block,aux);
 		i++;
 	}
+
+    string_iterate_lines(blocks, (void*) free);
+    free(blocks);
 
 	config_destroy(metadataConfig);
 
@@ -1133,7 +1133,7 @@ char* remove_line_from_file(char* fileContent,int pos,t_file_metadata* metadataF
 
 	metadataFile->size = string_itoa(auxIntSize);
 
-	char* aux=(char*)malloc(auxIntSize);
+	char* aux=(char*)malloc(auxIntSize+2);
 
 	if (pos != 0) {
 		memcpy(aux,fileContent,pos-1);

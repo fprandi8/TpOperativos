@@ -19,6 +19,8 @@
 #include<commons/string.h>
 #include<commons/config.h>
 #include<readline/readline.h>
+#include <pthread.h>
+#include <poll.h>
 
 typedef enum
 {
@@ -38,6 +40,7 @@ struct Broker
 
 void initBroker(struct Broker*);
 void readConfigBrokerValues(t_config*,struct Broker*);
+void SleepAndClose(void* args);
 
 int main(int argc, char **argv) {
 	puts("GameBoy (Publicador)"); /* prints GameBoy (Publicador) */
@@ -63,6 +66,7 @@ int main(int argc, char **argv) {
 	//Check if reciever is valid
 	t_reciever reciver;
 	message_type messageType;
+	int subscriptionTime = 0;
 
 	if(strcmp(argv[1], "BROKER") == 0){
 		reciver = BROKER;
@@ -169,6 +173,7 @@ int main(int argc, char **argv) {
 				printf("Incorrect message, for SUSCRIPTOR must be GET_POKEMON, CAUGHT_POKEMON, CATCH_POKEMON, NEW POKEMON, APPEARED_POKEMON, LOCALIZED_POKEMON \n");
 				return 1;
 			}
+			subscriptionTime = argv[3];
 		}else{
 
 			printf("Incorrect number of parameters for function SUSCRIPTOR, must be 3\n");
@@ -239,14 +244,55 @@ int main(int argc, char **argv) {
 
 	//////////////////////// ENVIAR ////////////////////////////////
 
-	//TODO Create message as requested and send
+	if(reciver == SUSCRIPTOR)
+	{
+		SendSubscriptionRequest(messageType, server_socket);
+
+		pthread_t* thread;
+		thread = (pthread_t*)malloc(sizeof(pthread_t));
+
+		int args[] = {server_socket, subscriptionTime};
+
+		pthread_create(thread,NULL,(void*)SleepAndClose,args);
+		pthread_detach(*thread);
+
+		int isRunning  = 1;
+
+		struct pollfd pfds[1]; // More if you want to monitor more
+
+		pfds[0].fd = server_socket;
+		pfds[0].events = POLLIN | POLLHUP; // Tell me when ready to read
+
+		while(isRunning)
+		{
+			 int num_events = poll(pfds, 1, subscriptionTime);
+			 if (num_events == 0)
+			 {
+			    continue;
+			 }
+			 else
+			 {
+				 int pollin_happened = pfds[0].revents & POLLIN;
+
+				 if (pollin_happened)
+				 {
+					 //TODO Log message
+				 }
+				 else
+				 {
+					 printf("Exit after %d", subscriptionTime);
+					 return EXIT_SUCCESS;
+				 }
+			 }
+		}
+
+
+	}
 
 
 	deli_message deliMessage;
 	deliMessage.messageType = messageType;
 	void* message = NULL;
-	//For the message, try to create the message
-
 
 	switch(reciver){
 		case BROKER:
@@ -383,12 +429,6 @@ int main(int argc, char **argv) {
 				}
 				break;
 			}
-				case SUSCRIPTOR:
-				{
-					//TODO
-					return 12;
-				}
-
 			default:
 				printf("Message type not supported\n");
 				return -1;
@@ -434,6 +474,12 @@ void readConfigBrokerValues(t_config *config,struct Broker *broker){
 		exit(-3);
 	}
 	printf("2. Finaliza lectura de config de broker\n");
+}
+
+void SleepAndClose(void* args)
+{
+	sleep(((int*)args)[1]);
+	close(((int*)args)[0]);
 }
 
 void initBroker(struct Broker *broker){

@@ -23,8 +23,6 @@ int main(void) {
 
 	pthread_t* subs;
 
-	char* ip;
-	char* puerto;
 	char* ptoMnt;
 	char* retryOperation;
 	char* delayTime;
@@ -39,8 +37,6 @@ int main(void) {
 
 	config = read_config();
 
-	ip= get_config_value(config,logger,IP_BROKER);
-	puerto = get_config_value(config,logger,PUERTO_BROKER);
 	ptoMnt = get_config_value(config,logger,PUNTO_MONTAJE_TALLGRASS);
 //  retryConnection = obtener_valor_config(config.logger,TIEMPO_DE_REINTENTO_CONEXION);
 	retryOperation = get_config_value(config,logger,TIEMPO_DE_REINTENTO_OPERACION);
@@ -48,7 +44,6 @@ int main(void) {
 
 	GameCard=GameCard_initialize(logger,ptoMnt,retryOperation, delayTime);
 	GameCard_mountFS(config);
-	config_destroy(config);
 
 	initBroker(&broker);
 	readConfigBrokerValues(config,logger,&broker);
@@ -56,6 +51,8 @@ int main(void) {
 	subs=(pthread_t*)malloc(sizeof(pthread_t)*3);
 
 	subscribeToBroker(broker,subs);
+
+	config_destroy(config);
 
 	while(1){
 
@@ -173,8 +170,9 @@ int GameCard_mountFS(t_config* config){
 void GameCard_Wait_For_Message(void* variables){
 
 	t_args* args= (t_args*)variables;
-	int broker = *((t_args*)variables)->broker;
+	int broker = ((t_args*)variables)->broker;
 	uint32_t queueType = ((t_args*)variables)->queueType;
+
 	char* queue;
 
 	switch (queueType) {
@@ -222,7 +220,15 @@ void GameCard_Wait_For_Message(void* variables){
 	else
 		log_debug(GameCard->logger,"Resultado de envio del mensaje: %d", resultado);
 
-	free(args);
+	thread = (pthread_t*)malloc(sizeof(pthread_t));
+
+	args->broker = broker;
+	args->queueType = GET_POKEMON;
+
+	pthread_create(thread,NULL,(void*)GameCard_Wait_For_Message,args);
+	pthread_detach(*thread);
+
+	pthread_exit(NULL);
 }
 
 void GameCard_Process_Message(deli_message* message, int broker){
@@ -1615,9 +1621,11 @@ void* subscribeToBrokerNew(void *brokerAdress){
 		log_debug(GameCard->logger,"3.1.2 Suscribe Queue - Se subscribió a New");
 	}
 
+//	thread = (pthread_t*)malloc(sizeof(pthread_t));
+
 	t_args* args= (t_args*) malloc (sizeof (t_args));
 
-	args->broker = &socketLocalized;
+	args->broker = socketLocalized;
 	args->queueType = NEW_POKEMON;
 
 	pthread_create(thread,NULL,(void*)GameCard_Wait_For_Message,args);
@@ -1636,9 +1644,11 @@ void* subscribeToBrokerCatch(void *brokerAdress){
 		log_debug(GameCard->logger,"3.2.2 Suscribe Queue - Se subscribió a Catch");
 	}
 
+//	thread = (pthread_t*)malloc(sizeof(pthread_t));
+
 	t_args* args= (t_args*) malloc (sizeof (t_args));
 
-	args->broker = &socketAppeared;
+	args->broker = socketAppeared;
 	args->queueType = CATCH_POKEMON;
 
 	pthread_create(thread,NULL,(void*)GameCard_Wait_For_Message,args);
@@ -1657,9 +1667,11 @@ void* subscribeToBrokerGet(void *brokerAdress){
 		log_debug(GameCard->logger,"3.3.2 Suscribe Queue - Se subscribió a Get");
 	}
 
+//	thread = (pthread_t*)malloc(sizeof(pthread_t));
+
 	t_args* args= (t_args*) malloc (sizeof (t_args));
 
-	args->broker = &socketCaught;
+	args->broker = socketCaught;
 	args->queueType = GET_POKEMON;
 
 	pthread_create(thread,NULL,(void*)GameCard_Wait_For_Message,args);

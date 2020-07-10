@@ -86,7 +86,7 @@ typedef struct {
 }t_values;
 
 typedef struct {
-	int* broker;
+	int broker;
 	uint32_t queueType;
 	} t_args;
 

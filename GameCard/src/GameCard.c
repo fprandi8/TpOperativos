@@ -12,22 +12,26 @@
 
 t_GameCard* GameCard;
 t_dictionary* pokeSemaphore;
+pthread_t* thread;
 
 int main(void) {
 
 	t_log* logger;
 	t_config* config;
 	pokeSemaphore=dictionary_create();
-//	pthread_t* subs;
+	signal(SIGINT,signaltHandler);
 
-//	char* ip,puerto;
+	pthread_t* subs;
+
+	char* ip;
+	char* puerto;
 	char* ptoMnt;
 	char* retryOperation;
 	char* delayTime;
 
-	//	char* retryConnection, delayTime;
+	thread = (pthread_t*)malloc(sizeof(pthread_t));
 
-//	int server,client;
+	//	char* retryConnection;
 
 	logger = iniciar_logger();
 	log_info(logger,"PROCESO GAMECARD ONLINE");
@@ -35,8 +39,8 @@ int main(void) {
 
 	config = read_config();
 
-//	ip= obtener_valor_config(config,logger,IP_BROKER);
-//	puerto = obtener_valor_config(config,logger,PUERTO_BROKER);
+	ip= get_config_value(config,logger,IP_BROKER);
+	puerto = get_config_value(config,logger,PUERTO_BROKER);
 	ptoMnt = get_config_value(config,logger,PUNTO_MONTAJE_TALLGRASS);
 //  retryConnection = obtener_valor_config(config.logger,TIEMPO_DE_REINTENTO_CONEXION);
 	retryOperation = get_config_value(config,logger,TIEMPO_DE_REINTENTO_OPERACION);
@@ -46,89 +50,16 @@ int main(void) {
 	GameCard_mountFS(config);
 	config_destroy(config);
 
-// ESTO YA FUNCIONA PERO NO LO VOY A PROBAR POR AHORA
-//	initBroker(&broker);
-//	readConfigBrokerValues(config,logger,&broker);
-//
-//	subs=(pthread_t*)malloc(sizeof(pthread_t)*3);
-//
-//	subscribeToBroker(broker,subs);
+	initBroker(&broker);
+	readConfigBrokerValues(config,logger,&broker);
 
-	deli_message* message;
+	subs=(pthread_t*)malloc(sizeof(pthread_t)*3);
 
-// -- PRUEBA DE NEW - BEGIN.
+	subscribeToBroker(broker,subs);
 
-	message = (deli_message*)malloc(sizeof(deli_message));
-	message->id = 88;
-	message->correlationId=99;
-	message->messageType=NEW_POKEMON;
+	while(1){
 
-	new_pokemon* newPokemon = (new_pokemon*)malloc(sizeof(new_pokemon));
-	newPokemon->ammount=1;
-	newPokemon->verticalCoordinate = 8;
-	newPokemon->horizontalCoordinate = 4;
-	newPokemon->pokemonName = "Pikachu";
-
-	message->messageContent = (void*)newPokemon;
-
-	GameCard_Process_Message(message);
-	free(message->messageContent);
-	free(message);
-
-	message = (deli_message*)malloc(sizeof(deli_message));
-	message->id = 88;
-	message->correlationId=99;
-	message->messageType=NEW_POKEMON;
-
-	newPokemon = (new_pokemon*)malloc(sizeof(new_pokemon));
-	newPokemon->ammount=10;
-	newPokemon->verticalCoordinate = 8;
-	newPokemon->horizontalCoordinate = 2;
-	newPokemon->pokemonName = "Pikachu";
-
-	message->messageContent = (void*)newPokemon;
-
-	GameCard_Process_Message(message);
-	free(message->messageContent);
-	free(message);
-//
-// -- PRUEBA DE NEW - END.
-
-// -- PRUEBA GET - BEGIN.
-
-	message = (deli_message*)malloc(sizeof(deli_message));
-	message->id = 88;
-	message->correlationId=99;
-	message->messageType=GET_POKEMON;
-
-	get_pokemon* getPokemon = (get_pokemon*)malloc(sizeof(get_pokemon));
-	getPokemon->pokemonName = "Pikachu";
-
-	message->messageContent = (void*)getPokemon;
-
-	GameCard_Process_Message(message);
-	free(message->messageContent);
-	free(message);
-
-// -- PRUEBA GET - END.
-
-// -- PRUEBA CATCH - BEGIN
-	message = (deli_message*)malloc(sizeof(deli_message));
-	message->id = 88;
-	message->correlationId=99;
-	message->messageType=CATCH_POKEMON;
-
-	catch_pokemon* catchPokemon = (catch_pokemon*)malloc(sizeof(catch_pokemon));
-	catchPokemon->pokemonName = "Pikachu";
-	catchPokemon->verticalCoordinate = 8;
-	catchPokemon->horizontalCoordinate = 4;
-
-	message->messageContent = (void*)catchPokemon;
-
-	GameCard_Process_Message(message);
-	free(message->messageContent);
-	free(message);
-// -- PRUEBA CATCH - END
+	}
 
 	munmap(GameCard->fileMapped, (GameCard->blocks/8));
 
@@ -239,30 +170,93 @@ int GameCard_mountFS(t_config* config){
 		return result;
 }
 
-void GameCard_Process_Message(deli_message* message){
+void GameCard_Wait_For_Message(void* variables){
 
-	deli_message* responseMessage;
+	t_args* args= (t_args*)variables;
+	int broker = *((t_args*)variables)->broker;
+	uint32_t queueType = ((t_args*)variables)->queueType;
+	char* queue;
+
+	switch (queueType) {
+
+		case NEW_POKEMON: {
+			queue =(char*)malloc(strlen("QUEUE NEW POKEMON") + 1);
+			strcpy(queue,"QUEUE NEW POKEMON");
+			break;
+		}
+
+		case GET_POKEMON:{
+			queue =(char*)malloc(strlen("QUEUE GET POKEMON") + 1);
+			strcpy(queue,"QUEUE GET POKEMON");
+			break;
+		}
+
+		case CATCH_POKEMON:{
+			queue =(char*)malloc(strlen("QUEUE CATCH POKEMON") + 1);
+			strcpy(queue,"QUEUE CATCH POKEMON");
+			break;
+		}
+
+	}
+
+	log_debug(GameCard->logger, "Esperando mensajes de la %s ", queue);
+	free(queue);
+
+	uint32_t type;
+	void* content = malloc(sizeof(void*));
+
+	int resultado= RecievePackage(broker,&type,&content);
+
+	if (!resultado)
+	{
+		deli_message* message = (deli_message*)content;
+		int result = SendMessageAcknowledge(message->id, broker);
+
+		if(!result)
+			log_debug(GameCard->logger, "Acknowledge enviado correctamente");
+		else
+			log_debug(GameCard->logger, "Error al enviar el acknoledge");
+
+		GameCard_Process_Message(message, broker);
+	}
+	else
+		log_debug(GameCard->logger,"Resultado de envio del mensaje: %d", resultado);
+
+	free(args);
+}
+
+void GameCard_Process_Message(deli_message* message, int broker){
+
+	void* responseMessage;
+	int result;
 
 	switch (message->messageType){
 		case NEW_POKEMON: {
-			GameCard_Process_Message_New(message);
+			responseMessage=GameCard_Process_Message_New(message);
+			appeared_pokemon* appearedPokemon = (appeared_pokemon*)responseMessage;
+			result=Send_APPEARED(*(appearedPokemon),message->id,broker);
 			break;
 		}
 
 		case GET_POKEMON:{
 			responseMessage= GameCard_Process_Message_Get(message);
-			free(responseMessage);
+			localized_pokemon* localizedPokemon = (localized_pokemon*)responseMessage;
+			result=Send_LOCALIZED(*(localizedPokemon),message->id,broker);
 			break;
 		}
 
 		case CATCH_POKEMON:{
 			responseMessage=GameCard_Process_Message_Catch(message);
+			caught_pokemon* caughtPokemon = (caught_pokemon*) responseMessage;
+			result=Send_CAUGHT(*(caughtPokemon),message->id,broker);
 			break;
 		}
 	}
+	free(responseMessage);
+	log_debug(GameCard->logger, "Resultado del envio del mensaje al broker %d", result);
 }
 
-deli_message* GameCard_Process_Message_Catch(deli_message* message){
+void* GameCard_Process_Message_Catch(deli_message* message){
 	int resulCatchPokemon;
 	catch_pokemon* catchPokemon = (catch_pokemon*)message->messageContent;
 
@@ -331,18 +325,13 @@ deli_message* GameCard_Process_Message_Catch(deli_message* message){
 
 	sleep(GameCard->delayTime);
 
-	deli_message* newMessage = (deli_message*)malloc(sizeof(deli_message));
-	newMessage->correlationId=message->id;
-	newMessage->messageType=CAUGHT_POKEMON;
-	message->messageContent = (void*)caughtPokemon;
-
 	free(directory);
 
-	return newMessage;
+	return (void*)caughtPokemon;
 
 }
 
-deli_message* GameCard_Process_Message_Get(deli_message* message){
+void* GameCard_Process_Message_Get(deli_message* message){
 	get_pokemon* getPokemon = (get_pokemon*)message->messageContent;
 
 	char * directory = (char*)malloc(strlen(GameCard->filePath) + strlen(getPokemon->pokemonName) + 1 );
@@ -397,16 +386,6 @@ deli_message* GameCard_Process_Message_Get(deli_message* message){
 
 	sleep(GameCard->delayTime);
 
-
-	// REVISAR ESTO POSIBLEMENTE TENGA QUE ENVIAR EL MENSAJE NO DEVOLVERLO...
-		deli_message* newMessage = (deli_message*)malloc(sizeof(deli_message));
-	//	newMessage->correlationId=message->id;
-	//	newMessage->messageType=LOCALIZED_POKEMON;
-	//
-	//	int tam = sizeof(uint32_t) * 2 + strlen(localizedPokemon->pokemonName)+1 + sizeof(uint32_t) * localizedPokemon->ammount * 2;
-	//	message->messageContent= malloc(tam);
-	//	message->messageContent = (void*)localizedPokemon;
-
 	printf("Cantidad del pokemon %s encontradods %d \n" , localizedPokemon->pokemonName,localizedPokemon->ammount);
 	printf("Coordenadas donde se encuentran %d - %d \n", localizedPokemon->coordinates->x, localizedPokemon->coordinates->y);
 	printf("Coordenadas donde se encuentran %d - %d \n", (localizedPokemon->coordinates[1]).x, (localizedPokemon->coordinates[1]).y);
@@ -416,10 +395,12 @@ deli_message* GameCard_Process_Message_Get(deli_message* message){
 	free(localizedPokemon);
 	free(directory);
 
-	return newMessage;
+	return (void*)localizedPokemon;
 }
 
-void GameCard_Process_Message_New(deli_message* message){
+void* GameCard_Process_Message_New(deli_message* message){
+
+	void* responseMessage;
 	new_pokemon* newPokemon = (new_pokemon*)message->messageContent;
 
 	char * directory = (char*)malloc(strlen(GameCard->filePath) + strlen(newPokemon->pokemonName) + 1 );
@@ -434,18 +415,17 @@ void GameCard_Process_Message_New(deli_message* message){
 
 	list_add(values->values,newPokemon);
 
-	int resultMessageProces;
 
 	switch (result){
 		case 2:
 		{
-			resultMessageProces= modify_poke_file(values, directory);
+			responseMessage= modify_poke_file(values, directory);
 			break;
 		}
 
 		case 0:
 		{
-			resultMessageProces= create_poke_file(values);
+			responseMessage= create_poke_file(values);
 			break;
 		}
 
@@ -455,11 +435,11 @@ void GameCard_Process_Message_New(deli_message* message){
 		}
 	}
 
-	log_debug(GameCard->logger, "Resultado del procesamiento del mensaje: %d", resultMessageProces);
-//	list_destroy_and_destroy_elements(values->values,free);
 	list_destroy(values->values);
 	free(values);
 	free(directory);
+
+	return responseMessage;
 }
 
 void GameCard_Initialize_bitarray(){
@@ -581,7 +561,7 @@ void create_localized_message(localized_pokemon* localizedPokemon, char* fileCon
 }
 
 
-int modify_poke_file(t_values* values, char* directory){;
+void* modify_poke_file(t_values* values, char* directory){;
 
 	char* file = (char*)malloc(strlen(directory) + strlen("/metadata.bin") + 1);
 
@@ -593,6 +573,12 @@ int modify_poke_file(t_values* values, char* directory){;
 	t_config* metadataConfig;
 
 	new_pokemon* newPokemon = (new_pokemon*)list_get(values->values,0);
+
+	appeared_pokemon* appearedPokemon = (appeared_pokemon*)malloc(sizeof(appeared_pokemon));
+	appearedPokemon->pokemonName = (char*)malloc(strlen(newPokemon->pokemonName) + 1);
+	strcpy(appearedPokemon->pokemonName,newPokemon->pokemonName);
+	appearedPokemon->horizontalCoordinate = newPokemon->horizontalCoordinate;
+	appearedPokemon->verticalCoordinate = newPokemon->verticalCoordinate;
 
 	log_debug(GameCard->logger, "Crea el config para leer el archivo %s", file);
 
@@ -623,9 +609,6 @@ int modify_poke_file(t_values* values, char* directory){;
 	}
 	else
 	{
-		//TODO: Si el bloque tiene espacio llenarlo primero
-		//TODO: Luego, si aún queda mensaje por grabar crearlo
-
 		int result;
 		int size = get_message_size(newPokemon);
 
@@ -640,8 +623,6 @@ int modify_poke_file(t_values* values, char* directory){;
 		metadataFile->size =  string_itoa(auxSize + size);
 
 		log_debug(GameCard->logger, "Nuevo tamaño de la metadata %s", metadataFile->size);
-
-//		char* buffer=serialize_data(atoi(metadataFile->size),newPokemon);
 
 		char*buffer = serialize_data(size,newPokemon);
 
@@ -665,8 +646,6 @@ int modify_poke_file(t_values* values, char* directory){;
 
 		if (!result)
 			log_debug(GameCard->logger, "Archivo de Metadata Actualizado Correctamente");
-
-//		free(buffer);
 	}
 
 	sleep(GameCard->delayTime);
@@ -682,12 +661,18 @@ int modify_poke_file(t_values* values, char* directory){;
 
 	Metadata_File_Destroy(metadataFile);
 
-	return 0;
+	return (void*)appearedPokemon;
 }
 
-int create_poke_file(t_values* values){
+void* create_poke_file(t_values* values){
 
 	new_pokemon* newPokemon = (new_pokemon*)list_get(values->values,0);
+
+	appeared_pokemon* appearedPokemon = (appeared_pokemon*)malloc(sizeof(appeared_pokemon));
+	appearedPokemon->pokemonName = (char*)malloc(strlen(newPokemon->pokemonName) + 1);
+	strcpy(appearedPokemon->pokemonName,newPokemon->pokemonName);
+	appearedPokemon->horizontalCoordinate = newPokemon->horizontalCoordinate;
+	appearedPokemon->verticalCoordinate = newPokemon->verticalCoordinate;
 
 	t_file_metadata* metadataFile = (t_file_metadata*)malloc(sizeof(t_file_metadata));
 
@@ -723,6 +708,9 @@ int create_poke_file(t_values* values){
 
 	result=create_file(POKE_METADATA,values);
 
+	if (!result)
+		log_debug(GameCard->logger, "Metadata del Pokemon Creada Correctamente");
+
 	list_remove(values->values,1);
 	list_remove(values->values,0);
 
@@ -730,7 +718,7 @@ int create_poke_file(t_values* values){
 
 	Metadata_File_Destroy(metadataFile);
 
-	return result;
+	return (void*)appearedPokemon;
 }
 
 void destroy_poke_dictionary(t_dictionary* pokeSemaphore){
@@ -1054,9 +1042,8 @@ void Metadata_File_Initialize_Block(t_file_metadata* metadataFile){
 }
 
 void read_metadata_file(t_file_metadata* metadataFile, t_config* metadataConfig, char* pokemonName){
-
-	sem_t* pokeSem = dictionary_get(pokeSemaphore,pokemonName);
-	int fileAvailable =0;
+	sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,pokemonName);
+	int fileAvailable=0;
 	while(!fileAvailable){
 		sem_wait(pokeSem);
 		metadataFile->open = *(get_config_value(metadataConfig,GameCard->logger,OPEN));
@@ -1099,6 +1086,17 @@ void read_metadata_file(t_file_metadata* metadataFile, t_config* metadataConfig,
 
 }
 
+sem_t* get_poke_semaphore(t_dictionary* pokeSempahore, char* pokemonName){
+
+	if (dictionary_has_key(pokeSemaphore, pokemonName))
+		return dictionary_get(pokeSemaphore,pokemonName);
+	else
+	{
+		create_poke_semaphore(pokemonName);
+		return dictionary_get(pokeSemaphore,pokemonName);
+	}
+}
+
 char* get_file_content(t_file_metadata* metadataFile){
 
 	log_debug(GameCard->logger, "Cantidad de bloques necesarios %d " , list_size(metadataFile->block));
@@ -1119,7 +1117,7 @@ char* get_file_content(t_file_metadata* metadataFile){
 		FILE* f= fopen(blockFile,"rb");
 
 		if (f==NULL){
-			log_debug(GameCard->logger,"Error en la creacion del archivo %s", blockFile);
+			log_debug(GameCard->logger,"Error en la lectura del bloque %s", blockFile);
 			return '1';
 		}
 
@@ -1433,24 +1431,17 @@ void write_blocks(t_file_metadata* metadataFile, int amountOfBlocks, char* buffe
 
 	while(list_get(metadataFile->block, i) != NULL)
 	{
-//	for (int i = 0; i<amountOfBlocks; i++){
-//		int bitBlock=get_first_free_block();
-//		char* charblock = string_itoa(bitBlock);
 
 		char* charblock = string_duplicate((char*)list_get(metadataFile->block,i));
 		log_debug(GameCard->logger,"Bloque donde va a guardar los datos %s" , charblock);
-//		list_add(metadataFile->block,(void*)charblock);
 
 		int bitBlock = atoi(charblock);
 		list_add(values->values,(void*)bitBlock);
 
 		index = 0;
-//		int eol =0;
-//		while((GameCard->block_size > index) && (index < tam) && (!eol)){
 		while((GameCard->block_size > index) && (index < tam)){
 			printf("Bloque a grabar : %c \n",buffer[cantBytes]);
 			bufferAux[index]=buffer[cantBytes];
-//			if (buffer[cantBytes]=='\n') eol=1;
 			cantBytes++;
 			index++;
 		}
@@ -1623,6 +1614,15 @@ void* subscribeToBrokerNew(void *brokerAdress){
 	}else{
 		log_debug(GameCard->logger,"3.1.2 Suscribe Queue - Se subscribió a New");
 	}
+
+	t_args* args= (t_args*) malloc (sizeof (t_args));
+
+	args->broker = &socketLocalized;
+	args->queueType = NEW_POKEMON;
+
+	pthread_create(thread,NULL,(void*)GameCard_Wait_For_Message,args);
+	pthread_detach(*thread);
+
 	pthread_exit(NULL);
 }
 
@@ -1635,6 +1635,15 @@ void* subscribeToBrokerCatch(void *brokerAdress){
 	}else{
 		log_debug(GameCard->logger,"3.2.2 Suscribe Queue - Se subscribió a Catch");
 	}
+
+	t_args* args= (t_args*) malloc (sizeof (t_args));
+
+	args->broker = &socketAppeared;
+	args->queueType = CATCH_POKEMON;
+
+	pthread_create(thread,NULL,(void*)GameCard_Wait_For_Message,args);
+	pthread_detach(*thread);
+
 	pthread_exit(NULL);
 }
 
@@ -1647,8 +1656,18 @@ void* subscribeToBrokerGet(void *brokerAdress){
 	}else{
 		log_debug(GameCard->logger,"3.3.2 Suscribe Queue - Se subscribió a Get");
 	}
+
+	t_args* args= (t_args*) malloc (sizeof (t_args));
+
+	args->broker = &socketCaught;
+	args->queueType = GET_POKEMON;
+
+	pthread_create(thread,NULL,(void*)GameCard_Wait_For_Message,args);
+	pthread_detach(*thread);
+
 	pthread_exit(NULL);
 }
+
 int connectBroker(char* ip, char* puerto,t_log* logger)
 {
 	int teamSocket;
@@ -1683,5 +1702,17 @@ int connectBroker(char* ip, char* puerto,t_log* logger)
 		}
 	}
     return -1;
+}
+
+// Manage an interupt or segmentation fault
+void signaltHandler(int sig_num){
+	log_debug(GameCard->logger, "SE INTERRUMPIO EL PROCESO");
+
+	munmap(GameCard->fileMapped, (GameCard->blocks/8));
+
+	destroy_poke_dictionary(pokeSemaphore);
+
+	GameCard_Destroy(GameCard);
+	exit(-5);
 }
 

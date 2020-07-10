@@ -85,13 +85,19 @@ typedef struct {
 	t_list* values;
 }t_values;
 
+typedef struct {
+	int* broker;
+	uint32_t queueType;
+	} t_args;
+
 
 t_GameCard* GameCard_initialize(t_log*, char*,char*,char*);
 int GameCard_mountFS(t_config*);
-void GameCard_Process_Message(deli_message*);
-void GameCard_Process_Message_New(deli_message*);
-deli_message* GameCard_Process_Message_Get(deli_message*);
-deli_message* GameCard_Process_Message_Catch(deli_message*);
+void GameCard_Wait_For_Message(void*);
+void GameCard_Process_Message(deli_message*,int);
+void* GameCard_Process_Message_New(deli_message*);
+void* GameCard_Process_Message_Get(deli_message*);
+void* GameCard_Process_Message_Catch(deli_message*);
 void GameCard_Initialize_bitarray();
 void GameCard_Destroy(t_GameCard*);
 
@@ -103,8 +109,9 @@ int create_file_metadata(t_values* );
 int create_file_metadata_directory(t_values* );
 int create_file_metadata_poke(t_values*);
 
-int create_poke_file(t_values*);
-int modify_poke_file(t_values*, char*);
+void* create_poke_file(t_values*);
+void* modify_poke_file(t_values*, char*);
+sem_t* get_poke_semaphore(t_dictionary*, char*);
 void create_poke_semaphore(char*);
 void destroy_poke_semaphore(char*);
 void destroy_poke_dictionary(t_dictionary*);
@@ -156,5 +163,7 @@ void initBroker(struct Broker *broker){
 }
 
 int connectBroker(char* , char* ,t_log* );
+
+void signaltHandler(int);
 
 #endif /* GAMECARD_H_ */

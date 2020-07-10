@@ -198,6 +198,7 @@ void broker_suscribe_process(void* buffer, int cliente, t_Broker* broker){
 		aux->suscripted = cliente;
 		list_add(queueToSuscribe->suscriptors,aux);
 		log_info(broker->logger,"NUEVA SUSCRIPCIÓN AL BROKER QUEUE: %d", *QueueType);
+		//TODO: agregar logica para enviar los mensajes cacheados al subscriptor
 	}
 
 }
@@ -245,7 +246,7 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 
 	thread = (pthread_t*)malloc(sizeof(pthread_t));
 
-	//TODO Acá deberia pedir memoria de la cache
+	//TODO La cache tiene que guardar el mensaje
 	queue_push(queue->queue,message->messageContent);
 
 
@@ -329,6 +330,7 @@ void queue_handler_send_message(void* args){
 		if (op_code == ACKNOWLEDGE ){
 			message_administrator_receive_acknowledge(messageAdministrator);
 			if (messageAdministrator->amountPendingAcknowledge == 0){
+				//TODO: logica de la cache para eliminar el mensaje
 				log_debug(broker->logger,"TODOS LOS SUSCRIPTORE RESCIBIERON EL MENSAJE SE ELININA");
 				void* element = queue_pop(queue->queue);
 				free(element);

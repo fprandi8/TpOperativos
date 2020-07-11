@@ -86,15 +86,21 @@ typedef struct {
 }t_values;
 
 typedef struct {
-	int broker;
+	int suscription;
 	uint32_t queueType;
-	} t_args;
+	void* brokerAddress;
+} t_args;
+
+typedef struct {
+	deli_message* message;
+	void* brokerAddress;
+} t_args_process_message;
 
 
 t_GameCard* GameCard_initialize(t_log*, char*,char*,char*);
 int GameCard_mountFS(t_config*);
 void GameCard_Wait_For_Message(void*);
-void GameCard_Process_Message(deli_message*,int);
+void GameCard_Process_Message(void*);
 void* GameCard_Process_Message_New(deli_message*);
 void* GameCard_Process_Message_Get(deli_message*);
 void* GameCard_Process_Message_Catch(deli_message*);

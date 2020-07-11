@@ -26,6 +26,10 @@ int main(void) {
 	char* ptoMnt;
 	char* retryOperation;
 	char* delayTime;
+	char* ip;
+	char* puerto;
+	int server;
+	int cliente;
 
 	thread = (pthread_t*)malloc(sizeof(pthread_t));
 
@@ -41,6 +45,11 @@ int main(void) {
 //  retryConnection = obtener_valor_config(config.logger,TIEMPO_DE_REINTENTO_CONEXION);
 	retryOperation = get_config_value(config,logger,TIEMPO_DE_REINTENTO_OPERACION);
 	delayTime = get_config_value(config,logger,TIEMPO_RETARDO_OPERACION);
+	ip = get_config_value(config,logger,IP_GAMECARD);
+	puerto = get_config_value(config,logger,PUERTO_GAMECARD);
+
+	server = iniciar_servidor(ip, puerto);
+
 
 	GameCard=GameCard_initialize(logger,ptoMnt,retryOperation, delayTime);
 	GameCard_mountFS(config);
@@ -56,6 +65,12 @@ int main(void) {
 
 	while(1){
 
+		cliente = esperar_cliente(server);
+
+		log_debug(GameCard->logger, "Proceso GameBoy Conectado");
+
+		pthread_create(thread,NULL,(void*)GameCard_Attend_Gameboy,&cliente);
+		pthread_detach(*thread);
 	}
 
 	munmap(GameCard->fileMapped, (GameCard->blocks/8));
@@ -165,6 +180,53 @@ int GameCard_mountFS(t_config* config){
 		free(values);
 
 		return result;
+}
+
+void GameCard_Attend_Gameboy(void* var){
+
+	uint32_t type;
+	void* content = malloc(sizeof(void*));
+
+	int* cliente = (int*)var;
+
+	int result= RecievePackage(*(cliente),&type,&content);
+
+	if (!result)
+	{
+		log_debug(GameCard->logger,"Mensaje del GameBoy recibido");
+		deli_message* message = (deli_message*)content;
+		GameCard_Process_Gameboy_Message(message);
+	}
+	else
+	{
+		log_debug(GameCard->logger, "Error al obtener el mensaje del GameBoy");
+	}
+
+	pthread_exit(NULL);
+}
+
+void GameCard_Process_Gameboy_Message(deli_message* message){
+	deli_message* responseMessage;
+
+	switch (message->messageType){
+		case NEW_POKEMON: {
+			responseMessage=GameCard_Process_Message_New(message);
+			break;
+		}
+
+		case GET_POKEMON:{
+			responseMessage= GameCard_Process_Message_Get(message);
+			break;
+		}
+
+		case CATCH_POKEMON:{
+			responseMessage=GameCard_Process_Message_Catch(message);
+			break;
+		}
+	}
+	free(responseMessage);
+	free(message->messageContent);
+	free(message);
 }
 
 void GameCard_Wait_For_Message(void* variables){

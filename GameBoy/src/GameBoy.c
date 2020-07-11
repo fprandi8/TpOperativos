@@ -44,9 +44,11 @@ void readConfigBrokerValues(t_config*,struct Broker*);
 void SleepAndClose(void* args);
 void GetKeysFor(t_reciever reciever, char* keys[]);
 void ReadConfigValues(t_config *config, char* keys[]);
+void RecieveAcknowledge(int server_socket);
+void RecieveMessage(int server_socket, message_type expectedType);
 
 int main(int argc, char **argv) {
-	puts("GameBoy (Publicador)"); /* prints GameBoy (Publicador) */
+	puts("GameBoy (Publicador)\n");
 
 /*
 	for(int i = 0; i < argc; i++)
@@ -69,7 +71,7 @@ int main(int argc, char **argv) {
 	//Check if reciever is valid
 	t_reciever reciver;
 	message_type messageType;
-	int subscriptionTime = 0;
+	int subscriptionTime = 0; //Time used to control suscription disconnection
 
 	if(strcmp(argv[1], "BROKER") == 0){
 		reciver = BROKER;
@@ -243,7 +245,7 @@ int main(int argc, char **argv) {
 		pfds[0].fd = server_socket;
 		pfds[0].events = POLLIN | POLLHUP; // Tell me when ready to read
 
-		while(1)
+		while(isRunning)
 		{
 			 int num_events = poll(pfds, 1, subscriptionTime);
 			 if (num_events == 0)
@@ -256,7 +258,7 @@ int main(int argc, char **argv) {
 
 				 if (pollin_happened)
 				 {
-					 //TODO Log message
+					 RecieveMessage(server_socket, messageType);
 				 }
 				 else
 				 {
@@ -273,6 +275,7 @@ int main(int argc, char **argv) {
 	deli_message deliMessage;
 	deliMessage.messageType = messageType;
 	void* message = NULL;
+	char* ptr_strtol; //pinter to char ised for strtol
 
 	switch(reciver){
 		case BROKER:
@@ -282,9 +285,9 @@ int main(int argc, char **argv) {
 					{
 						new_pokemon new;
 						new.pokemonName = argv[3];
-						new.horizontalCoordinate = argv[4];
-						new.verticalCoordinate = argv[5];
-						new.ammount = argv[6];
+						new.horizontalCoordinate = strtol(argv[4], &ptr_strtol, 10);
+						new.verticalCoordinate = strtol(argv[5], &ptr_strtol, 10);;
+						new.ammount = strtol(argv[6], &ptr_strtol, 10);;
 						message = &new;
 						deliMessage.messageContent = message;
 						deliMessage.id = 0;
@@ -295,20 +298,20 @@ int main(int argc, char **argv) {
 					{
 						appeared_pokemon app;
 						app.pokemonName=argv[3];
-						app.horizontalCoordinate = argv[4];
-						app.verticalCoordinate = argv[5];
+						app.horizontalCoordinate = strtol(argv[4], &ptr_strtol, 10);;
+						app.verticalCoordinate = strtol(argv[5], &ptr_strtol, 10);;
 						message = &app;
 						deliMessage.messageContent = message;
 						deliMessage.id = 0;
-						deliMessage.correlationId = argv[6];
+						deliMessage.correlationId = strtol(argv[6], &ptr_strtol, 10);;
 						break;
 					}
 					case CATCH_POKEMON:
 					{
 						catch_pokemon cat;
 						cat.pokemonName = argv[3];
-						cat.horizontalCoordinate = argv[4];
-						cat.verticalCoordinate = argv[5];
+						cat.horizontalCoordinate = strtol(argv[4], &ptr_strtol, 10);;
+						cat.verticalCoordinate = strtol(argv[5], &ptr_strtol, 10);;
 						message = &cat;
 						deliMessage.messageContent = message;
 						deliMessage.id = 0;
@@ -318,11 +321,11 @@ int main(int argc, char **argv) {
 					case CAUGHT_POKEMON:
 					{
 						caught_pokemon cau;
-						cau.caught = argv[4];
+						cau.caught = strtol(argv[4], &ptr_strtol, 10);;
 						message = &cau;
 						deliMessage.messageContent = message;
 						deliMessage.id = 0;
-						deliMessage.correlationId = argv[3];
+						deliMessage.correlationId = strtol(argv[3], &ptr_strtol, 10);;
 						break;
 					}
 					case GET_POKEMON:
@@ -349,8 +352,8 @@ int main(int argc, char **argv) {
 					{
 						appeared_pokemon app;
 						app.pokemonName = argv[3];
-						app.horizontalCoordinate = argv[4];
-						app.verticalCoordinate = argv[5];
+						app.horizontalCoordinate = strtol(argv[4], &ptr_strtol, 10);;
+						app.verticalCoordinate = strtol(argv[5], &ptr_strtol, 10);;
 						message = &app;
 						deliMessage.messageContent = message;
 						deliMessage.id = 0;
@@ -371,12 +374,12 @@ int main(int argc, char **argv) {
 					{
 						new_pokemon new;
 						new.pokemonName = argv[3];
-						new.horizontalCoordinate = argv[4];
-						new.verticalCoordinate = argv[5];
-						new.ammount = argv[6];
+						new.horizontalCoordinate = strtol(argv[4], &ptr_strtol, 10);;
+						new.verticalCoordinate = strtol(argv[5], &ptr_strtol, 10);;
+						new.ammount = strtol(argv[6], &ptr_strtol, 10);;
 						message = &new;
 						deliMessage.messageContent = message;
-						deliMessage.id = argv[7];
+						deliMessage.id = strtol(argv[7], &ptr_strtol, 10);
 						deliMessage.correlationId = 0;
 						break;
 					}
@@ -384,21 +387,21 @@ int main(int argc, char **argv) {
 					{
 						catch_pokemon cat;
 						cat.pokemonName = argv[3];
-						cat.horizontalCoordinate = argv[4];
-						cat.verticalCoordinate = argv[5];
+						cat.horizontalCoordinate = strtol(argv[4], &ptr_strtol, 10);;
+						cat.verticalCoordinate = strtol(argv[5], &ptr_strtol, 10);;
 						message = &cat;
 						deliMessage.messageContent = message;
-						deliMessage.id = argv[6];
+						deliMessage.id = strtol(argv[6], &ptr_strtol, 10);;
 						deliMessage.correlationId = 0;
 						break;
 					}
 					case GET_POKEMON:
 					{
 						get_pokemon get;
-						get.pokemonName =argv[3];
+						get.pokemonName = argv[3];
 						message = &get;
 						deliMessage.messageContent = message;
-						deliMessage.id = argv[4];
+						deliMessage.id = strtol(argv[4], &ptr_strtol, 10);;
 						deliMessage.correlationId = 0;
 						break;
 					}
@@ -427,8 +430,8 @@ int main(int argc, char **argv) {
 
 
 	//////////////////////// RECIBIR ACKNOWLEDGE ///////////////////
-
-	//TODO
+	printf("Waiting for messaje acknowledge\n");
+	RecieveAcknowledge(server_socket);
 
 	//////////////////////// END ////////////////////////////////
 
@@ -496,6 +499,61 @@ void GetKeysFor(t_reciever reciever, char* keys[])
 	{
 		keys[0] = "";
 		keys[1] = "";
+	}
+}
+
+void RecieveAcknowledge(int server_socket)
+{
+	op_code operationCode;
+	void* content;
+	if(RecievePackage(server_socket, &operationCode, &content) == 0)
+	{
+		switch (operationCode){
+			case SUBSCRIPTION:
+				puts("Error, recieved a suscription request while waiting for an acknowledge");
+				break;
+			case MESSAGE:
+				puts("Error, recieved a message while waiting for an acknowledge");
+				break;
+			case ACKNOWLEDGE:
+				puts("Recieved Acknowledge");
+				break;
+			default:
+				puts("Error, recieved a packet of unkown type");
+				break;
+		}
+	} 
+	else 
+	{
+		puts("Error, failed to recieve packet");
+	}
+}
+
+void RecieveMessage(int server_socket, message_type expectedType)
+{
+	op_code operationCode;
+	void* content;
+	if(RecievePackage(server_socket, &operationCode, &content) == 0)
+	{
+		switch (operationCode){
+			case SUBSCRIPTION:
+				puts("Error, recieved a suscription request while waiting for a message");
+				break;
+			case MESSAGE:
+				//TODO log message, give logger to function
+				if(((deli_message*)content)->messageType == expectedType) puts("Recieved Message of correct type"); else puts("Recieved Message with an incorrect type");
+				break;
+			case ACKNOWLEDGE:
+				puts("Error, recieved a suscription request while waiting for a message");
+				break;
+			default:
+				puts("Error, recieved a packet of unkown type");
+				break;
+		}
+	} 
+	else 
+	{
+		puts("Error, failed to recieve packet");
 	}
 }
 

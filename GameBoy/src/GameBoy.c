@@ -21,6 +21,7 @@
 #include<readline/readline.h>
 #include <pthread.h>
 #include <poll.h>
+#include <unistd.h>
 
 typedef enum
 {
@@ -41,18 +42,20 @@ struct Broker
 void initBroker(struct Broker*);
 void readConfigBrokerValues(t_config*,struct Broker*);
 void SleepAndClose(void* args);
+void GetKeysFor(t_reciever reciever, char* keys[]);
+void ReadConfigValues(t_config *config, char* keys[]);
 
 int main(int argc, char **argv) {
 	puts("GameBoy (Publicador)"); /* prints GameBoy (Publicador) */
 
-
+/*
 	for(int i = 0; i < argc; i++)
 	{
 		printf("%s\n",argv[i]);
 	}
 	printf("-------\n");
 	printf("%i\n",argc);
-	puts("////////////\n\n");
+	puts("////////////\n\n");*/
 	// TODO check if config file is exists and is valid
 
 
@@ -111,7 +114,7 @@ int main(int argc, char **argv) {
 			return 1;
 		}
 
-	}else if(strcmp(argv[1],"GAMECARD")) {
+	}else if(strcmp(argv[1],"GAMECARD") == 0) {
 		reciver = GAMECARD;
 		if(strcmp(argv[2], "NEW_POKEMON") == 0){
 					if(argc == 8){
@@ -140,7 +143,7 @@ int main(int argc, char **argv) {
 					return 1;
 				}
 	}
-	else if(strcmp(argv[1],"TEAM")) {
+	else if(strcmp(argv[1],"TEAM") == 0) {
 		reciver = TEAM;
 		if(strcmp(argv[2], "APPEARED_POKEMON") == 0){
 			if(argc == 6){
@@ -154,7 +157,7 @@ int main(int argc, char **argv) {
 			printf("Incorrect message, for TEAM must be APPEARED_POKEMON \n");
 			return 1;
 		}
-	}else if(strcmp(argv[1],"SUSCRIPTOR")) {
+	}else if(strcmp(argv[1],"SUSCRIPTOR") == 0) {
 		reciver = SUSCRIPTOR;
 		if(argc == 4){
 			if(strcmp(argv[2], "NEW_POKEMON") == 0){
@@ -173,7 +176,9 @@ int main(int argc, char **argv) {
 				printf("Incorrect message, for SUSCRIPTOR must be GET_POKEMON, CAUGHT_POKEMON, CATCH_POKEMON, NEW POKEMON, APPEARED_POKEMON, LOCALIZED_POKEMON \n");
 				return 1;
 			}
-			subscriptionTime = argv[3];
+			char* ptr;
+			subscriptionTime = strtol(argv[3], &ptr, 10);
+			printf("%d\n",subscriptionTime);
 		}else{
 
 			printf("Incorrect number of parameters for function SUSCRIPTOR, must be 3\n");
@@ -186,36 +191,12 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	/*char* pokemonName = argv[3];
-	printf("%s \n",pokemonName);
-	int numberOfIntegerArguments = argc-4;
-	printf("%i \n",numberOfIntegerArguments);
-	int* messageIntegerArguments = (int*)malloc(sizeof(int)*numberOfIntegerArguments);
-	for(int i = 4, u = 0; u < numberOfIntegerArguments; i++, u++)
-	{
-		int argument = atoi(argv[i]);
-		if(strcmp(argv[i], "0") != 0 && argument == 0)
-		{
-			printf("Invalid Input\n");
-			return 1;
-		}
-		messageIntegerArguments[u] = argument;
-	}*/
-
-
 	//Get IP from config
 	t_config* config = config_create("gameboy.config");
-	initBroker(&broker);
-	readConfigBrokerValues(config,&broker);
 
-	/*char* brokerIp = config_get_string_value(config, "IP_BROKER");
-	char* teamIp = config_get_string_value(config, "IP_TEAM");
-	char* gameCardIp = config_get_string_value(config, "IP_GAMECARD");
-
-	char* brokerPort = config_get_string_value(config, "PUERTO_BROKER");
-	char* teamPort = config_get_string_value(config, "PUERTO_TEAM");
-	char* gameCardPort = config_get_string_value(config, "PUERTO_GAMECARD");
-*/
+	char* keys[2];
+	GetKeysFor(reciver, keys);
+	ReadConfigValues(config, keys);
 
 	struct addrinfo hints;
 	struct addrinfo *server_info;
@@ -225,22 +206,21 @@ int main(int argc, char **argv) {
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	getaddrinfo(broker.ip, broker.port, &hints, &server_info);
+	getaddrinfo(keys[0], keys[1], &hints, &server_info);
 
 	int server_socket = socket(server_info->ai_family, server_info->ai_socktype, server_info->ai_protocol);
 
-	//Connect
 	int result = connect(server_socket, server_info->ai_addr, server_info->ai_addrlen);
 
 	if(result == -1)
 	{
-		printf("Could not connect");
+		printf("Could not connect\n");
 		return -1;
 	}
 
 	free(server_info);
 
-
+	printf("Connected\n");
 
 	//////////////////////// ENVIAR ////////////////////////////////
 
@@ -263,7 +243,7 @@ int main(int argc, char **argv) {
 		pfds[0].fd = server_socket;
 		pfds[0].events = POLLIN | POLLHUP; // Tell me when ready to read
 
-		while(isRunning)
+		while(1)
 		{
 			 int num_events = poll(pfds, 1, subscriptionTime);
 			 if (num_events == 0)
@@ -280,7 +260,7 @@ int main(int argc, char **argv) {
 				 }
 				 else
 				 {
-					 printf("Exit after %d", subscriptionTime);
+					 printf("Exit after %d seconds", subscriptionTime);
 					 return EXIT_SUCCESS;
 				 }
 			 }
@@ -475,6 +455,50 @@ void readConfigBrokerValues(t_config *config,struct Broker *broker){
 	}
 	printf("2. Finaliza lectura de config de broker\n");
 }
+
+void ReadConfigValues(t_config *config, char* keys[])
+{
+	printf("2. Comienza lectura de config\n");
+	if (config_has_property(config,keys[0])){
+		keys[0] = config_get_string_value(config,keys[0]);
+		printf("2. Se leyó la IP: %s\n", keys[0]);
+	}else{
+		exit(-3);
+	}
+
+	if (config_has_property(config,keys[1])){
+		keys[1] = config_get_string_value(config,keys[1]);
+		printf("2. Se leyó el puerto: %s\n", keys[1]);
+	}else{
+		exit(-3);
+	}
+	printf("2. Finaliza lectura de config\n\n");
+}
+
+void GetKeysFor(t_reciever reciever, char* keys[])
+{
+	if(reciever == SUSCRIPTOR || reciever == BROKER)
+	{
+		keys[0] = "IP_BROKER";
+		keys[1] = "PUERTO_BROKER";
+	}
+	else if(reciever == TEAM)
+	{
+		keys[0] = "IP_TEAM";
+		keys[1] = "PUERTO_TEAM";
+	}
+	else if(reciever == GAMECARD)
+	{
+		keys[0] = "IP_GAMECARD";
+		keys[1] = "PUERTO_GAMECARD";
+	}
+	else
+	{
+		keys[0] = "";
+		keys[1] = "";
+	}
+}
+
 
 void SleepAndClose(void* args)
 {

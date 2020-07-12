@@ -1186,6 +1186,8 @@ char* get_file_content(t_file_metadata* metadataFile){
 
 	int index = 0;
 
+	int tam = atoi(metadataFile->size);
+
 	while(list_get(metadataFile->block, index) != NULL){
 		char* block =(char*)malloc(strlen(list_get(metadataFile->block, index))+1);
 		strcpy(block,list_get(metadataFile->block, index));
@@ -1206,7 +1208,12 @@ char* get_file_content(t_file_metadata* metadataFile){
 
 		fread(buffer,GameCard->block_size,1,f);
 
-		buffer[GameCard->block_size] = '\0';
+		if (tam > GameCard->block_size){
+			tam = tam - GameCard->block_size;
+			buffer[GameCard->block_size] = '\0';
+		}else{
+			buffer[tam] = '\0';
+		}
 
 		if (index==0)
 			strcpy(aux,(char*)buffer);
@@ -1245,6 +1252,7 @@ char* remove_line_from_file(char* fileContent,int pos,t_file_metadata* metadataF
 
 	if (pos != 0) {
 		memcpy(aux,fileContent,pos-1);
+		auxIntSize = auxIntSize-pos+1;
 		if(auxIntSize > 0){
 			memcpy(aux+pos-1,fileContent+pos+bytes-1,auxIntSize);
 			aux[auxIntSize+pos-1]='\0';

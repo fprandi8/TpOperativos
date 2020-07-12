@@ -935,47 +935,42 @@ int create_file_bitmap(){
 	int f;
 
 	if( access( filename, F_OK ) != -1 ) {
-		f = open(filename, O_RDWR, (mode_t)0600);
-		exist = 1;
-
-	} else {
-		f = open(filename, O_CREAT, (mode_t)0600);
-		exist = 0;
+			f = open(filename, O_RDWR, (mode_t)0600);
+			exist = 1;
+	}
+	else {
+			f = open(filename, O_CREAT|O_RDWR, (mode_t)0600);
+			exist = 0;
 	}
 
 	if (f==-1){
-		log_debug(GameCard->logger,"Error en la creacion del archivo %s", filename);
-		return -1;
+			log_debug(GameCard->logger,"Error en la creacion del archivo %s", filename);
+			return -1;
 	}
 
-	if (exist)
-	{
-		read(f,&GameCard->bitArray->bitarray,GameCard->block_size/8);
-
+	if (exist){
+			int result= read(f,(void*)GameCard->bitArray->bitarray,(GameCard->blocks/8));
+			log_debug(GameCard->logger, "Cantidad de bytes leidos del bitmap-->%d", result);
 	}
-	else
-	{
-		int max = bitarray_get_max_bit(GameCard->bitArray);
-		log_debug(GameCard->logger,"El último bit es %d", max);
-
-		for (int i = 0; i <= max ; i++){
-
-			write(f,&GameCard->bitArray->bitarray[i],1);
-		}
+	else{
+			int max = bitarray_get_max_bit(GameCard->bitArray);
+			for (int i = 0; i< max; i++){
+				bitarray_clean_bit(GameCard->bitArray,i);
+			}
+			int result= write(f,(void*)GameCard->bitArray->bitarray,(GameCard->blocks/8));
+			log_debug(GameCard->logger, "Grabación del archivo bitmap --> %d", result);
 	}
 
-
-	if ((GameCard->fileMapped = mmap(0,(GameCard->blocks/8),PROT_READ|PROT_WRITE,MAP_SHARED,f,0)) ==  MAP_FAILED)
-		{
+	if ((GameCard->fileMapped = mmap(0,(GameCard->blocks/8),PROT_READ|PROT_WRITE,MAP_SHARED|MAP_FILE,f,0)) ==  MAP_FAILED){
 			log_debug(GameCard->logger, "Error mapping the file");
 			perror("nmap");
 			printf("\n");
 			close(f);
-		}
+	}
 
 	log_debug(GameCard->logger,"Archivo Mapeado ");
 	free(filename);
-//	fclose(f);
+	close(f);
 	return 0;
 }
 
@@ -1423,12 +1418,16 @@ int get_first_free_block(){
 void turn_bit_on(int block){
 	bitarray_set_bit(GameCard->bitArray, block);
 	//TODO:MARCAR EL BITMAP - Ver si esto esta bien...
-	msync(GameCard->fileMapped, GameCard->block_size/8 , MS_SYNC);
+	memcpy(GameCard->fileMapped, GameCard->bitArray->bitarray, (GameCard->blocks/8));
+	int result= msync(GameCard->fileMapped, (GameCard->blocks/8) , MS_SYNC);
+	log_debug(GameCard->logger, "Resultado del sync %d", result);
 }
 
 void turn_bit_off(int block){
 	bitarray_clean_bit(GameCard->bitArray, block);
-	msync(GameCard->fileMapped, GameCard->block_size/8 , MS_SYNC);
+	memcpy(GameCard->fileMapped, GameCard->bitArray->bitarray, (GameCard->blocks/8));
+	int result= msync(GameCard->fileMapped, (GameCard->blocks/8) , MS_SYNC);
+	log_debug(GameCard->logger, "Resultado del sync %d", result);
 }
 
 

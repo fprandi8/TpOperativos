@@ -11,6 +11,8 @@
 
 t_log* logger;
 pthread_t* thread;
+sem_t catch_semaphore = 1;
+sem_t countReady_semaphore = 1;
 
 int main(void) {
 	t_config* config;
@@ -709,7 +711,9 @@ void addToReady(t_trainer* trainer,t_trainer* trainers,int* countReady,struct Sc
 	}
 	(trainers)=temp;
 	(trainers)[(*countReady)]=(*trainer);
+	sem_wait(catch_semaphore);
 	(*countReady)++;
+	sem_post(catch_semaphore);
 	schedule(trainers,countReady,schedulingAlgorithm,exec, logger);
 }
 
@@ -720,7 +724,9 @@ void scheduleFifo(t_trainer* trainers,int* count, t_trainer* exec, t_log* logger
 
 void addToExec(t_trainer* ready,int* countReady,t_trainer* exec,t_log* logger){
 	exec[0]=ready[0];
+	sem_wait(catch_semaphore);
 	(*countReady)--;
+	sem_post(catch_semaphore);
 	for(int i=0;i<(*countReady);i++){
 		ready[i]=ready[i+1];
 	}
@@ -733,16 +739,25 @@ void addToExec(t_trainer* ready,int* countReady,t_trainer* exec,t_log* logger){
 }
 
 //TODO - cuando termina el quantum mandar al final de la lista de ready.
-void scheduleRR(t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_trainer* exec, t_log* logger){
+void scheduleRR(t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_trainer* exec, t_log* logger, t_objetive* localized_pokemon, int teamSocket){
 	while(*countReady){
 		int i=0;
+		int valueOfExecuteClock = 1;
 		t_trainer* trainer;
 		trainer = ((&trainers)[i]);
 		addToExec(trainer, countReady, exec, logger);
-		for(int j=0;j<=(int)(schedulingAlgorithm.quantum);j++){
-			//TODO executeClock(*countReady, exec, localized_pokemon);
+		for(int j=0;j<=(int)(schedulingAlgorithm.quantum) && valueOfExecuteClock == 1;j++){
+			valueOfExecuteClock = executeClock(*countReady, exec, localized_pokemon, teamSocket);
 		}
+		if(valueOfExecuteClock == -1){
+			for(i=0;i<(*countReady); i++){
+				((&trainers)[i]) = ((&trainers)[i+1]);
+			}
+			addToReady(trainer, trainers, countReady, schedulingAlgorithm, logger, exec);
+		}
+		sem_wait(countReady_semaphore);
 		(*countReady)--;
+		sem_post(countReady_semaphore);
 	}
 }
 
@@ -758,17 +773,18 @@ void scheduleSJFCD(t_trainer* trainers,int* countReady,struct SchedulingAlgorith
 
 
 //TODO - Cómo hacemos para pasarle el targetedPokemon
-int executeClock(int countReady, t_trainer* trainer, t_pokemon* pokemonTargeted){
+int executeClock(int countReady, t_trainer* trainer, t_pokemon* pokemonTargeted, int teamSocket){
 
 	if(getDistanceToPokemonTarget(trainer,pokemonTargeted)!=0){
 		moveTrainerToObjective(trainer, pokemonTargeted);
 		return 1;
 	}else if(getDistanceToPokemonTarget(trainer,pokemonTargeted)==0){
-		//CATCH_POKEMON(localized_pokemon)
+		sem_wait(catch_semaphore);
+		Send_CATCH(pokemonTargeted, teamSocket);
+		sem_post(catch_semaphore);
 		return 0;
-	}else{
-		return -1;
 	}
+	return -1;
 }
 
 

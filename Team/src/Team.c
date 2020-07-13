@@ -10,6 +10,7 @@
 #include "Team.h"
 
 t_log* logger;
+pthread_t* thread;
 
 int main(void) {
 	t_config* config;
@@ -22,12 +23,16 @@ int main(void) {
 	t_trainer* l_exec;
 	t_trainer* l_exit;
 	t_stateLists stateLists;
+	t_getMessages* getList;
 	int trainersCount,readyCount,execCount;
     pthread_t* subs;
 	t_objetive* missingPkms;
+	localized_pokemon* localized;
+	appeared_pokemon* appeared;
     int globalObjetivesDistinctCount=0,globalObjetivesCount=0;
     pthread_t closeScheduler,readyScheduler;
 
+	thread = (pthread_t*)malloc(sizeof(pthread_t));
 
 	//Init de config y logger
 	createConfig(&config);
@@ -65,7 +70,7 @@ int main(void) {
 
 	subs=(pthread_t*)malloc(sizeof(pthread_t)*3);
 	subscribeToBroker(broker,subs);//TODO ver si esto no conviene hacerlo con select (Falta ver con Marcos)
-	requestNewPokemons(missingPkms,globalObjetivesDistinctCount,logger,broker);
+	requestNewPokemons(missingPkms,globalObjetivesDistinctCount,logger,broker,getList);
 	log_debug(logger,"\n\n");
 	log_debug(logger,"Test de parametros");
 	log_debug(logger,"Entrenador 0 está en la posición (x,y)=(%i,%i), tiene %i pokemons: %s, %s y %s y tiene %i objetivos %s, %s, %s y %s",l_new[0].parameters.position.x,l_new[0].parameters.position.y,l_new[0].parameters.pokemonsCount,l_new[0].parameters.pokemons[0].name,l_new[0].parameters.pokemons[1].name,l_new[0].parameters.pokemons[2].name,l_new[0].parameters.objetivesCount,l_new[0].parameters.objetives[0].name,l_new[0].parameters.objetives[1].name,l_new[0].parameters.objetives[2].name,l_new[0].parameters.objetives[3].name);
@@ -113,15 +118,8 @@ int getGlobalObjetivesCount(t_trainer* trainers, int trainersCount){
 void subscribeToBroker(struct Broker broker,pthread_t* subs){
 
 	pthread_create(&(subs[0]),NULL,subscribeToBrokerCaught,(void*)&broker);
-	sleep(2);
 	pthread_create(&(subs[1]),NULL,subscribeToBrokerAppeared,(void*)&broker);
-	sleep(2);
 	pthread_create(&(subs[2]),NULL,subscribeToBrokerLocalized,(void*)&broker);
-	sleep(10);
-	//Dejar para pruebas
-	/*subscribeToBrokerLocalized((void*)&broker);
-	subscribeToBrokerLocalized((void*)&broker);
-	subscribeToBrokerLocalized((void*)&broker);*/
 }
 
 void* subscribeToBrokerLocalized(void *brokerAdress){
@@ -133,8 +131,21 @@ void* subscribeToBrokerLocalized(void *brokerAdress){
 	}else{
 		log_debug(logger,"Se subscribió a Localized");
 	}
+
+	t_args* args= (t_args*) malloc (sizeof (t_args));
+
+	args->suscription = socketLocalized;
+	args->queueType = LOCALIZED_POKEMON;
+	args->brokerAddress= brokerAdress;
+
+	pthread_create(thread,NULL,(void*)waitForMessage,args);
+	pthread_detach(*thread);
+
 	pthread_exit(NULL);
 }
+
+
+
 
 void* subscribeToBrokerAppeared(void *brokerAdress){
 	log_debug(logger,"Creando thread Appeared Subscriptions Handler");
@@ -145,6 +156,15 @@ void* subscribeToBrokerAppeared(void *brokerAdress){
 	}else{
 		log_debug(logger,"Se subscribió a Appeared");
 	}
+	t_args* args= (t_args*) malloc (sizeof (t_args));
+
+	args->suscription = socketAppeared;
+	args->queueType = APPEARED_POKEMON;
+	args->brokerAddress= brokerAdress;
+
+	pthread_create(thread,NULL,(void*)waitForMessage,args);
+	pthread_detach(*thread);
+
 	pthread_exit(NULL);
 }
 
@@ -157,25 +177,156 @@ void* subscribeToBrokerCaught(void *brokerAdress){
 	}else{
 		log_debug(logger,"Se subscribió a Caught");
 	}
+	t_args* args= (t_args*) malloc (sizeof (t_args));
+
+	args->suscription = socketCaught;
+	args->queueType = CAUGHT_POKEMON;
+	args->brokerAddress= brokerAdress;
+
+	pthread_create(thread,NULL,(void*)waitForMessage,args);
+	pthread_detach(*thread);
+
 	pthread_exit(NULL);
 }
 
-void requestNewPokemons(t_objetive* pokemons,int globalObjetivesDistinctCount,t_log* logger,struct Broker broker){
+void waitForMessage(void* variables){
+
+	t_args* args= (t_args*)variables;
+	int suscription = ((t_args*)variables)->suscription;
+	void* brokerAddress = args->brokerAddress;
+	uint32_t queueType = ((t_args*)variables)->queueType;
+
+	char* queue;
+
+	switch (queueType) {
+
+		case NEW_POKEMON: {
+			queue =(char*)malloc(strlen("QUEUE LOCALIZED POKEMON") + 1);
+			strcpy(queue,"QUEUE LOCALIZED POKEMON");
+			break;
+		}
+
+		case GET_POKEMON:{
+			queue =(char*)malloc(strlen("QUEUE APPEARED POKEMON") + 1);
+			strcpy(queue,"QUEUE APPEARED POKEMON");
+			break;
+		}
+
+		case CAUGHT_POKEMON:{
+			queue =(char*)malloc(strlen("QUEUE CAUGHT POKEMON") + 1);
+			strcpy(queue,"QUEUE CAUGHT POKEMON");
+			break;
+		}
+
+	}
+
+	log_debug(logger, "Esperando mensajes de la %s ", queue);
+	free(queue);
+
+	op_code type;
+	void* content = malloc(sizeof(void*));
+
+	int resultado= RecievePackage(suscription,&type,&content);
+
+	if (!resultado)
+	{
+		deli_message* message = (deli_message*)content;
+
+		t_args_process_message* argsProcessMessage= (t_args_process_message*) malloc (sizeof (t_args_process_message));
+		argsProcessMessage->message = message;
+		argsProcessMessage->brokerAddress= brokerAddress;
+
+		pthread_create(thread,NULL,(void*)processMessage,argsProcessMessage);
+	}
+	else
+		log_debug(logger,"Resultado de envio del mensaje: %d", resultado);
+
+	thread = (pthread_t*)malloc(sizeof(pthread_t));
+
+	pthread_create(thread,NULL,(void*)waitForMessage,args);
+	pthread_detach(*thread);
+
+	pthread_exit(NULL);
+}
+
+void processMessage(void* variables){
+
+	t_args_process_message* args = (t_args_process_message*)variables;
+
+	deli_message* message = args->message;
+	struct Broker broker = *((struct Broker*) ((t_args*)variables)->brokerAddress);
+
+	switch (message->messageType){
+		case LOCALIZED_POKEMON: {
+			processMessageLocalized(message);
+			break;
+		}
+
+		case APPEARED_POKEMON:{
+			processMessageAppeared(message);
+			break;
+		}
+
+		case CAUGHT_POKEMON:{
+			processMessageCaught(message);
+			break;
+		}
+	}
+
+	free(args);
+	log_debug(logger, "Se procesó el mensaje");
+}
+
+void processMessageLocalized(deli_message* message){
+	;//TODO
+}
+
+void processMessageAppeared(deli_message* message){
+	;//TODO
+}
+
+void processMessageCaught(deli_message* message){
+	;//TODO
+}
+
+
+void requestNewPokemons(t_objetive* pokemons,int globalObjetivesDistinctCount,t_log* logger,struct Broker broker,t_getMessages* getList){
+	getList->id = 0;
 	log_debug(logger,"Se solicitarán %i pokemons",globalObjetivesDistinctCount);
 	for(int obj=0;obj<globalObjetivesDistinctCount;obj++){
-		requestNewPokemon(pokemons[obj].pokemon,logger,broker);
+		requestNewPokemon(pokemons[obj].pokemon,logger,broker,getList);
 	}
 }
 
 //TODO debería usar la shared cuando este implementado para mandar.
-void requestNewPokemon(t_pokemon missingPkm,t_log* logger, struct Broker broker){
+void requestNewPokemon(t_pokemon missingPkm,t_log* logger, struct Broker broker,t_getMessages* getList){
 	log_debug(logger,"Se solicitarán el pokemon %s", missingPkm.name);
-	int client_socket = connectBroker(broker.ip, broker.port,logger);
+	int clientSocket = connectBroker(broker.ip, broker.port,logger);
 	get_pokemon get;
 	strcpy(get.pokemonName,missingPkm.name);
 	log_debug(logger,"Se enviará el send para el pokemon %s", missingPkm.name);
-	Send_GET(get, client_socket);
+	Send_GET(get, clientSocket);
 	log_debug(logger,"Pokemon requested: %s",missingPkm.name);
+
+	op_code type;
+	void* content = malloc(sizeof(void*));
+	int cut=0;
+	int result;
+	uint32_t* id;
+	while(cut != 1){
+		result = RecievePackage(clientSocket,&type,&content);
+		if(type == ACKNOWLEDGE){
+			cut=1;
+		}
+	}
+	if(!result){
+		id = (uint32_t*)content;
+		(*getList).id[(*getList).count]=id;
+		(*getList).count++;
+	}
+	else{
+		log_debug(logger,"Error al recibir el acknowledge");
+	}
 }
 
 

@@ -19,6 +19,7 @@
 #include <semaphore.h>
 #include <commons/collections/list.h>
 #include <delibird/comms/pokeio.h>
+#include <delibird/comms/messages.h>
 
 
 typedef struct
@@ -39,6 +40,13 @@ typedef struct
 	t_pokemon pokemon;
 	int count;
 } t_objetive;
+
+typedef struct
+{
+	uint32_t* id;
+	int count;
+} t_getMessages;
+
 
 typedef struct
 {
@@ -93,6 +101,17 @@ struct SchedulingAlgorithm
 	char* initEstimation;
 } schedulingAlgorithm;
 
+typedef struct {
+	int suscription;
+	uint32_t queueType;
+	void* brokerAddress;
+} t_args;
+
+typedef struct {
+	deli_message* message;
+	void* brokerAddress;
+} t_args_process_message;
+
 void createConfig(t_config**);
 void startLogger(t_config*,t_log**);
 void createLogger(char*,t_log**);
@@ -132,11 +151,15 @@ void* subscribeToBrokerLocalized(void* Broker);
 void* subscribeToBrokerAppeared(void* Broker);
 void* subscribeToBrokerCaught(void* Broker);
 int connectBroker(char*, char*,t_log*);
-void requestNewPokemons(t_objetive*,int,t_log*,struct Broker broker);
-void requestNewPokemon(t_pokemon,t_log*,struct Broker broker);
+void requestNewPokemons(t_objetive*,int,t_log*,struct Broker,t_getMessages*);
+void requestNewPokemon(t_pokemon,t_log*,struct Broker,t_getMessages*);
 int getGlobalObjetivesCount(t_trainer*, int);
 void initStateLists(t_stateLists,t_trainer*,t_trainer*,t_trainer*,t_trainer*,t_trainer*);
-
+void waitForMessage(void*);
+void processMessage(void*);
+void processMessageLocalized(deli_message*);
+void processMessageCaught(deli_message*);
+void processMessageAppeared(deli_message*);
 
 void initBroker(struct Broker *broker){
 	broker->ipKey="IP_BROKER";

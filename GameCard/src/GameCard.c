@@ -107,6 +107,8 @@ t_GameCard* GameCard_initialize(t_log* logger, char* ptoMnt,char* retryOperation
 	aux->retryOperation = atoi(retryOperation);
 	aux->delayTime = atoi(delayTime);
 
+	sem_init(&(aux->semMap),0,1);
+
 	return aux;
 }
 void GameCard_Destroy(t_GameCard* GameCard){
@@ -116,6 +118,7 @@ void GameCard_Destroy(t_GameCard* GameCard){
 	free(GameCard->ptoMnt);
 	free(GameCard->bitArray->bitarray);
 	bitarray_destroy(GameCard->bitArray);
+	sem_destroy(&(GameCard->semMap));
 	log_destroy(GameCard->logger);
 }
 
@@ -195,6 +198,12 @@ void GameCard_Attend_Gameboy(void* var){
 	{
 		log_debug(GameCard->logger,"Mensaje del GameBoy recibido");
 		deli_message* message = (deli_message*)content;
+
+		int result = SendMessageAcknowledge(message->id, *(cliente));
+
+		if (!result)
+			log_debug(GameCard->logger, "Acknowledge enviado correctamente al gameboy");
+
 		GameCard_Process_Gameboy_Message(message);
 	}
 	else
@@ -392,8 +401,11 @@ void* GameCard_Process_Message_Catch(deli_message* message){
 
 		resulCatchPokemon = catch_a_pokemon(fileContent,metadataFile,coordinate, catchPokemon->pokemonName);
 
+		sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,catchPokemon->pokemonName);
+		sem_wait(pokeSem);
 		metadataConfig = read_metadata(file);
 		Metadata_File_Open_Flag(metadataFile,metadataConfig,"N");
+		sem_post(pokeSem);
 
 		free(horCoordinate);
 		free(verCoordinate);
@@ -462,8 +474,11 @@ void* GameCard_Process_Message_Get(deli_message* message){
 
 		create_localized_message(localizedPokemon, fileContent, getPokemon->pokemonName, metadataFile);
 
+		sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,getPokemon->pokemonName);
+		sem_wait(pokeSem);
 		metadataConfig = read_metadata(file);
 		Metadata_File_Open_Flag(metadataFile,metadataConfig,"N");
+		sem_post(pokeSem);
 
 		free(fileContent);
 		free(file);
@@ -472,13 +487,6 @@ void* GameCard_Process_Message_Get(deli_message* message){
 
 	sleep(GameCard->delayTime);
 
-	printf("Cantidad del pokemon %s encontradods %d \n" , localizedPokemon->pokemonName,localizedPokemon->ammount);
-	printf("Coordenadas donde se encuentran %d - %d \n", localizedPokemon->coordinates->x, localizedPokemon->coordinates->y);
-	printf("Coordenadas donde se encuentran %d - %d \n", (localizedPokemon->coordinates[1]).x, (localizedPokemon->coordinates[1]).y);
-
-	free(localizedPokemon->pokemonName);
-	free(localizedPokemon->coordinates);
-	free(localizedPokemon);
 	free(directory);
 
 	return (void*)localizedPokemon;
@@ -567,7 +575,7 @@ int catch_a_pokemon(char* fileContent, t_file_metadata* metadataFile, char* coor
 
 			Metadata_File_Add_Blocks(metadataFile,amountOfBlocks);
 
-			write_blocks(metadataFile, amountOfBlocks, newFile);
+			write_blocks(metadataFile, newFile);
 
 			free(newFile);
 
@@ -689,9 +697,36 @@ void* modify_poke_file(t_values* values, char* directory){;
 	if (string_contains(fileContent,coordinate))
 	{
 		int pos= get_string_file_position(fileContent,coordinate);
-		increase_pokemon_amount(fileContent,pos,newPokemon->ammount);
-		rewrite_blocks(metadataFile, fileContent);
+		int newAmountExtraSize=increase_pokemon_amount(&(fileContent),pos,newPokemon->ammount, metadataFile);
 
+		if (newAmountExtraSize==0){
+			rewrite_blocks(metadataFile, fileContent);
+		}else{
+			int amountOfBlocksNeededForNeWAmount= get_amount_of_blocks(newAmountExtraSize, metadataFile);
+			log_debug(GameCard->logger,"La cantidad de bloques que necesito para guardar la nueva cantidad %d",
+					amountOfBlocksNeededForNeWAmount);
+
+			log_debug(GameCard->logger,"Cantidad de caracteres extra: %d", newAmountExtraSize);
+			int auxSize = atoi(metadataFile->size);
+
+			free(metadataFile->size);
+
+			metadataFile->size =  string_itoa(auxSize + newAmountExtraSize);
+
+			write_blocks(metadataFile, fileContent);
+
+			metadataFile->directory='N';
+			metadataFile->open='N';
+
+			list_remove(values->values,0);
+
+			list_add(values->values,newPokemon->pokemonName);
+			list_add(values->values,metadataFile);
+
+			int result=create_file(POKE_METADATA,values);
+
+			log_debug(GameCard->logger, "Resultado de la regeneración de Metadata %d", result);
+		}
 	}
 	else
 	{
@@ -704,9 +739,9 @@ void* modify_poke_file(t_values* values, char* directory){;
 
 		free(metadataFile->size);
 
-		Metadata_File_Add_Blocks(metadataFile,amountOfBlocks);
-
 		metadataFile->size =  string_itoa(auxSize + size);
+
+		Metadata_File_Add_Blocks(metadataFile,amountOfBlocks);
 
 		log_debug(GameCard->logger, "Nuevo tamaño de la metadata %s", metadataFile->size);
 
@@ -718,7 +753,7 @@ void* modify_poke_file(t_values* values, char* directory){;
 
 		free(buffer);
 
-		write_blocks(metadataFile, amountOfBlocks, fileContent);
+		write_blocks(metadataFile, fileContent);
 
 		metadataFile->directory='N';
 		metadataFile->open='N';
@@ -734,9 +769,13 @@ void* modify_poke_file(t_values* values, char* directory){;
 			log_debug(GameCard->logger, "Archivo de Metadata Actualizado Correctamente");
 	}
 
-	sleep(GameCard->delayTime);
+	sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,newPokemon->pokemonName);
+	sem_wait(pokeSem);
 	metadataConfig = read_metadata(file);
 	Metadata_File_Open_Flag(metadataFile,metadataConfig,"N");
+	sem_post(pokeSem);
+
+	sleep(GameCard->delayTime);
 
 	free(horCoordinate);
 	free(verCoordinate);
@@ -780,7 +819,7 @@ void* create_poke_file(t_values* values){
 
 	char* buffer=serialize_data(atoi(metadataFile->size),newPokemon);
 
-	write_blocks(metadataFile, amountOfBlocks, buffer);
+	write_blocks(metadataFile, buffer);
 
 	free(buffer);
 
@@ -1140,7 +1179,7 @@ void read_metadata_file(t_file_metadata* metadataFile, t_config* metadataConfig,
 		else
 		{
 			sem_post(pokeSem);
-			log_debug(GameCard->logger, "Archivo abierto, re intenta en %s segundos", GameCard->retryOperation);
+			log_debug(GameCard->logger, "Archivo abierto, re intenta en %d segundos", GameCard->retryOperation);
 			sleep(GameCard->retryOperation);
 		}
 	}
@@ -1267,16 +1306,18 @@ char* remove_line_from_file(char* fileContent,int pos,t_file_metadata* metadataF
 	return aux;
 }
 
-void increase_pokemon_amount(char* fileContent, int pos, int amount){
+int increase_pokemon_amount(char** fileContent, int pos, int amount, t_file_metadata* metadataFile){
 
 	int index1=0;
 	int index2=0;
 
-	while (fileContent[pos + index1] != '=') index1++;
+	char * file = *(fileContent);
 
-	while (fileContent[pos + index2] != '\n') index2++;
+	while (file[pos + index1] != '=') index1++;
 
-	char* line = string_substring(fileContent,pos,pos + index2+1);
+	while (file[pos + index2] != '\n') index2++;
+
+	char* line = string_substring(file,pos,pos + index2+1);
 
 	char* stringAux= get_amount_of_pokemons(line);
 
@@ -1287,24 +1328,35 @@ void increase_pokemon_amount(char* fileContent, int pos, int amount){
 	char* newAmount = string_itoa(auxAmount);
 
 	if (chars < strlen(newAmount)){
-		// Tratamiento para el archivo desplazar los espacios necesarios
-		// Debería pedir un bloque mas si excede e insertarlo en la metadata en el medio? eso resolveria pero me queda un bloque con
-		// los bytes que exceden y todo basura...
-		char* auxBuffer=(char*)malloc(strlen(fileContent) + (strlen(newAmount) - chars));
-		memcpy(auxBuffer,fileContent,(pos+index1));
-		memcpy(auxBuffer+(pos+index1)+strlen(newAmount),fileContent + pos +index1 + chars,strlen(fileContent)-pos +index1 + chars);
-		free(fileContent);
-		fileContent = auxBuffer;
+
+		char* auxBuffer=(char*)malloc(atoi(metadataFile->size) + (strlen(newAmount) - chars));
+		memcpy(auxBuffer,file,(pos+index1+1));
+		log_debug(GameCard->logger, "AUX: %s," ,auxBuffer);
+		memcpy(auxBuffer+(pos+index1)+1,newAmount,strlen(newAmount));
+		log_debug(GameCard->logger, "Nuevo Cantidad de Pokemon %s", newAmount);
+		memcpy(auxBuffer+(pos+index1)+strlen(newAmount)+1,file + pos +index1 + chars+1,atoi(metadataFile->size)-pos -index1);
+		log_debug(GameCard->logger, " FILE: [%s]", file);
+		log_debug(GameCard->logger, "AUX: [%s]," ,auxBuffer);
+		free(*(fileContent));
+		*fileContent = auxBuffer;
+
+		int auxNewAmount = strlen(newAmount);
+		free(newAmount);
+		free(line);
+		free(stringAux);
+		return (auxNewAmount - chars);
 	}
 
+	//TODO: Ver este warning, con un memcpy se arregla
 	for(int i=0; i<strlen(newAmount); i++)
 	{
-		fileContent[pos + index1 + 1 + i] = newAmount[i];
+		file[pos + index1 + 1 + i] = newAmount[i];
 	}
 
 	free(line);
 	free(stringAux);
 	free(newAmount);
+	return 0;
 }
 
 int decrease_pokemon_amount(char* fileContent,int pos, t_file_metadata* metadataFile){
@@ -1425,16 +1477,19 @@ int get_first_free_block(){
 
 void turn_bit_on(int block){
 	bitarray_set_bit(GameCard->bitArray, block);
-	//TODO:MARCAR EL BITMAP - Ver si esto esta bien...
+	sem_wait(&(GameCard->semMap));
 	memcpy(GameCard->fileMapped, GameCard->bitArray->bitarray, (GameCard->blocks/8));
 	int result= msync(GameCard->fileMapped, (GameCard->blocks/8) , MS_SYNC);
+	sem_post(&(GameCard->semMap));
 	log_debug(GameCard->logger, "Resultado del sync %d", result);
 }
 
 void turn_bit_off(int block){
 	bitarray_clean_bit(GameCard->bitArray, block);
+	sem_wait(&(GameCard->semMap));
 	memcpy(GameCard->fileMapped, GameCard->bitArray->bitarray, (GameCard->blocks/8));
 	int result= msync(GameCard->fileMapped, (GameCard->blocks/8) , MS_SYNC);
+	sem_post(&(GameCard->semMap));
 	log_debug(GameCard->logger, "Resultado del sync %d", result);
 }
 
@@ -1507,7 +1562,7 @@ char* serialize_data(int size, new_pokemon* newPokemon ){
 	return buffer;
 }
 
-void write_blocks(t_file_metadata* metadataFile, int amountOfBlocks, char* buffer ){
+void write_blocks(t_file_metadata* metadataFile, char* buffer ){
 
 	int cantBytes=0;
 	int index=0;

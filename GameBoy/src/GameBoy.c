@@ -194,10 +194,13 @@ int main(int argc, char **argv) {
 	}
 
 	//Get IP from config
-	t_config* config = config_create("gameboy.config");
+	t_config* config = config_create("/home/utnso/workspace/tp-2020-1c-MATE-OS/GameBoy/gameboy.config");
 
 	char* keys[2];
 	GetKeysFor(reciver, keys);
+	printf("Key's obtenidas %s \n" , keys[0]);
+	printf("Key's obtenidas %s \n" , keys[1]);
+
 	ReadConfigValues(config, keys);
 
 	struct addrinfo hints;

@@ -57,6 +57,7 @@ typedef struct {
 	char* fileMapped;
 	int retryOperation;
 	int delayTime;
+	sem_t semMap;
 } t_GameCard;
 
 struct Broker
@@ -149,7 +150,7 @@ int get_first_free_block();
 
 int get_string_file_position(char*,char*);
 int delete_file_line(char* , int , t_file_metadata* );
-void increase_pokemon_amount(char*, int, int );
+int increase_pokemon_amount(char**, int, int, t_file_metadata*);
 int decrease_pokemon_amount(char*,int, t_file_metadata*);
 char* get_amount_of_pokemons(char*);
 void delete_block_file(t_file_metadata*);
@@ -157,7 +158,7 @@ void delete_block_file(t_file_metadata*);
 char* get_x_coordinate(char*);
 char* get_y_coordinate(char*);
 
-void write_blocks(t_file_metadata*, int,char*);
+void write_blocks(t_file_metadata*,char*);
 void rewrite_blocks(t_file_metadata* , char*);
 
 void readConfigBrokerValues(t_config*,t_log* ,struct Broker*);

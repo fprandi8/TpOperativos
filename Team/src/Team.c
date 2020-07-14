@@ -31,8 +31,8 @@ int main(void) {
 	char* ip;
 	char* port;
 	t_trainer* l_new;
-	t_ready_trainers* list_ready;
-	t_ready_trainers* list_exec;
+	t_ready_trainer* list_ready;
+	t_ready_trainer list_exec;
 	t_trainer* l_blocked;
 	t_trainer* l_exit;
 	t_stateLists stateLists;
@@ -190,7 +190,7 @@ int startServer(t_log* logger)
 
 
 //TODO - FIX
-void initStateLists(t_stateLists stateLists,t_trainer* new, t_trainer* blocked,t_ready_trainers* ready, t_ready_trainers* exec, t_trainer* l_exit){
+void initStateLists(t_stateLists stateLists,t_trainer* new, t_trainer* blocked,t_ready_trainer* ready, t_ready_trainer exec, t_trainer* l_exit){
 	stateLists.new = new;
 	stateLists.blocked= blocked;
 	stateLists.ready = ready;
@@ -896,7 +896,7 @@ int getTrainersCount(t_config *config,t_log* logger) {
 	return count;
 }
 
-void schedule(t_ready_trainers* trainers,int* readyCount,struct SchedulingAlgorithm schedulingAlgorithm,t_ready_trainers* exec, t_log* logger){//Para el caso de FIFO y RR no hace nada, ya que las listas están ordenadas por FIFO y RR solo cambia como se procesa.
+void schedule(t_ready_trainer* trainers,int* readyCount,struct SchedulingAlgorithm schedulingAlgorithm,t_ready_trainer exec, t_log* logger){//Para el caso de FIFO y RR no hace nada, ya que las listas están ordenadas por FIFO y RR solo cambia como se procesa.
 	if (strcmp(schedulingAlgorithm.algorithm,"FIFO")==0){
 		scheduleFifo(trainers,readyCount,schedulingAlgorithm, exec, logger);
 	}else if(strcmp(schedulingAlgorithm.algorithm,"RR")==0){
@@ -908,7 +908,7 @@ void schedule(t_ready_trainers* trainers,int* readyCount,struct SchedulingAlgori
 	}
 }
 
-void addToReady(t_ready_trainers* trainer,t_ready_trainers* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm,t_log* logger, t_ready_trainers* exec){
+void addToReady(t_ready_trainer* trainer,t_ready_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm,t_log* logger, t_ready_trainer exec){
 	void* temp = realloc(trainers,sizeof(t_trainer)*((*countReady)+1));
 	if (!temp){
 		log_debug(logger,"error en realloc");
@@ -924,8 +924,8 @@ void addToReady(t_ready_trainers* trainer,t_ready_trainers* trainers,int* countR
 
 
 
-void addToExec(t_ready_trainers* ready,int* countReady,t_ready_trainers* exec,t_log* logger){
-	exec[0]=ready[0];
+void addToExec(t_ready_trainer* ready,int* countReady,t_ready_trainer exec,t_log* logger){
+	exec=ready[0];
 	sem_wait(catch_semaphore);
 	(*countReady)--;
 	sem_post(catch_semaphore);
@@ -943,9 +943,14 @@ void addToExec(t_ready_trainers* ready,int* countReady,t_ready_trainers* exec,t_
 
 //TODO - esta función debe generar el listado de ready ordenado por distancia. Hay que ver como eva
 void scheduleBydistance(localized_pokemon* localized, appeared_pokemon* appeared, t_trainer* l_new, int trainersCount){
-	appeared_pokemon* pokemonsToScheduleByDistance=(appeared_pokemon*)malloc(sizeof(appeared_pokemon));
+
+
+
+
+
+	/*appeared_pokemon* pokemonsToScheduleByDistance=(appeared_pokemon*)malloc(sizeof(appeared_pokemon));
 	appeared_pokemon* listOfPokemons=(appeared_pokemon*)malloc(sizeof(appeared_pokemon)*(localized->ammount));
-	t_ready_trainers* toReady=(t_ready_trainers*)malloc(sizeof(t_ready_trainers));
+	t_ready_trainer* toReady=(t_ready_trainer*)malloc(sizeof(t_ready_trainer));
 	int i=0;
 	while(localized->ammount){
 		localized->ammount--;
@@ -971,27 +976,27 @@ void scheduleBydistance(localized_pokemon* localized, appeared_pokemon* appeared
 			}
 		}
 
-	}
+	}*/
 }
 
 
 //TODO - No debería hacer nada; siempre se agregan cosas al final de ready y se sacan del HEAD de ready
-void scheduleFifo(t_ready_trainers* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_ready_trainers* exec, t_log* logger){
+void scheduleFifo(t_ready_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_ready_trainer exec, t_log* logger){
 
 }
 
 //TODO - cuando termina el quantum mandar al final de la lista de ready.
-void scheduleRR(t_ready_trainers* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_ready_trainers* exec, t_log* logger){
+void scheduleRR(t_ready_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_ready_trainer exec, t_log* logger){
 	while(*countReady){
 		int i=0;
 		int valueOfExecuteClock = 1;
-		t_ready_trainers* trainer;
+		t_ready_trainer* trainer;
 		trainer = ((&trainers)[i]);
 		addToExec(trainer, countReady, exec, logger);
 		for(int j=0;j<=(int)(schedulingAlgorithm.quantum) && valueOfExecuteClock == 1;j++){
-			valueOfExecuteClock = executeClock(*countReady, exec);
+			valueOfExecuteClock = executeClock(exec);
 		}
-		if(valueOfExecuteClock == -1){
+		if(valueOfExecuteClock == 0){
 			for(i=0;i<(*countReady); i++){
 				((&trainers)[i]) = ((&trainers)[i+1]);
 			}
@@ -1004,32 +1009,27 @@ void scheduleRR(t_ready_trainers* trainers,int* countReady,struct SchedulingAlgo
 }
 
 //TODO
-void scheduleSJFSD(t_ready_trainers* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_ready_trainers* exec, t_log* logger){
+void scheduleSJFSD(t_ready_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_ready_trainer exec, t_log* logger){
 ;
 }
 
 //TODO
-void scheduleSJFCD(t_ready_trainers* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_ready_trainers* exec, t_log* logger){
+void scheduleSJFCD(t_ready_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_ready_trainer exec, t_log* logger){
 ;
 }
 
 
 
-int executeClock(int countReady, t_ready_trainers* exec){
+int executeClock(t_ready_trainer exec){
 
-	appeared_pokemon* appeared;
-	appeared->pokemonName=exec->pokemon->name;
-	appeared->horizontalCoordinate=exec->pokemon->position.x;
-	appeared->horizontalCoordinate=exec->pokemon->position.y;
-
-	if(getDistanceToPokemonTarget(exec->trainer->parameters,appeared)!=0){
-		moveTrainerToObjective(exec->trainer, exec->pokemon);
+	if(getDistanceToPokemonTarget(exec.trainer.parameters,exec.pokemon)!=0){
+		moveTrainerToObjective(exec.trainer, exec.pokemon);
 		return 1;
-	}else if(getDistanceToPokemonTarget(exec->trainer->parameters,appeared)==0){
+	}else if(getDistanceToPokemonTarget(exec.trainer.parameters,exec.pokemon)==0){
 		catch_pokemon catch;
-		catch.pokemonName = exec->pokemon->name;
-		catch.horizontalCoordinate = exec->pokemon->position.x;
-		catch.verticalCoordinate = exec->pokemon->position.y;
+		catch.pokemonName = exec.pokemon.name;
+		catch.horizontalCoordinate = exec.pokemon.position.x;
+		catch.verticalCoordinate = exec.pokemon.position.y;
 		Send_CATCH(catch, connectBroker(broker.ip, broker.port,logger));
 		return 0;
 	}
@@ -1038,32 +1038,32 @@ int executeClock(int countReady, t_ready_trainers* exec){
 
 
 //TODO - Función que mueve al entrenador - Falta ver como implementaremos los semáforos
-void moveTrainerToObjective(t_trainer* trainer,  t_pokemon* pokemonTargeted){
+void moveTrainerToObjective(t_trainer trainer,  t_pokemon pokemonTargeted){
 
 	//t_trainerParameters* trainerToMove;
 	//trainerToMove = *trainer;
 	int difference_x;
-	difference_x = calculateDifference(trainer->parameters.position.x, pokemonTargeted->position.x);
+	difference_x = calculateDifference(trainer.parameters.position.x, pokemonTargeted.position.x);
 	int difference_y;
-	difference_y = calculateDifference(trainer->parameters.position.y, pokemonTargeted->position.y);
+	difference_y = calculateDifference(trainer.parameters.position.y, pokemonTargeted.position.y);
 	//meter semáforos acá
 	moveTrainerToTarget(trainer, difference_x, difference_y);
 	//fin semáforos;
 }
 
 //TODO - funcion que mueve una posición al entrenador - Falta Definir como haremos el CATCH
-void moveTrainerToTarget(t_trainer* trainer, int distanceToMoveInX, int distanceToMoveInY){
+void moveTrainerToTarget(t_trainer trainer, int distanceToMoveInX, int distanceToMoveInY){
 	if(distanceToMoveInX > 0){
-		trainer->parameters.position.x++;
+		trainer.parameters.position.x++;
 	}
 	else if(distanceToMoveInX < 0){
-		trainer->parameters.position.x--;
+		trainer.parameters.position.x--;
 	}
 	else if(distanceToMoveInY > 0){
-		trainer->parameters.position.y++;
+		trainer.parameters.position.y++;
 	}
 	else if(distanceToMoveInY < 0){
-		trainer->parameters.position.y--;
+		trainer.parameters.position.y--;
 	}
 
 }
@@ -1085,9 +1085,9 @@ int getClockTimeToNewPosition(int difference_x, int difference_y){
 }
 
 
-int getDistanceToPokemonTarget(t_trainerParameters trainer,  appeared_pokemon* targetPokemon){
-	int distanceInX = calculateDifference(trainer.position.x, targetPokemon->horizontalCoordinate);
-	int distanceInY = calculateDifference(trainer.position.y, targetPokemon->verticalCoordinate);
+int getDistanceToPokemonTarget(t_trainerParameters trainer,  t_pokemon targetPokemon){
+	int distanceInX = calculateDifference(trainer.position.x, targetPokemon.position.x);
+	int distanceInY = calculateDifference(trainer.position.y, targetPokemon.position.y);
 	int distance = getClockTimeToNewPosition(distanceInX, distanceInY);
 	return distance;
 }

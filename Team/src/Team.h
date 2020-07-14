@@ -122,16 +122,16 @@ typedef struct {
 
 typedef struct
 {
-	t_trainer* trainer;
-	t_pokemon* pokemon;
-} t_ready_trainers;
+	t_trainer trainer;
+	t_pokemon pokemon;
+} t_ready_trainer;
 
 typedef struct
 {
 	t_trainer* new;
 	t_trainer* blocked;
-	t_ready_trainers* ready;
-	t_ready_trainers* exec;
+	t_ready_trainer* ready;
+	t_ready_trainer exec;
 	t_trainer* exit;
 
 } t_stateLists;
@@ -150,12 +150,12 @@ void readConfigBrokerValues(t_config*,t_log*,struct Broker*);
 void readConfigSchedulerValues(t_config*, t_log*, struct SchedulingAlgorithm*);
 void readConfigTrainersValues(t_config*,t_log*,char***,char***,char***);
 void initScheduler(struct SchedulingAlgorithm*);
-void addToReady(t_ready_trainers* ,t_ready_trainers* ,int* ,struct SchedulingAlgorithm ,t_log* , t_ready_trainers* );
-void addToExec(t_ready_trainers* ,int* ,t_ready_trainers* ,t_log* );
-void scheduleFifo(t_ready_trainers*,int*,struct SchedulingAlgorithm,t_ready_trainers*,t_log*);
-void scheduleRR(t_ready_trainers*,int*,struct SchedulingAlgorithm,t_ready_trainers*,t_log*);
-void scheduleSJFSD(t_ready_trainers*,int*,struct SchedulingAlgorithm,t_ready_trainers*,t_log*);
-void scheduleSJFCD(t_ready_trainers*,int*,struct SchedulingAlgorithm,t_ready_trainers*,t_log*);
+void addToReady(t_ready_trainer* ,t_ready_trainer* ,int* ,struct SchedulingAlgorithm ,t_log* , t_ready_trainer );
+void addToExec(t_ready_trainer* ,int* ,t_ready_trainer ,t_log* );
+void scheduleFifo(t_ready_trainer*,int*,struct SchedulingAlgorithm,t_ready_trainer,t_log*);
+void scheduleRR(t_ready_trainer*,int*,struct SchedulingAlgorithm,t_ready_trainer,t_log*);
+void scheduleSJFSD(t_ready_trainer*,int*,struct SchedulingAlgorithm,t_ready_trainer,t_log*);
+void scheduleSJFCD(t_ready_trainer*,int*,struct SchedulingAlgorithm,t_ready_trainer,t_log*);
 void scheduleDistance(pthread_t**);
 void startInitMatrix(char *);
 void assignMatrixValues(void *);
@@ -180,7 +180,7 @@ int connectBroker(char*, char*,t_log*);
 void requestNewPokemons(t_objetive*,int,t_log*,struct Broker);
 void requestNewPokemon(t_pokemon,t_log*,struct Broker);
 int getGlobalObjetivesCount(t_trainer*, int);
-void initStateLists(t_stateLists,t_trainer*,t_trainer*,t_ready_trainers*,t_ready_trainers*,t_trainer*);
+void initStateLists(t_stateLists,t_trainer*,t_trainer*,t_ready_trainer*,t_ready_trainer,t_trainer*);
 void waitForMessage(void*);
 void processMessage(void*);
 void processMessageLocalized(deli_message*);
@@ -209,11 +209,11 @@ void initScheduler(struct SchedulingAlgorithm *schedulingAlgorithm){
 	schedulingAlgorithm->initEstimationKey="ESTIMACION_INICIAL";
 }
 
-void moveTrainerToTarget(t_trainer* trainer, int distanceToMoveInX, int distanceToMoveInY);
-void moveTrainerToObjective(t_trainer* trainer,  t_pokemon* pokemonTargeted);
+void moveTrainerToTarget(t_trainer trainer, int distanceToMoveInX, int distanceToMoveInY);
+void moveTrainerToObjective(t_trainer trainer,  t_pokemon pokemonTargeted);
 int calculateDifference(int, int);
-int getDistanceToPokemonTarget(t_trainerParameters, appeared_pokemon*);
+int getDistanceToPokemonTarget(t_trainerParameters, t_pokemon);
 void moveTrainetToObjective(t_trainer*, t_pokemon*);
-int executeClock(int, t_ready_trainers*);
+int executeClock(t_ready_trainer);
 
 #endif /* TEAM_H_ */

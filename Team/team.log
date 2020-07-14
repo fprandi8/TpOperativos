@@ -1,56 +1,57 @@
-[DEBUG] 01:05:56:978 Team/(31231:31231): 1. Finaliza creación de config y logger
-[DEBUG] 01:05:56:978 Team/(31231:31231): 2. Comienza lectura de config de broker
-[DEBUG] 01:05:56:978 Team/(31231:31231): 2. Se leyó la IP: 127.0.0.1
-[DEBUG] 01:05:56:978 Team/(31231:31231): 2. Se leyó el puerto: 6009
-[DEBUG] 01:05:56:978 Team/(31231:31231): 2. Finaliza lectura de config de broker
-[DEBUG] 01:05:56:978 Team/(31231:31231): 3. Comienza lectura de config de scheduler
-[DEBUG] 01:05:56:978 Team/(31231:31231): 3. Se leyó el algoritmo: RR
-[DEBUG] 01:05:56:978 Team/(31231:31231): 3. Se leyó el quantum: 2
-[DEBUG] 01:05:56:978 Team/(31231:31231): 3. Se leyó la estimación inicial: 0
-[DEBUG] 01:05:56:978 Team/(31231:31231): 3. Finaliza lectura de config de scheduler
-[DEBUG] 01:05:56:978 Team/(31231:31231): 4. Se contaron 3 entrenadores
-[DEBUG] 01:05:56:978 Team/(31231:31231): 5.Se alocó memoria para el array de threads
-[DEBUG] 01:05:56:978 Team/(31231:31231): 4. Comienza lectura de parámetros de entrenador
-[DEBUG] 01:05:56:978 Team/(31231:31231): 4. Finalizó la carga de config de entrenadores
-[DEBUG] 01:05:56:978 Team/(31231:31231): 4. Se alocó memoria para el array de parametros de entrenadore
-[DEBUG] 01:05:56:978 Team/(31231:31231): 4. Comienza el proceso de carga de atributos en struc
-[DEBUG] 01:05:56:978 Team/(31231:31231): 4.1. Comienza el proceso de carga de posición de entrenadores
-[DEBUG] 01:05:56:978 Team/(31231:31231): 4.1. Finaliza el proceso de carga de posición de entrenadores
-[DEBUG] 01:05:56:978 Team/(31231:31231): 4.2. Comienza el proceso de carga de pokemons de entrenadores
-[DEBUG] 01:05:56:978 Team/(31231:31231): 4.3. Comienza el proceso de carga de objetivos de entrenadores
-[DEBUG] 01:05:56:978 Team/(31231:31231): 4.3. Finaliza el proceso de carga de objetivos de entrenadores
-[DEBUG] 01:05:56:978 Team/(31231:31231): 4. Finalizó el proceso de carga de atributos
-[DEBUG] 01:05:56:978 Team/(31231:31231): 5.Comienza el proceso de creación de threads
-[DEBUG] 01:05:56:978 Team/(31231:31231): Creando el entrenador 0
-[DEBUG] 01:05:56:978 Team/(31231:31231): 5. Se creó un entrenador
-[DEBUG] 01:05:56:978 Team/(31231:31231): Creando el entrenador 1
-[DEBUG] 01:05:56:978 Team/(31231:31231): 5. Se creó un entrenador
-[DEBUG] 01:05:56:978 Team/(31231:31231): Creando el entrenador 2
-[DEBUG] 01:05:56:978 Team/(31231:31231): 5. Se creó un entrenador
-[DEBUG] 01:05:56:978 Team/(31231:31231): 5. Terminó el proceso de creación de threads
-[DEBUG] 01:05:56:978 Team/(31231:31231): add Entrenador 0, objetivo: 0, Agregar objetivo: Pikachu en registro 0, cantidad total 1
-[DEBUG] 01:05:56:978 Team/(31231:31231): add Entrenador 0, objetivo: 1, Agregar objetivo: Pikachu en registro 0, cantidad total 2
-[DEBUG] 01:05:56:978 Team/(31231:31231): add Entrenador 0, objetivo: 2, Agregar objetivo: Squirtle en registro 1, cantidad total 1
-[DEBUG] 01:05:56:978 Team/(31231:31231): add Entrenador 0, objetivo: 3, Agregar objetivo: Pidgey en registro 2, cantidad total 1
-[DEBUG] 01:05:56:978 Team/(31231:31231): add Entrenador 1, objetivo: 0, Agregar objetivo: Pikachu en registro 0, cantidad total 3
-[DEBUG] 01:05:56:978 Team/(31231:31231): add Entrenador 1, objetivo: 1, Agregar objetivo: Charmander en registro 3, cantidad total 1
-[DEBUG] 01:05:56:979 Team/(31231:31231): add Entrenador 1, objetivo: 2, Agregar objetivo: Charmander en registro 3, cantidad total 2
-[DEBUG] 01:05:56:979 Team/(31231:31231): add Entrenador 2, objetivo: 0, Agregar objetivo: Squirtle en registro 1, cantidad total 2
-[DEBUG] 01:05:56:979 Team/(31231:31231): add Entrenador 2, objetivo: 1, Agregar objetivo: Bulbasaur en registro 4, cantidad total 1
-[DEBUG] 01:05:56:979 Team/(31231:31231): diff Entrenador 0, objetivo entrenador: 0 vs objetivo lista: 0, Nombre: Pikachu
-[DEBUG] 01:05:56:979 Team/(31231:31231): diff Entrenador 0, objetivo entrenador: 1 vs objetivo lista: 1, Nombre: Squirtle
-[DEBUG] 01:05:56:979 Team/(31231:31231): diff Entrenador 0, objetivo entrenador: 2 vs objetivo lista: 2, Nombre: Pidgey
-[DEBUG] 01:05:56:979 Team/(31231:31231): diff Entrenador 1, objetivo entrenador: 0 vs objetivo lista: 1, Nombre: Squirtle
-[DEBUG] 01:05:56:979 Team/(31231:31231): diff Entrenador 1, objetivo entrenador: 1 vs objetivo lista: 1, Nombre: Charmander
-[DEBUG] 01:05:56:979 Team/(31231:31231): diff Entrenador 2, objetivo entrenador: 0 vs objetivo lista: 2, Nombre: Bulbasaur
-[DEBUG] 01:05:56:979 Team/(31231:31231): El objetivo global consta de 3 pokemons
-[DEBUG] 01:05:56:979 Team/(31231:31231): El objetivo global consta de 2 registros
-[DEBUG] 01:05:56:979 Team/(31231:31231): Registro 0: 2 Pikachu
-[DEBUG] 01:05:56:979 Team/(31231:31231): Registro 1: 1 Charmander
-[DEBUG] 01:05:56:979 Team/(31231:31231): Pokemon requested: Pikachu
-[DEBUG] 01:05:56:979 Team/(31231:31231): Pokemon requested: Charmander
-[DEBUG] 01:05:56:979 Team/(31231:31231): Creando thread Localized Subscriptions Handler
-[DEBUG] 01:05:56:979 Team/(31231:31231): IP y puerto configurado
-[DEBUG] 01:05:56:979 Team/(31231:31231): Socket configurado
-[DEBUG] 01:05:56:979 Team/(31231:31231): Se intentará conectar con Broker
-[DEBUG] 01:05:56:979 Team/(31231:31231): La conexión fue realizada
+[DEBUG] 06:03:34:717 Team/(20161:20161): 1. Finaliza creación de config y logger
+[DEBUG] 06:03:34:717 Team/(20161:20161): 2. Comienza lectura de config de broker
+[DEBUG] 06:03:34:717 Team/(20161:20161): 2. Se leyó la IP: 127.0.0.1
+[DEBUG] 06:03:34:717 Team/(20161:20161): 2. Se leyó el puerto: 6009
+[DEBUG] 06:03:34:717 Team/(20161:20161): 2. Finaliza lectura de config de broker
+[DEBUG] 06:03:34:717 Team/(20161:20161): 3. Comienza lectura de config de scheduler
+[DEBUG] 06:03:34:717 Team/(20161:20161): 3. Se leyó el algoritmo: RR
+[DEBUG] 06:03:34:717 Team/(20161:20161): 3. Se leyó el quantum: 2
+[DEBUG] 06:03:34:717 Team/(20161:20161): 3. Se leyó la estimación inicial: 0
+[DEBUG] 06:03:34:717 Team/(20161:20161): 3. Finaliza lectura de config de scheduler
+[DEBUG] 06:03:34:717 Team/(20161:20161): 4. Se contaron 3 entrenadores
+[DEBUG] 06:03:34:717 Team/(20161:20161): 5.Se alocó memoria para el array de threads
+[DEBUG] 06:03:34:717 Team/(20161:20161): 4. Comienza lectura de parámetros de entrenador
+[DEBUG] 06:03:34:717 Team/(20161:20161): 4. Finalizó la carga de config de entrenadores
+[DEBUG] 06:03:34:717 Team/(20161:20161): 4. Se alocó memoria para el array de parametros de entrenadore
+[DEBUG] 06:03:34:717 Team/(20161:20161): 4. Comienza el proceso de carga de atributos en struc
+[DEBUG] 06:03:34:717 Team/(20161:20161): 4.1. Comienza el proceso de carga de posición de entrenadores
+[DEBUG] 06:03:34:717 Team/(20161:20161): 4.1. Finaliza el proceso de carga de posición de entrenadores
+[DEBUG] 06:03:34:717 Team/(20161:20161): 4.2. Comienza el proceso de carga de pokemons de entrenadores
+[DEBUG] 06:03:34:717 Team/(20161:20161): 4.3. Comienza el proceso de carga de objetivos de entrenadores
+[DEBUG] 06:03:34:717 Team/(20161:20161): 4.3. Finaliza el proceso de carga de objetivos de entrenadores
+[DEBUG] 06:03:34:717 Team/(20161:20161): 4. Finalizó el proceso de carga de atributos
+[DEBUG] 06:03:34:717 Team/(20161:20161): 5.Comienza el proceso de creación de threads
+[DEBUG] 06:03:34:717 Team/(20161:20161): Creando el entrenador 0
+[DEBUG] 06:03:34:717 Team/(20161:20161): 5. Se creó un entrenador
+[DEBUG] 06:03:34:717 Team/(20161:20161): Creando el entrenador 1
+[DEBUG] 06:03:34:717 Team/(20161:20161): 5. Se creó un entrenador
+[DEBUG] 06:03:34:717 Team/(20161:20161): Creando el entrenador 2
+[DEBUG] 06:03:34:717 Team/(20161:20161): 5. Se creó un entrenador
+[DEBUG] 06:03:34:717 Team/(20161:20161): 5. Terminó el proceso de creación de threads
+[DEBUG] 06:03:34:717 Team/(20161:20161): add Entrenador 0, objetivo: 0, Agregar objetivo: Pikachu en registro 0, cantidad total 1
+[DEBUG] 06:03:34:717 Team/(20161:20161): add Entrenador 0, objetivo: 1, Agregar objetivo: Pikachu en registro 0, cantidad total 2
+[DEBUG] 06:03:34:717 Team/(20161:20161): add Entrenador 0, objetivo: 2, Agregar objetivo: Squirtle en registro 1, cantidad total 1
+[DEBUG] 06:03:34:717 Team/(20161:20161): add Entrenador 0, objetivo: 3, Agregar objetivo: Pidgey en registro 2, cantidad total 1
+[DEBUG] 06:03:34:717 Team/(20161:20161): add Entrenador 1, objetivo: 0, Agregar objetivo: Pikachu en registro 0, cantidad total 3
+[DEBUG] 06:03:34:717 Team/(20161:20161): add Entrenador 1, objetivo: 1, Agregar objetivo: Charmander en registro 3, cantidad total 1
+[DEBUG] 06:03:34:717 Team/(20161:20161): add Entrenador 1, objetivo: 2, Agregar objetivo: Charmander en registro 3, cantidad total 2
+[DEBUG] 06:03:34:718 Team/(20161:20161): add Entrenador 2, objetivo: 0, Agregar objetivo: Squirtle en registro 1, cantidad total 2
+[DEBUG] 06:03:34:718 Team/(20161:20161): add Entrenador 2, objetivo: 1, Agregar objetivo: Bulbasaur en registro 4, cantidad total 1
+[DEBUG] 06:03:34:718 Team/(20161:20161): diff Entrenador 0, objetivo entrenador: 0 vs objetivo lista: 0, Nombre: Pikachu
+[DEBUG] 06:03:34:718 Team/(20161:20161): diff Entrenador 0, objetivo entrenador: 1 vs objetivo lista: 1, Nombre: Squirtle
+[DEBUG] 06:03:34:718 Team/(20161:20161): diff Entrenador 0, objetivo entrenador: 2 vs objetivo lista: 2, Nombre: Pidgey
+[DEBUG] 06:03:34:718 Team/(20161:20161): diff Entrenador 1, objetivo entrenador: 0 vs objetivo lista: 1, Nombre: Squirtle
+[DEBUG] 06:03:34:718 Team/(20161:20161): diff Entrenador 1, objetivo entrenador: 1 vs objetivo lista: 1, Nombre: Charmander
+[DEBUG] 06:03:34:718 Team/(20161:20161): diff Entrenador 2, objetivo entrenador: 0 vs objetivo lista: 2, Nombre: Bulbasaur
+[DEBUG] 06:03:34:718 Team/(20161:20161): El objetivo global consta de 3 pokemons
+[DEBUG] 06:03:34:718 Team/(20161:20161): El objetivo global consta de 2 registros
+[DEBUG] 06:03:34:718 Team/(20161:20161): Registro 0: 2 Pikachu
+[DEBUG] 06:03:34:718 Team/(20161:20161): Registro 1: 1 Charmander
+[DEBUG] 06:03:34:718 Team/(20161:20161): Se solicitarán 2 pokemons
+[DEBUG] 06:03:34:718 Team/(20161:20161): Se solicitarán el pokemon Pikachu
+[DEBUG] 06:03:34:718 Team/(20161:20161): IP y puerto configurado
+[DEBUG] 06:03:34:718 Team/(20161:20171): Creando thread Localized Subscriptions Handler
+[DEBUG] 06:03:34:718 Team/(20161:20170): Creando thread Appeared Subscriptions Handler
+[DEBUG] 06:03:34:718 Team/(20161:20169): Creando thread Caught Subscriptions Handler
+[DEBUG] 06:03:34:722 Team/(20161:20161): Socket configurado
+[DEBUG] 06:03:34:722 Team/(20161:20161): Se intentará conectar con Broker

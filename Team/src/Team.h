@@ -24,8 +24,8 @@
 
 typedef struct
 {
-	int x;
-	int y;
+	uint32_t x;
+	uint32_t y;
 } t_trainerPosition, t_pokemonPosition;
 
 
@@ -38,24 +38,41 @@ typedef struct
 
 typedef struct
 {
+	t_pokemon* pokemons;
+	uint32_t count;
+} t_pokemonList;
+
+typedef struct
+{
 	t_pokemon pokemon;
-	int count;
+	uint32_t count;
 } t_objetive;
 
 typedef struct
 {
 	uint32_t* id;
-	int count;
-} t_getMessages;
+	uint32_t count;
+} t_idMessages;
 
+typedef struct
+{
+	uint32_t id;
+	t_trainer trainer;
+} t_catchMessage;
+
+typedef struct
+{
+	t_catchMessage* catchMessage;
+	uint32_t count;
+} t_catchMessages;
 
 typedef struct
 {
 	t_trainerPosition position;
 	t_pokemon* pokemons;
-	int pokemonsCount;
+	uint32_t pokemonsCount;
 	t_pokemon* objetives;
-	int objetivesCount;
+	uint32_t objetivesCount;
 } t_trainerParameters;
 
 typedef enum
@@ -155,14 +172,14 @@ void getTrainerAttrObj(char**,t_trainer*,int,t_log*);
 void startTrainers(t_trainer*,int,t_config*,t_log*);
 void startTrainer(t_trainer*,t_log*);
 void startThread(t_trainer*);
-void missingPokemons(t_trainer*, t_objetive*, int,int*,int*,t_log*);
+void missingPokemons(t_trainer*, int,t_log*);
 void subscribeToBroker(struct Broker,pthread_t*);
 void* subscribeToBrokerLocalized(void* Broker);
 void* subscribeToBrokerAppeared(void* Broker);
 void* subscribeToBrokerCaught(void* Broker);
 int connectBroker(char*, char*,t_log*);
-void requestNewPokemons(t_objetive*,int,t_log*,struct Broker,t_getMessages*);
-void requestNewPokemon(t_pokemon,t_log*,struct Broker,t_getMessages*);
+void requestNewPokemons(t_objetive*,int,t_log*,struct Broker);
+void requestNewPokemon(t_pokemon,t_log*,struct Broker);
 int getGlobalObjetivesCount(t_trainer*, int);
 void initStateLists(t_stateLists,t_trainer*,t_trainer*,t_ready_trainers*,t_ready_trainers*,t_trainer*);
 void waitForMessage(void*);
@@ -170,6 +187,8 @@ void processMessage(void*);
 void processMessageLocalized(deli_message*);
 void processMessageCaught(deli_message*);
 void processMessageAppeared(deli_message*);
+int findIdInGetList(uint32_t);
+int findNameInAvailableList(char*);
 
 void initBroker(struct Broker *broker){
 	broker->ipKey="IP_BROKER";

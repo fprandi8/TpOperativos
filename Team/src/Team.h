@@ -97,7 +97,7 @@ struct Broker
 	char* ip;
 	char* portKey;
 	char* port;
-} broker;
+} broker,teamServerAttr;
 
 struct SchedulingAlgorithm
 {
@@ -145,6 +145,7 @@ t_config* startConfig(void);
 void deleteLogger(t_log**);
 void removeLogger(char*);
 void initBroker(struct Broker*);
+void initTeamServer(struct Broker*);
 void readConfigBrokerValues(t_config*,t_log*,struct Broker*);
 void readConfigSchedulerValues(t_config*, t_log*, struct SchedulingAlgorithm*);
 void readConfigTrainersValues(t_config*,t_log*,char***,char***,char***);
@@ -187,10 +188,18 @@ void processMessageCaught(deli_message*);
 void processMessageAppeared(deli_message*);
 int findIdInGetList(uint32_t);
 int findNameInAvailableList(char*);
+void attendGameboy(void*);
+void processGameBoyMessage(deli_message*);
 
 void initBroker(struct Broker *broker){
 	broker->ipKey="IP_BROKER";
 	broker->portKey="PUERTO_BROKER";
+
+}
+
+void initTeamServer(struct Broker *teamServerAttr){
+	teamServerAttr->ipKey="IP_TEAM";
+	teamServerAttr->portKey="PUERTO_TEAM";
 
 }
 

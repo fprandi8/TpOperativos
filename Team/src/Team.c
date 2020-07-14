@@ -101,9 +101,94 @@ int main(void) {
     //startClosePlanning(new,blocked,ready);
 	//startReadyPlaning(ready,exec);
 	//TODO agregar aquí la función "scheduleByDistance"
+	int teamServer = startServer(logger);
+	int client;
+	while(1){
+		client = waitClient(teamServer);
+		log_debug(logger,"Gameboy connected");
+		pthread_create(thread,NULL,(void*)attendGameboy,&client);
+		pthread_detach(*thread);
+	}
 	deleteLogger(&logger);
 	return EXIT_SUCCESS;
 }
+
+void attendGameboy(void* var){
+	uint32_t type;
+	void* content = malloc(sizeof(void*));
+	int* client = (int*)var;
+	int result = RecievePackage(*(client),&type,&content);
+	if(!result){
+		log_debug(logger,"Gameboy's message processed");
+		deli_message* message = (deli_message*)content;
+		int result = SendMessageAcknowledge(message->id,*(client));
+		if(!result){
+			log_debug(logger,"Acknowledge sent to Gameboy");
+		}
+		processGameBoyMessage(message);
+	}else{
+		log_debug(logger,"Error receiving Gameboy's message");
+	}
+	pthread_exit(NULL);
+}
+void processGameBoyMessage(deli_message* message){
+	switch(message->messageType){
+		case APPEARED_POKEMON: {
+			processMessageAppeared(message);
+			break;
+		}
+	}
+	free(message->messageContent);
+	free(message);
+}
+
+int waitClient(int teamSocket){
+	struct sockaddr_in clientDir;
+	int tamDirection = sizeof(struct sockaddr_in);
+	return accept(teamSocket,(void*)&clientDir,&tamDirection);
+}
+
+int startServer(t_log* logger)
+{
+	int teamSocket;
+
+    struct addrinfo hints, *servinfo, *p;
+
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC;
+    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_flags = AI_PASSIVE;
+    //hints.ai_flags = 0;
+    //hints.ai_protocol = 0;
+
+    getaddrinfo(teamServerAttr.ip, teamServerAttr.port, &hints, &servinfo);
+    log_debug(logger,"IP y puerto configurado");
+    for (p = servinfo; p != NULL; p = p->ai_next) {
+    	teamSocket = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+		if (teamSocket == -1){
+			log_debug(logger,"El socket se configuró incorrectamente");
+			continue;
+		}
+		log_debug(logger,"Socket configurado");
+		uint32_t flag=1;
+		setsockopt(teamSocket,SOL_SOCKET,SO_REUSEPORT,&(flag),sizeof(flag));
+		if (bind(teamSocket, p->ai_addr, p->ai_addrlen)==-1) {
+			close(teamSocket);
+			log_debug(logger,"La conexión falló");
+			continue;
+		}else{
+			log_debug(logger,"La conexión fue realizada");
+			break;
+		}
+
+	}
+    listen(teamSocket,SOMAXCONN);
+    freeaddrinfo(servinfo);
+    return teamSocket;
+}
+
+
+
 //TODO - FIX
 void initStateLists(t_stateLists stateLists,t_trainer* new, t_trainer* blocked,t_ready_trainers* ready, t_ready_trainers* exec, t_trainer* l_exit){
 	stateLists.new = new;

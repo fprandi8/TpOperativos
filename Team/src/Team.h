@@ -56,18 +56,6 @@ typedef struct
 
 typedef struct
 {
-	uint32_t id;
-	t_trainer trainer;
-} t_catchMessage;
-
-typedef struct
-{
-	t_catchMessage* catchMessage;
-	uint32_t count;
-} t_catchMessages;
-
-typedef struct
-{
 	t_trainerPosition position;
 	t_pokemon* pokemons;
 	uint32_t pokemonsCount;
@@ -91,7 +79,17 @@ typedef enum
 
 } t_trainer;
 
+typedef struct
+{
+	uint32_t id;
+	t_trainer trainer;
+} t_catchMessage;
 
+typedef struct
+{
+	t_catchMessage* catchMessage;
+	uint32_t count;
+} t_catchMessages;
 
 struct Broker
 {

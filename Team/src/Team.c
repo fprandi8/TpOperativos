@@ -696,7 +696,7 @@ int getTrainersCount(t_config *config,t_log* logger) {
 
 void schedule(t_ready_trainers* trainers,int* readyCount,struct SchedulingAlgorithm schedulingAlgorithm,t_ready_trainers* exec, t_log* logger){//Para el caso de FIFO y RR no hace nada, ya que las listas están ordenadas por FIFO y RR solo cambia como se procesa.
 	if (strcmp(schedulingAlgorithm.algorithm,"FIFO")==0){
-		scheduleFifo(trainers,readyCount, exec, logger);
+		scheduleFifo(trainers,readyCount,schedulingAlgorithm, exec, logger);
 	}else if(strcmp(schedulingAlgorithm.algorithm,"RR")==0){
 		scheduleRR(trainers,readyCount,schedulingAlgorithm, exec, logger);
 	}else if(strcmp(schedulingAlgorithm.algorithm,"SJF-SD")==0){
@@ -706,7 +706,7 @@ void schedule(t_ready_trainers* trainers,int* readyCount,struct SchedulingAlgori
 	}
 }
 
-void addToReady(t_trainer* trainer,t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm,t_log* logger, t_trainer* exec){
+void addToReady(t_ready_trainers* trainer,t_ready_trainers* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm,t_log* logger, t_ready_trainers* exec){
 	void* temp = realloc(trainers,sizeof(t_trainer)*((*countReady)+1));
 	if (!temp){
 		log_debug(logger,"error en realloc");
@@ -714,16 +714,13 @@ void addToReady(t_trainer* trainer,t_trainer* trainers,int* countReady,struct Sc
 	}
 	(trainers)=temp;
 	(trainers)[(*countReady)]=(*trainer);
-	sem_wait(catch_semaphore);
+	sem_wait(countReady_semaphore);
 	(*countReady)++;
-	sem_post(catch_semaphore);
+	sem_post(countReady_semaphore);
 	schedule(trainers,countReady,schedulingAlgorithm,exec, logger);
 }
 
-//TODO - No debería hacer nada; siempre se agregan cosas al final de ready y se sacan del HEAD de ready
-void scheduleFifo(t_trainer* trainers,int* count, t_trainer* exec, t_log* logger){
 
-}
 
 void addToExec(t_ready_trainers* ready,int* countReady,t_ready_trainers* exec,t_log* logger){
 	exec[0]=ready[0];
@@ -739,6 +736,18 @@ void addToExec(t_ready_trainers* ready,int* countReady,t_ready_trainers* exec,t_
 			exit(9);
 		}
 		ready=temp;
+}
+
+
+//TODO - esta función debe generar el listado de ready ordenado por distancia.
+void scheduleBydistance(){
+
+}
+
+
+//TODO - No debería hacer nada; siempre se agregan cosas al final de ready y se sacan del HEAD de ready
+void scheduleFifo(t_ready_trainers* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_ready_trainers* exec, t_log* logger){
+
 }
 
 //TODO - cuando termina el quantum mandar al final de la lista de ready.
@@ -765,12 +774,12 @@ void scheduleRR(t_ready_trainers* trainers,int* countReady,struct SchedulingAlgo
 }
 
 //TODO
-void scheduleSJFSD(t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_trainer* exec, t_log* logger){
+void scheduleSJFSD(t_ready_trainers* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_ready_trainers* exec, t_log* logger){
 ;
 }
 
 //TODO
-void scheduleSJFCD(t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_trainer* exec, t_log* logger){
+void scheduleSJFCD(t_ready_trainers* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_ready_trainers* exec, t_log* logger){
 ;
 }
 

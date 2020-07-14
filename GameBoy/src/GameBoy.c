@@ -16,9 +16,10 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include<commons/string.h>
-#include<commons/config.h>
-#include<readline/readline.h>
+#include <commons/string.h>
+#include <commons/config.h>
+#include <commons/log.h>
+#include <readline/readline.h>
 #include <pthread.h>
 #include <poll.h>
 #include <unistd.h>
@@ -45,7 +46,10 @@ void SleepAndClose(void* args);
 void GetKeysFor(t_reciever reciever, char* keys[]);
 void ReadConfigValues(t_config *config, char* keys[]);
 void RecieveAcknowledge(int server_socket);
-void RecieveMessage(int server_socket, message_type expectedType);
+void RecieveMessage(int server_socket, message_type expectedType, t_log* logger);
+void LogConectedTo(t_log* logger, t_reciever reciver);
+void LogSubscribedTo(t_log* logger, message_type type);
+void LogMessage(t_log* logger, deli_message* message);
 
 int main(int argc, char **argv) {
 	puts("GameBoy (Publicador)\n");
@@ -193,6 +197,11 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
+	//Create logger
+	t_log* logger;
+	logger = log_create("Broker.log","Broker",0,LOG_LEVEL_INFO);
+
+
 	//Get IP from config
 	t_config* config = config_create("gameboy.config");
 
@@ -224,11 +233,21 @@ int main(int argc, char **argv) {
 
 	printf("Connected\n");
 
+	LogConectedTo(logger, reciver);
+
 	//////////////////////// ENVIAR ////////////////////////////////
 
 	if(reciver == SUSCRIPTOR)
 	{
-		SendSubscriptionRequest(messageType, server_socket);
+		int subResult = SendSubscriptionRequest(messageType, server_socket);
+
+		if(subResult != 0)
+		{
+			printf("Failed to subscribe\n");
+			return -1;
+		}
+
+		LogSubscribedTo(logger, messageType);
 
 		pthread_t* thread;
 		thread = (pthread_t*)malloc(sizeof(pthread_t));
@@ -258,7 +277,7 @@ int main(int argc, char **argv) {
 
 				 if (pollin_happened)
 				 {
-					 RecieveMessage(server_socket, messageType);
+					 RecieveMessage(server_socket, messageType, logger);
 				 }
 				 else
 				 {
@@ -529,7 +548,7 @@ void RecieveAcknowledge(int server_socket)
 	}
 }
 
-void RecieveMessage(int server_socket, message_type expectedType)
+void RecieveMessage(int server_socket, message_type expectedType, t_log* logger)
 {
 	op_code operationCode;
 	void* content;
@@ -540,8 +559,9 @@ void RecieveMessage(int server_socket, message_type expectedType)
 				puts("Error, recieved a suscription request while waiting for a message");
 				break;
 			case MESSAGE:
-				//TODO log message, give logger to function
+				LogMessage(logger, (deli_message*)content);
 				if(((deli_message*)content)->messageType == expectedType) puts("Recieved Message of correct type"); else puts("Recieved Message with an incorrect type");
+				Free_deli_message_withContent((deli_message*)content);
 				break;
 			case ACKNOWLEDGE:
 				puts("Error, recieved a suscription request while waiting for a message");
@@ -550,11 +570,67 @@ void RecieveMessage(int server_socket, message_type expectedType)
 				puts("Error, recieved a packet of unkown type");
 				break;
 		}
+
 	} 
 	else 
 	{
 		puts("Error, failed to recieve packet");
 	}
+}
+
+void LogConectedTo(t_log* logger, t_reciever reciver)
+{
+	char* target = "";
+	switch(reciver)
+	{
+		case BROKER: case SUSCRIPTOR:
+			target = "BROKER";
+			break;
+		case TEAM:
+			target = "TEAM";
+			break;
+		case GAMECARD:
+			target = "GAMECARD";
+			break;
+	}
+	log_debug(logger,"Connected to %s", target);
+}
+
+char* MessageTypeToString(message_type type)
+{
+	switch(type)
+	{
+		case NEW_POKEMON:
+			return "NEW_POKEMON";
+			break;
+		case LOCALIZED_POKEMON:
+			return "LOCALIZED_POKEMON";
+			break;
+		case GET_POKEMON:
+			return "GET_POKEMON";
+			break;
+		case APPEARED_POKEMON:
+			return "APPEARED_POKEMON";
+			break;
+		case CATCH_POKEMON:
+			return "CATCH_POKEMON";
+			break;
+		case CAUGHT_POKEMON:
+			return "CAUGHT_POKEMON";
+			break;
+	}
+}
+
+void LogSubscribedTo(t_log* logger, message_type type)
+{
+	char* target = MessageTypeToString(type);
+	log_debug(logger,"Subscribed to %s", target);
+}
+
+void LogMessage(t_log* logger, deli_message* message)
+{
+	char* messageType = MessageTypeToString(message->messageType);
+	log_debug(logger,"Recived %s message with id: %d, correlation id: %d", messageType, message->id, message->correlationId);
 }
 
 

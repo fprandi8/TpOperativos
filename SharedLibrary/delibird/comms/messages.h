@@ -129,4 +129,6 @@ void Free_catch_pokemon(catch_pokemon* catch);
 
 void Free_caught_pokemon(caught_pokemon* caught);
 
+void Free_deli_message_withContent(deli_message* message);
+
 #endif

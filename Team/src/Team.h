@@ -29,6 +29,7 @@ typedef struct
 } t_trainerPosition, t_pokemonPosition;
 
 
+
 typedef struct
 {
 	char* name;
@@ -73,15 +74,7 @@ typedef enum
 
 } t_trainer;
 
-typedef struct
-{
-	t_trainer* new;
-	t_trainer* blocked;
-	t_trainer* ready;
-	t_trainer* exec;
-	t_trainer* exit;
 
-} t_stateLists;
 
 struct Broker
 {
@@ -112,6 +105,23 @@ typedef struct {
 	void* brokerAddress;
 } t_args_process_message;
 
+typedef struct
+{
+	t_trainer* trainer;
+	t_pokemon* pokemon;
+} t_ready_trainers;
+
+typedef struct
+{
+	t_trainer* new;
+	t_trainer* blocked;
+	t_ready_trainers* ready;
+	t_ready_trainers* exec;
+	t_trainer* exit;
+
+} t_stateLists;
+
+
 void createConfig(t_config**);
 void startLogger(t_config*,t_log**);
 void createLogger(char*,t_log**);
@@ -125,9 +135,9 @@ void readConfigSchedulerValues(t_config*, t_log*, struct SchedulingAlgorithm*);
 void readConfigTrainersValues(t_config*,t_log*,char***,char***,char***);
 void initScheduler(struct SchedulingAlgorithm*);
 void addToReady(t_trainer*,t_trainer*,int*,struct SchedulingAlgorithm,t_log*,t_trainer*);
-void addToExec(t_trainer*,int*,t_trainer*,t_log*);
+void addToExec(t_ready_trainers* ,int* ,t_ready_trainers* ,t_log* );
 void scheduleFifo(t_trainer*,int*, t_trainer*,t_log*);
-void scheduleRR(t_trainer*,int*,struct SchedulingAlgorithm, t_trainer*,t_log*);
+void scheduleRR(t_ready_trainers*,int*,struct SchedulingAlgorithm,t_ready_trainers*,t_log*);
 void scheduleSJFSD(t_trainer*,int*,struct SchedulingAlgorithm, t_trainer*,t_log*);
 void scheduleSJFCD(t_trainer*,int*,struct SchedulingAlgorithm, t_trainer*,t_log*);
 void scheduleDistance(pthread_t**);
@@ -154,7 +164,7 @@ int connectBroker(char*, char*,t_log*);
 void requestNewPokemons(t_objetive*,int,t_log*,struct Broker,t_getMessages*);
 void requestNewPokemon(t_pokemon,t_log*,struct Broker,t_getMessages*);
 int getGlobalObjetivesCount(t_trainer*, int);
-void initStateLists(t_stateLists,t_trainer*,t_trainer*,t_trainer*,t_trainer*,t_trainer*);
+void initStateLists(t_stateLists,t_trainer*,t_trainer*,t_ready_trainers*,t_ready_trainers*,t_trainer*);
 void waitForMessage(void*);
 void processMessage(void*);
 void processMessageLocalized(deli_message*);

@@ -8,11 +8,13 @@
  ============================================================================
  */
 #include "Team.h"
+#include "semaphore.h"
+#include "delibird/comms/pokeio.h"
 
 t_log* logger;
 pthread_t* thread;
-sem_t catch_semaphore = 1;
-sem_t countReady_semaphore = 1;
+sem_t* catch_semaphore = 1;
+sem_t* countReady_semaphore = 1;
 
 int main(void) {
 	t_config* config;
@@ -20,9 +22,9 @@ int main(void) {
 	char* ip;
 	char* port;
 	t_trainer* l_new;
-	t_trainer* l_ready;
+	t_ready_trainers* list_ready;
+	t_ready_trainers* list_exec;
 	t_trainer* l_blocked;
-	t_trainer* l_exec;
 	t_trainer* l_exit;
 	t_stateLists stateLists;
 	t_getMessages* getList;
@@ -31,6 +33,7 @@ int main(void) {
 	t_objetive* missingPkms;
 	localized_pokemon* localized;
 	appeared_pokemon* appeared;
+
     int globalObjetivesDistinctCount=0,globalObjetivesCount=0;
     pthread_t closeScheduler,readyScheduler;
 
@@ -83,15 +86,15 @@ int main(void) {
 	for(int objCount=0;objCount<globalObjetivesDistinctCount;objCount++){
 		log_debug(logger,"Missing Pokemon %i: %i %s",objCount,missingPkms[objCount].count,missingPkms[objCount].pokemon.name);
 	}
-	initStateLists(stateLists,l_new,l_blocked,l_ready,l_exec,l_exit);
+	initStateLists(stateLists,l_new,l_blocked,list_ready,list_exec,l_exit);
     //startClosePlanning(new,blocked,ready);
 	//startReadyPlaning(ready,exec);
 
 	deleteLogger(&logger);
 	return EXIT_SUCCESS;
 }
-//FIX
-void initStateLists(t_stateLists stateLists,t_trainer* new, t_trainer* blocked,t_trainer* ready, t_trainer* exec, t_trainer* l_exit){
+//TODO - FIX
+void initStateLists(t_stateLists stateLists,t_trainer* new, t_trainer* blocked,t_ready_trainers* ready, t_ready_trainers* exec, t_trainer* l_exit){
 	stateLists.new = new;
 	stateLists.blocked= blocked;
 	stateLists.ready = ready;
@@ -691,7 +694,7 @@ int getTrainersCount(t_config *config,t_log* logger) {
 	return count;
 }
 
-void schedule(t_trainer* trainers,int* readyCount,struct SchedulingAlgorithm schedulingAlgorithm,t_trainer* exec, t_log* logger){//Para el caso de FIFO y RR no hace nada, ya que las listas están ordenadas por FIFO y RR solo cambia como se procesa.
+void schedule(t_ready_trainers* trainers,int* readyCount,struct SchedulingAlgorithm schedulingAlgorithm,t_ready_trainers* exec, t_log* logger){//Para el caso de FIFO y RR no hace nada, ya que las listas están ordenadas por FIFO y RR solo cambia como se procesa.
 	if (strcmp(schedulingAlgorithm.algorithm,"FIFO")==0){
 		scheduleFifo(trainers,readyCount, exec, logger);
 	}else if(strcmp(schedulingAlgorithm.algorithm,"RR")==0){
@@ -722,7 +725,7 @@ void scheduleFifo(t_trainer* trainers,int* count, t_trainer* exec, t_log* logger
 
 }
 
-void addToExec(t_trainer* ready,int* countReady,t_trainer* exec,t_log* logger){
+void addToExec(t_ready_trainers* ready,int* countReady,t_ready_trainers* exec,t_log* logger){
 	exec[0]=ready[0];
 	sem_wait(catch_semaphore);
 	(*countReady)--;
@@ -739,15 +742,15 @@ void addToExec(t_trainer* ready,int* countReady,t_trainer* exec,t_log* logger){
 }
 
 //TODO - cuando termina el quantum mandar al final de la lista de ready.
-void scheduleRR(t_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_trainer* exec, t_log* logger, t_objetive* localized_pokemon, int teamSocket){
+void scheduleRR(t_ready_trainers* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_ready_trainers* exec, t_log* logger){
 	while(*countReady){
 		int i=0;
 		int valueOfExecuteClock = 1;
-		t_trainer* trainer;
+		t_ready_trainers* trainer;
 		trainer = ((&trainers)[i]);
 		addToExec(trainer, countReady, exec, logger);
 		for(int j=0;j<=(int)(schedulingAlgorithm.quantum) && valueOfExecuteClock == 1;j++){
-			valueOfExecuteClock = executeClock(*countReady, exec, localized_pokemon, teamSocket);
+			valueOfExecuteClock = executeClock(*countReady, exec);
 		}
 		if(valueOfExecuteClock == -1){
 			for(i=0;i<(*countReady); i++){
@@ -772,16 +775,18 @@ void scheduleSJFCD(t_trainer* trainers,int* countReady,struct SchedulingAlgorith
 }
 
 
-//TODO - Cómo hacemos para pasarle el targetedPokemon
-int executeClock(int countReady, t_trainer* trainer, t_pokemon* pokemonTargeted, int teamSocket){
 
-	if(getDistanceToPokemonTarget(trainer,pokemonTargeted)!=0){
-		moveTrainerToObjective(trainer, pokemonTargeted);
+int executeClock(int countReady, t_ready_trainers* exec){
+
+	if(getDistanceToPokemonTarget(exec->trainer,exec->pokemon)!=0){
+		moveTrainerToObjective(exec->trainer, exec->pokemon);
 		return 1;
-	}else if(getDistanceToPokemonTarget(trainer,pokemonTargeted)==0){
-		sem_wait(catch_semaphore);
-		Send_CATCH(pokemonTargeted, teamSocket);
-		sem_post(catch_semaphore);
+	}else if(getDistanceToPokemonTarget(exec->trainer,exec->pokemon)==0){
+		catch_pokemon catch;
+		catch.pokemonName = exec->pokemon->name;
+		catch.horizontalCoordinate = exec->pokemon->position.x;
+		catch.verticalCoordinate = exec->pokemon->position.y;
+		Send_CATCH(catch, connectBroker(broker.ip, broker.port,logger));
 		return 0;
 	}
 	return -1;

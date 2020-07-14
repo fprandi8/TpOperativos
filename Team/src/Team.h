@@ -205,7 +205,8 @@ void initScheduler(struct SchedulingAlgorithm *schedulingAlgorithm){
 void moveTrainerToTarget(t_trainer* trainer, int distanceToMoveInX, int distanceToMoveInY);
 void moveTrainerToObjective(t_trainer* trainer,  t_pokemon* pokemonTargeted);
 int calculateDifference(int, int);
-int getDistanceToPokemonTarget(t_trainer*, t_pokemon*);
+int getDistanceToPokemonTarget(t_trainerParameters, appeared_pokemon*);
 void moveTrainetToObjective(t_trainer*, t_pokemon*);
+int executeClock(int, t_ready_trainers*);
 
 #endif /* TEAM_H_ */

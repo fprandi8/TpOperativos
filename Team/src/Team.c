@@ -100,7 +100,7 @@ int main(void) {
 	initStateLists(stateLists,l_new,l_blocked,list_ready,list_exec,l_exit);
     //startClosePlanning(new,blocked,ready);
 	//startReadyPlaning(ready,exec);
-
+	//TODO agregar aquí la función "scheduleByDistance"
 	deleteLogger(&logger);
 	return EXIT_SUCCESS;
 }
@@ -856,9 +856,37 @@ void addToExec(t_ready_trainers* ready,int* countReady,t_ready_trainers* exec,t_
 }
 
 
-//TODO - esta función debe generar el listado de ready ordenado por distancia.
-void scheduleBydistance(){
+//TODO - esta función debe generar el listado de ready ordenado por distancia. Hay que ver como eva
+void scheduleBydistance(localized_pokemon* localized, appeared_pokemon* appeared, t_trainer* l_new, int trainersCount){
+	appeared_pokemon* pokemonsToScheduleByDistance=(appeared_pokemon*)malloc(sizeof(appeared_pokemon));
+	appeared_pokemon* listOfPokemons=(appeared_pokemon*)malloc(sizeof(appeared_pokemon)*(localized->ammount));
+	t_ready_trainers* toReady=(t_ready_trainers*)malloc(sizeof(t_ready_trainers));
+	int i=0;
+	while(localized->ammount){
+		localized->ammount--;
+		pokemonsToScheduleByDistance->pokemonName = localized->pokemonName;
+		pokemonsToScheduleByDistance->horizontalCoordinate = localized->coordinates->x;
+		pokemonsToScheduleByDistance->horizontalCoordinate = localized->coordinates->y;
+		i++;
+		((&listOfPokemons)[i]) = pokemonsToScheduleByDistance;
+	}
 
+	//cómo agregar los de la lista de appeared??
+
+	while(i){
+		int j;
+		int minClockTime = 0;
+		for(j=0;j<trainersCount;j++){
+			int clockTime;
+			clockTime = getDistanceToPokemonTarget(l_new[j].parameters,((&listOfPokemons)[i]));
+			if(minClockTime == 0 || minClockTime > clockTime){
+
+				// cómo evaluar las dos listas completas, ya que si empiezo a recorrer por entrenador, debo fijarme que este sea el más cercano a este pokemon, y si lo hago
+				// por pokemones debería evaluar esto también.
+			}
+		}
+
+	}
 }
 
 
@@ -904,10 +932,15 @@ void scheduleSJFCD(t_ready_trainers* trainers,int* countReady,struct SchedulingA
 
 int executeClock(int countReady, t_ready_trainers* exec){
 
-	if(getDistanceToPokemonTarget(exec->trainer,exec->pokemon)!=0){
+	appeared_pokemon* appeared;
+	appeared->pokemonName=exec->pokemon->name;
+	appeared->horizontalCoordinate=exec->pokemon->position.x;
+	appeared->horizontalCoordinate=exec->pokemon->position.y;
+
+	if(getDistanceToPokemonTarget(exec->trainer->parameters,appeared)!=0){
 		moveTrainerToObjective(exec->trainer, exec->pokemon);
 		return 1;
-	}else if(getDistanceToPokemonTarget(exec->trainer,exec->pokemon)==0){
+	}else if(getDistanceToPokemonTarget(exec->trainer->parameters,appeared)==0){
 		catch_pokemon catch;
 		catch.pokemonName = exec->pokemon->name;
 		catch.horizontalCoordinate = exec->pokemon->position.x;
@@ -966,10 +999,10 @@ int getClockTimeToNewPosition(int difference_x, int difference_y){
 	return clockTime;
 }
 
-//Función que devuelve la distancia hacia el pokemon.  TODO hay que hacer una funcion target generica,porque el target puede ser un trainer tambien (deadlock)
-int getDistanceToPokemonTarget(t_trainer* trainer,  t_pokemon* targetPokemon){
-	int distanceInX = calculateDifference(trainer->parameters.position.x, targetPokemon->position.x);
-	int distanceInY = calculateDifference(trainer->parameters.position.y, targetPokemon->position.y);
+
+int getDistanceToPokemonTarget(t_trainerParameters trainer,  appeared_pokemon* targetPokemon){
+	int distanceInX = calculateDifference(trainer.position.x, targetPokemon->horizontalCoordinate);
+	int distanceInY = calculateDifference(trainer.position.y, targetPokemon->verticalCoordinate);
 	int distance = getClockTimeToNewPosition(distanceInX, distanceInY);
 	return distance;
 }

@@ -12,9 +12,11 @@
 #include "delibird/comms/pokeio.h"
 
 t_log* logger;
+t_trainer* l_blocked;
 pthread_t* thread;
 sem_t* catch_semaphore = 1;
 sem_t* countReady_semaphore = 1;
+sem_t* countBlocked_semaphore = 1;
 t_pokemonList availablePokemons;
 sem_t* availablePokemons_sem = 1;
 t_idMessages getList;
@@ -26,6 +28,9 @@ int missingPokemonsCount;//TODO: Decrementar cada vez que hay un caught
 int countReady = 0;
 int countBlocked = 0;
 int countNew = 0;
+t_ready_trainer* trainers;
+struct SchedulingAlgorithm schedulingAlgorithm;
+t_ready_trainer exec;
 
 int main(void) {
 	t_config* config;
@@ -898,43 +903,56 @@ int getTrainersCount(t_config *config,t_log* logger) {
 	return count;
 }
 
-void schedule(t_ready_trainer* trainers,int* readyCount,struct SchedulingAlgorithm schedulingAlgorithm,t_ready_trainer exec, t_log* logger){//Para el caso de FIFO y RR no hace nada, ya que las listas están ordenadas por FIFO y RR solo cambia como se procesa.
+void schedule(t_ready_trainer* trainers, t_ready_trainer exec, t_log* logger){//Para el caso de FIFO y RR no hace nada, ya que las listas están ordenadas por FIFO y RR solo cambia como se procesa.
 	if (strcmp(schedulingAlgorithm.algorithm,"FIFO")==0){
-		scheduleFifo(trainers,readyCount,schedulingAlgorithm, exec, logger);
+		scheduleFifo(trainers, exec, logger);
 	}else if(strcmp(schedulingAlgorithm.algorithm,"RR")==0){
-		scheduleRR(trainers,readyCount,schedulingAlgorithm, exec, logger);
+		scheduleRR(trainers, exec, logger);
 	}else if(strcmp(schedulingAlgorithm.algorithm,"SJF-SD")==0){
-		scheduleSJFSD(trainers,readyCount,schedulingAlgorithm, exec, logger);
+		scheduleSJFSD(trainers, exec, logger);
 	}else if(strcmp(schedulingAlgorithm.algorithm,"SJF-CD")==0){
-		scheduleSJFCD(trainers,readyCount,schedulingAlgorithm, exec, logger);
+		scheduleSJFCD(trainers, exec, logger);
 	}
 }
 
-void addToReady(t_ready_trainer* trainer,t_ready_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm,t_log* logger, t_ready_trainer exec){
-	void* temp = realloc(trainers,sizeof(t_trainer)*((*countReady)+1));
+void addToReady(t_ready_trainer* trainer,t_ready_trainer* trainers){
+	void* temp = realloc(trainers,sizeof(t_trainer)*((countReady)+1));
 	if (!temp){
 		log_debug(logger,"error en realloc");
 		exit(9);
 	}
 	(trainers)=temp;
 	sem_wait(countReady_semaphore);
-	(trainers)[(*countReady)]=(*trainer);
-	(*countReady)++;
+	(trainers)[(countReady)]=(*trainer);
+	(countReady)++;
 	sem_post(countReady_semaphore);
-	schedule(trainers,countReady,schedulingAlgorithm,exec, logger);
+	schedule(trainers, exec, logger);
+}
+
+void addToBlocked(t_trainer* ready){
+	void* temp = realloc(trainers,sizeof(t_trainer)*((countReady)+1));
+		if (!temp){
+			log_debug(logger,"error en realloc");
+			exit(10);
+		}
+		(ready)=temp;
+		sem_wait(countBlocked_semaphore);
+		(l_blocked)[(countBlocked)]=(*ready);
+		(countBlocked)++;
+		sem_post(countBlocked_semaphore);
 }
 
 
 
-void addToExec(t_ready_trainer* ready,int* countReady,t_ready_trainer exec,t_log* logger){
+void addToExec(t_ready_trainer* ready,t_ready_trainer exec){
 	exec=ready[0];
 	sem_wait(catch_semaphore);
-	(*countReady)--;
+	countReady--;
 	sem_post(catch_semaphore);
-	for(int i=0;i<(*countReady);i++){
+	for(int i=0;i<(countReady);i++){
 		ready[i]=ready[i+1];
 	}
-	void* temp = realloc(ready,sizeof(t_trainer)*(*countReady));
+	void* temp = realloc(ready,sizeof(t_trainer)*(countReady));
 		if (!temp){
 			log_debug(logger,"error en realloc");
 			exit(9);
@@ -963,11 +981,11 @@ void scheduleBydistance(t_trainer* l_blocked, t_trainer* l_new, int trainersCoun
 				countNew--;
 				if(clockTimeToPokemon==0){
 					clockTimeToPokemon = getDistanceToPokemonTarget(l_new[countNew].parameters,pokemonToSearchAtMissing);
-					trainerToAddToReady.trainer.parameters = l_new[countNew].parameters;
+					trainerToAddToReady.trainer = l_new[countNew];
 					trainerToAddToReady.pokemon = pokemonToSearchAtMissing;
 				}else if(clockTimeToPokemon > getDistanceToPokemonTarget(l_new[countNew].parameters,pokemonToSearchAtMissing)){
 					clockTimeToPokemon = getDistanceToPokemonTarget(l_new[countNew].parameters,pokemonToSearchAtMissing);
-					trainerToAddToReady.trainer.parameters = l_new[countNew].parameters;
+					trainerToAddToReady.trainer = l_new[countNew];
 					trainerToAddToReady.pokemon = pokemonToSearchAtMissing;
 				}
 			}
@@ -975,67 +993,82 @@ void scheduleBydistance(t_trainer* l_blocked, t_trainer* l_new, int trainersCoun
 				if(clockTimeToPokemon==0){
 					if(l_blocked[countBlocked].blockState == 1){
 					clockTimeToPokemon = getDistanceToPokemonTarget(l_blocked[countBlocked].parameters,pokemonToSearchAtMissing);
-					trainerToAddToReady.trainer.parameters = l_blocked[countNew].parameters;
+					trainerToAddToReady.trainer = l_blocked[countNew];
 					trainerToAddToReady.pokemon = pokemonToSearchAtMissing;
 					}else if(l_blocked[countBlocked].blockState == 1 && clockTimeToPokemon > getDistanceToPokemonTarget(l_blocked[countBlocked].parameters,pokemonToSearchAtMissing)){
 						clockTimeToPokemon = getDistanceToPokemonTarget(l_blocked[countBlocked].parameters,pokemonToSearchAtMissing);
-						trainerToAddToReady.trainer.parameters = l_blocked[countNew].parameters;
+						trainerToAddToReady.trainer = l_blocked[countNew];
 						trainerToAddToReady.pokemon = pokemonToSearchAtMissing;
 
 					}
 				}
 			}
+		addToReady((&trainerToAddToReady), trainers);
 		}
-	}
-
-	/*
-	else{//eliminar el pokemon de Available
-		for(i=0; i<avialablePokemonsCount;i++){
+	}else{
+		for(i=0; i<availablePokemons.count;i++){
 			availablePokemons.pokemons[i] = availablePokemons.pokemons[i+1];
-
-			//hay que actualizar el count.
 		}
+		availablePokemons.count--;
 	}
-	*/
 
 }
 
 
 //TODO - No debería hacer nada; siempre se agregan cosas al final de ready y se sacan del HEAD de ready
-void scheduleFifo(t_ready_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_ready_trainer exec, t_log* logger){
+void scheduleFifo(t_ready_trainer* trainers, t_ready_trainer exec, t_log* logger){
+	while(countReady){
+		int i=0;
+		t_ready_trainer* trainer;
+		trainer = ((&trainers)[i]);
+		addToExec(trainer, exec);
+		for(i=0;i<(countReady); i++){
+			((&trainers)[i]) = ((&trainers)[i+1]);
+		}
+		int cutWhile = 1;
+		while(cutWhile){
+			cutWhile = executeClock(exec);
+		}
+		sem_wait(countReady_semaphore);
+		(countReady)--;
+		sem_post(countReady_semaphore);
+	}
+
 
 }
 
 //TODO - cuando termina el quantum mandar al final de la lista de ready.
-void scheduleRR(t_ready_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_ready_trainer exec, t_log* logger){
-	while(*countReady){
+void scheduleRR(t_ready_trainer* trainers, t_ready_trainer exec, t_log* logger){
+	while(countReady){
 		int i=0;
 		int valueOfExecuteClock = 1;
 		t_ready_trainer* trainer;
 		trainer = ((&trainers)[i]);
-		addToExec(trainer, countReady, exec, logger);
+		addToExec(trainer, exec);
 		for(int j=0;j<(int)(schedulingAlgorithm.quantum) && valueOfExecuteClock == 1;j++){
 			valueOfExecuteClock = executeClock(exec);
 		}
-		if(valueOfExecuteClock == 0){
-			for(i=0;i<(*countReady); i++){
+		if(valueOfExecuteClock == 1){
+			for(i=0;i<(countReady); i++){
 				((&trainers)[i]) = ((&trainers)[i+1]);
 			}
-			addToReady(trainer, trainers, countReady, schedulingAlgorithm, logger, exec);
+			addToReady(trainer, trainers);
+		}else if(valueOfExecuteClock ==0){
+			addToBlocked((&trainer->trainer));
 		}
 		sem_wait(countReady_semaphore);
-		(*countReady)--;
+		(countReady)--;
 		sem_post(countReady_semaphore);
 	}
 }
 
 //TODO
-void scheduleSJFSD(t_ready_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_ready_trainer exec, t_log* logger){
+void scheduleSJFSD(t_ready_trainer* trainers, t_ready_trainer exec, t_log* logger){
 ;
 }
 
 //TODO
-void scheduleSJFCD(t_ready_trainer* trainers,int* countReady,struct SchedulingAlgorithm schedulingAlgorithm, t_ready_trainer exec, t_log* logger){
+void scheduleSJFCD(t_ready_trainer* trainers, t_ready_trainer exec, t_log* logger){
 ;
 }
 

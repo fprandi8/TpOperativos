@@ -150,12 +150,12 @@ void readConfigBrokerValues(t_config*,t_log*,struct Broker*);
 void readConfigSchedulerValues(t_config*, t_log*, struct SchedulingAlgorithm*);
 void readConfigTrainersValues(t_config*,t_log*,char***,char***,char***);
 void initScheduler(struct SchedulingAlgorithm*);
-void addToReady(t_ready_trainer* ,t_ready_trainer* ,int* ,struct SchedulingAlgorithm ,t_log* , t_ready_trainer );
-void addToExec(t_ready_trainer* ,int* ,t_ready_trainer ,t_log* );
-void scheduleFifo(t_ready_trainer*,int*,struct SchedulingAlgorithm,t_ready_trainer,t_log*);
-void scheduleRR(t_ready_trainer*,int*,struct SchedulingAlgorithm,t_ready_trainer,t_log*);
-void scheduleSJFSD(t_ready_trainer*,int*,struct SchedulingAlgorithm,t_ready_trainer,t_log*);
-void scheduleSJFCD(t_ready_trainer*,int*,struct SchedulingAlgorithm,t_ready_trainer,t_log*);
+void addToReady(t_ready_trainer*, t_ready_trainer*);
+void addToExec(t_ready_trainer* ,t_ready_trainer );
+void scheduleFifo(t_ready_trainer* , t_ready_trainer , t_log* );
+void scheduleRR(t_ready_trainer* , t_ready_trainer , t_log* );
+void scheduleSJFSD(t_ready_trainer* , t_ready_trainer , t_log* );
+void scheduleSJFCD(t_ready_trainer* , t_ready_trainer , t_log* );
 void scheduleDistance(pthread_t**);
 void startInitMatrix(char *);
 void assignMatrixValues(void *);
@@ -190,6 +190,7 @@ int findIdInGetList(uint32_t);
 int findNameInAvailableList(char*);
 void attendGameboy(void*);
 void processGameBoyMessage(deli_message*);
+void addToBlocked(t_trainer* );
 
 void initBroker(struct Broker *broker){
 	broker->ipKey="IP_BROKER";

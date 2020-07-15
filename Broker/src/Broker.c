@@ -16,7 +16,7 @@ t_Broker* broker;
 
 int main(void) {
 
-	//start_cache();
+	start_cache();
 	t_log* logger;
 	t_config* config;
 
@@ -198,12 +198,11 @@ void broker_suscribe_process(void* buffer, int cliente, t_Broker* broker){
 		aux->suscripted = cliente;
 		list_add(queueToSuscribe->suscriptors,aux);
 		log_info(broker->logger,"NUEVA SUSCRIPCIÓN AL BROKER QUEUE: %d", *QueueType);
-		//TODO: agregar logica para enviar los mensajes cacheados al subscriptor
+		//TODO: agregar logica para enviar los mensajes cacheados al subscriptor - generar hilos para enviar cada mensaje al nuevo suscriptor (con todo lo que conlleva)
 	}
 
 }
 
-//TODO - implementar los métodos para procesar un acknowledge y un mensaje
 void broker_get_acknowledge(void* buffer, int cliente, t_Broker* broker){
 
 }
@@ -225,6 +224,7 @@ void broker_process_message(void* buffer, int cliente, t_Broker* broker){
 	log_debug(broker->logger, "El ID del mensaje es %d", message->id);
 
 	//TODO ver que hacer con el correlation ID, podríamos saber si es necesario hacer algo por el tipo de mensaje
+	//en principio no hacer nada, ver en reunion
 
 	t_queue_handler* queue = broker_get_specific_Queue(*broker,message->messageType);
 
@@ -236,7 +236,9 @@ void broker_process_message(void* buffer, int cliente, t_Broker* broker){
 
 void queue_handler_process_message(t_queue_handler* queue, deli_message* message, t_Broker* broker){
 
-	//TODO lógica de cada mensaje, guardar en cache, enviar a los suscriptores, push en la cola
+	//TODO lógica de cada mensaje, guardar en cache
+	save_message(message);
+
 	//TODO estructura para administrar mensajes, a quienes se enviaron si fueron recibidos
 
 
@@ -331,7 +333,7 @@ void queue_handler_send_message(void* args){
 			message_administrator_receive_acknowledge(messageAdministrator);
 			if (messageAdministrator->amountPendingAcknowledge == 0){
 				//TODO: logica de la cache para eliminar el mensaje
-				log_debug(broker->logger,"TODOS LOS SUSCRIPTORE RESCIBIERON EL MENSAJE SE ELININA");
+				log_debug(broker->logger,"TODOS LOS SUSCRIPTORES RECIBIERON EL MENSAJE; SE ELIMINA");
 				void* element = queue_pop(queue->queue);
 				free(element);
 			}
@@ -367,7 +369,7 @@ t_suscriptor* queue_handler_get_suscriptor(t_queue_handler* self,int pos){
 	return list_get(self->suscriptors,pos);
 }
 
-// Messege admnistrator logic
+// Message admnistrator logic
 t_message_administrator* message_administrator_initialize(uint32_t id)
 {
 	t_message_administrator* aux =(t_message_administrator*) malloc(sizeof(t_message_administrator));

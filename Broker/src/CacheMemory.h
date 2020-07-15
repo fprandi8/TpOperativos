@@ -16,14 +16,16 @@
 #define PUERTO_BROKER "PUERTO_BROKER"
 #define FRECUENCIA_COMPACTACION "FRECUENCIA_COMPACTACION"
 
-#include<stdio.h>
-#include<stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
-#include<unistd.h>
+#include <unistd.h>
 #include <time.h>
-#include<commons/log.h>
-#include<commons/collections/queue.h>
-#include<commons/collections/list.h>
+#include <commons/log.h>
+#include <commons/collections/queue.h>
+#include <commons/collections/list.h>
+#include <commons/memory.h>
+#include "commons/temporal.h"
 #include "utils.h"
 #include "delibird/comms/messages.h"
 #include "delibird/comms/serialization.h"
@@ -31,24 +33,26 @@
 #include <semaphore.h>
 #include <signal.h>
 #include <string.h>
+#include <math.h>
 
 /*
 	******************STRUCTS***********************
 */
 typedef struct{
-    char* full_memory;
+    void* full_memory;
     uint32_t partition_minimum_size;
     uint32_t memory_size;
 }t_CacheMemory;
 
 typedef struct{
     //partition number would be generated when iterating the list
-    uint32_t id; //check if partition id or message id
-    char* begining;
+    uint32_t id; //its message id
+    void* begining;
     uint32_t size;
     message_type queue_type;
     bool free;
     clock_t timestap; //use clock() get a stamp
+    uint32_t parentId; // indicates parent Id for buddy system
 }t_partition;
 
 typedef struct{
@@ -65,18 +69,26 @@ typedef struct{
 */
 t_CacheMemory cache;
 t_config* config;
-sem_t* mutex_cached_messages;
+
 t_list* cached_messages;
-sem_t* mutex_partitions;
 t_list* partitions;
-sem_t* mutex_nextPartitionId;
+t_list* parent_partitions;
+t_partition* bs_freed_partition;
+
 int nextPartitionId;
 
+sem_t mutex_cached_messages;
+sem_t mutex_nextPartitionId;
+sem_t mutex_partitions;
+sem_t mutex_parent_partitions;
+sem_t mutex_index_finder;
+sem_t mutex_index_finder_destroyer;
+sem_t mutex_occupied_partitions;
 /*
 	********************CONTRACTS***********************
 */
 
-void start_cache(void);
+void start_cache();
 
 //size configuration
 t_config* get_config(void);
@@ -97,8 +109,8 @@ void delete_partition(void);
 t_partition* select_partition(uint32_t size);
 t_partition* select_partition_ff(uint32_t size); //select by first fit
 t_partition* select_partition_bf(uint32_t size); //select by best fit
-int delete_partition_fifo(void); //delete by fifo
-int delete_partition_lru(void); //delete by lru
+t_partition* delete_partition_fifo(void); //delete by fifo
+t_partition* delete_partition_lru(void); //delete by lru
 t_list* GetMessagesFromQueue(message_type queue_type);
 t_cachedMessage* GetCachedMessage(int);
 void* GetMessageContent(int);
@@ -108,5 +120,13 @@ void Free_CachedMessage(t_cachedMessage*);
 void add_to_cached_messages(t_cachedMessage);
 uint32_t add_occupied_size_from(t_list* occupied);
 int GetBusyPartitionsCount();
+int CalculateNearestPowerOfTwo(int x);
+double CalculateNearestPowerOfTwoRelativeToCache(int memoryLocation);
+void PrintDumpOfCache();
+t_partition* create_childrens_from(t_partition* parent);
+void start_consolidation_for(t_partition* freed_partition);
+void check_validations_and_consolidate_PD(t_partition* freed_partition);
+int check_validations_and_consolidate_BS(uint32_t freed_partition_id);
+void find_index_in_list_and_destroy(t_partition* partition);
 
 #endif /* CACHEMEMORY_H_ */

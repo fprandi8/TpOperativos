@@ -23,7 +23,9 @@ t_objetive* missingPkms;
 int globalObjetivesDistinctCount;
 int globalObjetivesCount;
 int missingPokemonsCount;//TODO: Decrementar cada vez que hay un caught
-
+int countReady = 0;
+int countBlocked = 0;
+int countNew = 0;
 
 int main(void) {
 	t_config* config;
@@ -100,7 +102,7 @@ int main(void) {
 	initStateLists(stateLists,l_new,l_blocked,list_ready,list_exec,l_exit);
     //startClosePlanning(new,blocked,ready);
 	//startReadyPlaning(ready,exec);
-	//TODO agregar aquí la función "scheduleByDistance"
+
 	int teamServer = startServer(logger);
 	int client;
 	while(1){
@@ -485,7 +487,7 @@ void processMessageCaught(deli_message* message){
 		;//TODO: Borrar de missingPokemon. Decrementar missingPokemonCount.Ver si entrenador pasa a EXIT; sino, cambiar blockstate de WAITING a AVAILABLE.
 		}else{
 			catchList.catchMessage[resultCatchId].trainer.blockState = AVAILABLE;
-		//TODO: ACá habría que chequear si hay pokemons disponibles para atrapar, si Sí, schedule; si no, fin de la función.
+		//TODO: ACá habría que chequear si hay pokemons disponibles para atrapar, si Sí, ; si no, fin de la función.
 		}
 	}
 }
@@ -942,41 +944,60 @@ void addToExec(t_ready_trainer* ready,int* countReady,t_ready_trainer exec,t_log
 
 
 //TODO - esta función debe generar el listado de ready ordenado por distancia. Hay que ver como eva
-void scheduleBydistance(localized_pokemon* localized, appeared_pokemon* appeared, t_trainer* l_new, int trainersCount){
+void scheduleBydistance(t_trainer* l_blocked, t_trainer* l_new, int trainersCount){
 
-
-
-
-
-	/*appeared_pokemon* pokemonsToScheduleByDistance=(appeared_pokemon*)malloc(sizeof(appeared_pokemon));
-	appeared_pokemon* listOfPokemons=(appeared_pokemon*)malloc(sizeof(appeared_pokemon)*(localized->ammount));
-	t_ready_trainer* toReady=(t_ready_trainer*)malloc(sizeof(t_ready_trainer));
-	int i=0;
-	while(localized->ammount){
-		localized->ammount--;
-		pokemonsToScheduleByDistance->pokemonName = localized->pokemonName;
-		pokemonsToScheduleByDistance->horizontalCoordinate = localized->coordinates->x;
-		pokemonsToScheduleByDistance->horizontalCoordinate = localized->coordinates->y;
-		i++;
-		((&listOfPokemons)[i]) = pokemonsToScheduleByDistance;
+	int i, foundAtMissing;
+	t_ready_trainer trainerToAddToReady;
+	foundAtMissing = 0;
+	t_pokemon pokemonToSearchAtMissing = availablePokemons.pokemons[0];
+	for(i=0; (i<missingPokemonsCount) && (foundAtMissing == 0); i++){
+		if(pokemonToSearchAtMissing.name == missingPkms[i].pokemon.name){
+			foundAtMissing = 1;
+			break;
+		}
 	}
+	if(foundAtMissing == 1){
+		if(countReady < missingPokemonsCount){
+			int clockTimeToPokemon = 0;
+			while(countNew){
+				countNew--;
+				if(clockTimeToPokemon==0){
+					clockTimeToPokemon = getDistanceToPokemonTarget(l_new[countNew].parameters,pokemonToSearchAtMissing);
+					trainerToAddToReady.trainer.parameters = l_new[countNew].parameters;
+					trainerToAddToReady.pokemon = pokemonToSearchAtMissing;
+				}else if(clockTimeToPokemon > getDistanceToPokemonTarget(l_new[countNew].parameters,pokemonToSearchAtMissing)){
+					clockTimeToPokemon = getDistanceToPokemonTarget(l_new[countNew].parameters,pokemonToSearchAtMissing);
+					trainerToAddToReady.trainer.parameters = l_new[countNew].parameters;
+					trainerToAddToReady.pokemon = pokemonToSearchAtMissing;
+				}
+			}
+			while(countBlocked){
+				if(clockTimeToPokemon==0){
+					if(l_blocked[countBlocked].blockState == 1){
+					clockTimeToPokemon = getDistanceToPokemonTarget(l_blocked[countBlocked].parameters,pokemonToSearchAtMissing);
+					trainerToAddToReady.trainer.parameters = l_blocked[countNew].parameters;
+					trainerToAddToReady.pokemon = pokemonToSearchAtMissing;
+					}else if(l_blocked[countBlocked].blockState == 1 && clockTimeToPokemon > getDistanceToPokemonTarget(l_blocked[countBlocked].parameters,pokemonToSearchAtMissing)){
+						clockTimeToPokemon = getDistanceToPokemonTarget(l_blocked[countBlocked].parameters,pokemonToSearchAtMissing);
+						trainerToAddToReady.trainer.parameters = l_blocked[countNew].parameters;
+						trainerToAddToReady.pokemon = pokemonToSearchAtMissing;
 
-	//cómo agregar los de la lista de appeared??
-
-	while(i){
-		int j;
-		int minClockTime = 0;
-		for(j=0;j<trainersCount;j++){
-			int clockTime;
-			clockTime = getDistanceToPokemonTarget(l_new[j].parameters,((&listOfPokemons)[i]));
-			if(minClockTime == 0 || minClockTime > clockTime){
-
-				// cómo evaluar las dos listas completas, ya que si empiezo a recorrer por entrenador, debo fijarme que este sea el más cercano a este pokemon, y si lo hago
-				// por pokemones debería evaluar esto también.
+					}
+				}
 			}
 		}
+	}
 
-	}*/
+	/*
+	else{//eliminar el pokemon de Available
+		for(i=0; i<avialablePokemonsCount;i++){
+			availablePokemons.pokemons[i] = availablePokemons.pokemons[i+1];
+
+			//hay que actualizar el count.
+		}
+	}
+	*/
+
 }
 
 
@@ -993,7 +1014,7 @@ void scheduleRR(t_ready_trainer* trainers,int* countReady,struct SchedulingAlgor
 		t_ready_trainer* trainer;
 		trainer = ((&trainers)[i]);
 		addToExec(trainer, countReady, exec, logger);
-		for(int j=0;j<=(int)(schedulingAlgorithm.quantum) && valueOfExecuteClock == 1;j++){
+		for(int j=0;j<(int)(schedulingAlgorithm.quantum) && valueOfExecuteClock == 1;j++){
 			valueOfExecuteClock = executeClock(exec);
 		}
 		if(valueOfExecuteClock == 0){

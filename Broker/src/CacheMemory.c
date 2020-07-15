@@ -19,7 +19,6 @@ void signal_handler(int signum)
 
 void start_cache()
 {
-    //Receives config from Broker
     config = get_config();
     define_partition_size();
     define_cache_maximum_size();

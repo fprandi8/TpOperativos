@@ -249,7 +249,7 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 	thread = (pthread_t*)malloc(sizeof(pthread_t));
 
 	//TODO La cache tiene que guardar el mensaje
-	queue_push(queue->queue,message->messageContent);
+	//queue_push(queue->queue,message->messageContent);
 
 
 	t_message_administrator* messageAdmnistrator = message_administrator_initialize(message->id);
@@ -334,8 +334,8 @@ void queue_handler_send_message(void* args){
 			if (messageAdministrator->amountPendingAcknowledge == 0){
 				//TODO: logica de la cache para eliminar el mensaje
 				log_debug(broker->logger,"TODOS LOS SUSCRIPTORES RECIBIERON EL MENSAJE; SE ELIMINA");
-				void* element = queue_pop(queue->queue);
-				free(element);
+				//void* element = queue_pop(queue->queue);
+				//free(element);
 			}
 		}
 	}

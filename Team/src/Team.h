@@ -216,5 +216,7 @@ int calculateDifference(int, int);
 int getDistanceToPokemonTarget(t_trainerParameters, t_pokemon);
 void moveTrainetToObjective(t_trainer*, t_pokemon*);
 int executeClock(t_ready_trainer);
+int readConfigAlphaValue(t_config*);
+int readConfigInitialEstimatedValue(t_config*);
 
 #endif /* TEAM_H_ */

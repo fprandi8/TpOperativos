@@ -31,6 +31,9 @@ int countNew = 0;
 t_ready_trainer* trainers;
 struct SchedulingAlgorithm schedulingAlgorithm;
 t_ready_trainer exec;
+int alphaForSJF;
+int initialEstimatedBurst;
+
 
 int main(void) {
 	t_config* config;
@@ -69,6 +72,9 @@ int main(void) {
 	initScheduler(&schedulingAlgorithm);
 	readConfigSchedulerValues(config,logger,&schedulingAlgorithm);//TODO agregar validaciones para que sólo se acepten los algoritmos especificos
 
+	//Init Alpha for SJF and Initial Estimated Burst
+	alphaForSJF = readConfigAlphaValue(config);
+	initialEstimatedBurst = readConfigInitialEstimatedValue(config);
 /*
 	teamSocket = iniciar_cliente(ip, port,logger);
 	log_debug(logger,"El socket del proceso Team es %i",teamSocket);
@@ -701,6 +707,24 @@ void readConfigTrainersValues(t_config *config,t_log *logger,char*** trainersPos
 
 }
 
+int readConfigAlphaValue(t_config *config){
+	if(config_has_property(config,"ALPHA")){
+		int alpha;
+		alpha=config_get_int_value(config,"ALPHA");
+		return alpha;
+	}else{
+		return 0;
+	}
+}
+
+int readConfigInitialEstimatedValue(t_config* config){
+	if(config_has_property(config,"ESTIMACION_INICIAL")){
+		int initialEstimatedBurst = config_get_int_value(config,"ESTIMACION_INICIAL");
+		return initialEstimatedBurst;
+	}else{
+		return 0;
+	}
+}
 void startTrainers(t_trainer* trainers,int trainersCount,t_config *config,t_log* logger){
 
 	char** trainersPosition;
@@ -1072,19 +1096,25 @@ void scheduleRR(t_ready_trainer* trainers, t_ready_trainer exec, t_log* logger){
 
 //TODO
 void scheduleSJFSD(t_ready_trainer* trainers, t_ready_trainer exec, t_log* logger){
-	t_ready_trainer trainer;
-	int shortBurst = 0;
-	for(int i=0; i<countReady;i++){
-		if(shortBurst == 0){
-			//shortBurst = get
-		}
+
+	while(countReady){
+
 	}
+
+
 }
 
 //TODO
 void scheduleSJFCD(t_ready_trainer* trainers, t_ready_trainer exec, t_log* logger){
 ;
 }
+
+float estimatedTimeForNextBurstCalculation(int realEstimatedTimeForBeforeBurts){
+
+	float estimatedBurstTime = (alphaForSJF * initialEstimatedBurst) + ((1 - alphaForSJF) * realEstimatedTimeForBeforeBurts);
+	return estimatedBurstTime;
+}
+
 
 
 

@@ -1029,6 +1029,9 @@ void scheduleFifo(t_ready_trainer* trainers, t_ready_trainer exec, t_log* logger
 		while(cutWhile){
 			cutWhile = executeClock(exec);
 		}
+		if(cutWhile == 0){
+			addToBlocked((&trainer->trainer));
+		}
 		sem_wait(countReady_semaphore);
 		(countReady)--;
 		sem_post(countReady_semaphore);
@@ -1053,7 +1056,7 @@ void scheduleRR(t_ready_trainer* trainers, t_ready_trainer exec, t_log* logger){
 				((&trainers)[i]) = ((&trainers)[i+1]);
 			}
 			addToReady(trainer, trainers);
-		}else if(valueOfExecuteClock ==0){
+		}else if(valueOfExecuteClock==0){
 			addToBlocked((&trainer->trainer));
 		}
 		sem_wait(countReady_semaphore);

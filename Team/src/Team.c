@@ -903,19 +903,19 @@ int getTrainersCount(t_config *config,t_log* logger) {
 	return count;
 }
 
-void schedule(t_ready_trainer* trainers, t_ready_trainer exec, t_log* logger){//Para el caso de FIFO y RR no hace nada, ya que las listas están ordenadas por FIFO y RR solo cambia como se procesa.
+void schedule(){//Para el caso de FIFO y RR no hace nada, ya que las listas están ordenadas por FIFO y RR solo cambia como se procesa.
 	if (strcmp(schedulingAlgorithm.algorithm,"FIFO")==0){
-		scheduleFifo(trainers, exec, logger);
+		scheduleFifo();
 	}else if(strcmp(schedulingAlgorithm.algorithm,"RR")==0){
-		scheduleRR(trainers, exec, logger);
+		scheduleRR();
 	}else if(strcmp(schedulingAlgorithm.algorithm,"SJF-SD")==0){
-		scheduleSJFSD(trainers, exec, logger);
+		scheduleSJFSD();
 	}else if(strcmp(schedulingAlgorithm.algorithm,"SJF-CD")==0){
-		scheduleSJFCD(trainers, exec, logger);
+		scheduleSJFCD();
 	}
 }
 
-void addToReady(t_ready_trainer* trainer,t_ready_trainer* trainers){
+void addToReady(t_ready_trainer trainer){
 	void* temp = realloc(trainers,sizeof(t_trainer)*((countReady)+1));
 	if (!temp){
 		log_debug(logger,"error en realloc");
@@ -923,21 +923,21 @@ void addToReady(t_ready_trainer* trainer,t_ready_trainer* trainers){
 	}
 	(trainers)=temp;
 	sem_wait(countReady_semaphore);
-	(trainers)[(countReady)]=(*trainer);
+	trainers[countReady]=trainer;
 	(countReady)++;
 	sem_post(countReady_semaphore);
-	schedule(trainers, exec, logger);
+	schedule();
 }
 
-void addToBlocked(t_trainer* ready){
+void addToBlocked(t_trainer* trainer){
 	void* temp = realloc(trainers,sizeof(t_trainer)*((countReady)+1));
 		if (!temp){
 			log_debug(logger,"error en realloc");
 			exit(10);
 		}
-		(ready)=temp;
+		(trainer)=temp;
 		sem_wait(countBlocked_semaphore);
-		(l_blocked)[(countBlocked)]=(*ready);
+		(l_blocked)[(countBlocked)]=(*trainer);
 		(countBlocked)++;
 		sem_post(countBlocked_semaphore);
 }
@@ -1041,27 +1041,19 @@ void scheduleFifo(t_ready_trainer* trainers, t_ready_trainer exec, t_log* logger
 }
 
 //TODO - cuando termina el quantum mandar al final de la lista de ready.
-void scheduleRR(t_ready_trainer* trainers, t_ready_trainer exec, t_log* logger){
+void scheduleRR(){
 	while(countReady){
 		int i=0;
 		int valueOfExecuteClock = 1;
-		t_ready_trainer* trainer;
-		trainer = ((&trainers)[i]);
-		addToExec(trainer, exec);
+		addToExec(trainers[i]);
 		for(int j=0;j<(int)(schedulingAlgorithm.quantum) && valueOfExecuteClock == 1;j++){
 			valueOfExecuteClock = executeClock(exec);
 		}
 		if(valueOfExecuteClock == 1){
-			for(i=0;i<(countReady); i++){
-				((&trainers)[i]) = ((&trainers)[i+1]);
-			}
-			addToReady(trainer, trainers);
+			addToReady(exec);
 		}else if(valueOfExecuteClock==0){
-			addToBlocked((&trainer->trainer));
+			addToBlocked(exec);
 		}
-		sem_wait(countReady_semaphore);
-		(countReady)--;
-		sem_post(countReady_semaphore);
 	}
 }
 

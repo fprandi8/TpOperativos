@@ -1094,7 +1094,7 @@ void scheduleSJFSD(){
 	initializeTrainersWithBurts();
 	while(countReady){
 		t_trainer_with_last_burst addExec = getTrainerWithBestEstimatedBurst();
-		addToExec(&(addExec.trainer),addExec.trainerPosition);
+		addToExec(&(addExec.trainer),addExec.trainerPositionInList);
 		int actualBurst = getDistanceToPokemonTarget(addExec.trainer.trainer.parameters,addExec.trainer.pokemon);
 		int cutWhile = 1;
 		while(cutWhile){
@@ -1128,7 +1128,7 @@ void initializeTrainersWithBurts(){
 	for(int i=0;i<countReady;i++){
 		trainer_with_last_burst[i].trainer = trainers[i];
 		trainer_with_last_burst[i].lastBurst = 0;
-		trainer_with_last_burst[i].trainerPosition = i;
+		trainer_with_last_burst[i].trainerPositionInList = i;
 	}
 	sem_post(countReady_semaphore);
 }
@@ -1143,6 +1143,7 @@ t_trainer_with_last_burst getTrainerWithBestEstimatedBurst(){
 			flag = 1;
 		}else if(estimatedTimeForNextBurstCalculation(trainer_with_last_burst[i].lastBurst)<estimatedTimeForNextBurstCalculation(trainerWithBestBurst.lastBurst)){
 			trainerWithBestBurst = trainer_with_last_burst[i];
+
 		}
 	}
 	sem_post(countReady_semaphore);

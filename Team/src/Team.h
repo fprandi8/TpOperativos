@@ -139,7 +139,7 @@ typedef struct
 typedef struct{
 	t_ready_trainer trainer;
 	int lastBurst;
-	int trainerPosition;
+	int trainerPositionInList;
 }t_trainer_with_last_burst;
 
 

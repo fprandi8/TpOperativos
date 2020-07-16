@@ -987,7 +987,7 @@ void addToExec(t_ready_trainer* ready, int positionOfTrainer){
 }
 
 
-//TODO - esta función debe generar el listado de ready ordenado por distancia. Hay que ver como eva
+
 void scheduleBydistance(t_trainer* l_blocked, t_trainer* l_new, int trainersCount){
 
 	int i, foundAtMissing;
@@ -1041,7 +1041,7 @@ void scheduleBydistance(t_trainer* l_blocked, t_trainer* l_new, int trainersCoun
 }
 
 
-//TODO - No debería hacer nada; siempre se agregan cosas al final de ready y se sacan del HEAD de ready
+
 void scheduleFifo(){
 	while(countReady){
 		int i=0;
@@ -1068,7 +1068,7 @@ void scheduleFifo(){
 
 }
 
-//TODO - cuando termina el quantum mandar al final de la lista de ready.
+
 void scheduleRR(){
 	while(countReady){
 		int i=0;
@@ -1089,12 +1089,23 @@ void scheduleRR(){
 	}
 }
 
-//TODO - Si mando a EXEC un entrenador que no está en la primer posición, la lista de ready se va a actualizar mal. VER como hacer esto.
+//TODO - DONE Si mando a EXEC un entrenador que no está en la primer posición, la lista de ready se va a actualizar mal. VER como hacer esto.
 void scheduleSJFSD(){
 	initializeTrainersWithBurts();
 	while(countReady){
-		t_trainer_with_last_burst exec = getTrainerWithBestEstimatedBurst();
-		addToExec(&(exec.trainer),exec.trainerPosition);
+		t_trainer_with_last_burst addExec = getTrainerWithBestEstimatedBurst();
+		addToExec(&(addExec.trainer),addExec.trainerPosition);
+		int actualBurst = getDistanceToPokemonTarget(addExec.trainer.trainer.parameters,addExec.trainer.pokemon);
+		int cutWhile = 1;
+		while(cutWhile){
+			cutWhile = executeClock(exec);
+		}
+		if(cutWhile == 0){
+			exec.trainer.blockState = WAITING;
+			addToBlocked(&(exec.trainer));
+			//se actualiza la última ráfaga ejecutada.
+			addExec.lastBurst = actualBurst;
+		}
 	}
 
 

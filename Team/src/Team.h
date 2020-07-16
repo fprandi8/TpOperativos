@@ -210,8 +210,8 @@ void initScheduler(struct SchedulingAlgorithm *schedulingAlgorithm){
 	schedulingAlgorithm->initEstimationKey="ESTIMACION_INICIAL";
 }
 
-void moveTrainerToTarget(t_trainer trainer, int distanceToMoveInX, int distanceToMoveInY);
-void moveTrainerToObjective(t_trainer trainer,  t_pokemon pokemonTargeted);
+void moveTrainerToTarget(t_trainer*, int distanceToMoveInX, int distanceToMoveInY);
+void moveTrainerToObjective(t_trainer* ,  t_pokemon );
 int calculateDifference(int, int);
 int getDistanceToPokemonTarget(t_trainerParameters, t_pokemon);
 void moveTrainetToObjective(t_trainer*, t_pokemon*);

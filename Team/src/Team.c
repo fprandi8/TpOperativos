@@ -1022,19 +1022,22 @@ void scheduleFifo(t_ready_trainer* trainers, t_ready_trainer exec, t_log* logger
 		t_ready_trainer* trainer;
 		trainer = ((&trainers)[i]);
 		addToExec(trainer, exec);
+		sem_wait(countReady_semaphore);
 		for(i=0;i<(countReady); i++){
 			((&trainers)[i]) = ((&trainers)[i+1]);
 		}
+
+			(countReady)--;
+		sem_post(countReady_semaphore);
 		int cutWhile = 1;
 		while(cutWhile){
 			cutWhile = executeClock(exec);
 		}
 		if(cutWhile == 0){
+			(&trainer->trainer)->blockState = WAITING;
 			addToBlocked((&trainer->trainer));
 		}
-		sem_wait(countReady_semaphore);
-		(countReady)--;
-		sem_post(countReady_semaphore);
+
 	}
 
 
@@ -1052,14 +1055,22 @@ void scheduleRR(){
 		if(valueOfExecuteClock == 1){
 			addToReady(exec);
 		}else if(valueOfExecuteClock==0){
+			(&trainer->trainer)->blockState = WAITING;
 			addToBlocked(exec);
 		}
+
 	}
 }
 
 //TODO
 void scheduleSJFSD(t_ready_trainer* trainers, t_ready_trainer exec, t_log* logger){
-;
+	t_ready_trainer trainer;
+	int shortBurst = 0;
+	for(int i=0; i<countReady;i++){
+		if(shortBurst == 0){
+			//shortBurst = get
+		}
+	}
 }
 
 //TODO
@@ -1072,7 +1083,7 @@ void scheduleSJFCD(t_ready_trainer* trainers, t_ready_trainer exec, t_log* logge
 int executeClock(t_ready_trainer exec){
 
 	if(getDistanceToPokemonTarget(exec.trainer.parameters,exec.pokemon)!=0){
-		moveTrainerToObjective(exec.trainer, exec.pokemon);
+		moveTrainerToObjective(&(exec.trainer), exec.pokemon);
 		return 1;
 	}else if(getDistanceToPokemonTarget(exec.trainer.parameters,exec.pokemon)==0){
 		catch_pokemon catch;
@@ -1087,32 +1098,32 @@ int executeClock(t_ready_trainer exec){
 
 
 //TODO - Función que mueve al entrenador - Falta ver como implementaremos los semáforos
-void moveTrainerToObjective(t_trainer trainer,  t_pokemon pokemonTargeted){
+void moveTrainerToObjective(t_trainer* trainer,  t_pokemon pokemonTargeted){
 
 	//t_trainerParameters* trainerToMove;
 	//trainerToMove = *trainer;
 	int difference_x;
-	difference_x = calculateDifference(trainer.parameters.position.x, pokemonTargeted.position.x);
+	difference_x = calculateDifference(trainer->parameters.position.x, pokemonTargeted.position.x);
 	int difference_y;
-	difference_y = calculateDifference(trainer.parameters.position.y, pokemonTargeted.position.y);
+	difference_y = calculateDifference(trainer->parameters.position.y, pokemonTargeted.position.y);
 	//meter semáforos acá
 	moveTrainerToTarget(trainer, difference_x, difference_y);
 	//fin semáforos;
 }
 
 //TODO - funcion que mueve una posición al entrenador - Falta Definir como haremos el CATCH
-void moveTrainerToTarget(t_trainer trainer, int distanceToMoveInX, int distanceToMoveInY){
+void moveTrainerToTarget(t_trainer* trainer, int distanceToMoveInX, int distanceToMoveInY){
 	if(distanceToMoveInX > 0){
-		trainer.parameters.position.x++;
+		trainer->parameters.position.x++;
 	}
 	else if(distanceToMoveInX < 0){
-		trainer.parameters.position.x--;
+		trainer->parameters.position.x--;
 	}
 	else if(distanceToMoveInY > 0){
-		trainer.parameters.position.y++;
+		trainer->parameters.position.y++;
 	}
 	else if(distanceToMoveInY < 0){
-		trainer.parameters.position.y--;
+		trainer->parameters.position.y--;
 	}
 
 }

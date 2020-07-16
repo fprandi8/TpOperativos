@@ -33,6 +33,7 @@ struct SchedulingAlgorithm schedulingAlgorithm;
 t_ready_trainer exec;
 int alphaForSJF;
 int initialEstimatedBurst;
+t_trainer_with_last_burst* trainer_with_last_burst;
 
 
 int main(void) {
@@ -1087,11 +1088,12 @@ void scheduleRR(){
 	}
 }
 
-//TODO
+//TODO - Si mando a EXEC un entrenador que no está en la primer posición, la lista de ready se va a actualizar mal. VER como hacer esto.
 void scheduleSJFSD(){
-
+	initializeTrainersWithBurts();
 	while(countReady){
-
+		t_ready_trainer exec = getTrainerWithBestEstimatedBurst();
+		addToExec(&exec);
 	}
 
 
@@ -1102,13 +1104,37 @@ void scheduleSJFCD(){
 ;
 }
 
-float estimatedTimeForNextBurstCalculation(int realEstimatedTimeForBeforeBurts){
+float estimatedTimeForNextBurstCalculation(int realTimeForLastBurts){
 
-	float estimatedBurstTime = (alphaForSJF * initialEstimatedBurst) + ((1 - alphaForSJF) * realEstimatedTimeForBeforeBurts);
+	float estimatedBurstTime = (alphaForSJF * initialEstimatedBurst) + ((1 - alphaForSJF) * realTimeForLastBurts);
 	return estimatedBurstTime;
 }
 
 
+void initializeTrainersWithBurts(){
+	sem_wait(countReady_semaphore);
+	for(int i=0;i<countReady;i++){
+		trainer_with_last_burst[i].trainer = trainers[i];
+		trainer_with_last_burst[i].lastBurst = 0;
+	}
+	sem_post(countReady_semaphore);
+}
+
+t_ready_trainer getTrainerWithBestEstimatedBurst(){
+	int flag=0;
+	t_trainer_with_last_burst trainerWithBestBurst;
+	sem_wait(countReady_semaphore);
+	for(int i=0;i<countReady;i++){
+		if(flag == 0){
+			trainerWithBestBurst = trainer_with_last_burst[i];
+			flag = 1;
+		}else if(estimatedTimeForNextBurstCalculation(trainer_with_last_burst[i].lastBurst)<estimatedTimeForNextBurstCalculation(trainerWithBestBurst.lastBurst)){
+			trainerWithBestBurst = trainer_with_last_burst[i];
+		}
+	}
+	sem_post(countReady_semaphore);
+	return trainerWithBestBurst.trainer;
+}
 
 
 int executeClock(t_ready_trainer exec){

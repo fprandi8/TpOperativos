@@ -136,6 +136,11 @@ typedef struct
 
 } t_stateLists;
 
+typedef struct{
+	t_ready_trainer trainer;
+	int lastBurst;
+}t_trainer_with_last_burst;
+
 
 void createConfig(t_config**);
 void startLogger(t_config*,t_log**);
@@ -218,5 +223,7 @@ void moveTrainetToObjective(t_trainer*, t_pokemon*);
 int executeClock(t_ready_trainer);
 int readConfigAlphaValue(t_config*);
 int readConfigInitialEstimatedValue(t_config*);
-
+float estimatedTimeForNextBurstCalculation(int);
+void initializeTrainersWithBurts();
+t_ready_trainer getTrainerWithBestEstimatedBurst();
 #endif /* TEAM_H_ */

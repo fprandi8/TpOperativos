@@ -139,6 +139,7 @@ typedef struct
 typedef struct{
 	t_ready_trainer trainer;
 	int lastBurst;
+	int trainerPosition;
 }t_trainer_with_last_burst;
 
 
@@ -156,7 +157,7 @@ void readConfigSchedulerValues(t_config*, t_log*, struct SchedulingAlgorithm*);
 void readConfigTrainersValues(t_config*,t_log*,char***,char***,char***);
 void initScheduler(struct SchedulingAlgorithm*);
 void addToReady(t_ready_trainer);
-void addToExec(t_ready_trainer*);
+void addToExec(t_ready_trainer*, int);
 void scheduleFifo();
 void scheduleRR();
 void scheduleSJFSD();
@@ -225,5 +226,5 @@ int readConfigAlphaValue(t_config*);
 int readConfigInitialEstimatedValue(t_config*);
 float estimatedTimeForNextBurstCalculation(int);
 void initializeTrainersWithBurts();
-t_ready_trainer getTrainerWithBestEstimatedBurst();
+t_trainer_with_last_burst getTrainerWithBestEstimatedBurst();
 #endif /* TEAM_H_ */

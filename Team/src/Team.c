@@ -969,13 +969,14 @@ void addToBlocked(t_trainer* trainer){
 
 
 
-void addToExec(t_ready_trainer* ready){
-	exec=ready[0];
+void addToExec(t_ready_trainer* ready, int positionOfTrainer){
+	int i;
+	exec=ready[positionOfTrainer];
 	sem_wait(catch_semaphore);
 	countReady--;
 	sem_post(catch_semaphore);
-	for(int i=0;i<(countReady);i++){
-		ready[i]=ready[i+1];
+	for(i=positionOfTrainer;i<(countReady);i++){
+		ready[positionOfTrainer]=ready[positionOfTrainer+1];
 	}
 	void* temp = realloc(ready,sizeof(t_trainer)*(countReady));
 		if (!temp){
@@ -1046,7 +1047,7 @@ void scheduleFifo(){
 		int i=0;
 		t_ready_trainer* trainer;
 		trainer = ((&trainers)[i]);
-		addToExec(trainer);
+		addToExec(trainer, i);
 		sem_wait(countReady_semaphore);
 		for(i=0;i<(countReady); i++){
 			((&trainers)[i]) = ((&trainers)[i+1]);
@@ -1072,7 +1073,7 @@ void scheduleRR(){
 	while(countReady){
 		int i=0;
 		int valueOfExecuteClock = 1;
-		addToExec(&trainers[i]);
+		addToExec(&trainers[i], i);
 		for(int j=0;j<(int)(schedulingAlgorithm.quantum) && valueOfExecuteClock == 1;j++){
 			valueOfExecuteClock = executeClock(exec);
 		}
@@ -1092,8 +1093,8 @@ void scheduleRR(){
 void scheduleSJFSD(){
 	initializeTrainersWithBurts();
 	while(countReady){
-		t_ready_trainer exec = getTrainerWithBestEstimatedBurst();
-		addToExec(&exec);
+		t_trainer_with_last_burst exec = getTrainerWithBestEstimatedBurst();
+		addToExec(&(exec.trainer),exec.trainerPosition);
 	}
 
 
@@ -1116,11 +1117,12 @@ void initializeTrainersWithBurts(){
 	for(int i=0;i<countReady;i++){
 		trainer_with_last_burst[i].trainer = trainers[i];
 		trainer_with_last_burst[i].lastBurst = 0;
+		trainer_with_last_burst[i].trainerPosition = i;
 	}
 	sem_post(countReady_semaphore);
 }
 
-t_ready_trainer getTrainerWithBestEstimatedBurst(){
+t_trainer_with_last_burst getTrainerWithBestEstimatedBurst(){
 	int flag=0;
 	t_trainer_with_last_burst trainerWithBestBurst;
 	sem_wait(countReady_semaphore);
@@ -1133,7 +1135,7 @@ t_ready_trainer getTrainerWithBestEstimatedBurst(){
 		}
 	}
 	sem_post(countReady_semaphore);
-	return trainerWithBestBurst.trainer;
+	return trainerWithBestBurst;
 }
 
 

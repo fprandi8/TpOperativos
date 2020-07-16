@@ -1050,8 +1050,7 @@ void scheduleFifo(){
 		for(i=0;i<(countReady); i++){
 			((&trainers)[i]) = ((&trainers)[i+1]);
 		}
-
-			(countReady)--;
+		(countReady)--;
 		sem_post(countReady_semaphore);
 		int cutWhile = 1;
 		while(cutWhile){

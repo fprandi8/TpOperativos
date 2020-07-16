@@ -1078,8 +1078,10 @@ void scheduleRR(){
 		if(valueOfExecuteClock == 1){
 			addToReady(exec);
 		}else if(valueOfExecuteClock==0){
+
 			exec.trainer.blockState = WAITING;
 			addToBlocked(&(exec.trainer));
+
 		}
 
 	}

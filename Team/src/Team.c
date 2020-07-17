@@ -1105,10 +1105,12 @@ int getClosestTrainerNew(t_pokemon* pkmAvailable){
 		clockTimeToPokemon = getDistanceToPokemonTarget(statesLists.newList.trainerList[0].parameters,*pkmAvailable);
 		pos = 0;
 		for(int i=1;i<statesLists.newList.count;i++){
-			clockTimeToPokemonAux = getDistanceToPokemonTarget(statesLists.newList.trainerList[i].parameters,*pkmAvailable);
-			if(clockTimeToPokemon > clockTimeToPokemonAux){
-				clockTimeToPokemon = clockTimeToPokemonAux;
-				pos=i;
+			if(statesLists.newList.trainerList[i].parameters.objetivesCount>statesLists.newList.trainerList[i].parameters.pokemonsCount){
+				clockTimeToPokemonAux = getDistanceToPokemonTarget(statesLists.newList.trainerList[i].parameters,*pkmAvailable);
+				if(clockTimeToPokemon > clockTimeToPokemonAux){
+					clockTimeToPokemon = clockTimeToPokemonAux;
+					pos=i;
+				}
 			}
 		}
 	}

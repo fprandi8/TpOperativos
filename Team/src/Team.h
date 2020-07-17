@@ -62,7 +62,7 @@ typedef struct
 	t_pokemon* objetives;
 	uint32_t objetivesCount;
 	uint32_t previousBurst;
-	uint32_t previousEstimate;
+	float previousEstimate;
 	t_pokemon scheduledPokemon;//TODO: inicializar en "NULL"
 } t_trainerParameters;
 
@@ -249,4 +249,5 @@ int readConfigInitialEstimatedValue(t_config*);
 float estimatedTimeForNextBurstCalculation(int);
 void initializeTrainersWithBurts();
 int getTrainerWithBestEstimatedBurst();
+float differenceBetweenEstimatedBurtsAndExecutedClocks(float, uint32_t);
 #endif /* TEAM_H_ */

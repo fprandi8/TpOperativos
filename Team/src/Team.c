@@ -1215,11 +1215,17 @@ void scheduleRR(){
 void scheduleSJFSD(){
 		if(statesLists.readyList.count && statesLists.execTrainer.boolean){
 			int pos=getTrainerWithBestEstimatedBurst();
+			float estimatedBurstTimeForCPU = estimatedTimeForNextBurstCalculation(pos);
 			addToExec(statesLists.readyList.trainerList[pos]);
 			removeFromReady(pos);
 			int cutWhile = 1;
+			if(statesLists.execTrainer.trainer.parameters.previousBurst == -1){
+				statesLists.execTrainer.trainer.parameters.previousBurst = 0;
+			}
+			statesLists.execTrainer.trainer.parameters.previousEstimate = estimatedBurstTimeForCPU;
 			while(cutWhile){
 				cutWhile = executeClock();
+				statesLists.execTrainer.trainer.parameters.previousBurst++;
 			}
 			if(cutWhile == 0){
 				statesLists.execTrainer.trainer.blockState = WAITING;
@@ -1232,7 +1238,37 @@ void scheduleSJFSD(){
 
 //TODO
 void scheduleSJFCD(){
-;
+	if(statesLists.readyList.count && statesLists.execTrainer.boolean){
+		int pos = getTrainerWithBestEstimatedBurst();
+		float estimatedBurstTimeForCPU = estimatedTimeForNextBurstCalculation(pos);
+		addToExec(statesLists.readyList.trainerList[pos]);
+		removeFromReady(pos);
+		int cutWhile = 1;
+		if(statesLists.execTrainer.trainer.parameters.previousBurst == -1){
+		statesLists.execTrainer.trainer.parameters.previousBurst = 0;
+		}
+		statesLists.execTrainer.trainer.parameters.previousEstimate = estimatedBurstTimeForCPU;
+		while(cutWhile && (differenceBetweenEstimatedBurtsAndExecutedClocks(estimatedBurstTimeForCPU, statesLists.execTrainer.trainer.parameters.previousBurst)) <= estimatedTimeForNextBurstCalculation(getTrainerWithBestEstimatedBurst())){
+			estimatedBurstTimeForCPU--;
+			cutWhile = executeClock();
+			statesLists.execTrainer.trainer.parameters.previousBurst++;
+		}
+		if(cutWhile == 0){
+			statesLists.execTrainer.trainer.blockState = WAITING;
+			removeFromExec();
+			addToBlocked(statesLists.execTrainer.trainer);
+		}else{
+			addToReady(statesLists.execTrainer.trainer);
+			removeFromExec();
+		}
+
+	}
+}
+
+
+float differenceBetweenEstimatedBurtsAndExecutedClocks(float estimatedTrainerBurstTime, uint32_t executedBursts){
+	float difference = estimatedTrainerBurstTime - executedBursts;
+	return difference;
 }
 
 float estimatedTimeForNextBurstCalculation(int pos){
@@ -1240,7 +1276,7 @@ float estimatedTimeForNextBurstCalculation(int pos){
 	if(statesLists.readyList.trainerList[pos].parameters.previousBurst==-1){
 		estimatedBurstTime=initialEstimatedBurst;
 	}else{
-		estimatedBurstTime = (alphaForSJF * statesLists.readyList.trainerList[pos].parameters.previousBurst) + ((1 - alphaForSJF) * statesLists.readyList.trainerList[pos].parameters.previousEstimate);
+		estimatedBurstTime = (alphaForSJF * statesLists.readyList.trainerList[pos].parameters.previousEstimate) + ((1 - alphaForSJF) * statesLists.readyList.trainerList[pos].parameters.previousBurst);
 	}
 	return estimatedBurstTime;
 }

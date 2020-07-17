@@ -1178,7 +1178,7 @@ void scheduleBydistance(int trainersCount){
 
 
 void scheduleFifo(){
-	if(statesLists.readyList.count  && statesLists.execTrainer.boolean){
+	if(statesLists.readyList.count  && statesLists.execTrainer.boolean==0){
 		addToExec(statesLists.readyList.trainerList[0]);
 		removeFromReady(0);
 		int valueOfExecuteClock = 1;
@@ -1193,7 +1193,7 @@ void scheduleFifo(){
 
 
 void scheduleRR(){
-	if(statesLists.readyList.count  && statesLists.execTrainer.boolean){
+	if(statesLists.readyList.count  && statesLists.execTrainer.boolean==0){
 		int valueOfExecuteClock = 1;
 		addToExec(statesLists.readyList.trainerList[0]);
 		removeFromReady(0);
@@ -1213,7 +1213,7 @@ void scheduleRR(){
 
 //TODO - DONE Si mando a EXEC un entrenador que no está en la primer posición, la lista de ready se va a actualizar mal. VER como hacer esto.
 void scheduleSJFSD(){
-		if(statesLists.readyList.count && statesLists.execTrainer.boolean){
+		if(statesLists.readyList.count  && statesLists.execTrainer.boolean==0){
 			int pos=getTrainerWithBestEstimatedBurst();
 			float estimatedBurstTimeForCPU = estimatedTimeForNextBurstCalculation(pos);
 			addToExec(statesLists.readyList.trainerList[pos]);
@@ -1225,7 +1225,9 @@ void scheduleSJFSD(){
 			statesLists.execTrainer.trainer.parameters.previousEstimate = estimatedBurstTimeForCPU;
 			while(cutWhile){
 				cutWhile = executeClock();
-				statesLists.execTrainer.trainer.parameters.previousBurst++;
+				if(cutWhile==1){
+					statesLists.execTrainer.trainer.parameters.previousBurst++;
+				}
 			}
 			if(cutWhile == 0){
 				statesLists.execTrainer.trainer.blockState = WAITING;
@@ -1238,20 +1240,22 @@ void scheduleSJFSD(){
 
 //TODO
 void scheduleSJFCD(){
-	if(statesLists.readyList.count && statesLists.execTrainer.boolean){
+	if(statesLists.readyList.count  && statesLists.execTrainer.boolean==0){
 		int pos = getTrainerWithBestEstimatedBurst();
 		float estimatedBurstTimeForCPU = estimatedTimeForNextBurstCalculation(pos);
 		addToExec(statesLists.readyList.trainerList[pos]);
 		removeFromReady(pos);
 		int cutWhile = 1;
 		if(statesLists.execTrainer.trainer.parameters.previousBurst == -1){
-		statesLists.execTrainer.trainer.parameters.previousBurst = 0;
+			statesLists.execTrainer.trainer.parameters.previousBurst = 0;
 		}
 		statesLists.execTrainer.trainer.parameters.previousEstimate = estimatedBurstTimeForCPU;
 		while(cutWhile && (differenceBetweenEstimatedBurtsAndExecutedClocks(estimatedBurstTimeForCPU, statesLists.execTrainer.trainer.parameters.previousBurst)) <= estimatedTimeForNextBurstCalculation(getTrainerWithBestEstimatedBurst())){
 			estimatedBurstTimeForCPU--;
 			cutWhile = executeClock();
-			statesLists.execTrainer.trainer.parameters.previousBurst++;
+			if(cutWhile==1){
+				statesLists.execTrainer.trainer.parameters.previousBurst++;
+			}
 		}
 		if(cutWhile == 0){
 			statesLists.execTrainer.trainer.blockState = WAITING;

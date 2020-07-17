@@ -61,6 +61,9 @@ typedef struct
 	uint32_t pokemonsCount;
 	t_pokemon* objetives;
 	uint32_t objetivesCount;
+	uint32_t previousBurst;
+	uint32_t previousEstimate;
+	t_pokemon scheduledPokemon;//TODO: inicializar en "NULL"
 } t_trainerParameters;
 
 typedef enum
@@ -82,7 +85,7 @@ typedef enum
 typedef struct
 {
 	uint32_t id;
-	t_trainer trainer;
+	int blockPos;
 } t_catchMessage;
 
 typedef struct
@@ -120,44 +123,44 @@ typedef struct {
 	void* brokerAddress;
 } t_args_process_message;
 
-typedef struct
+typedef struct t_trainerList
 {
+	t_trainer* trainerList;
+	uint32_t count;
+} t_trainerList;
+
+typedef struct t_trainerExec{
 	t_trainer trainer;
-	t_pokemon pokemon;
-} t_ready_trainer;
+	uint32_t boolean;
+} t_execTrainer;
 
-typedef struct
+struct t_stateLists
 {
-	t_trainer* new;
-	t_trainer* blocked;
-	t_ready_trainer* ready;
-	t_ready_trainer exec;
-	t_trainer* exit;
+	t_trainerList newList;
+	t_trainerList blockedList;
+	t_trainerList readyList;
+	t_execTrainer execTrainer;
+	t_trainerList exitList;
 
-} t_stateLists;
+} statesLists;
 
-typedef struct{
-	t_ready_trainer trainer;
-	int lastBurst;
-	int trainerPositionInList;
-}t_trainer_with_last_burst;
 
 
 void createConfig(t_config**);
-void startLogger(t_config*,t_log**);
-void createLogger(char*,t_log**);
+void startLogger(t_config*);
+void createLogger(char*);
 t_config* readConfig(void);
 t_config* startConfig(void);
-void deleteLogger(t_log**);
+void deleteLogger();
 void removeLogger(char*);
 void initBroker(struct Broker*);
-void initTeamServer(struct Broker*);
-void readConfigBrokerValues(t_config*,t_log*,struct Broker*);
-void readConfigSchedulerValues(t_config*, t_log*, struct SchedulingAlgorithm*);
-void readConfigTrainersValues(t_config*,t_log*,char***,char***,char***);
+//void initTeam_stateListsServer(struct Broker*);
+void readConfigBrokerValues(t_config*,struct Broker*);
+void readConfigSchedulerValues(t_config*, struct SchedulingAlgorithm*);
+void readConfigTrainersValues(t_config*,char***,char***,char***);
 void initScheduler(struct SchedulingAlgorithm*);
-void addToReady(t_ready_trainer);
-void addToExec(t_ready_trainer*, int);
+void addToReady(t_trainer);
+void addToExec(t_trainer);
 void scheduleFifo();
 void scheduleRR();
 void scheduleSJFSD();
@@ -169,24 +172,24 @@ void addToList(char *);
 void initlist(char *);
 int getListSize(t_list *);
 void getMatrix(char**,char**);
-int getTrainersCount(t_config*,t_log*);
-void getTrainerAttr(char**,char**,char**,int,t_log*,t_trainer*);
-void getTrainerAttrPos(char**,t_trainer*,int,t_log*);
-void getTrainerAttrPkm(char**,t_trainer*,int,t_log*);
-void getTrainerAttrObj(char**,t_trainer*,int,t_log*);
-void startTrainers(t_trainer*,int,t_config*,t_log*);
-void startTrainer(t_trainer*,t_log*);
+int getTrainersCount(t_config*);
+void getTrainerAttr(char**,char**,char**,int);
+void getTrainerAttrPos(char**,int);
+void getTrainerAttrPkm(char**,int);
+void getTrainerAttrObj(char**,int);
+void startTrainers(int,t_config*);
+void startTrainer(t_trainer*);
 void startThread(t_trainer*);
-void missingPokemons(t_trainer*, int,t_log*);
-void subscribeToBroker(struct Broker,pthread_t*);
-void* subscribeToBrokerLocalized(void* Broker);
-void* subscribeToBrokerAppeared(void* Broker);
-void* subscribeToBrokerCaught(void* Broker);
-int connectBroker(char*, char*,t_log*);
-void requestNewPokemons(t_objetive*,int,t_log*,struct Broker);
-void requestNewPokemon(t_pokemon,t_log*,struct Broker);
+void missingPokemons(t_trainer*, int);
+void subscribeToBroker(pthread_t*);
+void* subscribeToBrokerLocalized();
+void* subscribeToBrokerAppeared();
+void* subscribeToBrokerCaught();
+int connectBroker(char*, char*);
+void requestNewPokemons(t_objetive*,int,struct Broker);
+void requestNewPokemon(t_pokemon,struct Broker);
 int getGlobalObjetivesCount(t_trainer*, int);
-void initStateLists(t_stateLists,t_trainer*,t_trainer*,t_ready_trainer*,t_ready_trainer,t_trainer*);
+//void initStateLists();
 void waitForMessage(void*);
 void processMessage(void*);
 void processMessageLocalized(deli_message*);
@@ -196,7 +199,26 @@ int findIdInGetList(uint32_t);
 int findNameInAvailableList(char*);
 void attendGameboy(void*);
 void processGameBoyMessage(deli_message*);
-void addToBlocked(t_trainer* );
+void addToBlocked(t_trainer);
+int startServer();
+int waitClient(int);
+void scheduleBydistance(int trainersCount);
+void initPreviousBurst(t_trainer);
+void initScheduledPokemon(t_trainer);
+void initBurstScheduledPokemon();
+void removeFromExit();
+void removeFromExec();
+void removeFromBlocked(int);
+void removeFromReady(int);
+int getCountBlockedWaiting();
+int getCountBlockedAvailable();
+int getFirstBlockedAvailable();
+void getClosestTrainer(t_pokemon*);
+int getClosestTrainerNew(t_pokemon*);
+int getClosestTrainerBlocked(t_pokemon*);
+
+
+
 
 void initBroker(struct Broker *broker){
 	broker->ipKey="IP_BROKER";
@@ -217,14 +239,14 @@ void initScheduler(struct SchedulingAlgorithm *schedulingAlgorithm){
 }
 
 void moveTrainerToTarget(t_trainer*, int distanceToMoveInX, int distanceToMoveInY);
-void moveTrainerToObjective(t_trainer* ,  t_pokemon );
+void moveTrainerToObjective(t_trainer*);
 int calculateDifference(int, int);
 int getDistanceToPokemonTarget(t_trainerParameters, t_pokemon);
 void moveTrainetToObjective(t_trainer*, t_pokemon*);
-int executeClock(t_ready_trainer);
+int executeClock();
 int readConfigAlphaValue(t_config*);
 int readConfigInitialEstimatedValue(t_config*);
 float estimatedTimeForNextBurstCalculation(int);
 void initializeTrainersWithBurts();
-t_trainer_with_last_burst getTrainerWithBestEstimatedBurst();
+int getTrainerWithBestEstimatedBurst();
 #endif /* TEAM_H_ */

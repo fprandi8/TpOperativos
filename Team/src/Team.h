@@ -58,7 +58,7 @@ typedef struct
 {
 	t_trainerPosition position;
 	t_pokemon* pokemons;
-	uint32_t pokemonsCount;
+	int pokemonsCount;
 	t_pokemon* objetives;
 	uint32_t objetivesCount;
 	uint32_t previousBurst;
@@ -79,6 +79,7 @@ typedef enum
 	t_trainerParameters parameters;
 	sem_t semaphore;
 	t_blockState blockState;
+	uint32_t id;
 
 } t_trainer;
 
@@ -202,7 +203,7 @@ void processGameBoyMessage(deli_message*);
 void addToBlocked(t_trainer);
 int startServer();
 int waitClient(int);
-void scheduleBydistance(int trainersCount);
+void scheduleByDistance();
 void initPreviousBurst(t_trainer);
 void initScheduledPokemon(t_trainer);
 void initBurstScheduledPokemon();
@@ -216,8 +217,12 @@ int getFirstBlockedAvailable();
 void getClosestTrainer(t_pokemon*);
 int getClosestTrainerNew(t_pokemon*);
 int getClosestTrainerBlocked(t_pokemon*);
-
-
+void initTrainerName();
+void readConfigReconnectWaiting(t_config*);
+void catchPokemon();
+void readConfigTeamValues(t_config*);
+void* startScheduling();
+void initializeLists();
 
 
 void initBroker(struct Broker *broker){
@@ -226,9 +231,9 @@ void initBroker(struct Broker *broker){
 
 }
 
-void initTeamServer(struct Broker *teamServerAttr){
-	teamServerAttr->ipKey="IP_TEAM";
-	teamServerAttr->portKey="PUERTO_TEAM";
+void initTeamServer(){
+	teamServerAttr.ipKey="IP_TEAM";
+	teamServerAttr.portKey="PUERTO_TEAM";
 
 }
 

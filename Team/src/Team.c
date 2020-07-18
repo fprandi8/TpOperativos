@@ -183,7 +183,7 @@ void initializeLists(){
 
 void readConfigReconnectWaiting(t_config* config){
 	if (config_has_property(config,"TIEMPO_RECONEXION")){
-		retryConnectionTime=config_get_string_value(config,"TIEMPO_RECONEXION");
+		retryConnectionTime=config_get_int_value(config,"TIEMPO_RECONEXION");
 	}else{
 		exit(-3);
 	}
@@ -842,7 +842,7 @@ void initBurstScheduledPokemon(){
 
 void initTrainerName(){
 	for(int trainer = 0; trainer < statesLists.newList.count; trainer++){
-		statesLists.newList.trainerList[trainer].id=trainer;
+		statesLists.readyList.trainerList[trainer].id =  trainer;
 	}
 }
 

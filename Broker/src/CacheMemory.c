@@ -437,13 +437,13 @@ t_list* UpdateClockOn(t_list* c_messages)
     for(int index = 0; index < sizeof(c_messages); index++)
     {
         message = (t_cachedMessage*)list_get(c_messages, index);
-        UpdateTimestamp(message->partitionId);
+        UpdateClockOnMessage(message);
     }
     return c_messages;
 }
 
-t_cachedMessage UpdateClockOnMessage(t_cachedMessage message){
-    UpdateTimestamp(message.partitionId);
+t_cachedMessage* UpdateClockOnMessage(t_cachedMessage* message){
+    UpdateTimestamp(message->partitionId);
     return message;
 }
 
@@ -461,7 +461,7 @@ t_cachedMessage* GetCachedMessage(int messageId)
     {
         if(message->id == messageId) return true; else return false;
     }
-    return (t_cachedMessage*)list_find(cached_messages, (void*)_message_by_id);
+    return UpdateClockOnMessage((t_cachedMessage*)list_find(cached_messages, (void*)_message_by_id));
 }
 
 //TODO ver aca clock
@@ -471,7 +471,7 @@ t_cachedMessage* GetCachedMessageInPartition(int partitionId)
     {
         if(message->partitionId == partitionId) return true; else return false;
     }
-    return (t_cachedMessage*)list_find(cached_messages, (void*)_message_by_partition_id);
+    return UpdateClockOnMessage((t_cachedMessage*)list_find(cached_messages, (void*)_message_by_partition_id));
 }
 
 //TODO ver aca clock
@@ -532,6 +532,7 @@ void* GetMessageContent(int messageId)
 {
     t_cachedMessage* message = GetCachedMessage(messageId);
     t_partition* partition = GetPartition(message->partitionId);
+    UpdateTimestamp(partition->id);
     return DeserializeMessageContent(partition->queue_type, partition->begining);
 }
 

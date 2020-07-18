@@ -17,8 +17,9 @@ void signal_handler(int signum)
 }
 
 
-void start_cache()
+void start_cache(t_Broker* brokerPointer)
 {
+    broker = brokerPointer;
     config = get_config();
     define_partition_size();
     define_cache_maximum_size();
@@ -107,6 +108,7 @@ int save_message_body(void* messageContent, message_type queue){
 	sem_wait(&mutex_saving);
 	t_partition* partition;
     partition = find_empty_partition_of_size(sizeof(messageBuffer->bufferSize));
+    log_info(broker->logger, "MENSAJE GUARDADO EN PARTICION CON POSICION DE INICIO: %d", partition->begining);
     int savedPartitionId = save_body_in_partition(messageBuffer, partition, queue);
 	sem_post(&mutex_saving);
 	return savedPartitionId;
@@ -199,6 +201,7 @@ t_partition* find_empty_partition_of_size(uint32_t size)
         if(partition == NULL) //Reached compaction frequency, or run out of busy partitions to delete. Should never reach here on buddy system setting.
         {
             compact_memory();
+            log_info(broker->logger, "SE EJECUTO COMPACTACION");
             partition = select_partition(size);
         }
     } while(partition == NULL);
@@ -328,6 +331,8 @@ void delete_partition(void){
     }else{
     	deletedPartition = delete_partition_lru();
     }
+
+    log_info(broker->logger, "PARTICION ELIMINADA CON POSICION DE INICIO: %d", deletedPartition->begining);
 
     bool _message_to_delete(t_cachedMessage* message)
     {
@@ -540,6 +545,7 @@ void* GetMessageContent(int messageId)
 
 void PrintDumpOfCache()
 {
+    log_info(broker->logger, "SE SOLICITO DUMP DE CACHE.");
 //Imprimir:
 //  -----------------------------------------------------------------------------------------------------------------------------
 //  Dump: dd/mm/yy hh:mm:ss
@@ -734,8 +740,12 @@ int consolidate(t_partition related_partition){
 
     t_partition* left_partition = &related_partition;
 
-    if(bs_freed_partition->begining < related_partition.begining)
+    if(bs_freed_partition->begining < related_partition.begining){
         left_partition = bs_freed_partition;
+        log_info(broker->logger, "SE ASOCIARON LOS BLOQUES CON COMIENZO EN: %d %d",  bs_freed_partition->begining, related_partition.begining);
+    }else{
+        log_info(broker->logger, "SE ASOCIARON LOS BLOQUES CON COMIENZO EN: %d %d", related_partition.begining, bs_freed_partition->begining);
+    }
 
     sem_wait(&mutex_partitions);
     t_partition* parent = list_find(parent_partitions, (void*) _is_wanted_parent);

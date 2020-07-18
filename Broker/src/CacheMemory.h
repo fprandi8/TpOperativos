@@ -68,6 +68,7 @@ typedef struct{
 /*
 	*******************GLOBAL VARIABLES*****************
 */
+t_Broker* broker;
 t_CacheMemory cache;
 t_config* config;
 

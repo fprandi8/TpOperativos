@@ -124,16 +124,14 @@ int save_message_body(void* messageContent, message_type queue){
 
 uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition, message_type queue)
 {
-
     if(partition->size == messageBuffer->bufferSize)
     {
         partition->queue_type = queue;
         partition->free = 0;
         partition->timestap = clock();
 
-        nextPartitionId++;
+        memcpy(partition->begining, messageBuffer->stream, messageBuffer->bufferSize);
 
-        memcpy(partition->begining, messageBuffer->stream, sizeof(messageBuffer->bufferSize));
         return partition->id;
     }
 
@@ -156,7 +154,8 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
         partition->size = partition->size - newPartitionSize;
         partition->timestap = clock();
 
-        memcpy(partition->begining, messageBuffer->stream, sizeof(messageBuffer->bufferSize));
+        memcpy(partition->begining, messageBuffer->stream, messageBuffer->bufferSize);
+
         return newPartition->id;
     }
     else
@@ -173,7 +172,7 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
 				partition->free = 0;
 				partition->timestap = clock();
 
-				memcpy(partition->begining, messageBuffer->stream, sizeof(messageBuffer->bufferSize));
+				memcpy(partition->begining, messageBuffer->stream, messageBuffer->bufferSize);
 				return partition->id;	
 			} 
 			else 
@@ -513,7 +512,12 @@ t_list* GetAllMessagesForSuscriptor(int client, message_type queueType)
 
     void* _get_deli_message(t_cachedMessage* cachedMessage)
     {
-    	return GetPartition(cachedMessage->partitionId)->begining;
+		deli_message* message = (deli_message*)malloc(sizeof(deli_message));
+		message->id = cachedMessage->id;
+		message->correlationId = cachedMessage->corelationId;
+		message->messageType = cachedMessage->queue_type;
+		message->messageContent =  DeserializeMessageContent(queueType, (GetPartition(cachedMessage->partitionId))->begining);
+    	return message;
     }
 
     t_list* filteredMessages = list_filter(cached_messages, (void*)_message_by_queue);

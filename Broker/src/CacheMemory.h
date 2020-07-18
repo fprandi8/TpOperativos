@@ -137,5 +137,6 @@ void Free_Partition(t_partition* partition);
 t_list* UpdateClockOn(t_list* c_messages);
 t_partition* GetPartition(int partitionId);
 void UpdateTimestamp(uint32_t partitionId);
+t_cachedMessage* UpdateClockOnMessage(t_cachedMessage* message);
 
 #endif /* CACHEMEMORY_H_ */

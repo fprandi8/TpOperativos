@@ -561,6 +561,7 @@ void RecieveMessage(int server_socket, message_type expectedType, t_log* logger)
 			case MESSAGE:
 				if(((deli_message*)content)->messageType == expectedType) puts("Recieved Message of correct type"); else puts("Recieved Message with an incorrect type");
 				LogMessage(logger, (deli_message*)content);
+				SendMessageAcknowledge(((deli_message*)content)->id, server_socket);
 				Free_deli_message_withContent((deli_message*)content);
 				break;
 			case ACKNOWLEDGE:

@@ -254,6 +254,8 @@ void broker_process_message(void* buffer, int cliente, t_Broker* broker){
 
 	//log_debug(broker->logger, "El ID del mensaje es %d", message->id);
 
+	SendMessageAcknowledge(message->id, cliente);
+
 	//TODO ver que hacer con el correlation ID, podríamos saber si es necesario hacer algo por el tipo de mensaje
 	//en principio no hacer nada, ver en reunion
 

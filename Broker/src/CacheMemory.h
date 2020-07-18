@@ -108,6 +108,9 @@ int save_message_body(void*, message_type);
 t_partition* find_empty_partition_of_size(uint32_t size);
 uint32_t save_body_in_partition(t_buffer*, t_partition*, message_type); //check if this is needed
 void compact_memory(void);
+int find_index_in_list(t_partition* partition);
+int consolidate(t_partition related_partition);
+void find_index_in_list_and_destroy(t_partition* partition);
 void check_compact_restrictions(void);
 void delete_partition(void);
 t_partition* select_partition(uint32_t size);

@@ -594,7 +594,7 @@ void PrintDumpOfCache()
             char* queue = GetStringFromMessageType(message->queue_type);
             printf("Partición %d: <%s>. [%s] Size:%db LRU:%ld Cola:%s ID:%d\n",
                 partition->id,
-				memoryLocation,
+				*(memoryLocation),
                 busyStatus,
                 partition->size,
                 partition->timestap,
@@ -699,7 +699,7 @@ int check_validations_and_consolidate_BS(uint32_t freed_partition_id){
     if(related_partition == NULL)
         return -1;
 
-    return consolidate(related_partition);
+    return consolidate(*(related_partition));
 }
 
 void find_index_in_list_and_destroy(t_partition* partition){
@@ -708,7 +708,7 @@ void find_index_in_list_and_destroy(t_partition* partition){
     sem_wait(&mutex_index_finder);
         
     sem_wait(&mutex_partitions);
-    free(list_remove(partition, index));
+    free(list_remove(partitions, index));
     sem_post(&mutex_partitions);
  }
 

@@ -56,6 +56,7 @@ typedef struct {
 	t_bitarray* bitArray;
 	char* fileMapped;
 	int retryOperation;
+	int retryConnection;
 	int delayTime;
 	sem_t semMap;
 } t_GameCard;
@@ -100,7 +101,7 @@ typedef struct {
 } t_args_process_message;
 
 
-t_GameCard* GameCard_initialize(t_log*, char*,char*,char*);
+t_GameCard* GameCard_initialize(t_log*, char*,char*,char*, char*);
 int GameCard_mountFS(t_config*);
 void GameCard_Wait_For_Message(void*);
 void GameCard_Process_Message(void*);
@@ -131,7 +132,7 @@ void create_localized_message(localized_pokemon*, char*,char*, t_file_metadata*)
 
 int check_directory(char*);
 
-void read_metadata_file(t_file_metadata*, t_config*, char*);
+void read_metadata_file(t_file_metadata*, char*, char*);
 void Metadata_File_Open_Flag(t_file_metadata*,t_config*,char*);
 void Metadata_File_Destroy(t_file_metadata*);
 void Metadata_File_Initialize_Block(t_file_metadata*);

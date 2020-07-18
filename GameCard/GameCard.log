@@ -8782,3 +8782,266 @@ wk�wk�wk�wk
 [INFO] 15:18:25:88 GameCard/(9402:9402): 6
 [INFO] 15:18:33:51 GameCard/(9402:9402): Obtiene el array de datos
 [DEBUG] 15:18:39:81 GameCard/(9402:9402): Cantidad de bloques necesarios 2 
+[INFO] 00:56:53:243 GameCard/(25969:25969): PROCESO GAMECARD ONLINE
+[INFO] 00:56:53:250 GameCard/(25969:25969): /home/utnso/tall-grass
+[INFO] 00:56:53:250 GameCard/(25969:25969): 10
+[INFO] 00:56:53:250 GameCard/(25969:25969): 5
+[INFO] 00:56:53:250 GameCard/(25969:25969): 5
+[INFO] 00:56:53:250 GameCard/(25969:25969): 127.0.0.1
+[INFO] 00:56:53:250 GameCard/(25969:25969): 7001
+[DEBUG] 00:56:53:250 GameCard/(25969:25969): Inicializa la GameCard
+[DEBUG] 00:56:53:250 GameCard/(25969:25969): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass - 2
+[DEBUG] 00:56:53:250 GameCard/(25969:25969): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Files/ - 2
+[DEBUG] 00:56:53:251 GameCard/(25969:25969): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Blocks/ - 2
+[DEBUG] 00:56:53:251 GameCard/(25969:25969): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Metadata/ - 2
+[INFO] 00:56:53:251 GameCard/(25969:25969): 5
+[INFO] 00:56:53:251 GameCard/(25969:25969): 1024
+[INFO] 00:56:53:251 GameCard/(25969:25969): TALL_GRASS
+[INFO] 00:57:03:265 GameCard/(25969:26052): Reintento de conexión a la queue New en 10 segundos
+[INFO] 00:57:05:275 GameCard/(25969:26054): Reintento de conexión a la queue Catch en 10 segundos
+[DEBUG] 00:57:07:277 GameCard/(25969:25969): Proceso GameBoy Conectado
+[INFO] 00:57:07:280 GameCard/(25969:26055): Reintento de conexión a la queue Get en 10 segundos
+[INFO] 00:57:07:293 GameCard/(25969:26057): N
+[INFO] 00:57:07:293 GameCard/(25969:26057): N
+[INFO] 00:57:07:293 GameCard/(25969:26057): 8
+[INFO] 00:57:07:293 GameCard/(25969:26057): 8
+[INFO] 00:57:07:293 GameCard/(25969:26057): Obtiene el array de datos
+[INFO] 00:57:27:339 GameCard/(25969:26054): Reintento de conexión a la queue Catch en 10 segundos
+[INFO] 00:57:27:341 GameCard/(25969:26052): Reintento de conexión a la queue New en 10 segundos
+[INFO] 00:57:40:255 GameCard/(26085:26085): PROCESO GAMECARD ONLINE
+[INFO] 00:57:40:255 GameCard/(26085:26085): /home/utnso/tall-grass
+[INFO] 00:57:40:255 GameCard/(26085:26085): 10
+[INFO] 00:57:40:255 GameCard/(26085:26085): 5
+[INFO] 00:57:40:255 GameCard/(26085:26085): 5
+[INFO] 00:57:40:255 GameCard/(26085:26085): 127.0.0.1
+[INFO] 00:57:40:255 GameCard/(26085:26085): 7001
+[DEBUG] 00:57:40:255 GameCard/(26085:26085): Inicializa la GameCard
+[DEBUG] 00:57:40:255 GameCard/(26085:26085): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass - 2
+[DEBUG] 00:57:40:255 GameCard/(26085:26085): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Files/ - 2
+[DEBUG] 00:57:40:259 GameCard/(26085:26085): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Blocks/ - 2
+[DEBUG] 00:57:40:260 GameCard/(26085:26085): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Metadata/ - 2
+[INFO] 00:57:40:261 GameCard/(26085:26085): 5
+[INFO] 00:57:40:261 GameCard/(26085:26085): 1024
+[INFO] 00:57:40:261 GameCard/(26085:26085): TALL_GRASS
+[INFO] 00:57:50:273 GameCard/(26085:26094): Reintento de conexión a la queue New en 10 segundos
+[INFO] 00:57:52:282 GameCard/(26085:26096): Reintento de conexión a la queue Catch en 10 segundos
+[INFO] 00:57:54:286 GameCard/(26085:26097): Reintento de conexión a la queue Get en 10 segundos
+[INFO] 00:58:00:275 GameCard/(26085:26094): Reintento de conexión a la queue New en 10 segundos
+[INFO] 00:58:02:283 GameCard/(26085:26096): Reintento de conexión a la queue Catch en 10 segundos
+[DEBUG] 00:58:48:520 GameCard/(26085:26085): Proceso GameBoy Conectado
+[INFO] 00:59:00:402 GameCard/(26085:26124): S
+[ERROR] 00:59:00:402 GameCard/(26085:26124): Archivo abierto, re intenta en 5 segundos
+[INFO] 00:59:05:402 GameCard/(26085:26124): S
+[ERROR] 00:59:05:403 GameCard/(26085:26124): Archivo abierto, re intenta en 5 segundos
+[INFO] 00:59:10:406 GameCard/(26085:26124): S
+[ERROR] 00:59:10:407 GameCard/(26085:26124): Archivo abierto, re intenta en 5 segundos
+[INFO] 00:59:15:409 GameCard/(26085:26124): S
+[ERROR] 00:59:15:410 GameCard/(26085:26124): Archivo abierto, re intenta en 5 segundos
+[INFO] 00:59:20:416 GameCard/(26085:26124): S
+[ERROR] 00:59:20:416 GameCard/(26085:26124): Archivo abierto, re intenta en 5 segundos
+[INFO] 00:59:25:416 GameCard/(26085:26124): S
+[ERROR] 00:59:25:417 GameCard/(26085:26124): Archivo abierto, re intenta en 5 segundos
+[INFO] 00:59:30:421 GameCard/(26085:26124): S
+[ERROR] 00:59:30:422 GameCard/(26085:26124): Archivo abierto, re intenta en 5 segundos
+[INFO] 00:59:35:426 GameCard/(26085:26124): S
+[ERROR] 00:59:35:427 GameCard/(26085:26124): Archivo abierto, re intenta en 5 segundos
+[INFO] 00:59:40:429 GameCard/(26085:26124): S
+[ERROR] 00:59:40:430 GameCard/(26085:26124): Archivo abierto, re intenta en 5 segundos
+[INFO] 00:59:45:430 GameCard/(26085:26124): S
+[ERROR] 00:59:45:432 GameCard/(26085:26124): Archivo abierto, re intenta en 5 segundos
+[INFO] 00:59:50:433 GameCard/(26085:26124): S
+[ERROR] 00:59:50:435 GameCard/(26085:26124): Archivo abierto, re intenta en 5 segundos
+[INFO] 01:01:36:415 GameCard/(26229:26229): PROCESO GAMECARD ONLINE
+[INFO] 01:01:36:416 GameCard/(26229:26229): /home/utnso/tall-grass
+[INFO] 01:01:36:416 GameCard/(26229:26229): 10
+[INFO] 01:01:36:416 GameCard/(26229:26229): 5
+[INFO] 01:01:36:416 GameCard/(26229:26229): 5
+[INFO] 01:01:36:416 GameCard/(26229:26229): 127.0.0.1
+[INFO] 01:01:36:416 GameCard/(26229:26229): 7001
+[DEBUG] 01:01:36:416 GameCard/(26229:26229): Inicializa la GameCard
+[DEBUG] 01:01:36:416 GameCard/(26229:26229): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass - 2
+[DEBUG] 01:01:36:416 GameCard/(26229:26229): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Files/ - 2
+[DEBUG] 01:01:36:416 GameCard/(26229:26229): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Blocks/ - 2
+[DEBUG] 01:01:36:416 GameCard/(26229:26229): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Metadata/ - 2
+[INFO] 01:01:36:416 GameCard/(26229:26229): 5
+[INFO] 01:01:36:416 GameCard/(26229:26229): 1024
+[INFO] 01:01:36:416 GameCard/(26229:26229): TALL_GRASS
+[INFO] 01:01:46:425 GameCard/(26229:26239): Reintento de conexión a la queue New en 10 segundos
+[INFO] 01:01:48:432 GameCard/(26229:26241): Reintento de conexión a la queue Catch en 10 segundos
+[DEBUG] 01:01:50:431 GameCard/(26229:26229): Proceso GameBoy Conectado
+[INFO] 01:01:53:692 GameCard/(26229:26242): Reintento de conexión a la queue Get en 10 segundos
+[INFO] 01:01:58:311 GameCard/(26229:26239): Reintento de conexión a la queue New en 10 segundos
+[INFO] 01:01:58:322 GameCard/(26229:26244): N
+[INFO] 01:01:58:322 GameCard/(26229:26244): N
+[INFO] 01:01:58:322 GameCard/(26229:26244): 8
+[INFO] 01:01:58:322 GameCard/(26229:26244): 8
+[INFO] 01:01:58:322 GameCard/(26229:26244): Obtiene el array de datos
+[INFO] 01:02:15:238 GameCard/(26229:26241): Reintento de conexión a la queue Catch en 10 segundos
+[INFO] 01:02:39:321 GameCard/(26289:26289): PROCESO GAMECARD ONLINE
+[INFO] 01:02:39:321 GameCard/(26289:26289): /home/utnso/tall-grass
+[INFO] 01:02:39:321 GameCard/(26289:26289): 10
+[INFO] 01:02:39:321 GameCard/(26289:26289): 5
+[INFO] 01:02:39:321 GameCard/(26289:26289): 5
+[INFO] 01:02:39:321 GameCard/(26289:26289): 127.0.0.1
+[INFO] 01:02:39:321 GameCard/(26289:26289): 7001
+[DEBUG] 01:02:39:321 GameCard/(26289:26289): Inicializa la GameCard
+[DEBUG] 01:02:39:321 GameCard/(26289:26289): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass - 2
+[DEBUG] 01:02:39:321 GameCard/(26289:26289): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Files/ - 2
+[DEBUG] 01:02:39:321 GameCard/(26289:26289): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Blocks/ - 2
+[DEBUG] 01:02:39:321 GameCard/(26289:26289): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Metadata/ - 2
+[INFO] 01:02:39:321 GameCard/(26289:26289): 5
+[INFO] 01:02:39:321 GameCard/(26289:26289): 1024
+[INFO] 01:02:39:322 GameCard/(26289:26289): TALL_GRASS
+[INFO] 01:02:49:334 GameCard/(26289:26300): Reintento de conexión a la queue New en 10 segundos
+[INFO] 01:02:51:342 GameCard/(26289:26302): Reintento de conexión a la queue Catch en 10 segundos
+[DEBUG] 01:02:53:336 GameCard/(26289:26289): Proceso GameBoy Conectado
+[INFO] 01:02:53:344 GameCard/(26289:26304): Reintento de conexión a la queue Get en 10 segundos
+[INFO] 01:03:25:120 GameCard/(26289:26300): Reintento de conexión a la queue New en 10 segundos
+[INFO] 01:03:25:120 GameCard/(26289:26302): Reintento de conexión a la queue Catch en 10 segundos
+[INFO] 01:03:27:986 GameCard/(26289:26305): N
+[INFO] 01:03:27:986 GameCard/(26289:26305): N
+[INFO] 01:03:27:986 GameCard/(26289:26305): 8
+[INFO] 01:03:27:986 GameCard/(26289:26305): 8
+[INFO] 01:03:27:986 GameCard/(26289:26305): Obtiene el array de datos
+[DEBUG] 01:05:04:332 GameCard/(26289:26305): Cantidad de caracteres en el Amount actual 3
+[DEBUG] 01:05:07:849 GameCard/(26289:26305): Nueva cantidad 1110
+[INFO] 21:21:32:143 GameCard/(18966:18966): PROCESO GAMECARD ONLINE
+[INFO] 21:21:32:144 GameCard/(18966:18966): /home/utnso/tall-grass
+[INFO] 21:21:32:144 GameCard/(18966:18966): 10
+[INFO] 21:21:32:144 GameCard/(18966:18966): 5
+[INFO] 21:21:32:144 GameCard/(18966:18966): 5
+[INFO] 21:21:32:144 GameCard/(18966:18966): 127.0.0.1
+[INFO] 21:21:32:144 GameCard/(18966:18966): 7001
+[DEBUG] 21:21:32:144 GameCard/(18966:18966): Inicializa la GameCard
+[DEBUG] 21:21:32:144 GameCard/(18966:18966): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass - 2
+[DEBUG] 21:21:32:144 GameCard/(18966:18966): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Files/ - 2
+[DEBUG] 21:21:32:144 GameCard/(18966:18966): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Blocks/ - 2
+[DEBUG] 21:21:32:144 GameCard/(18966:18966): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Metadata/ - 2
+[INFO] 21:21:32:144 GameCard/(18966:18966): 5
+[INFO] 21:21:32:144 GameCard/(18966:18966): 1024
+[INFO] 21:21:32:144 GameCard/(18966:18966): TALL_GRASS
+[INFO] 21:21:42:153 GameCard/(18966:18974): Reintento de conexión a la queue New en 10 segundos
+[INFO] 21:21:44:160 GameCard/(18966:18976): Reintento de conexión a la queue Catch en 10 segundos
+[INFO] 21:21:46:163 GameCard/(18966:18977): Reintento de conexión a la queue Get en 10 segundos
+[INFO] 21:26:53:210 GameCard/(19150:19150): PROCESO GAMECARD ONLINE
+[INFO] 21:26:53:211 GameCard/(19150:19150): /home/utnso/tall-grass
+[INFO] 21:26:53:211 GameCard/(19150:19150): 10
+[INFO] 21:26:53:211 GameCard/(19150:19150): 5
+[INFO] 21:26:53:211 GameCard/(19150:19150): 5
+[INFO] 21:26:53:211 GameCard/(19150:19150): 127.0.0.1
+[INFO] 21:26:53:211 GameCard/(19150:19150): 7001
+[DEBUG] 21:26:53:211 GameCard/(19150:19150): Inicializa la GameCard
+[DEBUG] 21:26:53:211 GameCard/(19150:19150): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass - 2
+[DEBUG] 21:26:53:211 GameCard/(19150:19150): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Files/ - 2
+[DEBUG] 21:26:53:211 GameCard/(19150:19150): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Blocks/ - 2
+[DEBUG] 21:26:53:212 GameCard/(19150:19150): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Metadata/ - 2
+[INFO] 21:26:53:212 GameCard/(19150:19150): 5
+[INFO] 21:26:53:212 GameCard/(19150:19150): 1024
+[INFO] 21:26:53:212 GameCard/(19150:19150): TALL_GRASS
+[INFO] 21:27:03:224 GameCard/(19150:19158): Reintento de conexión a la queue New en 10 segundos
+[INFO] 21:27:05:229 GameCard/(19150:19160): Reintento de conexión a la queue Catch en 10 segundos
+[INFO] 21:27:07:239 GameCard/(19150:19161): Reintento de conexión a la queue Get en 10 segundos
+[DEBUG] 21:27:07:705 GameCard/(19150:19150): Proceso GameBoy Conectado
+[INFO] 21:27:17:835 GameCard/(19150:19160): Reintento de conexión a la queue Catch en 10 segundos
+[INFO] 21:27:17:836 GameCard/(19150:19158): Reintento de conexión a la queue New en 10 segundos
+[INFO] 21:27:17:851 GameCard/(19150:19163): S
+[ERROR] 21:27:17:851 GameCard/(19150:19163): Archivo abierto, re intenta en 5 segundos
+[INFO] 21:27:22:852 GameCard/(19150:19163): S
+[ERROR] 21:27:22:853 GameCard/(19150:19163): Archivo abierto, re intenta en 5 segundos
+[INFO] 21:27:27:854 GameCard/(19150:19163): S
+[ERROR] 21:27:27:856 GameCard/(19150:19163): Archivo abierto, re intenta en 5 segundos
+[INFO] 21:27:32:857 GameCard/(19150:19163): S
+[ERROR] 21:27:32:859 GameCard/(19150:19163): Archivo abierto, re intenta en 5 segundos
+[INFO] 21:27:37:860 GameCard/(19150:19163): S
+[ERROR] 21:27:37:862 GameCard/(19150:19163): Archivo abierto, re intenta en 5 segundos
+[INFO] 21:27:42:862 GameCard/(19150:19163): S
+[ERROR] 21:27:42:866 GameCard/(19150:19163): Archivo abierto, re intenta en 5 segundos
+[INFO] 21:27:47:871 GameCard/(19150:19163): N
+[INFO] 21:27:47:887 GameCard/(19150:19163): N
+[INFO] 21:27:47:891 GameCard/(19150:19163): 8
+[INFO] 21:27:47:892 GameCard/(19150:19163): 8
+[INFO] 21:27:47:892 GameCard/(19150:19163): Obtiene el array de datos
+[DEBUG] 21:27:52:505 GameCard/(19150:19163): lei la metadata
+[DEBUG] 21:27:53:997 GameCard/(19150:19163): obtuve el archivo
+[DEBUG] 21:28:09:977 GameCard/(19150:19163): Obtuve la posicion de la linea 0
+[DEBUG] 21:28:12:391 GameCard/(19150:19163): voy a sumar la cantidad
+[INFO] 21:29:44:657 GameCard/(19248:19248): PROCESO GAMECARD ONLINE
+[INFO] 21:29:44:657 GameCard/(19248:19248): /home/utnso/tall-grass
+[INFO] 21:29:44:657 GameCard/(19248:19248): 10
+[INFO] 21:29:44:657 GameCard/(19248:19248): 5
+[INFO] 21:29:44:657 GameCard/(19248:19248): 5
+[INFO] 21:29:44:657 GameCard/(19248:19248): 127.0.0.1
+[INFO] 21:29:44:657 GameCard/(19248:19248): 7001
+[DEBUG] 21:29:44:657 GameCard/(19248:19248): Inicializa la GameCard
+[DEBUG] 21:29:44:657 GameCard/(19248:19248): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass - 2
+[DEBUG] 21:29:44:657 GameCard/(19248:19248): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Files/ - 2
+[DEBUG] 21:29:44:658 GameCard/(19248:19248): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Blocks/ - 2
+[DEBUG] 21:29:44:658 GameCard/(19248:19248): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Metadata/ - 2
+[INFO] 21:29:44:658 GameCard/(19248:19248): 5
+[INFO] 21:29:44:658 GameCard/(19248:19248): 1024
+[INFO] 21:29:44:658 GameCard/(19248:19248): TALL_GRASS
+[INFO] 21:29:54:671 GameCard/(19248:19259): Reintento de conexión a la queue New en 10 segundos
+[INFO] 21:29:56:672 GameCard/(19248:19261): Reintento de conexión a la queue Catch en 10 segundos
+[INFO] 21:29:58:687 GameCard/(19248:19262): Reintento de conexión a la queue Get en 10 segundos
+[DEBUG] 21:30:00:44 GameCard/(19248:19248): Proceso GameBoy Conectado
+[INFO] 21:30:03:69 GameCard/(19248:19266): N
+[INFO] 21:30:03:70 GameCard/(19248:19266): N
+[INFO] 21:30:03:70 GameCard/(19248:19266): 8
+[INFO] 21:30:03:70 GameCard/(19248:19266): 8
+[INFO] 21:30:03:70 GameCard/(19248:19266): Obtiene el array de datos
+[INFO] 21:30:04:790 GameCard/(19248:19259): Reintento de conexión a la queue New en 10 segundos
+[DEBUG] 21:30:04:821 GameCard/(19248:19266): lei la metadata
+[DEBUG] 21:30:05:696 GameCard/(19248:19266): obtuve el archivo
+[INFO] 21:30:06:948 GameCard/(19248:19261): Reintento de conexión a la queue Catch en 10 segundos
+[DEBUG] 21:30:12:70 GameCard/(19248:19266): Obtuve la posicion de la linea 0
+[DEBUG] 21:30:12:587 GameCard/(19248:19266): voy a sumar la cantidad
+[INFO] 21:34:39:875 GameCard/(19374:19374): PROCESO GAMECARD ONLINE
+[INFO] 21:34:39:876 GameCard/(19374:19374): /home/utnso/tall-grass
+[INFO] 21:34:39:876 GameCard/(19374:19374): 10
+[INFO] 21:34:39:876 GameCard/(19374:19374): 5
+[INFO] 21:34:39:876 GameCard/(19374:19374): 5
+[INFO] 21:34:39:876 GameCard/(19374:19374): 127.0.0.1
+[INFO] 21:34:39:876 GameCard/(19374:19374): 7001
+[DEBUG] 21:34:39:876 GameCard/(19374:19374): Inicializa la GameCard
+[DEBUG] 21:34:39:876 GameCard/(19374:19374): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass - 2
+[DEBUG] 21:34:39:876 GameCard/(19374:19374): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Files/ - 2
+[DEBUG] 21:34:39:876 GameCard/(19374:19374): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Blocks/ - 2
+[DEBUG] 21:34:39:876 GameCard/(19374:19374): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Metadata/ - 2
+[INFO] 21:34:39:876 GameCard/(19374:19374): 5
+[INFO] 21:34:39:876 GameCard/(19374:19374): 1024
+[INFO] 21:34:39:876 GameCard/(19374:19374): TALL_GRASS
+[DEBUG] 21:35:35:794 GameCard/(19374:19374): Proceso GameBoy Conectado
+[INFO] 21:35:38:901 GameCard/(19374:19388): N
+[INFO] 21:35:38:901 GameCard/(19374:19388): N
+[INFO] 21:35:38:901 GameCard/(19374:19388): 8
+[INFO] 21:35:38:901 GameCard/(19374:19388): 8
+[INFO] 21:35:38:901 GameCard/(19374:19388): Obtiene el array de datos
+[DEBUG] 21:35:39:529 GameCard/(19374:19388): lei la metadata
+[DEBUG] 21:35:40:778 GameCard/(19374:19388): obtuve el archivo
+[DEBUG] 21:35:47:779 GameCard/(19374:19388): Obtuve la posicion de la linea 0
+[DEBUG] 21:35:48:524 GameCard/(19374:19388): voy a sumar la cantidad
+[INFO] 21:36:54:874 GameCard/(19478:19478): PROCESO GAMECARD ONLINE
+[INFO] 21:36:54:874 GameCard/(19478:19478): /home/utnso/tall-grass
+[INFO] 21:36:54:875 GameCard/(19478:19478): 10
+[INFO] 21:36:54:875 GameCard/(19478:19478): 5
+[INFO] 21:36:54:875 GameCard/(19478:19478): 5
+[INFO] 21:36:54:875 GameCard/(19478:19478): 127.0.0.1
+[INFO] 21:36:54:875 GameCard/(19478:19478): 7001
+[DEBUG] 21:36:54:875 GameCard/(19478:19478): Inicializa la GameCard
+[DEBUG] 21:36:54:875 GameCard/(19478:19478): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass - 2
+[DEBUG] 21:36:54:875 GameCard/(19478:19478): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Files/ - 2
+[DEBUG] 21:36:54:875 GameCard/(19478:19478): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Blocks/ - 2
+[DEBUG] 21:36:54:875 GameCard/(19478:19478): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Metadata/ - 2
+[INFO] 21:36:54:875 GameCard/(19478:19478): 5
+[INFO] 21:36:54:876 GameCard/(19478:19478): 1024
+[INFO] 21:36:54:876 GameCard/(19478:19478): TALL_GRASS
+[DEBUG] 21:37:04:313 GameCard/(19478:19478): Proceso GameBoy Conectado
+[INFO] 21:37:09:358 GameCard/(19478:19498): N
+[INFO] 21:37:09:359 GameCard/(19478:19498): N
+[INFO] 21:37:09:359 GameCard/(19478:19498): 8
+[INFO] 21:37:09:360 GameCard/(19478:19498): 8
+[INFO] 21:37:09:360 GameCard/(19478:19498): Obtiene el array de datos
+[DEBUG] 21:37:10:14 GameCard/(19478:19498): lei la metadata
+[DEBUG] 21:37:11:100 GameCard/(19478:19498): obtuve el archivo
+[DEBUG] 21:37:15:798 GameCard/(19478:19498): Obtuve la posicion de la linea 0
+[DEBUG] 21:37:16:276 GameCard/(19478:19498): voy a sumar la cantidad

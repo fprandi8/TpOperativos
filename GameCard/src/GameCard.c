@@ -223,32 +223,6 @@ void GameCard_Wait_For_Message(void* variables){
 	void* brokerAddress = args->brokerAddress;
 	uint32_t queueType = ((t_args*)variables)->queueType;
 
-	char* queue;
-
-	switch (queueType) {
-
-		case NEW_POKEMON: {
-			queue =(char*)malloc(strlen("QUEUE NEW POKEMON") + 1);
-			strcpy(queue,"QUEUE NEW POKEMON");
-			break;
-		}
-
-		case GET_POKEMON:{
-			queue =(char*)malloc(strlen("QUEUE GET POKEMON") + 1);
-			strcpy(queue,"QUEUE GET POKEMON");
-			break;
-		}
-
-		case CATCH_POKEMON:{
-			queue =(char*)malloc(strlen("QUEUE CATCH POKEMON") + 1);
-			strcpy(queue,"QUEUE CATCH POKEMON");
-			break;
-		}
-
-	}
-
-	free(queue);
-
 	uint32_t type;
 	void* content = malloc(sizeof(void*));
 
@@ -264,14 +238,45 @@ void GameCard_Wait_For_Message(void* variables){
 		argsProcessMessage->brokerAddress= brokerAddress;
 
 		pthread_create(thread,NULL,(void*)GameCard_Process_Message,argsProcessMessage);
+
+		thread = (pthread_t*)malloc(sizeof(pthread_t));
+
+		pthread_create(thread,NULL,(void*)GameCard_Wait_For_Message,args);
+		pthread_detach(*thread);
+
+		pthread_exit(NULL);
+	}else
+	{
+		thread = (pthread_t*)malloc(sizeof(pthread_t));
+		switch (queueType) {
+
+			case NEW_POKEMON: {
+				pthread_create(thread,NULL,(void*)subscribeToBrokerNew,brokerAddress);
+				pthread_detach(*thread);
+
+				pthread_exit(NULL);
+				break;
+			}
+
+			case GET_POKEMON:{
+				pthread_create(thread,NULL,(void*)subscribeToBrokerGet,brokerAddress);
+				pthread_detach(*thread);
+
+				pthread_exit(NULL);
+				break;
+			}
+
+			case CATCH_POKEMON:{
+				pthread_create(thread,NULL,(void*)subscribeToBrokerCatch,brokerAddress);
+				pthread_detach(*thread);
+
+				pthread_exit(NULL);
+				break;
+			}
+
+		}
 	}
 
-	thread = (pthread_t*)malloc(sizeof(pthread_t));
-
-	pthread_create(thread,NULL,(void*)GameCard_Wait_For_Message,args);
-	pthread_detach(*thread);
-
-	pthread_exit(NULL);
 }
 
 void GameCard_Process_Message(void* variables){

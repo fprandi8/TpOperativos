@@ -65,10 +65,11 @@ typedef struct{
     sem_t mutex_message;
 }t_cachedMessage;
 
+
 /*
 	*******************GLOBAL VARIABLES*****************
 */
-t_Broker* broker;
+t_log* cache_log;
 t_CacheMemory cache;
 t_config* config;
 

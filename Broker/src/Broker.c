@@ -16,7 +16,7 @@ t_Broker* broker;
 
 int main(void) {
 
-	start_cache(broker);
+	start_cache(broker->logger);
 	t_log* logger;
 	t_config* config;
 

@@ -16,7 +16,6 @@ t_Broker* broker;
 
 int main(void) {
 
-	start_cache(broker->logger);
 	t_log* logger;
 	t_config* config;
 
@@ -34,6 +33,8 @@ int main(void) {
 	thread = (pthread_t*)malloc(sizeof(pthread_t));
 
 	logger = iniciar_logger();
+
+	start_cache(logger);
 	//log_info(logger,"PROCESO BROKER ONLINE");
 
 	config = leer_config();
@@ -86,13 +87,16 @@ void serve_client(void* variables)
 	log_info(broker->logger,"NUEVO PROCESO CONECTADO CLIENTE %d", cliente);
 
 	uint32_t type;
-	void* content = malloc(sizeof(void*));
+	void* content;
 
 	int resultado= RecievePackage(cliente,&type,&content);
 
-	if (!resultado)
+	printf("result in serve_client %d\n", resultado); //TODO REMOVE
+
+	if (resultado == 0)
+	{
 		recive_message(type, cliente, broker, content);
-	else
+	}
 		//log_debug(broker->logger,"Resultado de envio del mensaje: %d", resultado);
 
 	free(args);
@@ -126,7 +130,7 @@ void recive_message(uint32_t type, int cliente, t_Broker* broker, void* content 
 
 t_log* iniciar_logger(void)
 {
-	return log_create("Broker.log","Broker",1,LOG_LEVEL_DEBUG);
+	return log_create("Broker.log","Broker",1,LOG_LEVEL_INFO);
 }
 
 t_config* leer_config(void)

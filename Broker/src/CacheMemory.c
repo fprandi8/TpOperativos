@@ -33,6 +33,7 @@ void start_cache(t_log* log)
     sem_init(&mutex_index_finder_destroyer, 0, 1);
     sem_init(&mutex_saving, 0, 1);
 
+    nextPartitionId = 0;
 	//signal(SIGUSR1, signal_handler);
 
     t_partition* first_partition = CreateNewPartition();
@@ -136,8 +137,9 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
         return partition->id;
     }
 
-    if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC"))
+    if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") == 0)
     {
+
         int newPartitionSize = config_get_int_value(config, TAMANO_MINIMO_PARTICION);
         if(messageBuffer->bufferSize > newPartitionSize) newPartitionSize = messageBuffer->bufferSize;
 
@@ -151,6 +153,7 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
         list_add(partitions, newPartition);
 
         partition->begining += newPartitionSize;
+        partition->size = partition->size - newPartitionSize;
         partition->timestap = clock();
 
         memcpy(partition->begining, messageBuffer->stream, sizeof(messageBuffer->bufferSize));
@@ -192,7 +195,7 @@ t_partition* find_empty_partition_of_size(uint32_t size)
     int busyPartitions = GetBusyPartitionsCount();
     //If its not dynamic, we set compaction_frequency to the same as busy partitions we have
     //0 frequency does not make sense, so we de-activate compaction_frequency also on 0
-    if(compaction_frequency <= 0 || !strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC")) compaction_frequency = busyPartitions;
+    if(compaction_frequency <= 0 || strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC")) compaction_frequency = busyPartitions;
     do
     {
         if(partition == NULL)
@@ -218,7 +221,7 @@ t_partition* find_empty_partition_of_size(uint32_t size)
 
 t_partition* select_partition(uint32_t size){
 	t_partition *partition;
-    if(strcmp(config_get_string_value(config, ALGORITMO_REEMPLAZO),"FF") && strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC")){ //compare dif algoritmos
+    if(strcmp(config_get_string_value(config, ALGORITMO_REEMPLAZO),"FF") == 0 && strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") == 0){ //compare dif algoritmos
         partition = select_partition_ff(size);
     }else{
         partition = select_partition_bf(size);
@@ -333,7 +336,7 @@ void check_compact_restrictions(void){
 
 void delete_partition(void){
     t_partition* deletedPartition;
-    if(strcmp(config_get_string_value(config, ALGORITMO_REEMPLAZO),"FIFO")){ //compare dif algoritmos
+    if(strcmp(config_get_string_value(config, ALGORITMO_REEMPLAZO),"FIFO") == 0){ //compare dif algoritmos
     	deletedPartition = delete_partition_fifo();
     }else{
     	deletedPartition = delete_partition_lru();
@@ -505,7 +508,7 @@ t_list* GetAllMessagesForSuscriptor(int client, message_type queueType)
 
     bool _message_by_queue(t_cachedMessage* cachedMessage)
     {
-        if(cachedMessage->queue_type == queueType && list_find(cachedMessage->sent_to_subscribers, (void*)_contains_client) == NULL) return true; else return false;
+        if(cachedMessage->queue_type == queueType && (list_find(cachedMessage->sent_to_subscribers, (void*)_contains_client) == NULL)) return true; else return false;
     }
 
     void* _get_deli_message(t_cachedMessage* cachedMessage)
@@ -513,9 +516,11 @@ t_list* GetAllMessagesForSuscriptor(int client, message_type queueType)
     	return GetPartition(cachedMessage->partitionId)->begining;
     }
 
-    t_list* messages = list_filter(cached_messages, (void*)_message_by_queue);
+    t_list* filteredMessages = list_filter(cached_messages, (void*)_message_by_queue);
 
-    return UpdateClockOn(list_map(messages, (void*)_get_deli_message));
+    filteredMessages = UpdateClockOn(filteredMessages);
+
+    return list_map(filteredMessages, (void*)_get_deli_message);
 }
 
 void AddASentSubscriberToMessage(int messageId, int client)
@@ -592,9 +597,11 @@ void PrintDumpOfCache()
             busyStatus = "X";
             t_cachedMessage* message = GetCachedMessageInPartition(partition->id);
             char* queue = GetStringFromMessageType(message->queue_type);
-            printf("Partición %d: <%s>. [%s] Size:%db LRU:%ld Cola:%s ID:%d\n",
+          //  printf("%d", partition->id);
+           // printf("%s", *(memoryLocation));
+            printf("Partición %d: %s. [%s] Size:%db LRU:%ld Cola:%s ID:%d\n",
                 partition->id,
-				*(memoryLocation),
+				memoryLocation,
                 busyStatus,
                 partition->size,
                 partition->timestap,

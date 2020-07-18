@@ -434,9 +434,14 @@ t_list* UpdateClockOn(t_list* c_messages){
     t_cachedMessage message;
     for(index = 0; index < sizeof(c_messages); index++){
         message = list_get(c_messages, index);
-        UpdateTimestamp(message.partitionId);
+        UpdateClockOnMessage(message);
     }
     return c_messages;
+}
+
+t_cachedMessage UpdateClockOnMessage(t_cachedMessage message){
+    UpdateTimestamp(message.partitionId);
+    return message;
 }
 
 void UpdateTimestamp(uint32_t partitionId){

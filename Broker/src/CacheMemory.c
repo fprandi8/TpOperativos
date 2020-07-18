@@ -320,7 +320,7 @@ uint32_t add_occupied_size_from(t_list* occupied){
     uint32_t sum = 0;
     t_partition* partition = (t_partition*) malloc(sizeof(t_partition*));
     for (int i = 0; i < sizeof(occupied); ++i) {
-        partition = list_get(occupied, i);
+        partition = (t_partition*) list_get(occupied, i);
         sum += partition->size;
     }
     free(partition);
@@ -645,7 +645,7 @@ void check_validations_and_consolidate_PD(t_partition* freed_partition){
     t_partition* left_partition = freed_partition;
     if(freed_partition->begining != 0){
         sem_wait(&mutex_partitions);
-        left_partition = list_find(partitions, (void*)_is_left_neighbor);
+        left_partition = (t_partition*) list_find(partitions, (void*)_is_left_neighbor);
         sem_post(&mutex_partitions);
         new_size += left_partition->size;
     }
@@ -653,7 +653,7 @@ void check_validations_and_consolidate_PD(t_partition* freed_partition){
     t_partition* right_partition = freed_partition;
     if((freed_partition->begining + freed_partition->size) < cache.full_memory){
         sem_wait(&mutex_partitions);
-        right_partition = list_find(partitions, (void*)_is_right_neighbor);
+        right_partition = (t_partition*) list_find(partitions, (void*)_is_right_neighbor);
         sem_post(&mutex_partitions);
         new_size += right_partition->size;
         sem_wait(&mutex_index_finder_destroyer);
@@ -686,14 +686,14 @@ int check_validations_and_consolidate_BS(uint32_t freed_partition_id){
     bool _has_wanted_id(t_partition* partition){ return partition->id == freed_partition_id;}
 
     sem_wait(&mutex_partitions);
-    bs_freed_partition = list_find(partitions, (void*) _has_wanted_id);
+    bs_freed_partition = (t_partition*) list_find(partitions, (void*) _has_wanted_id);
     sem_post(&mutex_partitions);
         
     if(bs_freed_partition->size >= cache.memory_size)
         return -1;
 
     sem_wait(&mutex_partitions);
-    t_partition* related_partition = list_find(partitions, (void*) _is_related_partition);
+    t_partition* related_partition = (t_partition*) list_find(partitions, (void*) _is_related_partition);
     sem_post(&mutex_partitions);
         
     if(related_partition == NULL)
@@ -708,7 +708,7 @@ void find_index_in_list_and_destroy(t_partition* partition){
     sem_wait(&mutex_index_finder);
         
     sem_wait(&mutex_partitions);
-    free(list_remove(partitions, index));
+    free((t_partition*) list_remove(partitions, index));
     sem_post(&mutex_partitions);
  }
 
@@ -755,7 +755,7 @@ int consolidate(t_partition related_partition){
     }
 
     sem_wait(&mutex_partitions);
-    t_partition* parent = list_find(parent_partitions, (void*) _is_wanted_parent);
+    t_partition* parent = (t_partition*) list_find(parent_partitions, (void*) _is_wanted_parent);
     sem_post(&mutex_partitions);
 
     parent->begining = left_partition->begining;

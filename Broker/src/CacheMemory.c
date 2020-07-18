@@ -30,6 +30,7 @@ void start_cache()
     sem_init(&mutex_parent_partitions, 0, 1);
     sem_init(&mutex_index_finder, 0, 1);
     sem_init(&mutex_index_finder_destroyer, 0, 1);
+    sem_init(&mutex_saving, 0, 1);
 
 	//signal(SIGUSR1, signal_handler);
 
@@ -88,9 +89,10 @@ t_cachedMessage create_cached_from_message(deli_message message){
     new_message.id = message.id;
     new_message.corelationId = message.correlationId;
     new_message.queue_type = message.messageType;
-    new_message.sent_to_subscribers = NULL;
-    new_message.ack_by_subscribers = NULL;
+    new_message.sent_to_subscribers = list_create();
+    new_message.ack_by_subscribers_left = 0;
     new_message.partitionId = 0;
+    sem_init(&new_message.mutex_message, 0, 1);
     return new_message;
 }
 
@@ -102,11 +104,11 @@ void add_to_cached_messages(t_cachedMessage new_message){
 
 int save_message_body(void* messageContent, message_type queue){
     t_buffer* messageBuffer = SerializeMessageContent(queue, messageContent);
-	sem_wait(&mutex_partitions);
+	sem_wait(&mutex_saving);
 	t_partition* partition;
     partition = find_empty_partition_of_size(sizeof(messageBuffer->bufferSize));
     int savedPartitionId = save_body_in_partition(messageBuffer, partition, queue);
-	sem_post(&mutex_partitions);
+	sem_post(&mutex_saving);
 	return savedPartitionId;
 }
 
@@ -258,7 +260,6 @@ void compact_memory(void){
         memcpy(backUp_memory + offsetMem, partition->begining, partition->size);
         offsetMem += partition->size;
     }
-
     int offsetPointerMem = 0;
     void _reasignPartitionPointers(t_partition* partition)
     {
@@ -285,14 +286,17 @@ void compact_memory(void){
     sem_wait(&mutex_occupied_partitions);
     list_iterate(occupied_partitions, (void*)_asignPartitionOnBackUpMem);
     sem_post(&mutex_occupied_partitions);
+
     memcpy(cache.full_memory, backUp_memory, sizeof(cache.memory_size));
+
     sem_wait(&mutex_occupied_partitions);
     list_iterate(occupied_partitions, (void*)_reasignPartitionPointers);
     sem_post(&mutex_occupied_partitions);
+
     free(backUp_memory);
 
     sem_wait(&mutex_partitions);
-	list_remove_and_destroy_by_condition(partitions, (void*)_is_empty_partition, (void*)Free_CachedMessage);
+	list_remove_and_destroy_by_condition(partitions, (void*)_is_empty_partition, (void*)Free_Partition);
     sem_post(&mutex_partitions);
 
 	list_clean(partitions);
@@ -388,10 +392,13 @@ void Free_CachedMessage(t_cachedMessage* message)
         free(sendOrAck);
     }
     list_clean_and_destroy_elements(message->sent_to_subscribers, (void*)_free_sendOrAck);
-    list_clean_and_destroy_elements(message->ack_by_subscribers, (void*)_free_sendOrAck);
     free(message->sent_to_subscribers);
-    free(message->ack_by_subscribers);
     free(message);
+}
+
+void Free_Partition(t_partition* partition)
+{
+    free(partition);
 }
 
 int GetNewId()
@@ -435,7 +442,7 @@ t_list* UpdateClockOn(t_list* c_messages){
 void UpdateTimestamp(uint32_t partitionId){
     t_partition* part;
     part = GetPartition(partitionId);
-    part->timestap = clock(); 
+    part->timestap = clock();
 }
 
 //TODO ver aca clock
@@ -468,6 +475,27 @@ t_partition* GetPartition(int partitionId)
     return (t_partition*)list_find(partitions, (void*)_partition_by_id);
 }
 
+void AddASentSubscriberToMessage(int messageId, int client)
+{
+	t_cachedMessage* cachedMessage = GetCachedMessage(messageId);
+	if(cachedMessage == NULL) return;
+	sem_wait(&cachedMessage->mutex_message);
+	int* cachedClient = (int*)malloc(sizeof(int));
+	*cachedClient = client;
+	list_add(cachedMessage->sent_to_subscribers, cachedClient);
+	cachedMessage->ack_by_subscribers_left++;
+	sem_post(&cachedMessage->mutex_message);
+}
+
+void AddAcknowledgeToMessage(int messageId)
+{
+	t_cachedMessage* cachedMessage = GetCachedMessage(messageId);
+	if(cachedMessage == NULL) return;
+	sem_wait(&cachedMessage->mutex_message);
+	cachedMessage->ack_by_subscribers_left--;
+	sem_post(&cachedMessage->mutex_message);
+}
+
 //TODO ver aca clock
 void* GetMessageContent(int messageId)
 {
@@ -487,7 +515,7 @@ void PrintDumpOfCache()
 //  Particiones ocupadas:
 //      Particion <Id>: <memoryStart-MemoryEnd>. <asignada [x]>   Size:<xxxxb>  LRU:<Valor>  Cola:<COLA>   ID:<ID>
 //  Particiones libres:
-//      Particion <Id>: <memoryStart-MemoryEnd>. <libre [l]>   Size:<xxxxb> 
+//      Particion <Id>: <memoryStart-MemoryEnd>. <libre [l]>   Size:<xxxxb>
 //Fin de por cada particion
 //  -----------------------------------------------------------------------------------------------------------------------------
    time_t rawtime;

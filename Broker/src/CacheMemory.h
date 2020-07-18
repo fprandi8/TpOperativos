@@ -60,8 +60,9 @@ typedef struct{
     uint32_t corelationId;
     message_type queue_type;
     t_list* sent_to_subscribers;
-    t_list* ack_by_subscribers;
+    int ack_by_subscribers_left;
     uint32_t partitionId;
+    sem_t mutex_message;
 }t_cachedMessage;
 
 /*
@@ -84,6 +85,7 @@ sem_t mutex_parent_partitions;
 sem_t mutex_index_finder;
 sem_t mutex_index_finder_destroyer;
 sem_t mutex_occupied_partitions;
+sem_t mutex_saving;
 /*
 	********************CONTRACTS***********************
 */
@@ -128,5 +130,7 @@ void start_consolidation_for(t_partition* freed_partition);
 void check_validations_and_consolidate_PD(t_partition* freed_partition);
 int check_validations_and_consolidate_BS(uint32_t freed_partition_id);
 void find_index_in_list_and_destroy(t_partition* partition);
+void AddASentSubscriberToMessage(int messageId, int client);
+void AddAcknowledgeToMessage(int messageId);
 
 #endif /* CACHEMEMORY_H_ */

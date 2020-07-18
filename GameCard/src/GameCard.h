@@ -127,7 +127,7 @@ sem_t* get_poke_semaphore(t_dictionary*, char*);
 void create_poke_semaphore(char*);
 void destroy_poke_semaphore(char*);
 void destroy_poke_dictionary(t_dictionary*);
-int catch_a_pokemon(char*,t_file_metadata*, char*, char*);
+int catch_a_pokemon(char**,t_file_metadata*, char*, char*);
 void create_localized_message(localized_pokemon*, char*,char*, t_file_metadata*);
 
 int check_directory(char*);
@@ -151,8 +151,8 @@ int get_first_free_block();
 
 int get_string_file_position(char*,char*);
 int delete_file_line(char* , int , t_file_metadata* );
-int increase_pokemon_amount(char**, int, int, t_file_metadata*);
-int decrease_pokemon_amount(char*,int, t_file_metadata*);
+int increase_pokemon_amount(char** , int, int, t_file_metadata*);
+int decrease_pokemon_amount(char** ,int, t_file_metadata*);
 char* get_amount_of_pokemons(char*);
 void delete_block_file(t_file_metadata*);
 

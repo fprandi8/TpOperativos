@@ -9045,3 +9045,19 @@ wk¸wk¸wk¸wk
 [DEBUG] 21:37:11:100 GameCard/(19478:19498): obtuve el archivo
 [DEBUG] 21:37:15:798 GameCard/(19478:19498): Obtuve la posicion de la linea 0
 [DEBUG] 21:37:16:276 GameCard/(19478:19498): voy a sumar la cantidad
+[INFO] 00:38:29:964 GameCard/(23539:23539): PROCESO GAMECARD ONLINE
+[INFO] 00:38:29:981 GameCard/(23539:23539): /home/utnso/tall-grass
+[INFO] 00:38:29:983 GameCard/(23539:23539): 10
+[INFO] 00:38:29:984 GameCard/(23539:23539): 5
+[INFO] 00:38:29:984 GameCard/(23539:23539): 5
+[INFO] 00:38:29:984 GameCard/(23539:23539): 127.0.0.1
+[INFO] 00:38:29:984 GameCard/(23539:23539): 7001
+[DEBUG] 00:38:29:984 GameCard/(23539:23539): Inicializa la GameCard
+[DEBUG] 00:38:29:984 GameCard/(23539:23539): 1.1 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass - 2
+[DEBUG] 00:38:29:985 GameCard/(23539:23539): 1.2 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Files/ - 2
+[DEBUG] 00:38:29:988 GameCard/(23539:23539): 1.3 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Blocks/ - 2
+[DEBUG] 00:38:29:991 GameCard/(23539:23539): 1.4 Mount FS - Resultado de la creacion del directorio: /home/utnso/tall-grass/Metadata/ - 2
+[INFO] 00:38:29:991 GameCard/(23539:23539): 64
+[INFO] 00:38:29:991 GameCard/(23539:23539): 1024
+[INFO] 00:38:29:992 GameCard/(23539:23539): TALL_GRASS
+[DEBUG] 00:38:33:793 GameCard/(23539:23539): Proceso GameBoy Conectado

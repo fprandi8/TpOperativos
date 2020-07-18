@@ -56,12 +56,12 @@ int main(void) {
 	GameCard=GameCard_initialize(logger,ptoMnt,retryOperation, delayTime, retryConnection);
 	GameCard_mountFS(config);
 
-//	initBroker(&broker);
-//	readConfigBrokerValues(config,logger,&broker);
-//
-//	subs=(pthread_t*)malloc(sizeof(pthread_t)*3);
-//
-//	subscribeToBroker(broker,subs);
+	initBroker(&broker);
+	readConfigBrokerValues(config,logger,&broker);
+
+	subs=(pthread_t*)malloc(sizeof(pthread_t)*3);
+
+	subscribeToBroker(broker,subs);
 
 	config_destroy(config);
 
@@ -407,7 +407,7 @@ void* GameCard_Process_Message_Catch(deli_message* message){
 		strcat(coordinate,"-");
 		strcat(coordinate,verCoordinate);
 
-		resulCatchPokemon = catch_a_pokemon(fileContent,metadataFile,coordinate, catchPokemon->pokemonName);
+		resulCatchPokemon = catch_a_pokemon(&(fileContent),metadataFile,coordinate, catchPokemon->pokemonName);
 
 		sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,catchPokemon->pokemonName);
 		sem_wait(pokeSem);
@@ -418,9 +418,12 @@ void* GameCard_Process_Message_Catch(deli_message* message){
 		free(horCoordinate);
 		free(verCoordinate);
 		free(coordinate);
+		log_debug(GameCard->logger,"acaaaaa");
 		free(fileContent);
+		log_debug(GameCard->logger,"o aca????");
 		free(file);
 		Metadata_File_Destroy(metadataFile);
+		log_debug(GameCard->logger,"Termine que onda??");
 
 	}
 
@@ -553,35 +556,38 @@ void GameCard_Initialize_bitarray(){
 	GameCard->bitArray=aux;
 }
 
-int catch_a_pokemon(char* fileContent, t_file_metadata* metadataFile, char* coordinate, char* pokemonName){
+int catch_a_pokemon(char** fileContent, t_file_metadata* metadataFile, char* coordinate, char* pokemonName){
 	int result;
 
-	if (string_contains(fileContent,coordinate))
+	char * file = *(fileContent);
+	if (string_contains(file,coordinate))
 	{
-		int pos= get_string_file_position(fileContent,coordinate);
+		int pos= get_string_file_position(file,coordinate);
 		int resultDecreaseAmount = decrease_pokemon_amount(fileContent,pos,metadataFile);
 
 		if (resultDecreaseAmount == 0)
 		{
-			rewrite_blocks(metadataFile, fileContent);
+			char * file = *(fileContent);
+			rewrite_blocks(metadataFile, file);
 		}
 		else
 		{
+			char * file = *(fileContent);
 			delete_block_file(metadataFile);
 
 			Metadata_File_Initialize_Block(metadataFile);
 
-			char* newFile;
+			int auxSize = atoi(metadataFile->size);
 
-			newFile = remove_line_from_file(fileContent,pos,metadataFile);
+			free(metadataFile->size);
+
+			metadataFile->size =  string_itoa(auxSize - resultDecreaseAmount);
 
 			int amountOfBlocks=get_amount_of_blocks(atoi(metadataFile->size), metadataFile);
 
 			Metadata_File_Add_Blocks(metadataFile,amountOfBlocks);
 
-			write_blocks(metadataFile, newFile);
-
-			free(newFile);
+			write_blocks(metadataFile, file);
 
 			metadataFile->directory='N';
 			metadataFile->open='N';
@@ -599,8 +605,8 @@ int catch_a_pokemon(char* fileContent, t_file_metadata* metadataFile, char* coor
 
 			list_remove(values->values,1);
 			list_remove(values->values,0);
-			list_destroy(values->values);
 			free(values);
+			log_debug(GameCard->logger, "Libere los values");
 		}
 		return 0;
 	}
@@ -1375,26 +1381,64 @@ int increase_pokemon_amount(char** fileContent, int pos, int amount, t_file_meta
 	return 0;
 }
 
-int decrease_pokemon_amount(char* fileContent,int pos, t_file_metadata* metadataFile){
+int decrease_pokemon_amount(char** fileContent,int pos, t_file_metadata* metadataFile){
 
 	int index1=0;
 	int index2=0;
 
-	int updated;
+	char * file = *(fileContent);
 
-	while (fileContent[pos + index1 ] != '=') index1++;
+	log_debug(GameCard->logger, "File content \n [%s]", file);
+	log_debug(GameCard->logger, "Posicion: %d", pos);
+	while (file[pos + index1 ] != '=') index1++;
 
-	while (fileContent[pos + index2] != '\n') index2++;
+	while (file[pos + index2] != '\n') index2++;
 
-	char* line = string_substring(fileContent,pos,pos + index2+1);
+	log_debug(GameCard->logger,"valor Index2 %d ", index2);
+	char* line = (char*)malloc(index2);
+	memcpy(line,file+pos,index2+1);
+//	char* line = string_substring(file,pos,pos + index2+1);
+
+	log_debug(GameCard->logger,"Linea del archivo \n [%s]",line);
+
+	int bytes = index2+1;
+
+	int auxIntSize = atoi(metadataFile->size) - bytes;
 
 	char* stringAux= get_amount_of_pokemons(line);
 
 	int auxAmount = atoi(stringAux) - 1;
 
-
 	if (auxAmount == 0 ){
-		updated=1;
+
+		char* auxBuffer=(char*)malloc(atoi(metadataFile->size) - index2-1);
+		if (pos != 0) {
+			log_debug(GameCard->logger, " FILE: [%s]", file);
+			memcpy(auxBuffer,file,pos);
+			auxBuffer[pos]='\0';
+			log_debug(GameCard->logger, "AUX: [%s]," ,auxBuffer);
+
+			auxIntSize = auxIntSize-pos+1;
+			if(auxIntSize > 0){
+				memcpy(auxBuffer+pos-1,file+pos+bytes-1,auxIntSize);
+				auxBuffer[pos+auxIntSize]='\0';
+				log_debug(GameCard->logger, "AUX: [%s]," ,auxBuffer);
+			}
+		}
+		else
+		{
+			memcpy(auxBuffer,file+bytes,auxIntSize);
+			log_debug(GameCard->logger, "AUX: %s," ,auxBuffer);
+
+		}
+
+		free(*(fileContent));
+		*fileContent = auxBuffer;
+
+		log_debug(GameCard->logger, "Cantidad de caracteres que tiene la linea a borrar %d", bytes);
+		free(line);
+		free(stringAux);
+		return bytes;
 	}
 	else
 	{
@@ -1407,17 +1451,16 @@ int decrease_pokemon_amount(char* fileContent,int pos, t_file_metadata* metadata
 
 		for(int i=0; i<strlen(newAmount); i++)
 		{
-			fileContent[pos + index1 + 1 + i] = newAmount[i];
+			file[pos + index1 + 1 + i] = newAmount[i];
 		}
 
 		free(newAmount);
-		updated = 0;
 	}
 
 	free(line);
 	free(stringAux);
 
-	return updated;
+	return 0;
 }
 
 void delete_block_file(t_file_metadata* metadataFile){

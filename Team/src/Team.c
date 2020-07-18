@@ -29,7 +29,10 @@ int missingPokemonsCount;//TODO: Decrementar cada vez que hay un caught
 struct SchedulingAlgorithm schedulingAlgorithm;
 int alphaForSJF;
 int initialEstimatedBurst;
-
+char* RR = "RR";
+char* SJFCD = "SJF-CD";
+char* SJFSD = "SJF-SD";
+char* FIFO = "FIFO";
 
 int main(void) {
 	t_config* config;
@@ -60,7 +63,7 @@ int main(void) {
 
 	//Init de scheduler
 	initScheduler(&schedulingAlgorithm);
-	readConfigSchedulerValues(config,&schedulingAlgorithm);//TODO agregar validaciones para que sólo se acepten los algoritmos especificos
+	readConfigSchedulerValues(config,&schedulingAlgorithm);//TODO agregar validaciones para que sólo se acepten los algoritmos especificos - DONE en líne de código 657 a 661.
 
 	//Init Alpha for SJF and Initial Estimated Burst
 	alphaForSJF = readConfigAlphaValue(config);
@@ -200,13 +203,6 @@ int startServer(t_log* logger)
 	stateLists.exec = exec;
 	stateLists.exit = l_exit;
 }*/
-
-//TODO
-/*void startClosePlanning(closeScheduler,new,blocked,ready){
-	t_trainet
-	pthread_create(&(closeScheduler),NULL,(void*)startThread,(void*)trainer);
-}
-*/
 
 
 int getGlobalObjetivesCount(t_trainer* trainers, int trainersCount){
@@ -651,7 +647,11 @@ void readConfigSchedulerValues(t_config *config,struct SchedulingAlgorithm *sche
 	log_debug(logger,"3. Comienza lectura de config de scheduler");
 	if (config_has_property(config,schedulingAlgorithm->algorithmKey)){
 		schedulingAlgorithm->algorithm=config_get_string_value(config,schedulingAlgorithm->algorithmKey);
-		log_debug(logger,"3. Se leyó el algoritmo: %s",schedulingAlgorithm->algorithm);
+		if(schedulingAlgorithm->algorithm==SJFCD || schedulingAlgorithm->algorithm==FIFO || schedulingAlgorithm->algorithm==SJFSD || schedulingAlgorithm->algorithm==RR){
+			log_debug(logger,"3. Algoritmo de planificación reconocido: %s", schedulingAlgorithm->algorithm);
+		}else{
+			log_debug(logger,"3. No se reconoce el algoritmo de planificación %s", schedulingAlgorithm->algorithm);
+		}
 	}else{
 		exit(-3);
 	}
@@ -686,7 +686,7 @@ void readConfigTrainersValues(t_config *config,char*** trainersPosition,char*** 
 
 }
 
-int readConfigAlphaValue(t_config *config){//TODO: DONDE LO CARGAS?
+int readConfigAlphaValue(t_config *config){
 	if(config_has_property(config,"ALPHA")){
 		int alpha;
 		alpha=config_get_int_value(config,"ALPHA");
@@ -696,7 +696,7 @@ int readConfigAlphaValue(t_config *config){//TODO: DONDE LO CARGAS?
 	}
 }
 
-int readConfigInitialEstimatedValue(t_config* config){//TODO: DONDE LO CARGAS?
+int readConfigInitialEstimatedValue(t_config* config){
 	if(config_has_property(config,"ESTIMACION_INICIAL")){
 		int initialEstimatedBurst = config_get_int_value(config,"ESTIMACION_INICIAL");
 		return initialEstimatedBurst;
@@ -1142,12 +1142,12 @@ int getClosestTrainerBlocked(t_pokemon* pkmAvailable){
 void scheduleBydistance(int trainersCount){
 	if(getCountBlockedAvailable()+statesLists.newList.count){
 		int i,selectedMissingPokemonCount;
-		for(int pkm=0;pkm<availablePokemons.count;pkm++){//TODO:agregar corte. encontre missing
+		for(int pkm=0;pkm<availablePokemons.count;pkm++){
 			for(i=0; (i<missingPokemonsCount); i++){
 				selectedMissingPokemonCount = 0;
 				if(availablePokemons.pokemons[pkm].name == missingPkms[i].pokemon.name){
 					selectedMissingPokemonCount = missingPkms[i].count;
-					if(statesLists.readyList.count+getCountBlockedWaiting()+statesLists.execTrainer.boolean < missingPokemonsCount){//TODO: 4 ready+1exec+ X blocked (Catch)       5 missingpokemon
+					if(statesLists.readyList.count+getCountBlockedWaiting()+statesLists.execTrainer.boolean < missingPokemonsCount){
 
 						if(statesLists.execTrainer.trainer.parameters.scheduledPokemon.name==availablePokemons.pokemons[pkm].name){
 							selectedMissingPokemonCount--;
@@ -1213,7 +1213,7 @@ void scheduleRR(){
 	}
 }
 
-//TODO - DONE Si mando a EXEC un entrenador que no está en la primer posición, la lista de ready se va a actualizar mal. VER como hacer esto.
+
 void scheduleSJFSD(){
 		if(statesLists.readyList.count  && statesLists.execTrainer.boolean==0){
 			int pos=getTrainerWithBestEstimatedBurst();
@@ -1240,7 +1240,7 @@ void scheduleSJFSD(){
 		}
 }
 
-//TODO
+
 void scheduleSJFCD(){
 	if(statesLists.readyList.count  && statesLists.execTrainer.boolean==0){
 		int pos = getTrainerWithBestEstimatedBurst();
@@ -1322,28 +1322,29 @@ int executeClock(){
 //TODO - Función que mueve al entrenador - Falta ver como implementaremos los semáforos
 void moveTrainerToObjective(t_trainer* trainer){
 
-	//t_trainerParameters* trainerToMove;
-	//trainerToMove = *trainer;
 	int difference_x = calculateDifference(trainer->parameters.position.x, trainer->parameters.scheduledPokemon.position.x);
 	int difference_y = calculateDifference(trainer->parameters.position.y, trainer->parameters.scheduledPokemon.position.y);
-	//TODO:meter semáforos acá
 	moveTrainerToTarget(trainer, difference_x, difference_y);
-	//fin semáforos;
+
 }
 
 //TODO - funcion que mueve una posición al entrenador - Falta Definir como haremos el CATCH
 void moveTrainerToTarget(t_trainer* trainer, int distanceToMoveInX, int distanceToMoveInY){
 	if(distanceToMoveInX > 0){
 		trainer->parameters.position.x++;
+		log_debug(logger,"Se movió al entrenador a la posición %d %d", trainer->parameters.position.x, trainer->parameters.position.y);
 	}
 	else if(distanceToMoveInX < 0){
 		trainer->parameters.position.x--;
+		log_debug(logger,"Se movió al entrenador a la posición %d %d", trainer->parameters.position.x, trainer->parameters.position.y);
 	}
 	else if(distanceToMoveInY > 0){
 		trainer->parameters.position.y++;
+		log_debug(logger,"Se movió al entrenador a la posición %d %d", trainer->parameters.position.x, trainer->parameters.position.y);
 	}
 	else if(distanceToMoveInY < 0){
 		trainer->parameters.position.y--;
+		log_debug(logger,"Se movió al entrenador a la posición %d %d", trainer->parameters.position.x, trainer->parameters.position.y);
 	}
 
 }

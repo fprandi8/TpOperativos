@@ -855,7 +855,7 @@ void initBurstScheduledPokemon(){
 
 void initTrainerName(){
 	for(int trainer = 0; trainer < statesLists.newList.count; trainer++){
-		statesLists.newList.trainerList[trainer].id=trainer;
+		statesLists.readyList.trainerList[trainer].id =  trainer;
 	}
 }
 

@@ -27,6 +27,7 @@ int main(void) {
 //	char* tam_men, tam_min_part, algo_mem, algo_reem, algo_part, frec_comp;
 
 	signal(SIGINT,signaltHandler);
+	signal(SIGUSR1,cacheSigHandler);
 
 	pthread_t* thread;
 
@@ -428,6 +429,11 @@ void signaltHandler(int sig_num){
 	log_debug(broker->logger, "SE INTERRUMPIO EL PROCESO");
 	broker_destroy(broker);
 	exit(-5);
+}
+
+void cacheSigHandler(int sig_num)
+{
+	PrintDumpOfCache();
 }
 
 

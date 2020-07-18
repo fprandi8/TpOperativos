@@ -187,18 +187,49 @@ t_queue_handler* broker_get_specific_Queue(t_Broker broker, message_type queueTy
 }
 
 
-void broker_suscribe_process(void* buffer, int cliente, t_Broker* broker){
+void broker_suscribe_process(void* buffer, int cliente, t_Broker* broker)
+{
+	message_type* queueType = (message_type*)buffer;
 
-	message_type* QueueType = (message_type*)buffer;
-
-	t_queue_handler* queueToSuscribe = broker_get_specific_Queue(*(broker), *QueueType);
+	t_queue_handler* queueToSuscribe = broker_get_specific_Queue(*(broker), *queueType);
 
 	if (queueToSuscribe != NULL){
 		t_suscriptor* aux= (t_suscriptor*)malloc(sizeof(t_suscriptor));
 		aux->suscripted = cliente;
 		list_add(queueToSuscribe->suscriptors,aux);
-		log_info(broker->logger,"NUEVA SUSCRIPCIÓN AL BROKER QUEUE: %d", *QueueType);
+		log_info(broker->logger,"NUEVA SUSCRIPCIÓN AL BROKER QUEUE: %d", *queueType);
 		//TODO: agregar logica para enviar los mensajes cacheados al subscriptor - generar hilos para enviar cada mensaje al nuevo suscriptor (con todo lo que conlleva)
+
+		//GetAllMessagesFromQueue that were not sent to him:
+		t_list* messagesToSend = GetAllMessagesForSuscriptor(cliente,*queueType);
+
+		if(!list_is_empty(messagesToSend))
+		{
+			pthread_t* thread;
+			thread = (pthread_t*)malloc(sizeof(pthread_t));
+
+			int index = 0;
+
+			while(list_get(messagesToSend, index) != NULL)
+			{
+				deli_message* message = (deli_message*)list_get(messagesToSend, index);
+
+				log_debug(broker->logger, "Envio mensaje al suscriptor: %d", cliente);
+
+				t_args_queue* args= (t_args_queue*) malloc (sizeof(t_args_queue));
+				args->message = message;
+				args->queue = queueToSuscribe;
+				args->broker = broker;
+				args->cliente = cliente;
+
+				pthread_create(thread,NULL,(void*)queue_handler_send_message,args);
+				pthread_detach(*thread);
+
+				index++;
+			}
+
+		}
+
 	}
 
 }
@@ -244,10 +275,6 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 
 	thread = (pthread_t*)malloc(sizeof(pthread_t));
 
-	t_args_queue* args= (t_args_queue*) malloc (sizeof(t_args_queue));
-	args->message =message;
-	args->queue = queue;
-	args->broker = broker;
 
 	int index = 0;
 
@@ -259,6 +286,10 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 
 		log_debug(broker->logger, "Envio mensaje al suscriptor: %d", suscriptor->suscripted);
 
+		t_args_queue* args= (t_args_queue*) malloc (sizeof(t_args_queue));
+		args->message =message;
+		args->queue = queue;
+		args->broker = broker;
 		args->cliente = suscriptor->suscripted;
 
 		pthread_create(thread,NULL,(void*)queue_handler_send_message,args);

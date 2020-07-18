@@ -430,11 +430,14 @@ t_list* GetMessagesFromQueue(message_type type)
     return UpdateClockOn(list_filter(cached_messages, (void*)_message_by_queue));
 }
 
-t_list* UpdateClockOn(t_list* c_messages){
-    t_cachedMessage message;
-    for(index = 0; index < sizeof(c_messages); index++){
-        message = list_get(c_messages, index);
-        UpdateClockOnMessage(message);
+
+t_list* UpdateClockOn(t_list* c_messages)
+{
+    t_cachedMessage* message;
+    for(int index = 0; index < sizeof(c_messages); index++)
+    {
+        message = (t_cachedMessage*)list_get(c_messages, index);
+        UpdateTimestamp(message->partitionId);
     }
     return c_messages;
 }
@@ -444,7 +447,8 @@ t_cachedMessage UpdateClockOnMessage(t_cachedMessage message){
     return message;
 }
 
-void UpdateTimestamp(uint32_t partitionId){
+void UpdateTimestamp(uint32_t partitionId)
+{
     t_partition* part;
     part = GetPartition(partitionId);
     part->timestap = clock();
@@ -478,6 +482,28 @@ t_partition* GetPartition(int partitionId)
         if(partition->id == partitionId) return true; else return false;
     }
     return (t_partition*)list_find(partitions, (void*)_partition_by_id);
+}
+
+t_list* GetAllMessagesForSuscriptor(int client, message_type queueType)
+{
+	bool _contains_client(int* id)
+	{
+		if(id == client) return true; else return false;
+	}
+
+    bool _message_by_queue(t_cachedMessage* cachedMessage)
+    {
+        if(cachedMessage->queue_type == queueType && list_find(cachedMessage->sent_to_subscribers, (void*)_contains_client) == NULL) return true; else return false;
+    }
+
+    void* _get_deli_message(t_cachedMessage* cachedMessage)
+    {
+    	return GetPartition(cachedMessage->partitionId)->begining;
+    }
+
+    t_list* list_map(t_list*, void*(*transformer)(void*));
+
+    return UpdateClockOn(list_filter(cached_messages, (void*)_message_by_queue));
 }
 
 void AddASentSubscriberToMessage(int messageId, int client)

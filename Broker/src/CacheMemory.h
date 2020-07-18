@@ -132,5 +132,10 @@ int check_validations_and_consolidate_BS(uint32_t freed_partition_id);
 void find_index_in_list_and_destroy(t_partition* partition);
 void AddASentSubscriberToMessage(int messageId, int client);
 void AddAcknowledgeToMessage(int messageId);
+t_list* GetAllMessagesForSuscriptor(int client, message_type queueType);
+void Free_Partition(t_partition* partition);
+t_list* UpdateClockOn(t_list* c_messages);
+t_partition* GetPartition(int partitionId);
+void UpdateTimestamp(uint32_t partitionId);
 
 #endif /* CACHEMEMORY_H_ */

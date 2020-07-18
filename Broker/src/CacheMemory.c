@@ -51,6 +51,10 @@ void start_cache()
 		first_partition->size = (int)pow(2, powerOfTwo);
 	}
 
+	sem_wait(&mutex_cached_messages);
+    cached_messages = list_create();
+	sem_post(&mutex_cached_messages);
+
 
 	sem_wait(&mutex_partitions);
 	partitions = list_create();
@@ -77,28 +81,31 @@ void set_full_memory(void){
     cache.full_memory = (char*) malloc(cache.memory_size * sizeof(char));
 }
 
-void save_message(deli_message message){
-    t_cachedMessage new_message = create_cached_from_message(message);
-    new_message.partitionId = save_message_body(message.messageContent, message.messageType);
+void save_message(deli_message message)
+{
+    t_cachedMessage* new_message = create_cached_from_message(message);
+    new_message->partitionId = save_message_body(message.messageContent, message.messageType);
     add_to_cached_messages(new_message);
 
 }
 
-t_cachedMessage create_cached_from_message(deli_message message){
-    t_cachedMessage new_message;
-    new_message.id = message.id;
-    new_message.corelationId = message.correlationId;
-    new_message.queue_type = message.messageType;
-    new_message.sent_to_subscribers = list_create();
-    new_message.ack_by_subscribers_left = 0;
-    new_message.partitionId = 0;
-    sem_init(&new_message.mutex_message, 0, 1);
+t_cachedMessage* create_cached_from_message(deli_message message)
+{
+    t_cachedMessage* new_message = (t_cachedMessage*)malloc(sizeof(t_cachedMessage));
+    new_message->id = message.id;
+    new_message->corelationId = message.correlationId;
+    new_message->queue_type = message.messageType;
+    new_message->sent_to_subscribers = list_create();
+    new_message->ack_by_subscribers_left = 0;
+    new_message->partitionId = 0;
+    sem_init(&new_message->mutex_message, 0, 1);
     return new_message;
 }
 
-void add_to_cached_messages(t_cachedMessage new_message){
+void add_to_cached_messages(t_cachedMessage* new_message)
+{
 	sem_wait(&mutex_cached_messages);
-    list_add(cached_messages, &new_message);
+    list_add(cached_messages, new_message);
 	sem_post(&mutex_cached_messages);
 }
 
@@ -434,7 +441,7 @@ t_list* GetMessagesFromQueue(message_type type)
 t_list* UpdateClockOn(t_list* c_messages)
 {
     t_cachedMessage* message;
-    for(int index = 0; index < sizeof(c_messages); index++)
+    for(int index = 0; index < list_size(c_messages); index++)
     {
         message = (t_cachedMessage*)list_get(c_messages, index);
         UpdateClockOnMessage(message);
@@ -488,7 +495,7 @@ t_list* GetAllMessagesForSuscriptor(int client, message_type queueType)
 {
 	bool _contains_client(int* id)
 	{
-		if(id == client) return true; else return false;
+		if(*id == client) return true; else return false;
 	}
 
     bool _message_by_queue(t_cachedMessage* cachedMessage)
@@ -501,9 +508,9 @@ t_list* GetAllMessagesForSuscriptor(int client, message_type queueType)
     	return GetPartition(cachedMessage->partitionId)->begining;
     }
 
-    t_list* list_map(t_list*, void*(*transformer)(void*));
+    t_list* messages = list_filter(cached_messages, (void*)_message_by_queue);
 
-    return UpdateClockOn(list_filter(cached_messages, (void*)_message_by_queue));
+    return UpdateClockOn(list_map(messages, (void*)_get_deli_message));
 }
 
 void AddASentSubscriberToMessage(int messageId, int client)

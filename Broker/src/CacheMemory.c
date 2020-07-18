@@ -314,12 +314,12 @@ uint32_t add_occupied_size_from(t_list* occupied){
 }
 
 void check_compact_restrictions(void){
-    //TODO
+    //TODO if needed
 }
 
 void delete_partition(void){
     t_partition* deletedPartition;
-    if(strcmp(config_get_string_value(config, ALGORITMO_REEMPLAZO),"FIFO")){//compare dif algoritmos
+    if(strcmp(config_get_string_value(config, ALGORITMO_REEMPLAZO),"FIFO")){ //compare dif algoritmos
     	deletedPartition = delete_partition_fifo();
     }else{
     	deletedPartition = delete_partition_lru();
@@ -413,16 +413,32 @@ t_partition* CreateNewPartition()
     return partition;
 }
 
-
+//TODO ver aca clock
 t_list* GetMessagesFromQueue(message_type type)
 {
     bool _message_by_queue(t_cachedMessage* message)
     {
         if(message->queue_type == type) return true; else return false;
     }
-    return list_filter(cached_messages, (void*)_message_by_queue);
+    return UpdateClockOn(list_filter(cached_messages, (void*)_message_by_queue));
 }
 
+t_list* UpdateClockOn(t_list* c_messages){
+    t_cachedMessage message;
+    for(index = 0; index < sizeof(c_messages); index++){
+        message = list_get(c_messages, index);
+        UpdateTimestamp(message.partitionId);
+    }
+    return c_messages;
+}
+
+void UpdateTimestamp(uint32_t partitionId){
+    t_partition* part;
+    part = GetPartition(partitionId);
+    part->timestap = clock(); 
+}
+
+//TODO ver aca clock
 t_cachedMessage* GetCachedMessage(int messageId)
 {
     bool _message_by_id(t_cachedMessage* message)
@@ -432,6 +448,7 @@ t_cachedMessage* GetCachedMessage(int messageId)
     return (t_cachedMessage*)list_find(cached_messages, (void*)_message_by_id);
 }
 
+//TODO ver aca clock
 t_cachedMessage* GetCachedMessageInPartition(int partitionId)
 {
     bool _message_by_partition_id(t_cachedMessage* message)
@@ -441,6 +458,7 @@ t_cachedMessage* GetCachedMessageInPartition(int partitionId)
     return (t_cachedMessage*)list_find(cached_messages, (void*)_message_by_partition_id);
 }
 
+//TODO ver aca clock
 t_partition* GetPartition(int partitionId)
 {
     bool _partition_by_id(t_partition* partition)
@@ -450,6 +468,7 @@ t_partition* GetPartition(int partitionId)
     return (t_partition*)list_find(partitions, (void*)_partition_by_id);
 }
 
+//TODO ver aca clock
 void* GetMessageContent(int messageId)
 {
     t_cachedMessage* message = GetCachedMessage(messageId);
@@ -465,7 +484,10 @@ void PrintDumpOfCache()
 //  -----------------------------------------------------------------------------------------------------------------------------
 //  Dump: dd/mm/yy hh:mm:ss
 //Por cada particion:
-//  Particion <Id>: <memoryStart-MemoryEnd>. <asignada [x] o libre [l]>   Size:<xxxxb>  LRU:<Valor>  Cola:<COLA>   ID:<ID>
+//  Particiones ocupadas:
+//      Particion <Id>: <memoryStart-MemoryEnd>. <asignada [x]>   Size:<xxxxb>  LRU:<Valor>  Cola:<COLA>   ID:<ID>
+//  Particiones libres:
+//      Particion <Id>: <memoryStart-MemoryEnd>. <libre [l]>   Size:<xxxxb> 
 //Fin de por cada particion
 //  -----------------------------------------------------------------------------------------------------------------------------
    time_t rawtime;

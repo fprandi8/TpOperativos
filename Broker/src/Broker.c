@@ -236,11 +236,7 @@ void broker_process_message(void* buffer, int cliente, t_Broker* broker){
 
 void queue_handler_process_message(t_queue_handler* queue, deli_message* message, t_Broker* broker){
 
-	//TODO lógica de cada mensaje, guardar en cache
-	save_message(message);
-
-	//TODO estructura para administrar mensajes, a quienes se enviaron si fueron recibidos
-
+	save_message(*message);
 
 	log_info(broker->logger,"NUEVO MENSAJE PARA LA QUEUE: %d", queue->type);
 
@@ -248,39 +244,28 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 
 	thread = (pthread_t*)malloc(sizeof(pthread_t));
 
-	//TODO La cache tiene que guardar el mensaje
-	//queue_push(queue->queue,message->messageContent);
-
-
-	t_message_administrator* messageAdmnistrator = message_administrator_initialize(message->id);
-
-	list_add(queue->messagesAdministrator,messageAdmnistrator);
-
 	t_args_queue* args= (t_args_queue*) malloc (sizeof(t_args_queue));
-	args->messageAdministrator = (t_message_administrator*) malloc(sizeof(t_message_administrator));
 	args->message =message;
 	args->queue = queue;
 	args->broker = broker;
 
 	int index = 0;
 
-	t_suscriptor* suscriptor = (t_suscriptor*) malloc (sizeof(t_suscriptor));
+	t_suscriptor* suscriptor;
 
-	while(list_get(queue->suscriptors, index) != NULL){
-		suscriptor=(t_suscriptor*)list_get(queue->suscriptors, index);
+	while(list_get(queue->suscriptors, index) != NULL)
+	{
+		suscriptor = (t_suscriptor*)list_get(queue->suscriptors, index);
+
 		log_debug(broker->logger, "Envio mensaje al suscriptor: %d", suscriptor->suscripted);
-		t_message_administrator* messageAdministrator = messege_administrator_get_administrator(queue->messagesAdministrator, message->id);
-		message_administrator_pending_acknowledge(messageAdministrator);
 
 		args->cliente = suscriptor->suscripted;
-		args->messageAdministrator = messageAdmnistrator;
 
 		pthread_create(thread,NULL,(void*)queue_handler_send_message,args);
 		pthread_detach(*thread);
 
-		index ++;
+		index++;
 	}
-	free(suscriptor);
 
 }
 
@@ -288,60 +273,46 @@ void queue_handler_send_message(void* args){
 
 	t_queue_handler* queue =((t_args_queue*)args)->queue;
 	deli_message* message= ((t_args_queue*)args)->message;
-	t_message_administrator* messageAdministrator = ((t_args_queue*)args)->messageAdministrator;
 	int client = ((t_args_queue*)args)->cliente;
 
-	switch (message->messageType) {
-
-		case NEW_POKEMON:
-
-			puts("new pokemon");
-			break;
-
-		case LOCALIZED_POKEMON:
-			puts("localized pokemon");
-			break;
-
-		case GET_POKEMON:
-			puts("get pokemon");
-			break;
-
-		case APPEARED_POKEMON:
-			puts("appeared pokemon");
-			break;
-
-		case CATCH_POKEMON:
-			puts("catch pokemon");
-			break;
-
-		case CAUGHT_POKEMON:
-			puts("caught pokemon");
-			break;
-	}
+	//Print in console the message type
+	puts(GetStringFromMessageType(message->messageType));
 
 	int result = SendMessage(*message,client);
 	log_debug(broker->logger, "SE ENVIO EL MENSAJE AL CLIENTE %d", client);
 	log_debug(broker->logger, "RESULTADO DEL ENVIO: %d", result);
-	uint32_t op_code;
-	void* content =malloc(sizeof(void*));
 
-	if (!result){
+	//TODO re-intentar, quiza tambien checkquear que el cliente siga ahi
+
+	AddASentSubscriberToMessage(message->id, client);
+
+	if (!result)
+	{
 		log_debug(broker->logger,"ESPERA EN ACKNOWLEDGE");
+		uint32_t op_code;
+		void* content;
 		result = RecievePackage(client,&op_code,&content);
 		log_debug(broker->logger,"RESULTADO DEL ACKNOWLEDGE: %d", result);
-		if (op_code == ACKNOWLEDGE ){
-			message_administrator_receive_acknowledge(messageAdministrator);
-			if (messageAdministrator->amountPendingAcknowledge == 0){
-				//TODO: logica de la cache para eliminar el mensaje
-				log_debug(broker->logger,"TODOS LOS SUSCRIPTORES RECIBIERON EL MENSAJE; SE ELIMINA");
-				//void* element = queue_pop(queue->queue);
-				//free(element);
+
+		if (op_code == ACKNOWLEDGE )
+		{
+			if(*(int*)content == message->id)
+			{
+				AddAcknowledgeToMessage(message->id);
 			}
+			free((int*)content);
+		}
+		else if(op_code == MESSAGE)
+		{
+			log_debug(broker->logger,"SE RECIBIO UN MESSAGE CUANDO SE ESPERABA UN ACKNOWLEDGE", result);
+			Free_deli_message((deli_message*)content);
+		}
+		else
+		{
+			log_debug(broker->logger,"SE RECIBIO UNA SOLICITUD DE SUSCRIPCION CUANDO SE ESPERABA UN ACKNOWLEDGE", result);
+			free((message_type*)content);
 		}
 	}
-
-	free(content);
-	free(messageAdministrator);
 	free(args);
 }
 

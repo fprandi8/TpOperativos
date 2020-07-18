@@ -145,6 +145,10 @@ struct t_stateLists
 
 } statesLists;
 
+typedef struct t_list_of_objectives{
+	t_pokemon* pokemon;
+	uint32_t* bit;
+} t_list_of_objectives_validation;
 
 
 void createConfig(t_config**);

@@ -186,7 +186,7 @@ void startTrainers(int,t_config*);
 void startTrainer(t_trainer*);
 void startThread(t_trainer*);
 void missingPokemons(t_trainer*, int);
-void subscribeToBroker(pthread_t*);
+void subscribeToBroker();
 void* subscribeToBrokerLocalized();
 void* subscribeToBrokerAppeared();
 void* subscribeToBrokerCaught();

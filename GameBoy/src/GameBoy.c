@@ -16,9 +16,13 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
-#include<commons/string.h>
-#include<commons/config.h>
-#include<readline/readline.h>
+#include <commons/string.h>
+#include <commons/config.h>
+#include <commons/log.h>
+#include <readline/readline.h>
+#include <pthread.h>
+#include <poll.h>
+#include <unistd.h>
 
 typedef enum
 {
@@ -38,18 +42,26 @@ struct Broker
 
 void initBroker(struct Broker*);
 void readConfigBrokerValues(t_config*,struct Broker*);
+void SleepAndClose(void* args);
+void GetKeysFor(t_reciever reciever, char* keys[]);
+void ReadConfigValues(t_config *config, char* keys[]);
+void RecieveAcknowledge(int server_socket);
+void RecieveMessage(int server_socket, message_type expectedType, t_log* logger);
+void LogConectedTo(t_log* logger, t_reciever reciver);
+void LogSubscribedTo(t_log* logger, message_type type);
+void LogMessage(t_log* logger, deli_message* message);
 
 int main(int argc, char **argv) {
-	puts("GameBoy (Publicador)"); /* prints GameBoy (Publicador) */
+	puts("GameBoy (Publicador)\n");
 
-
+/*
 	for(int i = 0; i < argc; i++)
 	{
 		printf("%s\n",argv[i]);
 	}
 	printf("-------\n");
 	printf("%i\n",argc);
-	puts("////////////\n\n");
+	puts("////////////\n\n");*/
 	// TODO check if config file is exists and is valid
 
 
@@ -63,6 +75,7 @@ int main(int argc, char **argv) {
 	//Check if reciever is valid
 	t_reciever reciver;
 	message_type messageType;
+	int subscriptionTime = 0; //Time used to control suscription disconnection
 
 	if(strcmp(argv[1], "BROKER") == 0){
 		reciver = BROKER;
@@ -107,7 +120,7 @@ int main(int argc, char **argv) {
 			return 1;
 		}
 
-	}else if(strcmp(argv[1],"GAMECARD")) {
+	}else if(strcmp(argv[1],"GAMECARD") == 0) {
 		reciver = GAMECARD;
 		if(strcmp(argv[2], "NEW_POKEMON") == 0){
 					if(argc == 8){
@@ -136,7 +149,7 @@ int main(int argc, char **argv) {
 					return 1;
 				}
 	}
-	else if(strcmp(argv[1],"TEAM")) {
+	else if(strcmp(argv[1],"TEAM") == 0) {
 		reciver = TEAM;
 		if(strcmp(argv[2], "APPEARED_POKEMON") == 0){
 			if(argc == 6){
@@ -150,7 +163,7 @@ int main(int argc, char **argv) {
 			printf("Incorrect message, for TEAM must be APPEARED_POKEMON \n");
 			return 1;
 		}
-	}else if(strcmp(argv[1],"SUSCRIPTOR")) {
+	}else if(strcmp(argv[1],"SUSCRIPTOR") == 0) {
 		reciver = SUSCRIPTOR;
 		if(argc == 4){
 			if(strcmp(argv[2], "NEW_POKEMON") == 0){
@@ -169,6 +182,9 @@ int main(int argc, char **argv) {
 				printf("Incorrect message, for SUSCRIPTOR must be GET_POKEMON, CAUGHT_POKEMON, CATCH_POKEMON, NEW POKEMON, APPEARED_POKEMON, LOCALIZED_POKEMON \n");
 				return 1;
 			}
+			char* ptr;
+			subscriptionTime = strtol(argv[3], &ptr, 10);
+			printf("%d\n",subscriptionTime);
 		}else{
 
 			printf("Incorrect number of parameters for function SUSCRIPTOR, must be 3\n");
@@ -181,36 +197,17 @@ int main(int argc, char **argv) {
 		return 1;
 	}
 
-	/*char* pokemonName = argv[3];
-	printf("%s \n",pokemonName);
-	int numberOfIntegerArguments = argc-4;
-	printf("%i \n",numberOfIntegerArguments);
-	int* messageIntegerArguments = (int*)malloc(sizeof(int)*numberOfIntegerArguments);
-	for(int i = 4, u = 0; u < numberOfIntegerArguments; i++, u++)
-	{
-		int argument = atoi(argv[i]);
-		if(strcmp(argv[i], "0") != 0 && argument == 0)
-		{
-			printf("Invalid Input\n");
-			return 1;
-		}
-		messageIntegerArguments[u] = argument;
-	}*/
+	//Create logger
+	t_log* logger;
+	logger = log_create("Broker.log","Broker",0,LOG_LEVEL_INFO);
 
 
 	//Get IP from config
 	t_config* config = config_create("gameboy.config");
-	initBroker(&broker);
-	readConfigBrokerValues(config,&broker);
 
-	/*char* brokerIp = config_get_string_value(config, "IP_BROKER");
-	char* teamIp = config_get_string_value(config, "IP_TEAM");
-	char* gameCardIp = config_get_string_value(config, "IP_GAMECARD");
-
-	char* brokerPort = config_get_string_value(config, "PUERTO_BROKER");
-	char* teamPort = config_get_string_value(config, "PUERTO_TEAM");
-	char* gameCardPort = config_get_string_value(config, "PUERTO_GAMECARD");
-*/
+	char* keys[2];
+	GetKeysFor(reciver, keys);
+	ReadConfigValues(config, keys);
 
 	struct addrinfo hints;
 	struct addrinfo *server_info;
@@ -220,33 +217,84 @@ int main(int argc, char **argv) {
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 
-	getaddrinfo(broker.ip, broker.port, &hints, &server_info);
+	getaddrinfo(keys[0], keys[1], &hints, &server_info);
 
 	int server_socket = socket(server_info->ai_family, server_info->ai_socktype, server_info->ai_protocol);
 
-	//Connect
 	int result = connect(server_socket, server_info->ai_addr, server_info->ai_addrlen);
 
 	if(result == -1)
 	{
-		printf("Could not connect");
+		printf("Could not connect\n");
 		return -1;
 	}
 
 	free(server_info);
 
+	printf("Connected\n");
 
+	LogConectedTo(logger, reciver);
 
 	//////////////////////// ENVIAR ////////////////////////////////
 
-	//TODO Create message as requested and send
+	if(reciver == SUSCRIPTOR)
+	{
+		int subResult = SendSubscriptionRequest(messageType, server_socket);
+
+		if(subResult != 0)
+		{
+			printf("Failed to subscribe\n");
+			return -1;
+		}
+
+		LogSubscribedTo(logger, messageType);
+
+		pthread_t* thread;
+		thread = (pthread_t*)malloc(sizeof(pthread_t));
+
+		int args[] = {server_socket, subscriptionTime};
+
+		pthread_create(thread,NULL,(void*)SleepAndClose,args);
+		pthread_detach(*thread);
+
+		int isRunning  = 1;
+
+		struct pollfd pfds[1]; // More if you want to monitor more
+
+		pfds[0].fd = server_socket;
+		pfds[0].events = POLLIN | POLLHUP; // Tell me when ready to read
+
+		while(isRunning)
+		{
+			 int num_events = poll(pfds, 1, subscriptionTime);
+			 if (num_events == 0)
+			 {
+			    continue;
+			 }
+			 else
+			 {
+				 int pollin_happened = pfds[0].revents & POLLIN;
+
+				 if (pollin_happened)
+				 {
+					 RecieveMessage(server_socket, messageType, logger);
+				 }
+				 else
+				 {
+					 printf("Exit after %d seconds", subscriptionTime);
+					 return EXIT_SUCCESS;
+				 }
+			 }
+		}
+
+
+	}
 
 
 	deli_message deliMessage;
 	deliMessage.messageType = messageType;
 	void* message = NULL;
-	//For the message, try to create the message
-
+	char* ptr_strtol; //pinter to char ised for strtol
 
 	switch(reciver){
 		case BROKER:
@@ -256,9 +304,9 @@ int main(int argc, char **argv) {
 					{
 						new_pokemon new;
 						new.pokemonName = argv[3];
-						new.horizontalCoordinate = argv[4];
-						new.verticalCoordinate = argv[5];
-						new.ammount = argv[6];
+						new.horizontalCoordinate = strtol(argv[4], &ptr_strtol, 10);
+						new.verticalCoordinate = strtol(argv[5], &ptr_strtol, 10);;
+						new.ammount = strtol(argv[6], &ptr_strtol, 10);;
 						message = &new;
 						deliMessage.messageContent = message;
 						deliMessage.id = 0;
@@ -269,20 +317,20 @@ int main(int argc, char **argv) {
 					{
 						appeared_pokemon app;
 						app.pokemonName=argv[3];
-						app.horizontalCoordinate = argv[4];
-						app.verticalCoordinate = argv[5];
+						app.horizontalCoordinate = strtol(argv[4], &ptr_strtol, 10);;
+						app.verticalCoordinate = strtol(argv[5], &ptr_strtol, 10);;
 						message = &app;
 						deliMessage.messageContent = message;
 						deliMessage.id = 0;
-						deliMessage.correlationId = argv[6];
+						deliMessage.correlationId = strtol(argv[6], &ptr_strtol, 10);;
 						break;
 					}
 					case CATCH_POKEMON:
 					{
 						catch_pokemon cat;
 						cat.pokemonName = argv[3];
-						cat.horizontalCoordinate = argv[4];
-						cat.verticalCoordinate = argv[5];
+						cat.horizontalCoordinate = strtol(argv[4], &ptr_strtol, 10);;
+						cat.verticalCoordinate = strtol(argv[5], &ptr_strtol, 10);;
 						message = &cat;
 						deliMessage.messageContent = message;
 						deliMessage.id = 0;
@@ -292,11 +340,11 @@ int main(int argc, char **argv) {
 					case CAUGHT_POKEMON:
 					{
 						caught_pokemon cau;
-						cau.caught = argv[4];
+						cau.caught = strtol(argv[4], &ptr_strtol, 10);;
 						message = &cau;
 						deliMessage.messageContent = message;
 						deliMessage.id = 0;
-						deliMessage.correlationId = argv[3];
+						deliMessage.correlationId = strtol(argv[3], &ptr_strtol, 10);;
 						break;
 					}
 					case GET_POKEMON:
@@ -323,8 +371,8 @@ int main(int argc, char **argv) {
 					{
 						appeared_pokemon app;
 						app.pokemonName = argv[3];
-						app.horizontalCoordinate = argv[4];
-						app.verticalCoordinate = argv[5];
+						app.horizontalCoordinate = strtol(argv[4], &ptr_strtol, 10);;
+						app.verticalCoordinate = strtol(argv[5], &ptr_strtol, 10);;
 						message = &app;
 						deliMessage.messageContent = message;
 						deliMessage.id = 0;
@@ -345,12 +393,12 @@ int main(int argc, char **argv) {
 					{
 						new_pokemon new;
 						new.pokemonName = argv[3];
-						new.horizontalCoordinate = argv[4];
-						new.verticalCoordinate = argv[5];
-						new.ammount = argv[6];
+						new.horizontalCoordinate = strtol(argv[4], &ptr_strtol, 10);;
+						new.verticalCoordinate = strtol(argv[5], &ptr_strtol, 10);;
+						new.ammount = strtol(argv[6], &ptr_strtol, 10);;
 						message = &new;
 						deliMessage.messageContent = message;
-						deliMessage.id = argv[7];
+						deliMessage.id = strtol(argv[7], &ptr_strtol, 10);
 						deliMessage.correlationId = 0;
 						break;
 					}
@@ -358,21 +406,21 @@ int main(int argc, char **argv) {
 					{
 						catch_pokemon cat;
 						cat.pokemonName = argv[3];
-						cat.horizontalCoordinate = argv[4];
-						cat.verticalCoordinate = argv[5];
+						cat.horizontalCoordinate = strtol(argv[4], &ptr_strtol, 10);;
+						cat.verticalCoordinate = strtol(argv[5], &ptr_strtol, 10);;
 						message = &cat;
 						deliMessage.messageContent = message;
-						deliMessage.id = argv[6];
+						deliMessage.id = strtol(argv[6], &ptr_strtol, 10);;
 						deliMessage.correlationId = 0;
 						break;
 					}
 					case GET_POKEMON:
 					{
 						get_pokemon get;
-						get.pokemonName =argv[3];
+						get.pokemonName = argv[3];
 						message = &get;
 						deliMessage.messageContent = message;
-						deliMessage.id = argv[4];
+						deliMessage.id = strtol(argv[4], &ptr_strtol, 10);;
 						deliMessage.correlationId = 0;
 						break;
 					}
@@ -383,12 +431,6 @@ int main(int argc, char **argv) {
 				}
 				break;
 			}
-				case SUSCRIPTOR:
-				{
-					//TODO
-					return 12;
-				}
-
 			default:
 				printf("Message type not supported\n");
 				return -1;
@@ -407,8 +449,8 @@ int main(int argc, char **argv) {
 
 
 	//////////////////////// RECIBIR ACKNOWLEDGE ///////////////////
-
-	//TODO
+	printf("Waiting for messaje acknowledge\n");
+	RecieveAcknowledge(server_socket);
 
 	//////////////////////// END ////////////////////////////////
 
@@ -434,6 +476,168 @@ void readConfigBrokerValues(t_config *config,struct Broker *broker){
 		exit(-3);
 	}
 	printf("2. Finaliza lectura de config de broker\n");
+}
+
+void ReadConfigValues(t_config *config, char* keys[])
+{
+	printf("2. Comienza lectura de config\n");
+	if (config_has_property(config,keys[0])){
+		keys[0] = config_get_string_value(config,keys[0]);
+		printf("2. Se leyó la IP: %s\n", keys[0]);
+	}else{
+		exit(-3);
+	}
+
+	if (config_has_property(config,keys[1])){
+		keys[1] = config_get_string_value(config,keys[1]);
+		printf("2. Se leyó el puerto: %s\n", keys[1]);
+	}else{
+		exit(-3);
+	}
+	printf("2. Finaliza lectura de config\n\n");
+}
+
+void GetKeysFor(t_reciever reciever, char* keys[])
+{
+	if(reciever == SUSCRIPTOR || reciever == BROKER)
+	{
+		keys[0] = "IP_BROKER";
+		keys[1] = "PUERTO_BROKER";
+	}
+	else if(reciever == TEAM)
+	{
+		keys[0] = "IP_TEAM";
+		keys[1] = "PUERTO_TEAM";
+	}
+	else if(reciever == GAMECARD)
+	{
+		keys[0] = "IP_GAMECARD";
+		keys[1] = "PUERTO_GAMECARD";
+	}
+	else
+	{
+		keys[0] = "";
+		keys[1] = "";
+	}
+}
+
+void RecieveAcknowledge(int server_socket)
+{
+	op_code operationCode;
+	void* content;
+	if(RecievePackage(server_socket, &operationCode, &content) == 0)
+	{
+		switch (operationCode){
+			case SUBSCRIPTION:
+				puts("Error, recieved a suscription request while waiting for an acknowledge");
+				break;
+			case MESSAGE:
+				puts("Error, recieved a message while waiting for an acknowledge");
+				break;
+			case ACKNOWLEDGE:
+				puts("Recieved Acknowledge");
+				break;
+			default:
+				puts("Error, recieved a packet of unkown type");
+				break;
+		}
+	} 
+	else 
+	{
+		puts("Error, failed to recieve packet");
+	}
+}
+
+void RecieveMessage(int server_socket, message_type expectedType, t_log* logger)
+{
+	op_code operationCode;
+	void* content;
+	if(RecievePackage(server_socket, &operationCode, &content) == 0)
+	{
+		switch (operationCode){
+			case SUBSCRIPTION:
+				puts("Error, recieved a suscription request while waiting for a message");
+				break;
+			case MESSAGE:
+				LogMessage(logger, (deli_message*)content);
+				if(((deli_message*)content)->messageType == expectedType) puts("Recieved Message of correct type"); else puts("Recieved Message with an incorrect type");
+				Free_deli_message_withContent((deli_message*)content);
+				break;
+			case ACKNOWLEDGE:
+				puts("Error, recieved a suscription request while waiting for a message");
+				break;
+			default:
+				puts("Error, recieved a packet of unkown type");
+				break;
+		}
+
+	} 
+	else 
+	{
+		puts("Error, failed to recieve packet");
+	}
+}
+
+void LogConectedTo(t_log* logger, t_reciever reciver)
+{
+	char* target = "";
+	switch(reciver)
+	{
+		case BROKER: case SUSCRIPTOR:
+			target = "BROKER";
+			break;
+		case TEAM:
+			target = "TEAM";
+			break;
+		case GAMECARD:
+			target = "GAMECARD";
+			break;
+	}
+	log_debug(logger,"Connected to %s", target);
+}
+
+char* MessageTypeToString(message_type type)
+{
+	switch(type)
+	{
+		case NEW_POKEMON:
+			return "NEW_POKEMON";
+			break;
+		case LOCALIZED_POKEMON:
+			return "LOCALIZED_POKEMON";
+			break;
+		case GET_POKEMON:
+			return "GET_POKEMON";
+			break;
+		case APPEARED_POKEMON:
+			return "APPEARED_POKEMON";
+			break;
+		case CATCH_POKEMON:
+			return "CATCH_POKEMON";
+			break;
+		case CAUGHT_POKEMON:
+			return "CAUGHT_POKEMON";
+			break;
+	}
+}
+
+void LogSubscribedTo(t_log* logger, message_type type)
+{
+	char* target = MessageTypeToString(type);
+	log_debug(logger,"Subscribed to %s", target);
+}
+
+void LogMessage(t_log* logger, deli_message* message)
+{
+	char* messageType = MessageTypeToString(message->messageType);
+	log_debug(logger,"Recived %s message with id: %d, correlation id: %d", messageType, message->id, message->correlationId);
+}
+
+
+void SleepAndClose(void* args)
+{
+	sleep(((int*)args)[1]);
+	close(((int*)args)[0]);
 }
 
 void initBroker(struct Broker *broker){

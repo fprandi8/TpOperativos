@@ -19,6 +19,37 @@ void Free_deli_message(deli_message* message)
 	free(message);
 }
 
+void Free_deli_message_withContent(deli_message* message)
+{
+	switch (message->messageType) {
+
+		case NEW_POKEMON:
+			Free_new_pokemon((new_pokemon*) message->messageContent);
+			break;
+
+		case LOCALIZED_POKEMON:
+			Free_localized_pokemon((localized_pokemon*) message->messageContent);
+			break;
+
+		case GET_POKEMON:
+			Free_get_pokemon((get_pokemon*) message->messageContent);
+			break;
+
+		case APPEARED_POKEMON:
+			Free_appeared_pokemon((appeared_pokemon*) message->messageContent);
+			break;
+
+		case CATCH_POKEMON:
+			Free_catch_pokemon((catch_pokemon*) message->messageContent);
+			break;
+
+		case CAUGHT_POKEMON:
+			Free_caught_pokemon((caught_pokemon*) message->messageContent);
+			break;
+	}
+	free(message);
+}
+
 void Free_new_pokemon(new_pokemon* new)
 {
 	free(new->pokemonName);

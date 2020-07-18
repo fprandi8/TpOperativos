@@ -1272,6 +1272,28 @@ void scheduleSJFCD(){
 }
 
 
+int evaluateDeadlockCondition(){
+	int deadlock=0;
+	int blockedDeadlocks = blockedInDeadlock();
+	if((statesLists.readyList.count == 0) && blockedDeadlocks && (statesLists.execTrainer.boolean == 0)){
+		deadlock = 1;
+	}
+	return deadlock;
+}
+
+int blockedInDeadlock(){
+	int blockedTrainers = statesLists.blockedList.count;
+	int flagBlockedInDeadlock = 1;
+	for(int i=0; i<blockedTrainers; i++){
+		if(statesLists.blockedList.trainerList[i].blockState == WAITING || statesLists.blockedList.trainerList[i].blockState == AVAILABLE){
+			flagBlockedInDeadlock = 0;
+			break;
+		}
+	}
+	return flagBlockedInDeadlock;
+}
+
+
 float differenceBetweenEstimatedBurtsAndExecutedClocks(float estimatedTrainerBurstTime, uint32_t executedBursts){
 	float difference = estimatedTrainerBurstTime - executedBursts;
 	return difference;

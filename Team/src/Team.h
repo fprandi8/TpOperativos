@@ -250,4 +250,6 @@ float estimatedTimeForNextBurstCalculation(int);
 void initializeTrainersWithBurts();
 int getTrainerWithBestEstimatedBurst();
 float differenceBetweenEstimatedBurtsAndExecutedClocks(float, uint32_t);
+int blockedInDeadlock();
+int evaluateDeadlockCondition();
 #endif /* TEAM_H_ */

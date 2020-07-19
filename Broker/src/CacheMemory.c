@@ -485,7 +485,7 @@ t_cachedMessage* GetCachedMessageInPartition(int partitionId)
     {
         if(message->partitionId == partitionId) return true; else return false;
     }
-    return UpdateClockOnMessage((t_cachedMessage*)list_find(cached_messages, (void*)_message_by_partition_id));
+    return (t_cachedMessage*)list_find(cached_messages, (void*)_message_by_partition_id);
 }
 
 //TODO ver aca clock

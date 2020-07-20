@@ -85,8 +85,8 @@ typedef enum
 
 typedef struct
 {
-	uint32_t id;
-	int blockPos;
+	uint32_t catchId;
+	uint32_t trainerId;
 } t_catchMessage;
 
 typedef struct
@@ -232,6 +232,7 @@ void removeFromAvailable(int);
 void* startAlgorithmScheduling();
 void schedule();
 void addToPokemonList(t_trainer*);
+void processAcknowledge(void*,uint32_t,uint32_t);
 
 
 

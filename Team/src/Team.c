@@ -52,6 +52,11 @@ int main(void) {
 	char* ip;
 	char* port;
 	int trainersCount;
+	catchList.count=0;
+	catchList.catchMessage = (t_catchMessage*)malloc(sizeof(t_catchMessage));
+	getList.count=0;
+	getList.id = (uint32_t*)malloc(sizeof(uint32_t));
+
 
     availablePokemons.pokemons=(t_pokemon*)malloc(sizeof(t_pokemon));
     sem_init(&(catch_semaphore),0,1);
@@ -596,7 +601,7 @@ void processMessageAppeared(deli_message* message){
 int findIdInCatchList(uint32_t cid){
 	int position=-1;
 	for(int i=0;i<catchList.count;i++){
-		int compare = memcmp(catchList.catchMessage[i].id,cid,sizeof(uint32_t));
+		int compare = memcmp(catchList.catchMessage[i].catchId,cid,sizeof(uint32_t));
 		if(compare==0){
 			position=i;
 			break;
@@ -649,41 +654,32 @@ void requestNewPokemons(t_objetive* pokemons,int globalObjetivesDistinctCount,st
 //TODO debería usar la shared cuando este implementado para mandar.
 void requestNewPokemon(t_pokemon missingPkm, struct Broker broker){
 	log_debug(logger,"Se solicitará el pokemon %s", missingPkm.name);
-	int clientSocket = connectBroker(broker.ip, broker.port);
-	if(clientSocket != -1){
+	int socketGet = connectBroker(broker.ip, broker.port);
+	if(socketGet != -1){
 		get_pokemon get;
 		get.pokemonName=(char*)malloc(strlen(missingPkm.name)+1);
 		strcpy(get.pokemonName,missingPkm.name);
 		log_debug(logger,"Se enviará el send para el pokemon %s", missingPkm.name);
-		Send_GET(get, clientSocket);
+		Send_GET(get, socketGet);
 		sleep(clockSimulationTime);
 		log_debug(logger,"Pokemon requested: %s",missingPkm.name);
 
+
 		op_code type;
 		void* content = malloc(sizeof(void*));
-		int cut=0;
 		int result;
-		uint32_t* id;
+		int cut = 0;
 		while(cut != 1){
-			result = RecievePackage(clientSocket,&type,&content);
+			result = RecievePackage(socketGet,&type,&content);
 			if(type == ACKNOWLEDGE){
 				cut=1;
 			}
 		}
+		uint32_t originMessageType = GET_POKEMON;
 		if(!result){
-			id = (uint32_t*)content;
-			void* temp = realloc(getList.id,sizeof(uint32_t)*((getList.count)+1));
-			if (!temp){
-				log_debug(logger,"error en realloc");
-				exit(9);
-			}
-			getList.id=temp;
-			getList.id[getList.count]=id;
-			getList.count++;
+				processAcknowledge(content,originMessageType,statesLists.execTrainer.trainer.id);
 		}
-		else{
-			log_debug(logger,"Error al recibir el acknowledge");
-		}}
+	}
 }
 
 
@@ -1644,8 +1640,22 @@ void catchPokemon(){
 		catch.pokemonName = statesLists.execTrainer.trainer.parameters.scheduledPokemon.name;
 		catch.horizontalCoordinate = statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.x;
 		catch.verticalCoordinate = statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.y;
-		Send_CATCH(catch, connectBroker(broker.ip, broker.port));
-
+		int socketCatch = connectBroker(broker.ip, broker.port);
+		Send_CATCH(catch, socketCatch);
+		op_code type;
+		void* content = malloc(sizeof(void*));
+		int result;
+		int cut = 0;
+		while(cut != 1){
+			result = RecievePackage(socketCatch,&type,&content);
+			if(type == ACKNOWLEDGE){
+				cut=1;
+			}
+		}
+		uint32_t originMessageType = CATCH_POKEMON;
+		if(!result){
+				processAcknowledge(content,originMessageType,statesLists.execTrainer.trainer.id);
+		}
 		sleep(clockSimulationTime);
 		log_debug(logger,"Se envió el catchdel pokemon %s por elentrenador %i",catch.pokemonName,statesLists.execTrainer.trainer.id);
 		statesLists.execTrainer.trainer.blockState = WAITING;
@@ -1674,6 +1684,49 @@ void catchPokemon(){
 
 	}
 
+}
+
+void processAcknowledge(void*buffer,uint32_t type ,uint32_t trainerId){
+	switch(type){
+		case CATCH_POKEMON:
+		{
+			uint32_t* id = (uint32_t*)buffer;
+			if(catchList.count==0){
+				catchList.catchMessage[catchList.count].catchId = (*id);
+				catchList.catchMessage[catchList.count].trainerId = trainerId;
+				catchList.count++;
+			}else{
+				void* temp = realloc(catchList.catchMessage,sizeof(t_catchMessage)*((catchList.count)+1));
+				if (!temp){
+					log_debug(logger,"error en realloc");
+					exit(9);
+				}
+				(catchList.catchMessage)=temp;
+				catchList.catchMessage[catchList.count].catchId = (*id);
+				catchList.catchMessage[catchList.count].trainerId = trainerId;
+				catchList.count++;
+
+			}
+			break;
+		}
+		case GET_POKEMON:
+		{
+			uint32_t* id = (uint32_t*)buffer;
+			if(getList.count==0){
+						getList.id[getList.count] = (*id);
+						getList.count++;
+			}else{
+				void* temp = realloc(getList.id,sizeof(uint32_t)*((getList.count)+1));
+				if (!temp){
+					log_debug(logger,"error en realloc");
+					exit(9);
+				}
+				(getList.id)=temp;
+				getList.id[getList.count]=(*id);
+				getList.count++;
+			}
+		}
+	}
 }
 
 int checkTrainerState(t_trainer trainer){

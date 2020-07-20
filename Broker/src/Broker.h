@@ -34,6 +34,7 @@
 #include "delibird/comms/serialization.h"
 #include "delibird/comms/pokeio.h"
 #include <signal.h>
+#include <poll.h>
 
 
 typedef struct {

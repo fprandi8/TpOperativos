@@ -51,7 +51,7 @@ typedef struct{
     uint32_t size;
     message_type queue_type;
     bool free;
-    clock_t timestap; //use clock() get a stamp
+    int timestap; //use clock() get a stamp
     uint32_t parentId; // indicates parent Id for buddy system
 }t_partition;
 

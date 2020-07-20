@@ -319,6 +319,11 @@ void queue_handler_send_message(void* args){
 	log_info(broker->logger, "SE ENVIO EL MENSAJE AL CLIENTE %d", client);
 	//log_debug(broker->logger, "RESULTADO DEL ENVIO: %d", result);
 
+	struct pollfd pfds[1];
+	pfds[0].fd = client;
+	pfds[0].events = POLLIN | POLLHUP; // Tell me when ready to read
+	int num_events = poll(pfds, 1, 1);
+
 	//TODO re-intentar, quiza tambien checkquear que el cliente siga ahi
 
 	AddASentSubscriberToMessage(message->id, client);

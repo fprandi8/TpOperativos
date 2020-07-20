@@ -115,7 +115,9 @@ int save_message_body(void* messageContent, message_type queue){
     t_buffer* messageBuffer = SerializeMessageContent(queue, messageContent);
 	sem_wait(&mutex_saving);
 	t_partition* partition;
-    partition = find_empty_partition_of_size(sizeof(messageBuffer->bufferSize));
+	uint32_t minSize = config_get_int_value(config, TAMANO_MINIMO_PARTICION);
+	uint32_t requiredSize = messageBuffer->bufferSize > minSize ? messageBuffer->bufferSize : minSize;
+    partition = find_empty_partition_of_size(requiredSize);
     log_info(cache_log, "MENSAJE GUARDADO EN PARTICION CON POSICION DE INICIO: %d", partition->begining);
     int savedPartitionId = save_body_in_partition(messageBuffer, partition, queue);
 	sem_post(&mutex_saving);
@@ -124,7 +126,10 @@ int save_message_body(void* messageContent, message_type queue){
 
 uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition, message_type queue)
 {
-    if(partition->size == messageBuffer->bufferSize)
+    int newPartitionSize = config_get_int_value(config, TAMANO_MINIMO_PARTICION);
+    if(messageBuffer->bufferSize > newPartitionSize) newPartitionSize = messageBuffer->bufferSize;
+
+    if(newPartitionSize == partition->size)
     {
         partition->queue_type = queue;
         partition->free = 0;
@@ -132,14 +137,17 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
 
         memcpy(partition->begining, messageBuffer->stream, messageBuffer->bufferSize);
 
+        //Take out the partition and add it again, this is so we keep consistent with the order of messages entering
+        int indexOfPartition = find_index_in_list(partition);
+        list_remove(partitions, indexOfPartition);
+        list_add(partitions, partition);
+
         return partition->id;
     }
 
     if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") == 0)
     {
 
-        int newPartitionSize = config_get_int_value(config, TAMANO_MINIMO_PARTICION);
-        if(messageBuffer->bufferSize > newPartitionSize) newPartitionSize = messageBuffer->bufferSize;
 
         t_partition* newPartition = CreateNewPartition();
         newPartition->begining = partition->begining;
@@ -220,7 +228,7 @@ t_partition* find_empty_partition_of_size(uint32_t size)
 
 t_partition* select_partition(uint32_t size){
 	t_partition *partition;
-    if(strcmp(config_get_string_value(config, ALGORITMO_REEMPLAZO),"FF") == 0 && strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") == 0){ //compare dif algoritmos
+    if(strcmp(config_get_string_value(config, ALGORITMO_PARTICION_LIBRE),"FF") == 0 && strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") == 0){ //compare dif algoritmos
         partition = select_partition_ff(size);
     }else{
         partition = select_partition_bf(size);
@@ -401,7 +409,7 @@ int GetBusyPartitionsCount()
 
 void Free_CachedMessage(t_cachedMessage* message)
 {
-    void _free_sendOrAck(void* sendOrAck)
+    void _free_sendOrAck(int* sendOrAck)
     {
         free(sendOrAck);
     }
@@ -588,11 +596,11 @@ void PrintDumpOfCache()
         if(partition->free == 1)
         {
             busyStatus = "L";
-            printf("Partición %d: %s. [%s] Size:%db\n",
+            printf("Partición %d: %s. [%s] Size:%ub\n",
             	(int)partition->id,
 				memoryLocation,
                 busyStatus, 
-                (int)partition->size
+                (uint32_t)partition->size
             );
 
         } 
@@ -603,12 +611,12 @@ void PrintDumpOfCache()
             char* queue = GetStringFromMessageType(message->queue_type);
           //  printf("%d", partition->id);
            // printf("%s", *(memoryLocation));
-            printf("Partición %d: %s. [%s] Size:%db LRU:%ld Cola:%s ID:%d\n",
+            printf("Partición %d: %s. [%s] Size:%ub LRU:%ld Cola:%s ID:%d\n",
                 partition->id,
 				memoryLocation,
                 busyStatus,
-                partition->size,
-                partition->timestap,
+                (uint32_t)partition->size,
+                clock() - partition->timestap,
                 queue,
                 message->id
             );
@@ -622,13 +630,18 @@ void PrintDumpOfCache()
 
 void start_consolidation_for(t_partition* freed_partition){
 
-    if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") != 0){
+	log_info(cache_log, "ARRANCO LA CONSOLIDACION"); //TODO REMOVE
+    if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") != 0)
+    {
         uint32_t partitionId = freed_partition->id;
 
-        while(partitionId >= 0 ){
+        while(partitionId >= 0 )
+        {
             partitionId = check_validations_and_consolidate_BS(partitionId);
         }
-     }else{
+     }
+    else
+    {
         if(freed_partition->size == cache.memory_size)
             return;
         check_validations_and_consolidate_PD(freed_partition);
@@ -642,7 +655,7 @@ void start_consolidation_for(t_partition* freed_partition){
  * @return void
  */
 void check_validations_and_consolidate_PD(t_partition* freed_partition){
-    
+
     bool _is_left_neighbor(t_partition* partition){
         return (partition->begining + partition->size) == freed_partition->begining;
     }
@@ -653,31 +666,50 @@ void check_validations_and_consolidate_PD(t_partition* freed_partition){
     
     int new_size = freed_partition->size;
 
+    //Check if there is a free partition to our left
     t_partition* left_partition = freed_partition;
-    if(freed_partition->begining != 0){
+    if(freed_partition->begining != cache.full_memory)
+    {
         sem_wait(&mutex_partitions);
-        left_partition = (t_partition*) list_find(partitions, (void*)_is_left_neighbor);
+        t_partition* tmp = (t_partition*) list_find(partitions, (void*)_is_left_neighbor);
         sem_post(&mutex_partitions);
-        new_size += left_partition->size;
+        if(tmp->free)
+        {
+        	left_partition = tmp;
+        	new_size += left_partition->size;
+        }
     }
 
+    //Check if there is a free partition to our right
     t_partition* right_partition = freed_partition;
-    if((freed_partition->begining + freed_partition->size) < cache.full_memory){
+    if((freed_partition->begining + freed_partition->size) < cache.full_memory + cache.memory_size)
+    {
         sem_wait(&mutex_partitions);
-        right_partition = (t_partition*) list_find(partitions, (void*)_is_right_neighbor);
+        t_partition* tmp = (t_partition*) list_find(partitions, (void*)_is_right_neighbor);
         sem_post(&mutex_partitions);
-        new_size += right_partition->size;
-        sem_wait(&mutex_index_finder_destroyer);
-        find_index_in_list_and_destroy(right_partition);
-        sem_post(&mutex_index_finder_destroyer);
+
+        if(tmp->free)
+        {
+        	right_partition = tmp;
+			new_size += right_partition->size;
+
+        	//Delete the partition to the right
+			sem_wait(&mutex_index_finder_destroyer);
+			find_index_in_list_and_destroy(right_partition);
+			sem_post(&mutex_index_finder_destroyer);
+        }
     }
 
-    if(left_partition != freed_partition){
+    //If there is a parition to the left, delete the one we deleted originaly and se this one as the new free partition
+    if(left_partition != freed_partition)
+    {
     	sem_wait(&mutex_index_finder_destroyer);
         find_index_in_list_and_destroy(freed_partition);
         sem_post(&mutex_index_finder_destroyer);
     }
-    left_partition->size = new_size;
+
+    //If false, it means we did not create any new paritions
+    if(left_partition->size < new_size) left_partition->size = new_size;
 }
 
 /**
@@ -714,11 +746,9 @@ int check_validations_and_consolidate_BS(uint32_t freed_partition_id){
 }
 
 void find_index_in_list_and_destroy(t_partition* partition){
-    sem_wait(&mutex_index_finder);
-    int index = find_index_in_list(partition);
-    sem_wait(&mutex_index_finder);
-        
     sem_wait(&mutex_partitions);
+    int index = find_index_in_list(partition);
+        
     free((t_partition*) list_remove(partitions, index));
     sem_post(&mutex_partitions);
  }
@@ -728,9 +758,7 @@ int find_index_in_list(t_partition* partition){
     int wanted_id = partition->id;
     t_partition* aux_partition;
     while(index < sizeof(partitions)){
-        sem_wait(&mutex_partitions);
         aux_partition = (t_partition*)list_get(partitions, index);
-        sem_post(&mutex_partitions);
         if(aux_partition->id == wanted_id)
             break;
         index++;

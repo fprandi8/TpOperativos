@@ -199,14 +199,17 @@ int main(int argc, char **argv) {
 
 	//Create logger
 	t_log* logger;
-	logger = log_create("Broker.log","Broker",0,LOG_LEVEL_INFO);
+	logger = log_create("Broker.log","Broker",1,LOG_LEVEL_INFO);
 
 
 	//Get IP from config
-	t_config* config = config_create("gameboy.config");
+	t_config* config = config_create("/home/utnso/workspace/tp-2020-1c-MATE-OS/GameBoy/gameboy.config");
 
 	char* keys[2];
 	GetKeysFor(reciver, keys);
+	printf("Key's obtenidas %s \n" , keys[0]);
+	printf("Key's obtenidas %s \n" , keys[1]);
+
 	ReadConfigValues(config, keys);
 
 	struct addrinfo hints;
@@ -281,7 +284,7 @@ int main(int argc, char **argv) {
 				 }
 				 else
 				 {
-					 printf("Exit after %d seconds", subscriptionTime);
+					 printf("Exit after %d seconds\n", subscriptionTime);
 					 return EXIT_SUCCESS;
 				 }
 			 }
@@ -559,8 +562,9 @@ void RecieveMessage(int server_socket, message_type expectedType, t_log* logger)
 				puts("Error, recieved a suscription request while waiting for a message");
 				break;
 			case MESSAGE:
-				LogMessage(logger, (deli_message*)content);
 				if(((deli_message*)content)->messageType == expectedType) puts("Recieved Message of correct type"); else puts("Recieved Message with an incorrect type");
+				LogMessage(logger, (deli_message*)content);
+				SendMessageAcknowledge(((deli_message*)content)->id, server_socket);
 				Free_deli_message_withContent((deli_message*)content);
 				break;
 			case ACKNOWLEDGE:
@@ -624,13 +628,13 @@ char* MessageTypeToString(message_type type)
 void LogSubscribedTo(t_log* logger, message_type type)
 {
 	char* target = MessageTypeToString(type);
-	log_debug(logger,"Subscribed to %s", target);
+	log_info(logger,"Subscribed to %s", target);
 }
 
 void LogMessage(t_log* logger, deli_message* message)
 {
 	char* messageType = MessageTypeToString(message->messageType);
-	log_debug(logger,"Recived %s message with id: %d, correlation id: %d", messageType, message->id, message->correlationId);
+	log_info(logger,"Recived %s message with id: %d, correlation id: %d", messageType, message->id, message->correlationId);
 }
 
 

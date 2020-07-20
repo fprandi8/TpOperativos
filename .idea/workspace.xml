@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated />
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="2d9e64d9-ef2c-4351-bef5-5652ea27e9de" name="Default Changelist" comment="add logs obligatorios">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Broker/src/CacheMemory.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1925">
+              <caret line="77" column="32" lean-forward="true" selection-start-line="77" selection-start-column="32" selection-end-line="77" selection-end-column="32" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Broker/src/CacheMemory.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="464">
+              <caret line="783" lean-forward="true" selection-start-line="783" selection-end-line="783" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Broker/src/Broker.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="519">
+              <caret line="409" lean-forward="true" selection-start-line="409" selection-end-line="409" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Broker/src/Broker.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1525">
+              <caret line="61" column="6" selection-start-line="61" selection-start-column="6" selection-end-line="61" selection-end-column="6" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SharedLibrary/commons/collections/list.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1650">
+              <caret line="66" column="21" selection-start-line="66" selection-start-column="13" selection-end-line="66" selection-end-column="21" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SharedLibrary/commons/collections/list.c">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2425">
+              <caret line="97" column="63" selection-start-line="97" selection-start-column="54" selection-end-line="97" selection-end-column="63" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>_does_partition_fit</find>
+      <find>t_config</find>
+      <find>list_get</find>
+      <find>get</find>
+      <find>missing</find>
+      <find>destroy</find>
+      <find>compact_memory</find>
+      <find>find_empty_partition_of_size</find>
+      <find>Free_CachedMessage</find>
+      <find>GetMessage</find>
+      <find>GetMessageContent</find>
+      <find>newCache</find>
+      <find>first_empty_partition</find>
+      <find>has_free_neighbor</find>
+      <find>find_index</find>
+      <find>check_validations_and_consolidate_BS</find>
+      <find>list_filter</find>
+      <find>filter</find>
+      <find>list_find</find>
+      <find>find</find>
+      <find>condition</find>
+      <find>find_index_in_list</find>
+      <find>index</find>
+      <find>one</find>
+      <find>list_remove_and_destroy_by_condition</find>
+      <find>message_type</find>
+    </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="teamDevelop" />
+      </map>
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/SharedLibrary/commons/collections/list.h" />
+        <option value="$PROJECT_DIR$/Team/src/Team.c" />
+        <option value="$PROJECT_DIR$/Broker/src/CacheMemory.h" />
+        <option value="$PROJECT_DIR$/Broker/src/Broker.c" />
+        <option value="$PROJECT_DIR$/Broker/src/CacheMemory.c" />
+      </list>
+    </option>
+  </component>
+  <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
+  <component name="ProjectConfigurationFiles">
+    <option name="files">
+      <list>
+        <option value="$PROJECT_DIR$/.idea/tp-2020-1c-MATE-OS.iml" />
+        <option value="$PROJECT_DIR$/.idea/misc.xml" />
+        <option value="$PROJECT_DIR$/.idea/vcs.xml" />
+        <option value="$PROJECT_DIR$/.idea/modules.xml" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="478" />
+    <option name="width" value="1589" />
+    <option name="height" value="1411" />
+  </component>
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="tp-2020-1c-MATE-OS" type="b2602c69:ProjectViewProjectNode" />
+              <item name="tp-2020-1c-MATE-OS" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="tp-2020-1c-MATE-OS" type="b2602c69:ProjectViewProjectNode" />
+              <item name="tp-2020-1c-MATE-OS" type="462c0819:PsiDirectoryNode" />
+              <item name="Broker" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="tp-2020-1c-MATE-OS" type="b2602c69:ProjectViewProjectNode" />
+              <item name="tp-2020-1c-MATE-OS" type="462c0819:PsiDirectoryNode" />
+              <item name="Broker" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="tp-2020-1c-MATE-OS" type="b2602c69:ProjectViewProjectNode" />
+              <item name="tp-2020-1c-MATE-OS" type="462c0819:PsiDirectoryNode" />
+              <item name="SharedLibrary" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="Git.Branch.Popup.ShowAllRemotes" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2d9e64d9-ef2c-4351-bef5-5652ea27e9de" name="Default Changelist" comment="" />
+      <created>1591999323475</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1591999323475</updated>
+      <workItem from="1591999326173" duration="24974000" />
+      <workItem from="1592063797014" duration="4595000" />
+      <workItem from="1592698858171" duration="14511000" />
+      <workItem from="1593222878428" duration="2104000" />
+      <workItem from="1593378356943" duration="6613000" />
+      <workItem from="1594510769557" duration="2208000" />
+      <workItem from="1594597302213" duration="4141000" />
+      <workItem from="1595022866042" duration="113000" />
+      <workItem from="1595025284259" duration="4125000" />
+    </task>
+    <task id="LOCAL-00001" summary="Add compact feature">
+      <created>1592005491332</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1592005491332</updated>
+    </task>
+    <task id="LOCAL-00002" summary="remove check restrictions &amp; add todo">
+      <created>1592006067735</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1592006067735</updated>
+    </task>
+    <task id="LOCAL-00003" summary="add point">
+      <created>1592017718678</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1592017718678</updated>
+    </task>
+    <task id="LOCAL-00004" summary="add compact logic">
+      <created>1592026317029</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1592026317029</updated>
+    </task>
+    <task id="LOCAL-00005" summary="comment v1 for testing">
+      <created>1592026791134</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1592026791134</updated>
+    </task>
+    <task id="LOCAL-00006" summary="solve errors">
+      <created>1592031993985</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1592031993986</updated>
+    </task>
+    <task id="LOCAL-00007" summary="solve building">
+      <created>1592036279833</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1592036279833</updated>
+    </task>
+    <task id="LOCAL-00008" summary="change checkpoint feedback">
+      <created>1592068362727</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1592068362727</updated>
+    </task>
+    <task id="LOCAL-00009" summary="change checkpoint feedback">
+      <created>1592068513201</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1592068513201</updated>
+    </task>
+    <task id="LOCAL-00010" summary="change algorithm">
+      <created>1592721861843</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1592721861843</updated>
+    </task>
+    <task id="LOCAL-00011" summary="change firm">
+      <created>1592721949899</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1592721949899</updated>
+    </task>
+    <task id="LOCAL-00012" summary="consolidation finished, recursive call next">
+      <created>1592798020136</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1592798020136</updated>
+    </task>
+    <task id="LOCAL-00013" summary="refactor BS consolidation">
+      <created>1593391499333</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1593391499333</updated>
+    </task>
+    <task id="LOCAL-00014" summary="update cache&#10;Broker connection missing">
+      <created>1594512895784</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1594512895784</updated>
+    </task>
+    <task id="LOCAL-00015" summary="add clock management">
+      <created>1595042206410</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1595042206410</updated>
+    </task>
+    <task id="LOCAL-00016" summary="add logs obligatorios">
+      <created>1595051984147</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1595051984147</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="63384000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="2576" height="1426" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.12559618" />
+      <window_info id="Favorites" order="1" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.33255085" />
+      <window_info anchor="bottom" id="Database Changes" order="7" />
+      <window_info anchor="bottom" x="22" y="365" width="2516" height="679" id="Version Control" order="8" weight="0.52513534" />
+      <window_info anchor="bottom" id="Terminal" order="9" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" weight="0.32942098" />
+      <window_info anchor="bottom" id="Messages" order="11" weight="0.28538284" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Database" order="3" />
+      <window_info anchor="right" id="Structure" order="4" weight="0.18574232" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ORDER">
+      <list>
+        <option value="0" />
+        <option value="2" />
+        <option value="3" />
+        <option value="1" />
+      </list>
+    </option>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="RECENTLY_FILTERED_USER_GROUPS">
+                <collection />
+              </option>
+              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+                <collection />
+              </option>
+              <option name="COLUMN_ORDER">
+                <list>
+                  <option value="0" />
+                  <option value="1" />
+                  <option value="2" />
+                  <option value="3" />
+                </list>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list />
+          </value>
+        </entry>
+        <entry key="User">
+          <value>
+            <list />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Add compact feature" />
+    <MESSAGE value="remove check restrictions &amp; add todo" />
+    <MESSAGE value="add point" />
+    <MESSAGE value="add compact logic" />
+    <MESSAGE value="comment v1 for testing" />
+    <MESSAGE value="solve errors" />
+    <MESSAGE value="solve building" />
+    <MESSAGE value="change checkpoint feedback" />
+    <MESSAGE value="change algorithm" />
+    <MESSAGE value="change firm" />
+    <MESSAGE value="consolidation finished, recursive call next" />
+    <MESSAGE value="refactor BS consolidation" />
+    <MESSAGE value="update cache&#10;Broker connection missing" />
+    <MESSAGE value="add clock management" />
+    <MESSAGE value="add logs obligatorios" />
+    <option name="LAST_COMMIT_MESSAGE" value="add logs obligatorios" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state width="379" height="619" key="Git.Branch.Popup" />
+    <state width="379" height="619" key="Git.Branch.Popup/2560.1440/1920.1080" />
+    <state width="379" height="619" key="Git.Branch.Popup@2560.1440" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/Team/src/Team.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1645">
+          <caret line="173" column="38" selection-start-line="173" selection-start-column="38" selection-end-line="173" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Broker/src/Broker.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1525">
+          <caret line="61" column="6" selection-start-line="61" selection-start-column="6" selection-end-line="61" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SharedLibrary/commons/collections/list.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1650">
+          <caret line="66" column="21" selection-start-line="66" selection-start-column="13" selection-end-line="66" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SharedLibrary/commons/collections/list.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2425">
+          <caret line="97" column="63" selection-start-line="97" selection-start-column="54" selection-end-line="97" selection-end-column="63" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Broker/src/CacheMemory.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1925">
+          <caret line="77" column="32" lean-forward="true" selection-start-line="77" selection-start-column="32" selection-end-line="77" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Broker/src/Broker.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="519">
+          <caret line="409" lean-forward="true" selection-start-line="409" selection-end-line="409" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Broker/src/CacheMemory.c">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="464">
+          <caret line="783" lean-forward="true" selection-start-line="783" selection-end-line="783" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

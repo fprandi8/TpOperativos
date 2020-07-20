@@ -46,25 +46,41 @@ int esperar_cliente(int socket_servidor)
 }
 
 
-//void process_request(int cod_op, int cliente_fd) {
-//	int size;
-//	char* procesando = "PROCESANDO MENSAJE \n";
-//	send(cliente_fd,procesando,strlen(procesando),0);
-//	void* msg;
-//		switch (cod_op) {
-//		case MENSAJE:
-////			puts("Llegó");
-//			msg = recibir_mensaje(cliente_fd, &size);
-////			printf("Longitud del mensaje %d \n", size);
-////			puts("Recibido");
-//			puts(msg);
-//			devolver_mensaje(msg, size, cliente_fd);
-////			puts("Enviado");
-//			free(msg);
-//			break;
-//		case 0:
-//			pthread_exit(NULL);
-//		case -1:
-//			pthread_exit(NULL);
-//		}
-//}
+t_log* iniciar_logger(void)
+{
+	return log_create("GameCard.log","GameCard",1,LOG_LEVEL_DEBUG);
+}
+
+t_config* read_config(void)
+{
+	return config_create("/home/utnso/workspace/tp-2020-1c-MATE-OS/GameCard/GameCard.config");
+
+}
+
+t_config* read_metadata(char* file)
+{
+	return config_create(file);
+}
+
+char* get_config_value(t_config* config, t_log* logger, char* propiedad){
+
+	if (config_has_property(config,propiedad)){
+//		log_info(logger,config_get_string_value(config,propiedad));
+		return config_get_string_value(config, propiedad);
+	} else {
+//		log_debug(logger,"Error al obtener el atributo");
+		return NULL;
+	}
+}
+
+char ** get_config_value_array(t_config* config, t_log* logger, char* propiedad){
+
+	if (config_has_property(config,propiedad)){
+//		log_info(logger,"Obtiene el array de datos");
+		return config_get_array_value(config, propiedad);
+	} else {
+//		log_debug(logger,"Error al obtener el atributo");
+		return NULL;
+	}
+}
+

@@ -25,6 +25,7 @@ sem_t availablePokemons_mutex;
 sem_t availablePokemons_sem;
 sem_t readyTrainer_sem;
 sem_t execTrainer_sem;
+sem_t deadlockTrainers_semaphore;
 t_idMessages getList;
 t_catchMessages catchList;
 t_objetive* missingPkms;
@@ -105,6 +106,7 @@ int main(void) {
 */
 	trainersCount = getTrainersCount(config);
 	sem_init(&(availableTrainersCount_sem),0,trainersCount);
+	sem_init(&(deadlockTrainers_semaphore),0,1-trainersCount);
 	log_debug(logger,"4. Se contaron %i entrenadores",trainersCount);
 	log_debug(logger,"5.Se alocó memoria para el array de threads");
 	statesLists.newList.trainerList = (t_trainer*)malloc(sizeof(t_trainer)*trainersCount);
@@ -1258,6 +1260,11 @@ void addToExec(t_trainer trainer){
 	statesLists.execTrainer.boolean = 1;
 }
 
+void addToDeadlock(t_trainer trainer){
+	trainer.blockState=DEADLOCK;
+	sem_post(&deadlockTrainers_semaphore);
+}
+
 void removeFromExec(){
 	statesLists.execTrainer.boolean = 0;
 	sem_post(&execTrainer_sem);
@@ -1536,6 +1543,32 @@ void scheduleSJFCD(){
 			removeFromExec();
 		}
 
+	}
+}
+
+
+t_list_of_objectives_validation* createListOfBlockedObjectives(int position){
+
+	t_list_of_objectives_validation validationList;
+	for(int i=0; i < statesLists.blockedList.count; i++){
+		strcpy(validationList.pokemon[i].name, statesLists.blockedList.trainerList[position].parameters.objetives[i].name);
+		validationList.bit[i] = 0;
+	}
+	return &validationList;
+}
+
+
+void deadlockForTrainer(){
+	int flag;
+	for(int i = 0; i<statesLists.blockedList.count; i++){
+		if(statesLists.blockedList.trainerList[i].parameters.objetivesCount == statesLists.blockedList.trainerList[i].parameters.pokemonsCount){
+			for(int j = 0; j<statesLists.blockedList.trainerList[i].parameters.objetivesCount;j++){
+				for(int k = 0; k<statesLists.blockedList.trainerList[i].parameters.pokemonsCount;k++){
+					flag = strcmp(statesLists.blockedList.trainerList[i].parameters.pokemons[j].name,statesLists.blockedList.trainerList[i].parameters.objetives[k].name);
+
+				}
+			}
+		}
 	}
 }
 

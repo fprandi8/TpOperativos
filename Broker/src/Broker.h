@@ -34,6 +34,7 @@
 #include "delibird/comms/serialization.h"
 #include "delibird/comms/pokeio.h"
 #include <signal.h>
+#include <poll.h>
 
 
 typedef struct {
@@ -109,4 +110,5 @@ uint32_t message_admnistrator(t_message_administrator*);
 
 
 void signaltHandler(int);
+void cacheSigHandler(int);
 #endif /* BROKER_H_ */

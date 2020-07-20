@@ -21,7 +21,10 @@ sem_t countExit_semaphore;
 t_pokemonList availablePokemons;
 sem_t availableTrainersCount_sem;
 sem_t availablePokemonsCount_sem;
+sem_t availablePokemons_mutex;
 sem_t availablePokemons_sem;
+sem_t readyTrainer_sem;
+sem_t execTrainer_sem;
 t_idMessages getList;
 t_catchMessages catchList;
 t_objetive* missingPkms;
@@ -39,6 +42,8 @@ int retryConnectionTime=0;
 int connectedToBroker=0;
 int trainersCount=0;
 pthread_t* subs;
+int clockSimulationTime;
+
 
 int main(void) {
 	t_config* config;
@@ -55,7 +60,9 @@ int main(void) {
     sem_init(&(countExit_semaphore),0,1);
     sem_init(&(availablePokemons_sem),0,1);
     sem_init(&(availablePokemonsCount_sem),0,0);
-
+    sem_init(&(readyTrainer_sem),0,0);
+    sem_init(&(execTrainer_sem),0,1);
+    sem_init(&(availablePokemons_mutex),0,1);
     initializeLists();
 
 
@@ -80,6 +87,7 @@ int main(void) {
 	readConfigBrokerValues(config,&broker);
 	readConfigTeamValues(config);
 	readConfigReconnectWaiting(config);
+	readConfigClockSimulationTime(config);
 
 
 	//Init de scheduler
@@ -111,7 +119,6 @@ int main(void) {
 	}
 	missingPkms=temp;
 	missingPokemonsCount = globalObjetivesDistinctCount;
-
 	subs=(pthread_t*)malloc(sizeof(pthread_t)*3);
 	subscribeToBroker();//TODO ver si esto no conviene hacerlo con select (Falta ver con Marcos)
 	requestNewPokemons(missingPkms,globalObjetivesDistinctCount,broker);
@@ -129,7 +136,9 @@ int main(void) {
     //startClosePlanning(new,blocked,ready);
 	//startReadyPlaning(ready,exec);
 
-	pthread_create(thread,NULL,(void*)startScheduling,NULL);
+	pthread_create(thread,NULL,(void*)startCloseScheduling,NULL);
+	pthread_detach(*thread);
+	pthread_create(thread,NULL,(void*)startAlgorithmScheduling,NULL);
 	pthread_detach(*thread);
 	log_debug(logger,"se iniciará el aceptamiento de mensajes de la gameboy, fiera");
 	int teamServer = startServer();
@@ -147,14 +156,31 @@ int main(void) {
 
 
 
-void* startScheduling(){
+void* startCloseScheduling(){
 	while(1){
-		log_debug(logger,"Se comienza a planificar");
+
 		sem_wait(&(availableTrainersCount_sem));
 		sem_wait(&(availablePokemonsCount_sem));
+		sem_wait(&availablePokemons_sem);
+		log_error(logger,"Se comienza a planificar planificador por cercanía");
 		scheduleByDistance();
+		log_error(logger,"Se termina de planificar planificador por cercania");
+		sem_post(&availablePokemons_sem);
 	}
 }
+
+void* startAlgorithmScheduling(){
+	while(1){
+
+		sem_wait(&(readyTrainer_sem));
+		sem_wait(&(execTrainer_sem));
+		log_error(logger,"Se comienza a planificar la lista de ready");
+		schedule();
+		log_error(logger,"Se termina de planificar la lista de ready");
+	}
+}
+
+
 
 
 
@@ -163,6 +189,15 @@ void initializeLists(){
 	statesLists.readyList.count = 0;
 	statesLists.newList.count = 0;
 	statesLists.exitList.count = 0;
+	statesLists.execTrainer.boolean = 0;
+}
+
+void initTrainersPokemonLists(){
+	for(int i=0;i<trainersCount;i++){
+		statesLists.newList.trainerList[i].parameters.pokemonsCount=0;
+		statesLists.newList.trainerList[i].parameters.objetivesCount=0;
+	}
+
 }
 
 
@@ -174,12 +209,13 @@ void initializeLists(){
 
 
 
-
-
-
-
-
-
+void readConfigClockSimulationTime(t_config* config){
+	if (config_has_property(config,"RETARDO_CICLO_CPU")){
+		clockSimulationTime=config_get_int_value(config,"RETARDO_CICLO_CPU");
+	}else{
+		exit(-3);
+	}
+}
 
 
 void readConfigReconnectWaiting(t_config* config){
@@ -367,9 +403,9 @@ void* subscribeToBrokerCaught(){
 		socketCaught = connectBroker(broker.ip,broker.port);
 		if(socketCaught!=-1){
 			if (-1==SendSubscriptionRequest(CAUGHT_POKEMON,socketCaught)){
-				log_debug(logger,"Error en subscripcion de Localized");
+				log_debug(logger,"Error en subscripcion de caught");
 			}else{
-				log_debug(logger,"Se subscribió a Localized");
+				log_debug(logger,"Se subscribió a Caught");
 			}
 		}else{
 			log_debug(logger,"Se intentará reconectarse al broker para subscribirse a Caught cada %i",retryConnectionTime);
@@ -503,6 +539,7 @@ void processMessageLocalized(deli_message* message){
 		}
 		availablePokemons.pokemons=temp;
 		for(int i=0;i<localizedPokemon->ammount;i++){
+			availablePokemons.pokemons[availablePokemons.count].name=malloc(strlen(localizedPokemon->pokemonName)+1);
 			availablePokemons.pokemons[availablePokemons.count].name=localizedPokemon->pokemonName;
 			availablePokemons.pokemons[availablePokemons.count].position.x=localizedPokemon->coordinates->x;
 			availablePokemons.pokemons[availablePokemons.count].position.y=localizedPokemon->coordinates->y;
@@ -529,7 +566,7 @@ int findNameInMissingPokemons(char* pokeName){
 
 
 void processMessageAppeared(deli_message* message){
-	log_debug(logger,"processMessageAppeared: availablePokemonCount: %i",availablePokemons.count);
+	log_error(logger,"Before AddMessageAppeared: availablePokemonCount: %i",availablePokemons.count);
 	appeared_pokemon* appearedPokemon = (appeared_pokemon*)message->messageContent;
 	int resultMissingPokemon = findNameInMissingPokemons(appearedPokemon->pokemonName);
 		if(resultMissingPokemon==1){//TODO: Agregar en el planificador que valide si ya hay un entrenador planificado para ese pokemon que llego por otro appeared o localized
@@ -540,14 +577,18 @@ void processMessageAppeared(deli_message* message){
 				exit(9);
 			}
 			availablePokemons.pokemons=temp;
+			availablePokemons.pokemons[availablePokemons.count].name=(char*)malloc(strlen(appearedPokemon->pokemonName)+1);
 			availablePokemons.pokemons[availablePokemons.count].name=appearedPokemon->pokemonName;
 			availablePokemons.pokemons[availablePokemons.count].position.x=appearedPokemon->horizontalCoordinate;
 			availablePokemons.pokemons[availablePokemons.count].position.y=appearedPokemon->verticalCoordinate;
 			availablePokemons.count++;
+			log_error(logger,"After processMessageAppeared: Pokemon sirve availablePokemonCount: %i",availablePokemons.count);
 			sem_post(&availablePokemons_sem);
 			sem_post(&(availablePokemonsCount_sem));
-			log_debug(logger,"Termino processMessageAppeared");
-				}
+		}else{
+			log_error(logger,"After AddMessageAppeared: Pokemon no sirve availablePokemonCount: %i",availablePokemons.count);
+		}
+
 }
 
 int findIdInCatchList(uint32_t cid){
@@ -567,13 +608,28 @@ void processMessageCaught(deli_message* message){
 	uint32_t cid = (uint32_t)message->correlationId;
 	int resultCatchId = findIdInCatchList(cid);
 	if(resultCatchId>=0){
-		if(caughtPokemon->caught==1){
-			missingPokemonsCount--;
-		;//TODO: Borrar de missingPokemon. Ver si entrenador pasa a EXIT; sino, cambiar blockstate de WAITING a AVAILABLE.SACAR PKM de scheduledPokemon
+		removeFromMissingPkms(statesLists.execTrainer.trainer.parameters.scheduledPokemon);
+		addToPokemonList(&(statesLists.execTrainer.trainer));
+		log_debug(logger,"Se captura el pokemon por Caught message");
+
+		if(statesLists.execTrainer.trainer.parameters.objetivesCount==statesLists.execTrainer.trainer.parameters.pokemonsCount){
+			if(checkTrainerState(statesLists.execTrainer.trainer)==1){
+				statesLists.execTrainer.trainer.blockState = DEADLOCK;
+				addToBlocked(statesLists.execTrainer.trainer);
+				removeFromExec();
+			}else{
+				addToExit(statesLists.execTrainer.trainer);
+				removeFromExec();
+			}
 		}else{
+			statesLists.execTrainer.trainer.blockState = AVAILABLE;
+			addToBlocked(statesLists.execTrainer.trainer);
+			removeFromExec();
+			sem_post(&(availableTrainersCount_sem));
+		}
+	}else{
 			//catchList.catchMessage[resultCatchId].trainer.blockState = AVAILABLE;
 		//TODO: ACá habría que chequear si hay pokemons disponibles para atrapar, si Sí, ; si no, fin de la función.SACAR PKM de scheduledPokemon
-		}
 	}
 }
 
@@ -594,9 +650,11 @@ void requestNewPokemon(t_pokemon missingPkm, struct Broker broker){
 	int clientSocket = connectBroker(broker.ip, broker.port);
 	if(clientSocket != -1){
 		get_pokemon get;
+		get.pokemonName=(char*)malloc(strlen(missingPkm.name)+1);
 		strcpy(get.pokemonName,missingPkm.name);
 		log_debug(logger,"Se enviará el send para el pokemon %s", missingPkm.name);
 		Send_GET(get, clientSocket);
+		sleep(clockSimulationTime);
 		log_debug(logger,"Pokemon requested: %s",missingPkm.name);
 
 		op_code type;
@@ -637,7 +695,6 @@ void missingPokemons(t_trainer* trainers, int trainersCount){
 			if(globalObjetivesDistinctCount==0){
 				missingPkms[globalObjetivesDistinctCount].pokemon=trainers[trainer].parameters.objetives[obj];
 				missingPkms[globalObjetivesDistinctCount].count++;
-				log_debug(logger,"add Entrenador %i, objetivo: %i, Agregar objetivo: %s en registro %i, cantidad total %i",trainer,obj,missingPkms[globalObjetivesDistinctCount].pokemon.name,globalObjetivesDistinctCount,missingPkms[globalObjetivesDistinctCount].count);
 				globalObjetivesDistinctCount++;
 			}else{
 				int added=0;
@@ -645,14 +702,12 @@ void missingPokemons(t_trainer* trainers, int trainersCount){
 					if(0==strcmp(missingPkms[objCmp].pokemon.name,trainers[trainer].parameters.objetives[obj].name)){
 						added=1;
 						missingPkms[objCmp].count++;
-						log_debug(logger,"add Entrenador %i, objetivo: %i, Agregar objetivo: %s en registro %i, cantidad total %i",trainer,obj,missingPkms[objCmp].pokemon.name,objCmp,missingPkms[objCmp].count);
 					}
 
 				}
 				if(added==0){
 					missingPkms[globalObjetivesDistinctCount].pokemon=trainers[trainer].parameters.objetives[obj];
 					missingPkms[globalObjetivesDistinctCount].count++;
-					log_debug(logger,"add Entrenador %i, objetivo: %i, Agregar objetivo: %s en registro %i, cantidad total %i",trainer,obj,missingPkms[globalObjetivesDistinctCount].pokemon.name,globalObjetivesDistinctCount,missingPkms[globalObjetivesDistinctCount].count);
 					globalObjetivesDistinctCount++;
 				}
 			}
@@ -663,14 +718,12 @@ void missingPokemons(t_trainer* trainers, int trainersCount){
 				for(int total=0;total<globalObjetivesCount;total++){
 					if(0==strcmp(missingPkms[total].pokemon.name,trainers[trainer].parameters.pokemons[pkm].name)){
 						if(missingPkms[total].count==1){
-							log_debug(logger,"diff Entrenador %i, objetivo entrenador: %i vs objetivo lista: %i, Nombre: %s",trainer,pkm,total,missingPkms[total].pokemon.name);
 							for(int new=total;new<globalObjetivesDistinctCount;new++){
 								missingPkms[new]=missingPkms[new+1];
 							}
 							globalObjetivesCount--;
 							globalObjetivesDistinctCount--;
 						}else{
-							log_debug(logger,"diff Entrenador %i, objetivo entrenador: %i vs objetivo lista: %i, Nombre: %s",trainer,pkm,total,missingPkms[total].pokemon.name);
 							missingPkms[total].count--;
 							globalObjetivesCount--;
 						}
@@ -679,12 +732,6 @@ void missingPokemons(t_trainer* trainers, int trainersCount){
 				}
 			}
 		}
-	log_debug(logger,"El objetivo global consta de %i pokemons",globalObjetivesCount);
-	log_debug(logger,"El objetivo global consta de %i registros",globalObjetivesDistinctCount);
-
-	for(int count=0;count<globalObjetivesDistinctCount;count++){
-		log_debug(logger,"Registro %i: %i %s",count,missingPkms[count].count,missingPkms[count].pokemon.name);
-	}
 }
 
 void createLogger(char* logFilename)
@@ -776,8 +823,8 @@ void readConfigSchedulerValues(t_config *config,struct SchedulingAlgorithm *sche
 		exit(-3);
 	}
 	if (config_has_property(config, schedulingAlgorithm->quantumKey)){
-		schedulingAlgorithm->quantum=config_get_string_value(config,schedulingAlgorithm->quantumKey);
-		log_debug(logger,"3. Se leyó el quantum: %s",schedulingAlgorithm->quantum);
+		schedulingAlgorithm->quantum=config_get_int_value(config,schedulingAlgorithm->quantumKey);
+		log_debug(logger,"3. Se leyó el quantum: %i",schedulingAlgorithm->quantum);
 	}else{
 		exit(-3);
 	}
@@ -833,6 +880,7 @@ void startTrainers(int trainersCount,t_config *config){
 	readConfigTrainersValues(config,&trainersPosition,&trainersPokemons,&trainersObjetives);
 	log_debug(logger,"4. Se alocó memoria para el array de parametros de entrenadore");
 	log_debug(logger,"4. Comienza el proceso de carga de atributos en struc");
+	initTrainersPokemonLists();
 	getTrainerAttr(trainersPosition,trainersPokemons,trainersObjetives,trainersCount);
 	initBurstScheduledPokemon();
 	statesLists.newList.count=trainersCount;
@@ -855,7 +903,7 @@ void initBurstScheduledPokemon(){
 
 void initTrainerName(){
 	for(int trainer = 0; trainer < statesLists.newList.count; trainer++){
-		statesLists.readyList.trainerList[trainer].id =  trainer;
+		statesLists.newList.trainerList[trainer].id =  trainer;
 	}
 }
 
@@ -945,7 +993,7 @@ void getTrainerAttrPkm(char** trainersPokemons, int trainersCount)
 		  }
 		  int counter=0;
 		  void getElement(void *element) {
-			  statesLists.newList.trainerList[actualTrainer].parameters.pokemons[counter].name=malloc(sizeof((char*)element));
+			  statesLists.newList.trainerList[actualTrainer].parameters.pokemons[counter].name=malloc(strlen((char*)element)+1);
 			  strcpy(statesLists.newList.trainerList[actualTrainer].parameters.pokemons[counter].name,(char*)element);
 			  counter++;
 		  }
@@ -989,7 +1037,7 @@ void getTrainerAttrObj(char** trainersObjetives, int trainersCount)
 		  }
 		  int counter=0;
 		  void getElement(void *element) {
-			  statesLists.newList.trainerList[actualTrainer].parameters.objetives[counter].name=malloc(sizeof((char*)element));
+			  statesLists.newList.trainerList[actualTrainer].parameters.objetives[counter].name=malloc(strlen((char*)element)+1);
 				  strcpy(statesLists.newList.trainerList[actualTrainer].parameters.objetives[counter].name,(char*)element);
 				  counter++;
 		  }
@@ -1061,7 +1109,22 @@ void schedule(){//Para el caso de FIFO y RR no hace nada, ya que las listas est�
 	}
 }
 
-void addToReady(t_trainer trainer){
+void addToPokemonList(t_trainer* trainer){
+	if((*trainer).parameters.pokemonsCount==0){
+		((*trainer).parameters.pokemons)=(t_pokemon*)malloc(sizeof(t_pokemon));
+	}else{
+		void* temp = realloc((*trainer).parameters.pokemons,sizeof(t_pokemon)*(((*trainer).parameters.pokemonsCount)+1));
+		if (!temp){
+			log_debug(logger,"error en realloc");
+					exit(9);
+				}
+		((*trainer).parameters.pokemons)=temp;
+		}
+	(*trainer).parameters.pokemons[(*trainer).parameters.pokemonsCount]=(*trainer).parameters.scheduledPokemon;
+	(*trainer).parameters.pokemonsCount++;
+}
+
+void addToReady(t_trainer* trainer){
 	void* temp = realloc(statesLists.readyList.trainerList,sizeof(t_trainer)*((statesLists.readyList.count)+1));
 	if (!temp){
 		log_debug(logger,"error en realloc");
@@ -1069,10 +1132,10 @@ void addToReady(t_trainer trainer){
 			}
 	(statesLists.readyList.trainerList)=temp;
 	sem_wait(&countReady_semaphore);
-	statesLists.readyList.trainerList[statesLists.readyList.count]=trainer;
+	statesLists.readyList.trainerList[statesLists.readyList.count]=(*trainer);
 	(statesLists.readyList.count)++;
 	sem_post(&countReady_semaphore);
-	log_debug(logger,"SE planificó al entrenador %i",statesLists.readyList.trainerList[statesLists.readyList.count-1].id);
+	sem_post(&readyTrainer_sem);
 }
 
 void removeFromReady(int trainerPositionInList){
@@ -1084,29 +1147,75 @@ void removeFromReady(int trainerPositionInList){
 	sem_wait(&countReady_semaphore);
 	(statesLists.readyList.count)--;
 	sem_post(&countReady_semaphore);
-	void* temp = realloc(statesLists.readyList.trainerList,sizeof(t_trainer)*((statesLists.readyList.count)));
-	if (!temp){
-		log_debug(logger,"error en realloc");
-		exit(9);
+	if(statesLists.readyList.count){
+		void* temp = realloc(statesLists.readyList.trainerList,sizeof(t_trainer)*((statesLists.readyList.count)));
+		if (!temp){
+			log_debug(logger,"error en realloc");
+			exit(9);
+		}
+		(statesLists.readyList.trainerList)=temp;
 	}
-	(statesLists.readyList.trainerList)=temp;
 }
 
 void removeFromNew(int trainerPositionInList){
-
+	log_error(logger,"Se removera el entrenador %i de New. Total: %i",statesLists.newList.trainerList[trainerPositionInList].id,statesLists.newList.count);
 	for(int i=trainerPositionInList;i<(statesLists.newList.count)-1; i++){
 		statesLists.newList.trainerList[i] = statesLists.newList.trainerList[i+1];
 
 	}
-	sem_wait(&countNew_semaphore);
 	(statesLists.newList.count)--;
-	sem_post(&countNew_semaphore);
+	if(statesLists.newList.count){
 	void* temp = realloc(statesLists.newList.trainerList,sizeof(t_trainer)*((statesLists.newList.count)));
 	if (!temp){
 		log_debug(logger,"error en realloc");
 		exit(9);
 	}
 	(statesLists.newList.trainerList)=temp;
+	}
+	log_error(logger,"Se removio el entrenador de new. Total: %i",statesLists.newList.count);
+}
+
+void removeFromMissingPkms(t_pokemon pkm){
+	for(int i=0;i<missingPokemonsCount;i++){
+		if(0==strcmp(missingPkms[i].pokemon.name,pkm.name)){
+			if(missingPkms[i].count==1){
+				for(int j=i;j<(missingPokemonsCount)-1; j++){
+					missingPkms[j] = missingPkms[j+1] ;
+					}
+				missingPokemonsCount--;
+			}else{
+				missingPkms[i].count--;
+			}
+		}
+	}
+	if(missingPokemonsCount>0){
+			void* temp = realloc(missingPkms,sizeof(t_objetive)*missingPokemonsCount);
+			if (!temp){
+				log_debug(logger,"error en realloc");
+				exit(9);
+			}
+		(missingPkms)=temp;
+		}
+}
+
+void removeFromAvailable(int pkmPosition){
+	log_error(logger,"Before removeMessageAppeared: availablePokemonCount: %i",availablePokemons.count);
+	for(int i=pkmPosition;i<(availablePokemons.count)-1; i++){
+		availablePokemons.pokemons[i] = availablePokemons.pokemons[i+1] ;
+
+	}
+
+	(availablePokemons.count)--;
+
+	if(availablePokemons.count){
+		void* temp = realloc(availablePokemons.pokemons,sizeof(t_trainer)*((availablePokemons.count)));
+		if (!temp){
+			log_debug(logger,"error en realloc");
+			exit(9);
+		}
+	(availablePokemons.pokemons)=temp;
+	}
+	log_error(logger,"After removeMessageAppeared: availablePokemonCount: %i",availablePokemons.count);
 }
 
 
@@ -1119,12 +1228,15 @@ void removeFromBlocked(int trainerPositionInList){
 	sem_wait(&countBlocked_semaphore);
 	(statesLists.blockedList.count)--;
 	sem_post(&countBlocked_semaphore);
-	void* temp = realloc(statesLists.blockedList.trainerList,sizeof(t_trainer)*((statesLists.blockedList.count)));
-	if (!temp){
-		log_debug(logger,"error en realloc");
-		exit(9);
+	if(statesLists.blockedList.count){
+		void* temp = realloc(statesLists.blockedList.trainerList,sizeof(t_trainer)*((statesLists.blockedList.count)));
+		if (!temp){
+			log_debug(logger,"error en realloc");
+			exit(9);
+		}
+
+		(statesLists.blockedList.trainerList)=temp;
 	}
-	(statesLists.blockedList.trainerList)=temp;
 }
 
 void addToBlocked(t_trainer trainer){
@@ -1148,6 +1260,7 @@ void addToExec(t_trainer trainer){
 
 void removeFromExec(){
 	statesLists.execTrainer.boolean = 0;
+	sem_post(&execTrainer_sem);
 }
 
 void addToExit(t_trainer trainer){
@@ -1192,22 +1305,24 @@ int getFirstBlockedAvailable(){
 	return -1;
 }
 
-void getClosestTrainer(t_pokemon* pkmAvailable){
+void getClosestTrainer(t_pokemon* pkmAvailable, int pkmAvailablePos){
+	log_debug(logger,"obteniendo el entrenador mas cercano");
 	int closestNew;
 	int closestBlocked;
 	log_debug(logger,"%i",getCountBlockedAvailable());
 	if(getCountBlockedAvailable()==0){
 		log_debug(logger,"entre");
 		closestNew = getClosestTrainerNew(pkmAvailable);
-
 		statesLists.newList.trainerList[closestNew].parameters.scheduledPokemon=*pkmAvailable;
-		addToReady(statesLists.newList.trainerList[closestNew]);
+		removeFromAvailable(pkmAvailablePos);
+		addToReady(&statesLists.newList.trainerList[closestNew]);
 		removeFromNew(closestNew);
 	}else if(statesLists.newList.count==0){
 		closestBlocked = getClosestTrainerBlocked(pkmAvailable);
 		statesLists.blockedList.trainerList[closestBlocked].parameters.scheduledPokemon=*pkmAvailable;
 		log_debug(logger,"se planificará al entrenador %i",statesLists.newList.trainerList[closestBlocked].id);
-		addToReady(statesLists.blockedList.trainerList[closestBlocked]);
+		removeFromAvailable(pkmAvailablePos);
+		addToReady(&statesLists.blockedList.trainerList[closestBlocked]);
 		log_debug(logger,"se planificará al entrenador %i",statesLists.newList.trainerList[closestBlocked].id);
 		removeFromBlocked(closestBlocked);
 	}else{
@@ -1215,15 +1330,17 @@ void getClosestTrainer(t_pokemon* pkmAvailable){
 		closestNew = getClosestTrainerNew(pkmAvailable);
 		closestBlocked = getClosestTrainerBlocked(pkmAvailable);
 
-		int distanceNew = getDistanceToPokemonTarget(statesLists.newList.trainerList[closestNew].parameters,*pkmAvailable);
-		int distanceBlocked = getDistanceToPokemonTarget(statesLists.blockedList.trainerList[closestBlocked].parameters,*pkmAvailable);
+		int distanceNew = getDistanceToPokemonTarget(statesLists.newList.trainerList[closestNew],*pkmAvailable);
+		int distanceBlocked = getDistanceToPokemonTarget(statesLists.blockedList.trainerList[closestBlocked],*pkmAvailable);
 			if(distanceNew<=distanceBlocked ){
 				statesLists.newList.trainerList[closestNew].parameters.scheduledPokemon=*pkmAvailable;
-				addToReady(statesLists.newList.trainerList[closestNew]);
+				removeFromAvailable(pkmAvailablePos);
+				addToReady(&statesLists.newList.trainerList[closestNew]);
 				removeFromNew(closestNew);
 			}else{
 				statesLists.blockedList.trainerList[closestBlocked].parameters.scheduledPokemon=*pkmAvailable;
-				addToReady(statesLists.blockedList.trainerList[closestBlocked]);
+				removeFromAvailable(pkmAvailablePos);
+				addToReady(&statesLists.blockedList.trainerList[closestBlocked]);
 				removeFromBlocked(closestBlocked);
 			}
 	}
@@ -1234,11 +1351,11 @@ int getClosestTrainerNew(t_pokemon* pkmAvailable){
 	int pos=-1;
 	int clockTimeToPokemonAux;
 	if(statesLists.newList.count>0){
-		clockTimeToPokemon = getDistanceToPokemonTarget(statesLists.newList.trainerList[0].parameters,*pkmAvailable);
+		clockTimeToPokemon = getDistanceToPokemonTarget(statesLists.newList.trainerList[0],*pkmAvailable);
 		pos = 0;
 		for(int i=1;i<statesLists.newList.count;i++){
 			if(statesLists.newList.trainerList[i].parameters.objetivesCount>statesLists.newList.trainerList[i].parameters.pokemonsCount){
-				clockTimeToPokemonAux = getDistanceToPokemonTarget(statesLists.newList.trainerList[i].parameters,*pkmAvailable);
+				clockTimeToPokemonAux = getDistanceToPokemonTarget(statesLists.newList.trainerList[i],*pkmAvailable);
 				if(clockTimeToPokemon > clockTimeToPokemonAux){
 					clockTimeToPokemon = clockTimeToPokemonAux;
 					pos=i;
@@ -1255,12 +1372,12 @@ int getClosestTrainerBlocked(t_pokemon* pkmAvailable){
 	if(getCountBlockedAvailable()>0){
 		int i=getFirstBlockedAvailable();
 		pos=i;
-		clockTimeToPokemon = getDistanceToPokemonTarget(statesLists.blockedList.trainerList[i].parameters,*pkmAvailable);
+		clockTimeToPokemon = getDistanceToPokemonTarget(statesLists.blockedList.trainerList[i],*pkmAvailable);
 		i++;
 		int clockTimeToPokemonAux;
 		for(;i<statesLists.blockedList.count;i++){
 			if(statesLists.blockedList.trainerList[i].blockState==AVAILABLE){
-				clockTimeToPokemonAux = getDistanceToPokemonTarget(statesLists.blockedList.trainerList[i].parameters,*pkmAvailable);
+				clockTimeToPokemonAux = getDistanceToPokemonTarget(statesLists.blockedList.trainerList[i],*pkmAvailable);
 				if(clockTimeToPokemon > clockTimeToPokemonAux){
 					clockTimeToPokemon = clockTimeToPokemonAux;
 					pos=i;
@@ -1276,49 +1393,49 @@ void scheduleByDistance(){
 		int i;
 		int selectedMissingPokemonCount;
 		for(int pkm=0;pkm<availablePokemons.count;pkm++){
-			log_debug(logger,"1. Available Itera en %i, max: %i",pkm,availablePokemons.count);
+			//log_debug(logger,"1. Available Itera en %i, max: %i",pkm,availablePokemons.count);
 			for(i=0; (i<missingPokemonsCount); i++){
-				log_debug(logger,"2. missingPokemons Itera en %i,max: %i",i,missingPokemonsCount);
+				//log_debug(logger,"2. missingPokemons Itera en %i,max: %i",i,missingPokemonsCount);
 				selectedMissingPokemonCount = 0;
 				log_debug(logger,"a. Comparo: %s %s",availablePokemons.pokemons[pkm].name,missingPkms[i].pokemon.name);
 				if(0==strcmp(availablePokemons.pokemons[pkm].name,missingPkms[i].pokemon.name)){
-					log_debug(logger,"entré");
+					//log_debug(logger,"entré");
 					selectedMissingPokemonCount = missingPkms[i].count;
-					log_debug(logger,"b. valido: readyList %i + blockedwaiting %i + exectrainer %i < missingPokemons %i",statesLists.readyList.count,getCountBlockedWaiting(),statesLists.execTrainer.boolean,missingPokemonsCount);
+					//log_debug(logger,"b. valido: readyList %i + blockedwaiting %i + exectrainer %i < missingPokemons %i",statesLists.readyList.count,getCountBlockedWaiting(),statesLists.execTrainer.boolean,missingPokemonsCount);
 					if(statesLists.readyList.count+getCountBlockedWaiting()+statesLists.execTrainer.boolean < missingPokemonsCount){
-						log_debug(logger,"entré");
-						log_debug(logger,"c. Comparo: %s %s",statesLists.execTrainer.trainer.parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name);
-						if(statesLists.execTrainer.trainer.parameters.scheduledPokemon.name==availablePokemons.pokemons[pkm].name){
-							log_debug(logger,"entré");
-							selectedMissingPokemonCount--;
-						}
-						for(int j=0;j<statesLists.readyList.count;j++){
-							log_debug(logger,"3. readyListCount Itera en %i, max: %i",j,statesLists.readyList.count);
-							log_debug(logger,"d. Comparo: %s %s",statesLists.readyList.trainerList[j].parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name);
-							if(statesLists.readyList.trainerList[j].parameters.scheduledPokemon.name ==availablePokemons.pokemons[pkm].name){
-								log_debug(logger,"entré");
+						//log_debug(logger,"entré");
+						if(statesLists.execTrainer.boolean!=0){
+							log_debug(logger,"c. Comparo: %s %s",statesLists.execTrainer.trainer.parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name);
+							if(0==strcmp(statesLists.execTrainer.trainer.parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name)){
+								//log_debug(logger,"entré");
 								selectedMissingPokemonCount--;
 							}
 						}
-						for(int j=0;statesLists.blockedList.count;j++){
-							log_debug(logger,"4. readyListCount Itera en %i, max: %i",j,statesLists.readyList.count);
-							log_debug(logger,"e. Comparo: %s %s",statesLists.blockedList.trainerList[j].blockState,WAITING);
+						for(int j=0;j<statesLists.readyList.count;j++){
+							//log_debug(logger,"3. readyListCount Itera en %i, max: %i",j,statesLists.readyList.count);
+							//log_debug(logger,"d. Comparo: %s %s",statesLists.readyList.trainerList[j].parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name);
+							if(strcmp(statesLists.readyList.trainerList[j].parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name)){
+								//log_debug(logger,"entré");
+								selectedMissingPokemonCount--;
+							}
+						}
+						for(int j=0;j<statesLists.blockedList.count;j++){
+							//log_debug(logger,"4. readyListCount Itera en %i, max: %i",j,statesLists.readyList.count);
+							//log_debug(logger,"e. Comparo: %s %s",statesLists.blockedList.trainerList[j].blockState,WAITING);
 							if(statesLists.blockedList.trainerList[j].blockState==WAITING){
-								log_debug(logger,"entré");
-								log_debug(logger,"e. Comparo: %s %s",statesLists.blockedList.trainerList[j].parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name);
-								if(statesLists.blockedList.trainerList[j].parameters.scheduledPokemon.name ==availablePokemons.pokemons[pkm].name){
-									log_debug(logger,"entré");
+								//log_debug(logger,"entré");
+								//log_debug(logger,"e. Comparo: %s %s",statesLists.blockedList.trainerList[j].parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name);
+								if(0==strcmp(statesLists.blockedList.trainerList[j].parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name)){
+									//log_debug(logger,"entré");
 									selectedMissingPokemonCount--;
 								}
 							}
 						}
 
 						if(selectedMissingPokemonCount>0){
-							log_debug(logger,"Se buscara al enrrenador mas cercano");
-							getClosestTrainer(&(availablePokemons.pokemons[pkm]));
-							pthread_create(thread,NULL,(void*)startScheduling,NULL);
-							pthread_detach(*thread);
-							pthread_exit(*thread);
+							//log_debug(logger,"Se buscara al enrrenador mas cercano");
+							getClosestTrainer(&(availablePokemons.pokemons[pkm]),pkm);
+							return;
 						}
 
 					}
@@ -1327,6 +1444,7 @@ void scheduleByDistance(){
 			}
 		}
 	}
+	sem_post(&(availableTrainersCount_sem));
 }
 
 
@@ -1339,8 +1457,6 @@ void scheduleFifo(){
 		while(valueOfExecuteClock){
 			valueOfExecuteClock = executeClock();
 		}
-		removeFromExec();
-		addToBlocked(statesLists.execTrainer.trainer);
 	}
 }
 
@@ -1350,14 +1466,18 @@ void scheduleRR(){
 		int valueOfExecuteClock = 1;
 		addToExec(statesLists.readyList.trainerList[0]);
 		removeFromReady(0);
-		for(int i=0;i<(int)(schedulingAlgorithm.quantum) && valueOfExecuteClock == 1;i++){
-			valueOfExecuteClock = executeClock();
+		for(int i=0;i<schedulingAlgorithm.quantum;i++){
+			if(valueOfExecuteClock == 1){
+				valueOfExecuteClock = executeClock();
+			}
 		}
 		if(valueOfExecuteClock == 1){
 			removeFromExec();
-			addToReady(statesLists.execTrainer.trainer);
+			addToReady(&statesLists.execTrainer.trainer);
 		}else{
 			removeFromExec();
+			statesLists.execTrainer.boolean=0;
+			statesLists.execTrainer.trainer.blockState=AVAILABLE;
 			addToBlocked(statesLists.execTrainer.trainer);
 		}
 	}
@@ -1412,7 +1532,7 @@ void scheduleSJFCD(){
 			removeFromExec();
 			addToBlocked(statesLists.execTrainer.trainer);
 		}else{
-			addToReady(statesLists.execTrainer.trainer);
+			addToReady(&statesLists.execTrainer.trainer);
 			removeFromExec();
 		}
 
@@ -1423,7 +1543,7 @@ void scheduleSJFCD(){
 int evaluateDeadlockCondition(){
 	int deadlock=0;
 	int blockedDeadlocks = blockedInDeadlock();
-	if((statesLists.readyList.count == 0) && blockedDeadlocks && (statesLists.execTrainer.boolean == 0)){
+	if((statesLists.readyList.count == 0) && (statesLists.newList.count == 0) && blockedDeadlocks && (statesLists.execTrainer.boolean == 0)){
 		deadlock = 1;
 	}
 	return deadlock;
@@ -1474,10 +1594,10 @@ int getTrainerWithBestEstimatedBurst(){
 
 int executeClock(){
 
-	if(getDistanceToPokemonTarget(statesLists.execTrainer.trainer.parameters,statesLists.execTrainer.trainer.parameters.scheduledPokemon)!=0){
+	if(getDistanceToPokemonTarget(statesLists.execTrainer.trainer,statesLists.execTrainer.trainer.parameters.scheduledPokemon)!=0){
 		moveTrainerToObjective(&(statesLists.execTrainer.trainer));
 		return 1;
-	}else if(getDistanceToPokemonTarget(statesLists.execTrainer.trainer.parameters,statesLists.execTrainer.trainer.parameters.scheduledPokemon)==0){
+	}else if(getDistanceToPokemonTarget(statesLists.execTrainer.trainer,statesLists.execTrainer.trainer.parameters.scheduledPokemon)==0){
 		catchPokemon();
 		return 0;
 	}
@@ -1486,17 +1606,67 @@ int executeClock(){
 
 void catchPokemon(){
 	if(connectedToBroker){
+		log_debug(logger,"Se enviará el catch");
 		catch_pokemon catch;
 		catch.pokemonName = statesLists.execTrainer.trainer.parameters.scheduledPokemon.name;
 		catch.horizontalCoordinate = statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.x;
 		catch.verticalCoordinate = statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.y;
 		Send_CATCH(catch, connectBroker(broker.ip, broker.port));
+
+		sleep(clockSimulationTime);
+		log_debug(logger,"Se envió el catchdel pokemon %s por elentrenador %i",catch.pokemonName,statesLists.execTrainer.trainer.id);
 		statesLists.execTrainer.trainer.blockState = WAITING;
+		addToBlocked(statesLists.execTrainer.trainer);
+		removeFromExec();
 	}else{
-		statesLists.execTrainer.trainer.blockState = AVAILABLE;
-		statesLists.execTrainer.trainer.parameters.pokemons[statesLists.execTrainer.trainer.parameters.pokemonsCount]=statesLists.execTrainer.trainer.parameters.scheduledPokemon;
+		removeFromMissingPkms(statesLists.execTrainer.trainer.parameters.scheduledPokemon);
+		addToPokemonList(&(statesLists.execTrainer.trainer));
+		log_debug(logger,"Se captura el pokemon por falta de conexión con broker");
+
+		if(statesLists.execTrainer.trainer.parameters.objetivesCount==statesLists.execTrainer.trainer.parameters.pokemonsCount){
+			if(checkTrainerState(statesLists.execTrainer.trainer)==1){
+				statesLists.execTrainer.trainer.blockState = DEADLOCK;
+				addToBlocked(statesLists.execTrainer.trainer);
+				removeFromExec();
+			}else{
+				addToExit(statesLists.execTrainer.trainer);
+				removeFromExec();
+			}
+		}else{
+			statesLists.execTrainer.trainer.blockState = AVAILABLE;
+			addToBlocked(statesLists.execTrainer.trainer);
+			removeFromExec();
+			sem_post(&(availableTrainersCount_sem));
+		}
+
 	}
 
+}
+
+int checkTrainerState(t_trainer trainer){
+	int distinctPkmCount;
+	for(int i=0;i<trainer.parameters.objetivesCount;i++){
+		log_debug(logger,"se comparán %i objetivos y %i pokemons atrapados ",trainer.parameters.objetivesCount,trainer.parameters.pokemonsCount);
+		distinctPkmCount=0;
+		for(int j=0;j<trainer.parameters.objetivesCount;j++){
+			log_debug(logger,"1 se compará %s con %s ",trainer.parameters.objetives[i].name,trainer.parameters.objetives[j].name);
+			if(0==strcmp(trainer.parameters.objetives[i].name,trainer.parameters.objetives[j].name)){
+				distinctPkmCount++;
+			}
+		}
+		for(int k=0;k<trainer.parameters.pokemonsCount;k++){
+			log_debug(logger,"2 se compará %s con %s ",trainer.parameters.objetives[i].name,trainer.parameters.pokemons[k].name);
+			if(0==strcmp(trainer.parameters.objetives[i].name,trainer.parameters.pokemons[k].name)){
+				distinctPkmCount--;
+			}
+		}
+		if(distinctPkmCount!=0){
+			log_error(logger,"Entrenador en deadlock");
+			return 1;//deadlock
+		}
+	}
+	log_error(logger,"Entrenador finalizado");
+	return 0;//exit
 }
 
 //TODO - Función que mueve al entrenador - Falta ver como implementaremos los semáforos
@@ -1511,19 +1681,23 @@ void moveTrainerToObjective(t_trainer* trainer){
 //TODO - funcion que mueve una posición al entrenador - Falta Definir como haremos el CATCH
 void moveTrainerToTarget(t_trainer* trainer, int distanceToMoveInX, int distanceToMoveInY){
 	if(distanceToMoveInX > 0){
-		trainer->parameters.position.x++;
+		trainer->parameters.position.x--;
+		sleep(clockSimulationTime);
 		log_debug(logger,"Se movió al entrenador a la posición %d %d", trainer->parameters.position.x, trainer->parameters.position.y);
 	}
 	else if(distanceToMoveInX < 0){
-		trainer->parameters.position.x--;
+		trainer->parameters.position.x++;
+		sleep(clockSimulationTime);
 		log_debug(logger,"Se movió al entrenador a la posición %d %d", trainer->parameters.position.x, trainer->parameters.position.y);
 	}
 	else if(distanceToMoveInY > 0){
-		trainer->parameters.position.y++;
+		trainer->parameters.position.y--;
+		sleep(clockSimulationTime);
 		log_debug(logger,"Se movió al entrenador a la posición %d %d", trainer->parameters.position.x, trainer->parameters.position.y);
 	}
 	else if(distanceToMoveInY < 0){
-		trainer->parameters.position.y--;
+		trainer->parameters.position.y++;
+		sleep(clockSimulationTime);
 		log_debug(logger,"Se movió al entrenador a la posición %d %d", trainer->parameters.position.x, trainer->parameters.position.y);
 	}
 
@@ -1540,16 +1714,17 @@ int calculateDifference(int oldPostion, int newPosition){
 //Función que calcula los ciclos de Reloj que demora en mover al entrenador
 int getClockTimeToNewPosition(int difference_x, int difference_y){
 	int clockTime = 0;
-	clockTime = (difference_x >= 0) ? clockTime + difference_x : clockTime - difference_x;
-	clockTime = (difference_y >= 0) ? clockTime + difference_y : clockTime - difference_y;
+	clockTime += (difference_x >= 0) ? difference_x : (difference_x*(-1));
+	clockTime += (difference_y >= 0) ? difference_y : (difference_y*(-1));
 	return clockTime;
 }
 
 
-int getDistanceToPokemonTarget(t_trainerParameters trainer,  t_pokemon targetPokemon){
-	int distanceInX = calculateDifference(trainer.position.x, targetPokemon.position.x);
-	int distanceInY = calculateDifference(trainer.position.y, targetPokemon.position.y);
+int getDistanceToPokemonTarget(t_trainer trainer,  t_pokemon targetPokemon){
+	int distanceInX = calculateDifference(trainer.parameters.position.x, targetPokemon.position.x);
+	int distanceInY = calculateDifference(trainer.parameters.position.y, targetPokemon.position.y);
 	int distance = getClockTimeToNewPosition(distanceInX, distanceInY);
+	log_debug(logger,"Entrenador: %i en X=%i Y=%i, Pokemon %s en X=%i Y=%i distancia %i",trainer.id,trainer.parameters.position.x, trainer.parameters.position.y,targetPokemon.name,targetPokemon.position.x,targetPokemon.position.y,distance);
 	return distance;
 }
 

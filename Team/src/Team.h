@@ -160,7 +160,7 @@ void readConfigBrokerValues(t_config*,struct Broker*);
 void readConfigSchedulerValues(t_config*, struct SchedulingAlgorithm*);
 void readConfigTrainersValues(t_config*,char***,char***,char***);
 void initScheduler(struct SchedulingAlgorithm*);
-void addToReady(t_trainer);
+void addToReady(t_trainer*);
 void addToExec(t_trainer);
 void scheduleFifo();
 void scheduleRR();
@@ -214,15 +214,22 @@ void removeFromReady(int);
 int getCountBlockedWaiting();
 int getCountBlockedAvailable();
 int getFirstBlockedAvailable();
-void getClosestTrainer(t_pokemon*);
+void getClosestTrainer(t_pokemon*,int);
 int getClosestTrainerNew(t_pokemon*);
 int getClosestTrainerBlocked(t_pokemon*);
 void initTrainerName();
 void readConfigReconnectWaiting(t_config*);
+void readConfigClockSimulationTime(t_config*);
 void catchPokemon();
 void readConfigTeamValues(t_config*);
-void* startScheduling();
+void* startCloseScheduling();
 void initializeLists();
+void removeFromAvailable(int);
+void* startAlgorithmScheduling();
+void schedule();
+void addToPokemonList(t_trainer*);
+
+
 
 
 void initBroker(struct Broker *broker){
@@ -246,7 +253,7 @@ void initScheduler(struct SchedulingAlgorithm *schedulingAlgorithm){
 void moveTrainerToTarget(t_trainer*, int distanceToMoveInX, int distanceToMoveInY);
 void moveTrainerToObjective(t_trainer*);
 int calculateDifference(int, int);
-int getDistanceToPokemonTarget(t_trainerParameters, t_pokemon);
+int getDistanceToPokemonTarget(t_trainer, t_pokemon);
 void moveTrainetToObjective(t_trainer*, t_pokemon*);
 int executeClock();
 int readConfigAlphaValue(t_config*);

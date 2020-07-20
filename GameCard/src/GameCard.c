@@ -231,8 +231,9 @@ void GameCard_Wait_For_Message(void* variables){
 	if (!resultado)
 	{
 		deli_message* message = (deli_message*)content;
+		log_debug(GameCard->logger,"Suscriptor que envia el acknowldge: %d", suscription);
 		int result = SendMessageAcknowledge(message->id, suscription);
-
+		log_debug(GameCard->logger, "Resultado del acknowdlege: %d", result);
 		t_args_process_message* argsProcessMessage= (t_args_process_message*) malloc (sizeof (t_args_process_message));
 		argsProcessMessage->message = message;
 		argsProcessMessage->brokerAddress= brokerAddress;
@@ -284,11 +285,13 @@ void GameCard_Process_Message(void* variables){
 	t_args_process_message* args = (t_args_process_message*)variables;
 
 	deli_message* message = args->message;
-	struct Broker broker = *((struct Broker*) ((t_args*)variables)->brokerAddress);
+	struct Broker broker = *((struct Broker*) args->brokerAddress);
 
 
 	void* responseMessage;
 	int result;
+
+	log_debug(GameCard->logger, "voy a procesar el mensaje ");
 
 	switch (message->messageType){
 		case NEW_POKEMON: {
@@ -296,7 +299,7 @@ void GameCard_Process_Message(void* variables){
 			appeared_pokemon* appearedPokemon = (appeared_pokemon*)responseMessage;
 
 			int brokerSocket = connectBroker(broker.ip,broker.port,GameCard->logger);
-			if (brokerSocket!=1){
+			if (brokerSocket > 0){
 				result=Send_APPEARED(*(appearedPokemon),message->id,brokerSocket);
 			}else{
 				log_info(GameCard->logger, "El Mensaje no pudo ser enviado al broker");
@@ -309,7 +312,7 @@ void GameCard_Process_Message(void* variables){
 			localized_pokemon* localizedPokemon = (localized_pokemon*)responseMessage;
 
 			int brokerSocket = connectBroker(broker.ip,broker.port,GameCard->logger);
-			if (brokerSocket!= -1){
+			if (brokerSocket > 0){
 				result=Send_LOCALIZED(*(localizedPokemon),message->id,brokerSocket);
 			}else{
 				log_info(GameCard->logger, "El Mensaje no pudo ser enviado al broker");
@@ -323,7 +326,7 @@ void GameCard_Process_Message(void* variables){
 			caught_pokemon* caughtPokemon = (caught_pokemon*) responseMessage;
 
 			int brokerSocket = connectBroker(broker.ip,broker.port,GameCard->logger);
-			if (brokerSocket != -1){
+			if (brokerSocket > 0){
 				result=Send_CAUGHT(*(caughtPokemon),message->id,brokerSocket);
 			}else{
 				log_info(GameCard->logger, "El Mensaje no pudo ser enviado al broker");
@@ -1660,13 +1663,17 @@ int create_directory(char* directory){
 //BROKER LOGIC
 void readConfigBrokerValues(t_config *config,t_log *logger,struct Broker *broker){
 	if (config_has_property(config,broker->ipKey)){
-		broker->ip=config_get_string_value(config,broker->ipKey);
+		char* aux = config_get_string_value(config,broker->ipKey);
+		broker->ip=(char*)malloc(strlen(aux)+1);
+		strcpy(broker->ip,aux);
 	}else{
 		exit(-3);
 	}
 
 	if (config_has_property(config,broker->portKey)){
-		broker->port=config_get_string_value(config,broker->portKey);
+		char* aux = config_get_string_value(config,broker->portKey);
+		broker->port=(char*)malloc(strlen(aux)+1);
+		strcpy(broker->port,aux);
 	}else{
 		exit(-3);
 	}
@@ -1689,8 +1696,9 @@ void* subscribeToBrokerNew(void *brokerAdress){
 	int connectionSuccess = 0;
 	while (!connectionSuccess){
 		socketNew = connectBroker(broker.ip,broker.port,GameCard->logger);
-		if (socketNew != -1){
+		if (socketNew > 0){
 			if (-1==SendSubscriptionRequest(NEW_POKEMON,socketNew)){
+				sleep(GameCard->retryConnection);
 			}else{
 				connectionSuccess=1;
 			}
@@ -1719,8 +1727,9 @@ void* subscribeToBrokerCatch(void *brokerAdress){
 	int connectionSuccess = 0;
 	while (!connectionSuccess){
 		socketCatch = connectBroker(broker.ip,broker.port,GameCard->logger);
-		if (socketCatch != -1){
+		if (socketCatch > 0){
 			if(-1==SendSubscriptionRequest(CATCH_POKEMON,socketCatch)){
+				sleep(GameCard->retryConnection);
 			}else{
 				connectionSuccess=1;
 			}
@@ -1745,9 +1754,10 @@ void* subscribeToBrokerGet(void *brokerAdress){
 	struct Broker broker = *((struct Broker*) brokerAdress);
 	int socketGet;
 	int connectionSuccess = 0;
+
 	while (!connectionSuccess){
 		socketGet = connectBroker(broker.ip,broker.port,GameCard->logger);
-		if (socketGet != -1){
+		if (socketGet > 0){
 			if(-1==SendSubscriptionRequest(GET_POKEMON,socketGet)){
 			}else{
 				connectionSuccess = 1;

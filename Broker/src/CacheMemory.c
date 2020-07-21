@@ -53,6 +53,7 @@ void start_cache(t_log* log)
 		first_partition->size = (int)pow(2, powerOfTwo);
 	}
 
+	//Initialize lists
 	sem_wait(&mutex_cached_messages);
     cached_messages = list_create();
 	sem_post(&mutex_cached_messages);
@@ -62,6 +63,11 @@ void start_cache(t_log* log)
 	partitions = list_create();
     list_add(partitions, first_partition);
 	sem_post(&mutex_partitions);
+
+
+	sem_wait(&mutex_parent_partitions);
+	parent_partitions = list_create();
+	sem_post(&mutex_parent_partitions);
 
     PrintDumpOfCache();
 
@@ -172,8 +178,8 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
 		while(run == 1)
 		{
 			if(
-				(partition->size / 2 < messageBuffer->bufferSize && partition->size >= messageBuffer->bufferSize) ||
-				partition->size / 2 >= config_get_int_value(config, TAMANO_MINIMO_PARTICION)
+				(partition->size / 2 < newPartitionSize && partition->size >= newPartitionSize) ||
+				partition->size / 2 < config_get_int_value(config, TAMANO_MINIMO_PARTICION)
 			)
 			{
 				partition->queue_type = queue;
@@ -289,29 +295,25 @@ void compact_memory(void){
 
 
     //- create big empty partition
-    sem_wait(&mutex_occupied_partitions);
+
     uint32_t occupied_size = add_occupied_size_from(occupied_partitions);
-    sem_post(&mutex_occupied_partitions);
+
 
     t_partition* emptySpacePartition = CreateNewPartition();
-    emptySpacePartition->begining = NULL;
     emptySpacePartition->size = cache.memory_size - occupied_size;
+    emptySpacePartition->begining = cache.full_memory + emptySpacePartition->size;
     emptySpacePartition->queue_type = 0;
     emptySpacePartition->free = true;
 
-    sem_wait(&mutex_occupied_partitions);
-    list_add(occupied_partitions, emptySpacePartition);
-    sem_post(&mutex_occupied_partitions);
 
-    sem_wait(&mutex_occupied_partitions);
+    list_add(occupied_partitions, emptySpacePartition);
+
+
     list_iterate(occupied_partitions, (void*)_asignPartitionOnBackUpMem);
-    sem_post(&mutex_occupied_partitions);
 
     memcpy(cache.full_memory, backUp_memory, sizeof(cache.memory_size));
 
-    sem_wait(&mutex_occupied_partitions);
     list_iterate(occupied_partitions, (void*)_reasignPartitionPointers);
-    sem_post(&mutex_occupied_partitions);
 
     free(backUp_memory);
 
@@ -328,12 +330,11 @@ void compact_memory(void){
 
 uint32_t add_occupied_size_from(t_list* occupied){
     uint32_t sum = 0;
-    t_partition* partition = (t_partition*) malloc(sizeof(t_partition*));
-    for (int i = 0; i < sizeof(occupied); ++i) {
+    t_partition* partition;
+    for (int i = 0; i < list_size(occupied); ++i) {
         partition = (t_partition*) list_get(occupied, i);
         sum += partition->size;
     }
-    free(partition);
     return sum;
 }
 
@@ -379,6 +380,7 @@ t_partition* delete_partition_lru(void){
     t_partition* leastUsedPartition = NULL;
     void _get_least_used(t_partition* partition)
     {
+    	if(partition->free) return;
         if(leastUsedPartition == NULL) leastUsedPartition = partition;
         else
         {
@@ -388,7 +390,6 @@ t_partition* delete_partition_lru(void){
 
     list_iterate(partitions, (void*)_get_least_used);
     leastUsedPartition->free = 1;
-    leastUsedPartition->timestap = clock();
 
     return leastUsedPartition;
 }
@@ -634,10 +635,10 @@ void start_consolidation_for(t_partition* freed_partition){
     if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") != 0)
     {
         uint32_t partitionId = freed_partition->id;
-
-        while(partitionId >= 0 )
+        int result = 0;
+        while(result != -1)
         {
-            partitionId = check_validations_and_consolidate_BS(partitionId);
+            result = check_validations_and_consolidate_BS(&partitionId);
         }
      }
     else
@@ -718,22 +719,30 @@ void check_validations_and_consolidate_PD(t_partition* freed_partition){
  * @return id of the parent that replaced both children to continue the recursion, if >= 0 then call again with the partition
  * id, if < 0 then break the cycle.
  */
-int check_validations_and_consolidate_BS(uint32_t freed_partition_id){
+int check_validations_and_consolidate_BS(uint32_t* freed_partition_id)
+{
 
-    bool _is_related_partition(t_partition* partition){
+    bool _is_related_partition(t_partition* partition)
+    {
         return ( partition->free
+        		&& partition->id != bs_freed_partition->id
                 && partition->size == bs_freed_partition->size
-                && partition -> parentId == bs_freed_partition->parentId);
+                && partition->parentId == bs_freed_partition->parentId);
     }
 
-    bool _has_wanted_id(t_partition* partition){ return partition->id == freed_partition_id;}
+    bool _has_wanted_id(t_partition* partition){ return partition->id == *freed_partition_id;}
 
     sem_wait(&mutex_partitions);
     bs_freed_partition = (t_partition*) list_find(partitions, (void*) _has_wanted_id);
     sem_post(&mutex_partitions);
+
+    log_info(cache_log, "ID OF DELETED PARTITION USED TO SEARCH %d", *freed_partition_id); //TODO REMOVE
+
+    log_info(cache_log, "ID OF FOUND PARTITION: %d", bs_freed_partition->id); //TODO REMOVE
         
     if(bs_freed_partition->size >= cache.memory_size)
         return -1;
+
 
     sem_wait(&mutex_partitions);
     t_partition* related_partition = (t_partition*) list_find(partitions, (void*) _is_related_partition);
@@ -742,7 +751,9 @@ int check_validations_and_consolidate_BS(uint32_t freed_partition_id){
     if(related_partition == NULL)
         return -1;
 
-    return consolidate(*(related_partition));
+    *freed_partition_id = consolidate(related_partition);
+
+    return 0;
 }
 
 void find_index_in_list_and_destroy(t_partition* partition){
@@ -780,44 +791,36 @@ double CalculateNearestPowerOfTwoRelativeToCache(int memoryLocation)
 		return 1;//powerOfTwo = (int)floor(log10(evenSize) / log10(2));
 }
 
-int consolidate(t_partition related_partition){
+uint32_t consolidate(t_partition* related_partition)
+{
 
-    bool _is_wanted_parent(t_partition* partition){ return(partition->id == related_partition.parentId); }
+	uint32_t parentId = related_partition->parentId;
 
-    t_partition* left_partition = &related_partition;
-
-    if(bs_freed_partition->begining < related_partition.begining){
-        left_partition = bs_freed_partition;
-        log_info(cache_log, "SE ASOCIARON LOS BLOQUES CON COMIENZO EN: %d %d",  bs_freed_partition->begining, related_partition.begining);
-    }else{
-        log_info(cache_log, "SE ASOCIARON LOS BLOQUES CON COMIENZO EN: %d %d", related_partition.begining, bs_freed_partition->begining);
-    }
-
-    sem_wait(&mutex_partitions);
-    t_partition* parent = (t_partition*) list_find(parent_partitions, (void*) _is_wanted_parent);
-    sem_post(&mutex_partitions);
-
-    parent->begining = left_partition->begining;
+    bool _is_wanted_parent(t_partition* partition){ return(partition->id == parentId); }
 
     bool _is_child_partition(t_partition* partition)
     {
-        return (partition->parentId == parent->id);
+        return (partition->parentId == parentId);
     }
 
-    void _free_partitions(t_partition* partition)
-    {
-        free(partition);
-    }
+    t_partition* left_partition = related_partition;
 
-    sem_wait(&mutex_partitions);
-    list_remove_and_destroy_by_condition(partitions, (void*)_is_child_partition, (void*)_free_partitions);
-    sem_post(&mutex_partitions);
+    if(bs_freed_partition->begining < related_partition->begining){
+        left_partition = bs_freed_partition;
+        log_info(cache_log, "SE ASOCIARON LOS BLOQUES CON COMIENZO EN: %d %d",  bs_freed_partition->begining, related_partition->begining);
+    }else{
+        log_info(cache_log, "SE ASOCIARON LOS BLOQUES CON COMIENZO EN: %d %d", related_partition->begining, bs_freed_partition->begining);
+    }
 
     sem_wait(&mutex_parent_partitions);
-    list_remove_by_condition(parent_partitions, (void*) _is_wanted_parent);
+    t_partition* parent = (t_partition*) list_remove_by_condition(parent_partitions, (void*) _is_wanted_parent);
     sem_post(&mutex_parent_partitions);
 
+    //parent->begining = left_partition->begining;
+
     sem_wait(&mutex_partitions);
+    list_remove_and_destroy_by_condition(partitions, (void*)_is_child_partition, (void*)Free_Partition);
+    list_remove_and_destroy_by_condition(partitions, (void*)_is_child_partition, (void*)Free_Partition);
     list_add(partitions, parent);
     sem_post(&mutex_partitions);
 
@@ -834,28 +837,22 @@ t_partition* create_childrens_from(t_partition* parent){
     one_children->free = 1;
     one_children->size = newPartitionsSize;
 
-    sem_wait(&mutex_partitions);
-    list_add(partitions, one_children);
-    sem_post(&mutex_partitions);
-
     t_partition* another_children = CreateNewPartition();
     another_children->parentId = parent->id;
-    one_children->parentId = parent->id;
-    one_children->begining = parent->begining + newPartitionsSize;
-    one_children->free = 1;
-    one_children->size = newPartitionsSize;
+    another_children->begining = parent->begining + newPartitionsSize;
+    another_children->free = 1;
+    another_children->size = newPartitionsSize;
 
     sem_wait(&mutex_partitions);
+    list_add(partitions, one_children);
     list_add(partitions, another_children);
+    list_remove(partitions ,find_index_in_list(parent));
     sem_post(&mutex_partitions);
 
     sem_wait(&mutex_parent_partitions);
     list_add(parent_partitions, parent);
     sem_post(&mutex_parent_partitions);
 
-    sem_wait(&mutex_partitions);
-    list_remove(partitions ,find_index_in_list(parent));
-    sem_post(&mutex_partitions);
 
     return one_children;
 }

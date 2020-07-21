@@ -109,7 +109,7 @@ t_partition* find_empty_partition_of_size(uint32_t size);
 uint32_t save_body_in_partition(t_buffer*, t_partition*, message_type); //check if this is needed
 void compact_memory(void);
 int find_index_in_list(t_partition* partition);
-int consolidate(t_partition related_partition);
+uint32_t consolidate(t_partition* related_partition);
 void find_index_in_list_and_destroy(t_partition* partition);
 void check_compact_restrictions(void);
 void delete_partition(void);
@@ -133,7 +133,7 @@ void PrintDumpOfCache();
 t_partition* create_childrens_from(t_partition* parent);
 void start_consolidation_for(t_partition* freed_partition);
 void check_validations_and_consolidate_PD(t_partition* freed_partition);
-int check_validations_and_consolidate_BS(uint32_t freed_partition_id);
+int check_validations_and_consolidate_BS(uint32_t* freed_partition_id);
 void find_index_in_list_and_destroy(t_partition* partition);
 void AddASentSubscriberToMessage(int messageId, int client);
 void AddAcknowledgeToMessage(int messageId);

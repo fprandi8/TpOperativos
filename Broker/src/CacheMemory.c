@@ -179,7 +179,7 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
 		{
 			if(
 				(partition->size / 2 < newPartitionSize && partition->size >= newPartitionSize) ||
-				partition->size / 2 <= config_get_int_value(config, TAMANO_MINIMO_PARTICION)
+				partition->size / 2 < config_get_int_value(config, TAMANO_MINIMO_PARTICION)
 			)
 			{
 				partition->queue_type = queue;
@@ -794,7 +794,14 @@ double CalculateNearestPowerOfTwoRelativeToCache(int memoryLocation)
 uint32_t consolidate(t_partition* related_partition)
 {
 
-    bool _is_wanted_parent(t_partition* partition){ return(partition->id == related_partition->parentId); }
+	uint32_t parentId = related_partition->parentId;
+
+    bool _is_wanted_parent(t_partition* partition){ return(partition->id == parentId); }
+
+    bool _is_child_partition(t_partition* partition)
+    {
+        return (partition->parentId == parentId);
+    }
 
     t_partition* left_partition = related_partition;
 
@@ -805,31 +812,15 @@ uint32_t consolidate(t_partition* related_partition)
         log_info(cache_log, "SE ASOCIARON LOS BLOQUES CON COMIENZO EN: %d %d", related_partition->begining, bs_freed_partition->begining);
     }
 
-    sem_wait(&mutex_partitions);
-    t_partition* parent = (t_partition*) list_find(parent_partitions, (void*) _is_wanted_parent);
-    sem_post(&mutex_partitions);
-
-    parent->begining = left_partition->begining;
-
-    bool _is_child_partition(t_partition* partition)
-    {
-        return (partition->parentId == parent->id);
-    }
-
-    void _free_partitions(t_partition* partition)
-    {
-        free(partition);
-    }
-
-    sem_wait(&mutex_partitions);
-    list_remove_and_destroy_by_condition(partitions, (void*)_is_child_partition, (void*)_free_partitions);
-    sem_post(&mutex_partitions);
-
     sem_wait(&mutex_parent_partitions);
-    list_remove_by_condition(parent_partitions, (void*) _is_wanted_parent);
+    t_partition* parent = (t_partition*) list_remove_by_condition(parent_partitions, (void*) _is_wanted_parent);
     sem_post(&mutex_parent_partitions);
 
+    //parent->begining = left_partition->begining;
+
     sem_wait(&mutex_partitions);
+    list_remove_and_destroy_by_condition(partitions, (void*)_is_child_partition, (void*)Free_Partition);
+    list_remove_and_destroy_by_condition(partitions, (void*)_is_child_partition, (void*)Free_Partition);
     list_add(partitions, parent);
     sem_post(&mutex_partitions);
 
@@ -846,18 +837,14 @@ t_partition* create_childrens_from(t_partition* parent){
     one_children->free = 1;
     one_children->size = newPartitionsSize;
 
-    sem_wait(&mutex_partitions);
-    list_add(partitions, one_children);
-    sem_post(&mutex_partitions);
-
     t_partition* another_children = CreateNewPartition();
-    another_children->parentId = parent->id;
     another_children->parentId = parent->id;
     another_children->begining = parent->begining + newPartitionsSize;
     another_children->free = 1;
     another_children->size = newPartitionsSize;
 
     sem_wait(&mutex_partitions);
+    list_add(partitions, one_children);
     list_add(partitions, another_children);
     list_remove(partitions ,find_index_in_list(parent));
     sem_post(&mutex_partitions);

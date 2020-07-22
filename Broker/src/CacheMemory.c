@@ -561,12 +561,19 @@ void AddAcknowledgeToMessage(int messageId)
 }
 
 //TODO ver aca clock
-void* GetMessageContent(int messageId)
+deli_message* GetMessage(int messageId)
 {
-    t_cachedMessage* message = GetCachedMessage(messageId);
-    t_partition* partition = GetPartition(message->partitionId);
+    t_cachedMessage* cachedMessage = GetCachedMessage(messageId);
+    t_partition* partition = GetPartition(cachedMessage->partitionId);
     UpdateTimestamp(partition->id);
-    return DeserializeMessageContent(partition->queue_type, partition->begining);
+
+	deli_message* message = (deli_message*)malloc(sizeof(deli_message));
+	message->id = cachedMessage->id;
+	message->correlationId = cachedMessage->corelationId;
+	message->messageType = cachedMessage->queue_type;
+	message->messageContent =  DeserializeMessageContent(partition->queue_type, partition->begining);
+
+    return message;
 }
 
 

@@ -120,7 +120,7 @@ t_partition* delete_partition_fifo(void); //delete by fifo
 t_partition* delete_partition_lru(void); //delete by lru
 t_list* GetMessagesFromQueue(message_type queue_type);
 t_cachedMessage* GetCachedMessage(int);
-void* GetMessageContent(int);
+deli_message* GetMessage(int);
 t_partition* CreateNewPartition();
 t_cachedMessage* create_cached_from_message(deli_message message);
 void Free_CachedMessage(t_cachedMessage*);

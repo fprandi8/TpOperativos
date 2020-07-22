@@ -221,7 +221,7 @@ void broker_suscribe_process(void* buffer, int cliente, t_Broker* broker)
 				//log_debug(broker->logger, "Envio mensaje al suscriptor: %d", cliente);
 
 				t_args_queue* args= (t_args_queue*) malloc (sizeof(t_args_queue));
-				args->message = message;
+				args->messageId = message->id;
 				args->queue = queueToSuscribe;
 				args->broker = broker;
 				args->cliente = cliente;
@@ -293,7 +293,7 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 		//log_debug(broker->logger, "Envio mensaje al suscriptor: %d", suscriptor->suscripted);
 
 		t_args_queue* args= (t_args_queue*) malloc (sizeof(t_args_queue));
-		args->message = message;
+		args->messageId = message->id;
 		args->queue = queue;
 		args->broker = broker;
 		args->cliente = suscriptor->suscripted;
@@ -309,11 +309,9 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 void queue_handler_send_message(void* args){
 
 	t_queue_handler* queue =((t_args_queue*)args)->queue;
-	deli_message* message= ((t_args_queue*)args)->message;
+	deli_message* message = GetMessage(((t_args_queue*)args)->messageId);
 	int client = ((t_args_queue*)args)->cliente;
 
-	//TODO sacar esto para la entrega Print in console the message type
-	puts(GetStringFromMessageType(message->messageType));
 
 	int result = SendMessage(*message,client);
 	log_info(broker->logger, "SE ENVIO EL MENSAJE AL CLIENTE %d", client);

@@ -440,6 +440,9 @@ t_partition* CreateNewPartition()
     t_partition* partition = (t_partition*)malloc(sizeof(t_partition));
 	partition->id = GetNewId();
 	partition->timestap = clock();
+	partition->parentId = 0;
+	partition->free = 1;
+	partition->begining = NULL;
     return partition;
 }
 
@@ -764,11 +767,13 @@ void find_index_in_list_and_destroy(t_partition* partition){
     sem_post(&mutex_partitions);
  }
 
-int find_index_in_list(t_partition* partition){
+int find_index_in_list(t_partition* partition)
+{
     int index = 0;
     int wanted_id = partition->id;
     t_partition* aux_partition;
-    while(index < sizeof(partitions)){
+    while(index < list_size(partitions))
+    {
         aux_partition = (t_partition*)list_get(partitions, index);
         if(aux_partition->id == wanted_id)
             break;

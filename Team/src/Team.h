@@ -64,6 +64,7 @@ typedef struct
 	int previousBurst;
 	float previousEstimate;
 	t_pokemon scheduledPokemon;//TODO: inicializar en "NULL"
+	int cpuClocksCount;
 } t_trainerParameters;
 
 typedef enum
@@ -235,6 +236,8 @@ void addToPokemonList(t_trainer*);
 void processAcknowledge(void*,uint32_t,uint32_t);
 void addToExit(t_trainer);
 void removeFromMissingPkms(t_pokemon);
+void* resolveDeadlock();
+void* finishTeam();
 
 
 

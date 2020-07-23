@@ -209,9 +209,11 @@ t_partition* find_empty_partition_of_size(uint32_t size)
     int compaction_frequency =  config_get_int_value(config, FRECUENCIA_COMPACTACION);
     if(partition != NULL) return partition;
     int busyPartitions = GetBusyPartitionsCount();
-    //If its not dynamic, we set compaction_frequency to the same as busy partitions we have
+    //If its BS or is Dynamic a has frequency -1,  we set compaction_frequency be to the same as busy partitions we have
     //0 frequency does not make sense, so we de-activate compaction_frequency also on 0
-    if(memorySchemeIsDynamic) compaction_frequency = busyPartitions;
+    if( !memorySchemeIsDynamic || (memorySchemeIsDynamic && compaction_frequency == -1) )
+         compaction_frequency = busyPartitions;
+
     do
     {
         if(partition == NULL)

@@ -87,7 +87,7 @@ t_message* ConvertDeliMessageToMessage(deli_message* deliMessage)
 t_buffer* SerializeNewPokemon(new_pokemon* newPokemon)
 {
 	//size of name, name, cordinate in x, cordinate in y, ammoun of pokemon
-	uint32_t sizeOfPokemonName = strlen(newPokemon->pokemonName) + 1;
+	uint32_t sizeOfPokemonName = strlen(newPokemon->pokemonName);
 
 	t_buffer* newBuffer = (t_buffer*)malloc(sizeof(t_buffer));
 	newBuffer->bufferSize = sizeof(uint32_t) * 4 + sizeOfPokemonName;
@@ -113,7 +113,7 @@ t_buffer* SerializeNewPokemon(new_pokemon* newPokemon)
 t_buffer* SerializeLocalizedPokemon(localized_pokemon* localizedPokemon)
 {
 	//size of name, name, ammount in x, cordinates
-	uint32_t sizeOfPokemonName = strlen(localizedPokemon->pokemonName) + 1;
+	uint32_t sizeOfPokemonName = strlen(localizedPokemon->pokemonName);
 
 	t_buffer* newBuffer = (t_buffer*)malloc(sizeof(t_buffer));
 	newBuffer->bufferSize = sizeof(uint32_t) * 2 + sizeOfPokemonName + sizeof(uint32_t) * localizedPokemon->ammount * 2;
@@ -144,7 +144,7 @@ t_buffer* SerializeLocalizedPokemon(localized_pokemon* localizedPokemon)
 t_buffer* SerializeGetPokemon(get_pokemon* getPokemon)
 {
 	//size of name, name, ammount in x, cordinates
-	uint32_t sizeOfPokemonName = strlen(getPokemon->pokemonName) + 1;
+	uint32_t sizeOfPokemonName = strlen(getPokemon->pokemonName);
 
 	t_buffer* newBuffer = (t_buffer*)malloc(sizeof(t_buffer));
 	newBuffer->bufferSize = sizeof(uint32_t) + sizeOfPokemonName;
@@ -164,7 +164,7 @@ t_buffer* SerializeGetPokemon(get_pokemon* getPokemon)
 t_buffer* SerializeCatchPokemon(catch_pokemon* catchPokemon)
 {
 	//size of name, name, cordinate in x, cordinate in y
-	uint32_t sizeOfPokemonName = strlen(catchPokemon->pokemonName) + 1;
+	uint32_t sizeOfPokemonName = strlen(catchPokemon->pokemonName);
 
 	t_buffer* newBuffer = (t_buffer*)malloc(sizeof(t_buffer));
 	newBuffer->bufferSize = sizeof(uint32_t) * 3 + sizeOfPokemonName;
@@ -203,7 +203,7 @@ t_buffer* SerializeCaughtPokemon(caught_pokemon* caughtPokemon)
 t_buffer* SerializeAppearedPokemon(appeared_pokemon* appearedPokemon)
 {
 	//size of name, name, cordinate in x, cordinate in y
-	uint32_t sizeOfPokemonName = strlen(appearedPokemon->pokemonName) + 1;
+	uint32_t sizeOfPokemonName = strlen(appearedPokemon->pokemonName);
 
 	t_buffer* newBuffer = (t_buffer*)malloc(sizeof(t_buffer));
 	newBuffer->bufferSize = sizeof(uint32_t) * 3 + sizeOfPokemonName;
@@ -303,10 +303,11 @@ new_pokemon* DeserializeNewPokemon(void* serializedNewPokemon)
 
 	uint32_t sizeOfPokemonName;
 	memcpy(&(sizeOfPokemonName),serializedNewPokemon, sizeof(uint32_t));
-	newPokemon->pokemonName = malloc(sizeOfPokemonName);
+	newPokemon->pokemonName = malloc(sizeOfPokemonName + 1);
 	serializedNewPokemon += sizeof(uint32_t);
 	newPokemon->pokemonName = (char*)malloc(sizeOfPokemonName);
 	memcpy(newPokemon->pokemonName, serializedNewPokemon, sizeOfPokemonName);
+	newPokemon->pokemonName[sizeOfPokemonName] = '\0';
 	serializedNewPokemon += sizeOfPokemonName;
 	memcpy(&(newPokemon->horizontalCoordinate), serializedNewPokemon, sizeof(uint32_t));
 	serializedNewPokemon += sizeof(uint32_t);
@@ -325,8 +326,9 @@ localized_pokemon* DeserializeLocalizedPokemon(void* serializedLocalizedPokemon)
 	uint32_t sizeOfPokemonName;
 	memcpy(&(sizeOfPokemonName),serializedLocalizedPokemon, sizeof(uint32_t));
 	serializedLocalizedPokemon += sizeof(uint32_t);
-	localizedPokemon->pokemonName = (char*)malloc(sizeOfPokemonName);
+	localizedPokemon->pokemonName = (char*)malloc(sizeOfPokemonName + 1);
 	memcpy(localizedPokemon->pokemonName, serializedLocalizedPokemon, sizeOfPokemonName);
+	localizedPokemon->pokemonName[sizeOfPokemonName] = '\0';
 	serializedLocalizedPokemon += sizeOfPokemonName;
 	memcpy(&(localizedPokemon->ammount), serializedLocalizedPokemon,  sizeof(uint32_t));
 	serializedLocalizedPokemon += sizeof(uint32_t);
@@ -352,8 +354,9 @@ get_pokemon* DeserializeGetPokemon(void* serializedGetPokemon)
 	uint32_t sizeOfPokemonName;
 	memcpy(&(sizeOfPokemonName),serializedGetPokemon, sizeof(uint32_t));
 	serializedGetPokemon += sizeof(uint32_t);
-	getPokemon->pokemonName = (char*)malloc(sizeOfPokemonName);
+	getPokemon->pokemonName = (char*)malloc(sizeOfPokemonName + 1);
 	memcpy(getPokemon->pokemonName, serializedGetPokemon, sizeOfPokemonName);
+	getPokemon->pokemonName[sizeOfPokemonName] = '\0';
 
 	return getPokemon;
 }
@@ -365,10 +368,11 @@ catch_pokemon* DeserializeCatchPokemon(void* serializedCatchPokemon)
 
 	uint32_t sizeOfPokemonName;
 	memcpy(&(sizeOfPokemonName),serializedCatchPokemon, sizeof(uint32_t));
-	catchPokemon->pokemonName = malloc(sizeOfPokemonName);
+	//catchPokemon->pokemonName = malloc(sizeOfPokemonName);
 	serializedCatchPokemon += sizeof(uint32_t);
-	catchPokemon->pokemonName = (char*)malloc(sizeOfPokemonName);
+	catchPokemon->pokemonName = (char*)malloc(sizeOfPokemonName + 1);
 	memcpy(catchPokemon->pokemonName, serializedCatchPokemon, sizeOfPokemonName);
+	catchPokemon->pokemonName[sizeOfPokemonName] = '\0';
 	serializedCatchPokemon += sizeOfPokemonName;
 	memcpy(&(catchPokemon->horizontalCoordinate), serializedCatchPokemon, sizeof(uint32_t));
 	serializedCatchPokemon += sizeof(uint32_t);
@@ -396,8 +400,9 @@ appeared_pokemon* DeserializeAppearedPokemon(void* serializedAppearedPokemon)
 	memcpy(&(sizeOfPokemonName),serializedAppearedPokemon, sizeof(uint32_t));
 	appearedPokemon->pokemonName = malloc(sizeOfPokemonName);
 	serializedAppearedPokemon += sizeof(uint32_t);
-	appearedPokemon->pokemonName = (char*)malloc(sizeOfPokemonName);
+	appearedPokemon->pokemonName = (char*)malloc(sizeOfPokemonName+1);
 	memcpy(appearedPokemon->pokemonName, serializedAppearedPokemon, sizeOfPokemonName);
+	appearedPokemon->pokemonName[sizeOfPokemonName] = '\0';
 	serializedAppearedPokemon += sizeOfPokemonName;
 	memcpy(&(appearedPokemon->horizontalCoordinate), serializedAppearedPokemon, sizeof(uint32_t));
 	serializedAppearedPokemon += sizeof(uint32_t);

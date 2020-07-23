@@ -25,6 +25,10 @@ void start_cache(t_log* log)
     define_cache_maximum_size();
     set_full_memory();
 
+    memorySchemeIsDynamic = strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"PARTICIONES") == 0;
+    partitionSelectionIsFirstFit = strcmp(config_get_string_value(config, ALGORITMO_PARTICION_LIBRE),"FF") == 0;
+    victimSelectionIsFifo = strcmp(config_get_string_value(config, ALGORITMO_REEMPLAZO),"FIFO") == 0;
+
 	sem_init(&mutex_nextPartitionId, 0, 1);
 	sem_init(&mutex_partitions, 0, 1);
 	sem_init(&mutex_cached_messages, 0, 1);
@@ -34,7 +38,6 @@ void start_cache(t_log* log)
     sem_init(&mutex_saving, 0, 1);
 
     nextPartitionId = 0;
-	//signal(SIGUSR1, signal_handler);
 
     t_partition* first_partition = CreateNewPartition();
     first_partition->queue_type = 0;
@@ -42,7 +45,7 @@ void start_cache(t_log* log)
     first_partition->timestap = clock();
 	first_partition->begining = cache.full_memory;
 
-	if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") == 0)
+	if(memorySchemeIsDynamic)
 	{
     	first_partition->size = cache.memory_size;
 	}
@@ -208,7 +211,7 @@ t_partition* find_empty_partition_of_size(uint32_t size)
     int busyPartitions = GetBusyPartitionsCount();
     //If its not dynamic, we set compaction_frequency to the same as busy partitions we have
     //0 frequency does not make sense, so we de-activate compaction_frequency also on 0
-    if(compaction_frequency <= 0 || strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC")) compaction_frequency = busyPartitions;
+    if(memorySchemeIsDynamic) compaction_frequency = busyPartitions;
     do
     {
         if(partition == NULL)
@@ -234,7 +237,7 @@ t_partition* find_empty_partition_of_size(uint32_t size)
 
 t_partition* select_partition(uint32_t size){
 	t_partition *partition;
-    if(strcmp(config_get_string_value(config, ALGORITMO_PARTICION_LIBRE),"FF") == 0 && strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") == 0){ //compare dif algoritmos
+    if(partitionSelectionIsFirstFit && memorySchemeIsDynamic){ //compare dif algoritmos
         partition = select_partition_ff(size);
     }else{
         partition = select_partition_bf(size);
@@ -344,7 +347,7 @@ void check_compact_restrictions(void){
 
 void delete_partition(void){
     t_partition* deletedPartition;
-    if(strcmp(config_get_string_value(config, ALGORITMO_REEMPLAZO),"FIFO") == 0){ //compare dif algoritmos
+    if(victimSelectionIsFifo){ //compare dif algoritmos
     	deletedPartition = delete_partition_fifo();
     }else{
     	deletedPartition = delete_partition_lru();
@@ -642,7 +645,7 @@ void PrintDumpOfCache()
 void start_consolidation_for(t_partition* freed_partition){
 
 	log_info(cache_log, "ARRANCO LA CONSOLIDACION"); //TODO REMOVE
-    if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") != 0)
+    if(!memorySchemeIsDynamic)
     {
         uint32_t partitionId = freed_partition->id;
         int result = 0;

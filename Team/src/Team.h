@@ -18,7 +18,7 @@
 #include <arpa/inet.h>
 #include <semaphore.h>
 #include <commons/collections/list.h>
-#include <delibird/comms/pokeio.h>
+#include "delibird/comms/pokeio.h"
 #include <delibird/comms/messages.h>
 
 
@@ -61,7 +61,7 @@ typedef struct
 	int pokemonsCount;
 	t_pokemon* objetives;
 	uint32_t objetivesCount;
-	uint32_t previousBurst;
+	int previousBurst;
 	float previousEstimate;
 	t_pokemon scheduledPokemon;//TODO: inicializar en "NULL"
 } t_trainerParameters;
@@ -208,8 +208,8 @@ void addToBlocked(t_trainer);
 int startServer();
 int waitClient(int);
 void scheduleByDistance();
-void initPreviousBurst(t_trainer);
-void initScheduledPokemon(t_trainer);
+void initPreviousBurst(t_trainer*);
+void initScheduledPokemon(t_trainer*);
 void initBurstScheduledPokemon();
 void removeFromExit();
 void removeFromExec();

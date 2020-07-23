@@ -765,7 +765,7 @@ void removeLogger(char* logFilename)
 
 void createConfig(t_config **config)
 {
-	*config = config_create("Team.config");
+	*config = config_create("/home/utnso/workspace/tp-2020-1c-MATE-OS/Team/Team.config");
 	if (*config == NULL){
 		printf("No se pudo crear el config\n");
 		exit(2);
@@ -880,8 +880,8 @@ void startTrainers(int trainersCount,t_config *config){
 	log_debug(logger,"4. Comienza el proceso de carga de atributos en struc");
 	initTrainersPokemonLists();
 	getTrainerAttr(trainersPosition,trainersPokemons,trainersObjetives,trainersCount);
-	initBurstScheduledPokemon();
 	statesLists.newList.count=trainersCount;
+	initBurstScheduledPokemon();
 	initTrainerName();
 	log_debug(logger,"5.Comienza el proceso de creación de threads");
 	for(int actualTrainer = 0; actualTrainer < trainersCount; actualTrainer++){
@@ -889,14 +889,16 @@ void startTrainers(int trainersCount,t_config *config){
 		log_debug(logger,"Creando el entrenador %i",actualTrainer);
 		startTrainer(&(statesLists.newList.trainerList[actualTrainer]));
 	}
+
 	log_debug(logger,"5. Terminó el proceso de creación de threads");
 }
 
 void initBurstScheduledPokemon(){
 	for(int trainer = 0; trainer < statesLists.newList.count; trainer++){
-		initPreviousBurst(statesLists.newList.trainerList[trainer]);
-		initScheduledPokemon(statesLists.newList.trainerList[trainer]);
+		initPreviousBurst(&(statesLists.newList.trainerList[trainer]));
+		initScheduledPokemon(&(statesLists.newList.trainerList[trainer]));
 	}
+	log_info(logger,"valor del count %u", statesLists.newList.count);
 }
 
 void initTrainerName(){
@@ -905,12 +907,15 @@ void initTrainerName(){
 	}
 }
 
-void initPreviousBurst(t_trainer trainer){
-	trainer.parameters.previousBurst=-1;
+void initPreviousBurst(t_trainer* trainer){
+	log_error(logger, "id del entrenador %u", trainer->id);
+	trainer->parameters.previousBurst=-1;
+	log_error(logger, "previousBurst value %i", trainer->parameters.previousBurst);
+
 }
 
-void initScheduledPokemon(t_trainer trainer){
-	trainer.parameters.scheduledPokemon.name="NULL";
+void initScheduledPokemon(t_trainer* trainer){
+	trainer->parameters.scheduledPokemon.name="NULL";
 }
 
 void startTrainer(t_trainer* trainer){
@@ -1404,21 +1409,22 @@ void scheduleByDistance(){
 				if(0==strcmp(availablePokemons.pokemons[pkm].name,missingPkms[i].pokemon.name)){
 					//log_debug(logger,"entré");
 					selectedMissingPokemonCount = missingPkms[i].count;
+					log_info(logger,"selectedMissingPokemonCount: %i", selectedMissingPokemonCount);
 					//log_debug(logger,"b. valido: readyList %i + blockedwaiting %i + exectrainer %i < missingPokemons %i",statesLists.readyList.count,getCountBlockedWaiting(),statesLists.execTrainer.boolean,missingPokemonsCount);
 					if(statesLists.readyList.count+getCountBlockedWaiting()+statesLists.execTrainer.boolean < missingPokemonsCount){
 						//log_debug(logger,"entré");
 						if(statesLists.execTrainer.boolean!=0){
 							log_debug(logger,"c. Comparo: %s %s",statesLists.execTrainer.trainer.parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name);
 							if(0==strcmp(statesLists.execTrainer.trainer.parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name)){
-								//log_debug(logger,"entré");
+								log_info(logger,"entré 1");
 								selectedMissingPokemonCount--;
 							}
 						}
 						for(int j=0;j<statesLists.readyList.count;j++){
 							//log_debug(logger,"3. readyListCount Itera en %i, max: %i",j,statesLists.readyList.count);
 							//log_debug(logger,"d. Comparo: %s %s",statesLists.readyList.trainerList[j].parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name);
-							if(strcmp(statesLists.readyList.trainerList[j].parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name)){
-								//log_debug(logger,"entré");
+							if(0==strcmp(statesLists.readyList.trainerList[j].parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name)){
+								log_info(logger,"entré 2 con entrenado %u",statesLists.readyList.trainerList[j].id);
 								selectedMissingPokemonCount--;
 							}
 						}
@@ -1429,7 +1435,7 @@ void scheduleByDistance(){
 								//log_debug(logger,"entré");
 								//log_debug(logger,"e. Comparo: %s %s",statesLists.blockedList.trainerList[j].parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name);
 								if(0==strcmp(statesLists.blockedList.trainerList[j].parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name)){
-									//log_debug(logger,"entré");
+									log_info(logger,"entré 3");
 									selectedMissingPokemonCount--;
 								}
 							}
@@ -1512,7 +1518,7 @@ void scheduleSJFSD(){
 		}
 }
 
-
+//TODO - Jere fijate si entendes la función.
 void scheduleSJFCD(){
 	if(statesLists.readyList.count  && statesLists.execTrainer.boolean==0){
 		int pos = getTrainerWithBestEstimatedBurst();
@@ -1598,6 +1604,7 @@ float differenceBetweenEstimatedBurtsAndExecutedClocks(float estimatedTrainerBur
 
 float estimatedTimeForNextBurstCalculation(int pos){
 	float estimatedBurstTime;
+	log_error(logger,"valor de previous burst %i", statesLists.readyList.trainerList[pos].parameters.previousBurst);
 	if(statesLists.readyList.trainerList[pos].parameters.previousBurst==-1){
 		estimatedBurstTime=initialEstimatedBurst;
 	}else{

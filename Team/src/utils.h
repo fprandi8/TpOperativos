@@ -47,7 +47,7 @@ typedef struct
 {
 
 } t_map;
-/*
+*/
 
 int iniciar_cliente(char*, char*,t_log*);
 /*void* serializar_paquete(t_paquete*, int);

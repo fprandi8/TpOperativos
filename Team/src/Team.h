@@ -262,7 +262,7 @@ int calculateDifference(int, int);
 int getDistanceToPokemonTarget(t_trainer, t_pokemon);
 void moveTrainetToObjective(t_trainer*, t_pokemon*);
 int executeClock();
-int readConfigAlphaValue(t_config*);
+double readConfigAlphaValue(t_config*);
 int readConfigInitialEstimatedValue(t_config*);
 float estimatedTimeForNextBurstCalculation(int);
 void initializeTrainersWithBurts();

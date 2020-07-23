@@ -33,7 +33,7 @@ int globalObjetivesDistinctCount;
 int globalObjetivesCount;
 int missingPokemonsCount;//TODO: Decrementar cada vez que hay un caught
 struct SchedulingAlgorithm schedulingAlgorithm;
-int alphaForSJF;
+double alphaForSJF;
 int initialEstimatedBurst;
 char* RR = "RR";
 char* SJFCD = "SJF-CD";
@@ -102,6 +102,7 @@ int main(void) {
 
 	//Init Alpha for SJF and Initial Estimated Burst
 	alphaForSJF = readConfigAlphaValue(config);
+	log_info(logger, "alpha valor %f", alphaForSJF);
 	initialEstimatedBurst = readConfigInitialEstimatedValue(config);
 /*
 	teamSocket = iniciar_cliente(ip, port,logger);
@@ -851,10 +852,10 @@ void readConfigTrainersValues(t_config *config,char*** trainersPosition,char*** 
 
 }
 
-int readConfigAlphaValue(t_config *config){
+double readConfigAlphaValue(t_config *config){
 	if(config_has_property(config,"ALPHA")){
-		int alpha;
-		alpha=config_get_int_value(config,"ALPHA");
+		double alpha;
+		alpha=config_get_double_value(config,"ALPHA");
 		return alpha;
 	}else{
 		return 0;
@@ -908,9 +909,7 @@ void initTrainerName(){
 }
 
 void initPreviousBurst(t_trainer* trainer){
-	log_error(logger, "id del entrenador %u", trainer->id);
 	trainer->parameters.previousBurst=-1;
-	log_error(logger, "previousBurst value %i", trainer->parameters.previousBurst);
 
 }
 
@@ -1519,17 +1518,17 @@ void scheduleSJFSD(){
 		}
 }
 
-//TODO - Jere fijate si entendes la función.
+
 void scheduleSJFCD(){
 	if(statesLists.readyList.count  && statesLists.execTrainer.boolean==0){
 		int pos = getTrainerWithBestEstimatedBurst();
+		log_info(logger, "ráfaga ejecutada anteriormente %i ráfaga estimada anterior %f para entrenador %u ", statesLists.readyList.trainerList[pos].parameters.previousBurst,statesLists.readyList.trainerList[pos].parameters.previousEstimate,statesLists.readyList.trainerList[pos].id);
 		float estimatedBurstTimeForCPU = estimatedTimeForNextBurstCalculation(pos);
+		log_info(logger,"estimatedBurstTimeForCPU %f para entrenador %u ", estimatedBurstTimeForCPU,statesLists.readyList.trainerList[pos].id);
 		addToExec(statesLists.readyList.trainerList[pos]);
 		removeFromReady(pos);
 		int cutWhile = 1;
-		if(statesLists.execTrainer.trainer.parameters.previousBurst == -1){
-			statesLists.execTrainer.trainer.parameters.previousBurst = 0;
-		}
+		statesLists.execTrainer.trainer.parameters.previousBurst = 0;
 		statesLists.execTrainer.trainer.parameters.previousEstimate = estimatedBurstTimeForCPU;
 		while(cutWhile && (differenceBetweenEstimatedBurtsAndExecutedClocks(estimatedBurstTimeForCPU, statesLists.execTrainer.trainer.parameters.previousBurst)) <= estimatedTimeForNextBurstCalculation(getTrainerWithBestEstimatedBurst())){
 			estimatedBurstTimeForCPU--;
@@ -1539,6 +1538,8 @@ void scheduleSJFCD(){
 			}
 		}
 		if(cutWhile == 0){
+			log_info(logger,"ráfaga ejecutada %i para entrenador %u ", statesLists.execTrainer.trainer.parameters.previousBurst, statesLists.execTrainer.trainer.id);
+			log_info(logger,"rafaga estimada %f para entrenador %u ", statesLists.execTrainer.trainer.parameters.previousEstimate, statesLists.execTrainer.trainer.id);
 			removeFromExec();
 			addToBlocked(statesLists.execTrainer.trainer);
 		}else{
@@ -1605,7 +1606,6 @@ float differenceBetweenEstimatedBurtsAndExecutedClocks(float estimatedTrainerBur
 
 float estimatedTimeForNextBurstCalculation(int pos){
 	float estimatedBurstTime;
-	log_error(logger,"valor de previous burst %i", statesLists.readyList.trainerList[pos].parameters.previousBurst);
 	if(statesLists.readyList.trainerList[pos].parameters.previousBurst==-1){
 		estimatedBurstTime=initialEstimatedBurst;
 	}else{

@@ -1327,11 +1327,10 @@ void getClosestTrainer(t_pokemon* pkmAvailable, int pkmAvailablePos){
 		removeFromNew(closestNew);
 	}else if(statesLists.newList.count==0){
 		closestBlocked = getClosestTrainerBlocked(pkmAvailable);
+		log_info(logger, "posición del closestBloqued %i", closestBlocked);
 		statesLists.blockedList.trainerList[closestBlocked].parameters.scheduledPokemon=*pkmAvailable;
-		log_debug(logger,"se planificará al entrenador %i",statesLists.newList.trainerList[closestBlocked].id);
 		removeFromAvailable(pkmAvailablePos);
 		addToReady(&statesLists.blockedList.trainerList[closestBlocked]);
-		log_debug(logger,"se planificará al entrenador %i",statesLists.newList.trainerList[closestBlocked].id);
 		removeFromBlocked(closestBlocked);
 	}else{
 
@@ -1377,9 +1376,11 @@ int getClosestTrainerNew(t_pokemon* pkmAvailable){
 int getClosestTrainerBlocked(t_pokemon* pkmAvailable){
 	int clockTimeToPokemon;
 	int pos = -1;
+
 	if(getCountBlockedAvailable()>0){
 		int i=getFirstBlockedAvailable();
 		pos=i;
+		log_info(logger, "entrenador seleccionado de la lista bloque %u", statesLists.blockedList.trainerList[i].id);
 		clockTimeToPokemon = getDistanceToPokemonTarget(statesLists.blockedList.trainerList[i],*pkmAvailable);
 		i++;
 		int clockTimeToPokemonAux;

@@ -233,7 +233,8 @@ void* startAlgorithmScheduling();
 void schedule();
 void addToPokemonList(t_trainer*);
 void processAcknowledge(void*,uint32_t,uint32_t);
-
+void addToExit(t_trainer);
+void removeFromMissingPkms(t_pokemon);
 
 
 

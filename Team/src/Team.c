@@ -272,26 +272,8 @@ void* resolveDeadlock(){
 void planificateDeadlockTrainer(t_trainer* trainer){
 
 	addToReady(trainer);
-	addToExec(*trainer);
-	int cutWhile = 1;
-	while(cutWhile){
-		cutWhile = executeClockForDeadlockTrainers(trainer);
-	}
-}
+	sem_post(&(readyTrainer_sem));
 
-int executeClockForDeadlockTrainers(t_trainer* trainer){
-	if(getDistanceToTrainerToExchange(*trainer)!=0){
-		moveTrainerToObjectiveDeadlock(trainer);
-		trainer->parameters.cpuClocksCount++;
-		cpuClocksCount++;
-		return 1;
-	}else if(getDistanceToTrainerToExchange(*trainer)==0){
-		trainer->parameters.cpuClocksCount += 5;
-		cpuClocksCount += 5;
-		exchangePokemon(trainer);
-		return 0;
-	}
-	return -1;
 }
 
 void exchangePokemon(t_trainer* trainer){
@@ -1754,18 +1736,6 @@ void scheduleSJFCD(){
 	}
 }
 
-
-t_list_of_objectives_validation* createListOfBlockedObjectives(int position){
-
-	t_list_of_objectives_validation validationList;
-	for(int i=0; i < statesLists.blockedList.count; i++){
-		strcpy(validationList.pokemon[i].name, statesLists.blockedList.trainerList[position].parameters.objetives[i].name);
-		validationList.bit[i] = 0;
-	}
-	return &validationList;
-}
-
-
 void deadlockForTrainer(){
 	int flag;
 	for(int i = 0; i<statesLists.blockedList.count; i++){
@@ -1835,12 +1805,22 @@ int getTrainerWithBestEstimatedBurst(){
 
 int executeClock(){
 
+	if(statesLists.execTrainer.trainer.blockState!=DEADLOCK){
 	if(getDistanceToPokemonTarget(statesLists.execTrainer.trainer,statesLists.execTrainer.trainer.parameters.scheduledPokemon)!=0){
 		moveTrainerToObjective(&(statesLists.execTrainer.trainer));
 		return 1;
 	}else if(getDistanceToPokemonTarget(statesLists.execTrainer.trainer,statesLists.execTrainer.trainer.parameters.scheduledPokemon)==0){
 		catchPokemon();
 		return 0;
+	}
+		}else{
+			if(getDistanceToTrainerToExchange(statesLists.execTrainer.trainer)!=0){
+				moveTrainerToObjectiveDeadlock(&statesLists.execTrainer.trainer);
+				return 1;
+			}else if(getDistanceToTrainerToExchange(statesLists.execTrainer.trainer)==0){
+				exchangePokemon(&statesLists.execTrainer.trainer);
+				return 0;
+			}
 	}
 	return -1;
 }

@@ -245,6 +245,8 @@ int executeClockForDeadlockTrainers(t_trainer*);
 void moveTrainerToObjectiveDeadlock(t_trainer*);
 void exchangePokemon(t_trainer*);
 int getClockTimeToNewPosition(int, int);
+void planificateDeadlockTrainer(t_trainer*);
+int checkTrainerState(t_trainer);
 
 void initBroker(struct Broker *broker){
 	broker->ipKey="IP_BROKER";

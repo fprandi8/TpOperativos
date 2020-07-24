@@ -175,10 +175,98 @@ int main(void) {
 
 void* resolveDeadlock(){
 	sem_wait(&(deadlockCount_sem));
+	for(int trainerPos=0;trainerPos<statesLists.blockedList.count;trainerPos++){
+		if(statesLists.blockedList.trainerList[trainerPos].blockState==DEADLOCK){
+			for(int trainerPos2=trainerPos+1;trainerPos2<statesLists.blockedList.count;trainerPos2++){
+				if(statesLists.blockedList.trainerList[trainerPos2].blockState==DEADLOCK){
 
+
+					int distinctPkmCount;
+					int distinctPkmCount2;
+					int distinctPkmCount3;
+					for(int objPos=0;objPos<statesLists.blockedList.trainerList[trainerPos].parameters.objetivesCount;objPos++){
+						log_debug(logger,"se comparán %i objetivos y %i pokemons atrapados ",statesLists.blockedList.trainerList[trainerPos].parameters.objetivesCount,statesLists.blockedList.trainerList[trainerPos].parameters.pokemonsCount);
+						distinctPkmCount=0;
+						for(int objPosAux=0;objPosAux<statesLists.blockedList.trainerList[trainerPos].parameters.objetivesCount;objPosAux++){
+							log_debug(logger,"1 se compará %s con %s ",statesLists.blockedList.trainerList[trainerPos].parameters.objetives[objPos].name,statesLists.blockedList.trainerList[trainerPos].parameters.objetives[objPosAux].name);
+							if(0==strcmp(statesLists.blockedList.trainerList[trainerPos].parameters.objetives[objPos].name,statesLists.blockedList.trainerList[trainerPos].parameters.objetives[objPosAux].name)){
+								distinctPkmCount++;
+							}
+						}
+						for(int pkmPos=0;pkmPos<statesLists.blockedList.trainerList[trainerPos].parameters.pokemonsCount;pkmPos++){
+							log_debug(logger,"2 se compará %s con %s ",statesLists.blockedList.trainerList[trainerPos].parameters.objetives[objPos].name,statesLists.blockedList.trainerList[trainerPos].parameters.pokemons[pkmPos].name);
+							if(0==strcmp(statesLists.blockedList.trainerList[trainerPos].parameters.objetives[objPos].name,statesLists.blockedList.trainerList[trainerPos].parameters.pokemons[pkmPos].name)){
+								distinctPkmCount--;
+							}
+						}
+						if(distinctPkmCount>0){
+
+							for(int pkmPos2=0;pkmPos2<statesLists.blockedList.trainerList[trainerPos2].parameters.pokemonsCount;pkmPos2++){
+								if(0==strcmp(statesLists.blockedList.trainerList[trainerPos].parameters.objetives[objPos].name,statesLists.blockedList.trainerList[trainerPos2].parameters.pokemons[pkmPos2].name)){
+									log_debug(logger,"se comparán %i objetivos y %i pokemons atrapados ",statesLists.blockedList.trainerList[trainerPos2].parameters.pokemonsCount,statesLists.blockedList.trainerList[trainerPos2].parameters.pokemonsCount);
+									distinctPkmCount2=0;
+									for(int pkmPos2Aux=0;pkmPos2Aux<statesLists.blockedList.trainerList[trainerPos2].parameters.pokemonsCount;pkmPos2Aux++){
+										log_debug(logger,"1 se compará %s con %s ",statesLists.blockedList.trainerList[trainerPos2].parameters.pokemons[pkmPos2].name,statesLists.blockedList.trainerList[trainerPos2].parameters.pokemons[pkmPos2Aux].name);
+										if(0==strcmp(statesLists.blockedList.trainerList[trainerPos2].parameters.pokemons[pkmPos2].name,statesLists.blockedList.trainerList[trainerPos2].parameters.objetives[pkmPos2Aux].name)){
+											distinctPkmCount2++;
+										}
+									}
+									for(int objPos2=0;objPos2<statesLists.blockedList.trainerList[trainerPos].parameters.objetivesCount;objPos2++){
+										log_debug(logger,"2 se compará %s con %s ",statesLists.blockedList.trainerList[trainerPos2].parameters.pokemons[pkmPos2].name,statesLists.blockedList.trainerList[trainerPos2].parameters.objetives[objPos2].name);
+										if(0==strcmp(statesLists.blockedList.trainerList[trainerPos2].parameters.pokemons[pkmPos2].name,statesLists.blockedList.trainerList[trainerPos2].parameters.objetives[objPos2].name)){
+											distinctPkmCount2--;
+										}
+									}
+									if(distinctPkmCount2>0){
+										//busco el pokemon que le sobra a 1
+										for(int i=0;i<statesLists.blockedList.trainerList[trainerPos].parameters.objetivesCount;i++){
+											log_debug(logger,"se comparán %i objetivos y %i pokemons atrapados ",statesLists.blockedList.trainerList[trainerPos].parameters.objetivesCount,statesLists.blockedList.trainerList[trainerPos].parameters.pokemonsCount);
+											distinctPkmCount3=0;
+											for(int j=0;j<statesLists.blockedList.trainerList[trainerPos].parameters.objetivesCount;j++){
+												log_debug(logger,"1 se compará %s con %s ",statesLists.blockedList.trainerList[trainerPos].parameters.objetives[i].name,statesLists.blockedList.trainerList[trainerPos].parameters.objetives[j].name);
+												if(0==strcmp(statesLists.blockedList.trainerList[trainerPos].parameters.objetives[i].name,statesLists.blockedList.trainerList[trainerPos].parameters.objetives[j].name)){
+													distinctPkmCount3++;
+												}
+											}
+											for(int k=0;k<statesLists.blockedList.trainerList[trainerPos].parameters.pokemonsCount;k++){
+												log_debug(logger,"2 se compará %s con %s ",statesLists.blockedList.trainerList[trainerPos].parameters.objetives[i].name,statesLists.blockedList.trainerList[trainerPos].parameters.pokemons[k].name);
+												if(0==strcmp(statesLists.blockedList.trainerList[trainerPos].parameters.objetives[i].name,statesLists.blockedList.trainerList[trainerPos].parameters.pokemons[k].name)){
+													distinctPkmCount3--;
+												}
+											}
+											if(distinctPkmCount3<0){
+												statesLists.blockedList.trainerList[trainerPos].parameters.scheduledTrainerId=statesLists.blockedList.trainerList[trainerPos2].id;
+												statesLists.blockedList.trainerList[trainerPos].parameters.scheduledPokemon = statesLists.blockedList.trainerList[trainerPos].parameters.pokemons[i];
+												statesLists.blockedList.trainerList[trainerPos2].parameters.scheduledPokemon = statesLists.blockedList.trainerList[trainerPos].parameters.objetives[objPos];
+												planificateDeadlockTrainer(&(statesLists.blockedList.trainerList[trainerPos]));
+												if(checkTrainerState(statesLists.blockedList.trainerList[trainerPos])==0){
+													addToExit(statesLists.blockedList.trainerList[trainerPos]);
+													removeFromExec();
+												}
+												if(checkTrainerState(statesLists.blockedList.trainerList[trainerPos2])==0){
+													addToExit(statesLists.blockedList.trainerList[trainerPos2]);
+													removeFromBlocked(trainerPos2);
+												}
+												pthread_create(thread,NULL,(void*)resolveDeadlock,NULL);
+												pthread_detach(*thread);
+												pthread_exit(NULL);
+
+											}
+										}
+
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 	//TODO: RESOLVER DEADLOCKS
 	//TODO: Por cada entrenador que se resueve, sem_post(&exitCount_sem);
 	//TODO: Cada vez que se resuelve un deadlocl -> solvedDeadlocks++;
+	pthread_exit(NULL);
 }
 
 void* finishTeam(){

@@ -245,10 +245,11 @@ void GameCard_Wait_For_Message(void* variables){
 		pthread_exit(NULL);
 	}else
 	{
-		thread = (pthread_t*)malloc(sizeof(pthread_t));
+//		thread = (pthread_t*)malloc(sizeof(pthread_t));
 		switch (queueType) {
 
 			case NEW_POKEMON: {
+				log_debug(GameCard->logger, "Vuelve a subscribir new");
 				pthread_create(thread,NULL,(void*)subscribeToBrokerNew,NULL);
 				pthread_detach(*thread);
 
@@ -257,6 +258,7 @@ void GameCard_Wait_For_Message(void* variables){
 			}
 
 			case GET_POKEMON:{
+				log_debug(GameCard->logger, "Vuelve a subscribir get");
 				pthread_create(thread,NULL,(void*)subscribeToBrokerGet,NULL);
 				pthread_detach(*thread);
 
@@ -265,6 +267,7 @@ void GameCard_Wait_For_Message(void* variables){
 			}
 
 			case CATCH_POKEMON:{
+				log_debug(GameCard->logger, "Vuelve a subscribir catch");
 				pthread_create(thread,NULL,(void*)subscribeToBrokerCatch,NULL);
 				pthread_detach(*thread);
 

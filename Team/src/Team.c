@@ -1647,6 +1647,7 @@ void scheduleFifo(){
 			valueOfExecuteClock = executeClock();
 			if(valueOfExecuteClock==1){
 				statesLists.execTrainer.trainer.parameters.cpuClocksCount++;
+				cpuClocksCount++;
 			}
 		}
 	}
@@ -1661,6 +1662,7 @@ void scheduleRR(){
 		for(int i=0;i<schedulingAlgorithm.quantum;i++){
 			if(valueOfExecuteClock == 1){
 				valueOfExecuteClock = executeClock();
+				cpuClocksCount++;
 				statesLists.execTrainer.trainer.parameters.cpuClocksCount += valueOfExecuteClock;
 			}else{
 				break;
@@ -1691,6 +1693,7 @@ void scheduleSJFSD(){
 			while(cutWhile){
 				cutWhile = executeClock();
 				if(cutWhile==1){
+					cpuClocksCount++;
 					statesLists.execTrainer.trainer.parameters.cpuClocksCount++;
 					statesLists.execTrainer.trainer.parameters.previousBurst++;
 				}
@@ -1719,6 +1722,7 @@ void scheduleSJFCD(){
 			estimatedBurstTimeForCPU--;
 			cutWhile = executeClock();
 			if(cutWhile==1){
+				cpuClocksCount++;
 				statesLists.execTrainer.trainer.parameters.cpuClocksCount++;
 				statesLists.execTrainer.trainer.parameters.previousBurst++;
 			}

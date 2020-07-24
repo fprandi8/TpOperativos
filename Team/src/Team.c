@@ -473,8 +473,11 @@ int getGlobalObjetivesCount(t_trainer* trainers, int trainersCount){
 void subscribeToBroker(){
 
 	pthread_create(&(subs[0]),NULL,subscribeToBrokerCaught,NULL);
+	sleep(3);
 	pthread_create(&(subs[1]),NULL,subscribeToBrokerAppeared,NULL);
+	sleep(3);
 	pthread_create(&(subs[2]),NULL,subscribeToBrokerLocalized,NULL);
+	sleep(3);
 }
 
 void* subscribeToBrokerLocalized(){
@@ -489,6 +492,7 @@ void* subscribeToBrokerLocalized(){
 				log_debug(logger,"Error en subscripcion de Localized");
 			}else{
 				log_debug(logger,"Se subscribió a Localized");
+				flagConnected=1;
 			}
 		}else{
 			log_info(logger,"9. Se intentará reconectarse al broker para subscribirse a Localized cada %i. Se realizará la operación por default",retryConnectionTime);
@@ -521,9 +525,10 @@ void* subscribeToBrokerAppeared(){
 		socketAppeared = connectBroker(broker.ip,broker.port);
 		if(socketAppeared!=-1){
 			if (-1==SendSubscriptionRequest(APPEARED_POKEMON,socketAppeared)){
-				log_debug(logger,"Error en subscripcion de Localized");
+				log_debug(logger,"Error en subscripcion de Appeared");
 			}else{
-				log_debug(logger,"Se subscribió a Localized");
+				log_debug(logger,"Se subscribió a Appeared");
+				flagConnected=1;
 			}
 		}else{
 			log_info(logger,"9. Se intentará reconectarse al broker para subscribirse a Appeared cada %i. Se realizará la operación por default",retryConnectionTime);
@@ -556,6 +561,7 @@ void* subscribeToBrokerCaught(){
 				log_debug(logger,"Error en subscripcion de caught");
 			}else{
 				log_debug(logger,"Se subscribió a Caught");
+				flagConnected=1;
 			}
 		}else{
 			log_info(logger,"9. Se intentará reconectarse al broker para subscribirse a Caught cada %i. Se realizará la operación por default",retryConnectionTime);
@@ -651,9 +657,8 @@ void processMessage(void* variables){
 int findIdInGetList(uint32_t cid){
 	int position=-1;
 	for(int i=0;i<getList.count;i++){
-		int size = sizeof(uint32_t);
-		int compare = memcmp(getList.id[i],cid,size);
-		if(compare==0){
+		int compare = (getList.id[i]==cid);
+		if(compare!=0){
 			position=i;
 			break;
 		}
@@ -812,12 +817,9 @@ void requestNewPokemon(t_pokemon missingPkm, struct Broker broker){
 		strcpy(get.pokemonName,missingPkm.name);
 		log_debug(logger,"Se enviará el send para el pokemon %s", missingPkm.name);
 		Send_GET(get, socketGet);
-		log_info(logger,"9. Se intentará reconectarse al broker para enviar Get cada %i. Se realizará la operación por default",retryConnectionTime);
 		sleep(clockSimulationTime);
 		cpuClocksCount++;
 		log_debug(logger,"Pokemon requested: %s",missingPkm.name);
-
-
 		op_code type;
 		void* content = malloc(sizeof(void*));
 		int result;
@@ -832,6 +834,9 @@ void requestNewPokemon(t_pokemon missingPkm, struct Broker broker){
 		if(!result){
 				processAcknowledge(content,originMessageType,statesLists.execTrainer.trainer.id);
 		}
+	}else{
+		log_info(logger,"9. Se intentará reconectarse al broker para enviar Get cada %i. Se realizará la operación por default",retryConnectionTime);
+
 	}
 }
 
@@ -1868,7 +1873,7 @@ void catchPokemon(){
 
 }
 
-void processAcknowledge(void*buffer,uint32_t type ,uint32_t trainerId){
+void processAcknowledge(void* buffer,uint32_t type ,uint32_t trainerId){
 	switch(type){
 		case CATCH_POKEMON:
 		{
@@ -1895,8 +1900,9 @@ void processAcknowledge(void*buffer,uint32_t type ,uint32_t trainerId){
 		{
 			uint32_t* id = (uint32_t*)buffer;
 			if(getList.count==0){
-						getList.id[getList.count] = (*id);
-						getList.count++;
+				getList.id = (uint32_t*)malloc(sizeof(uint32_t));
+				getList.id[getList.count] = (*id);
+				getList.count++;
 			}else{
 				void* temp = realloc(getList.id,sizeof(uint32_t)*((getList.count)+1));
 				if (!temp){

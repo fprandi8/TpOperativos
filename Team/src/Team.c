@@ -687,6 +687,7 @@ void processMessageLocalized(deli_message* message){
 	int resultGetId = findIdInGetList(cid);
 	int resultReceivedPokemon = findNameInAvailableList(localizedPokemon->pokemonName);
 	if(resultGetId>=0 && resultReceivedPokemon==0){
+		log_error(logger,"valores: available count= %u, valores: ammount =%u",availablePokemons.count,localizedPokemon->ammount);
 		sem_wait(&availablePokemons_sem);
 		void* temp = realloc(availablePokemons.pokemons,sizeof(t_pokemon)*(availablePokemons.count+localizedPokemon->ammount));
 		if (!temp){

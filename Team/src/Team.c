@@ -295,48 +295,38 @@ void planificateDeadlockTrainer(t_trainer* trainer){
 }
 
 void exchangePokemon(t_trainer* trainer){
-	int positionPkmTrainerOne, positionPkmTrainerTwo;
-	for(int i=0;trainer->parameters.objetivesCount;i++){
-		if(0==strcmp(
-				trainer->parameters.scheduledPokemon.name,
-				trainer->parameters.pokemons[i].name))
-		{
-			positionPkmTrainerOne = i;
+	int pos;
+	for(int i=0;i<statesLists.blockedList.count;i++){
+		if(statesLists.execTrainer.trainer.parameters.scheduledTrainerId==statesLists.blockedList.trainerList[i].id){
+			pos = i;
 			break;
 		}
 	}
-	for(int j=0; statesLists.blockedList.trainerList[trainer->parameters.scheduledTrainerId].parameters.objetivesCount;j++){
-		if(0==strcmp(
-				statesLists.blockedList.trainerList[trainer->parameters.scheduledTrainerId].parameters.scheduledPokemon.name,
-				statesLists.blockedList.trainerList[trainer->parameters.scheduledTrainerId].parameters.pokemons[j].name
-				))
-		{
-			positionPkmTrainerTwo = j;
-			break;
-		}
-	}
+	addToPokemonList(&statesLists.execTrainer.trainer);
+	addToPokemonList(&statesLists.blockedList.trainerList[pos]);
+	removeFromPokemonList(&statesLists.blockedList.trainerList[pos].parameters.pokemons, &statesLists.execTrainer.trainer.parameters.scheduledPokemon);
+	removeFromPokemonList(&statesLists.execTrainer.trainer.parameters.pokemons, &statesLists.blockedList.trainerList[pos].parameters.scheduledPokemon);
 
-	char* auxPkmName = trainer->parameters.pokemons[positionPkmTrainerOne].name;
-
-	trainer->parameters.pokemons[positionPkmTrainerOne].name = statesLists.blockedList.trainerList[trainer->parameters.scheduledTrainerId].parameters.pokemons[positionPkmTrainerTwo].name;
-
-	statesLists.blockedList.trainerList[trainer->parameters.scheduledTrainerId].parameters.pokemons[positionPkmTrainerTwo].name = auxPkmName;
-
-	trainer->parameters.scheduledPokemon.name = "NULL";
-	statesLists.blockedList.trainerList[trainer->parameters.scheduledTrainerId].parameters.scheduledPokemon.name = "NULL";
 }
 
 int getDistanceToTrainerToExchange(t_trainer trainerGoing){
-	int distanceInX = calculateDifference(trainerGoing.parameters.position.x, statesLists.blockedList.trainerList[trainerGoing.parameters.scheduledTrainerId].parameters.position.x);
-	int distanceInY = calculateDifference(trainerGoing.parameters.position.y, statesLists.blockedList.trainerList[trainerGoing.parameters.scheduledTrainerId].parameters.position.y);
+	int pos;
+	for(int i=0;i<statesLists.blockedList.count;i++){
+		if(trainerGoing.parameters.scheduledTrainerId==statesLists.blockedList.trainerList[i].id){
+			pos = i;
+			break;
+		}
+	}
+	int distanceInX = calculateDifference(trainerGoing.parameters.position.x, statesLists.blockedList.trainerList[pos].parameters.position.x);
+	int distanceInY = calculateDifference(trainerGoing.parameters.position.y, statesLists.blockedList.trainerList[pos].parameters.position.y);
 	int distance = getClockTimeToNewPosition(distanceInX, distanceInY);
 	log_debug(logger,"Entrenador: %i en X=%i Y=%i, Entrenador a ir a intercambiar: %i en X=%i Y=%i distancia %i",
 			trainerGoing.id,
 			trainerGoing.parameters.position.x,
 			trainerGoing.parameters.position.y,
 			trainerGoing.parameters.scheduledTrainerId,
-			statesLists.blockedList.trainerList[trainerGoing.parameters.scheduledTrainerId].parameters.position.x,
-			statesLists.blockedList.trainerList[trainerGoing.parameters.scheduledTrainerId].parameters.position.y,
+			statesLists.blockedList.trainerList[pos].parameters.position.x,
+			statesLists.blockedList.trainerList[pos].parameters.position.y,
 			distance);
 	return distance;
 
@@ -1853,21 +1843,21 @@ int getTrainerWithBestEstimatedBurst(){
 int executeClock(){
 
 	if(statesLists.execTrainer.trainer.blockState!=DEADLOCK){
-	if(getDistanceToPokemonTarget(statesLists.execTrainer.trainer,statesLists.execTrainer.trainer.parameters.scheduledPokemon)!=0){
-		moveTrainerToObjective(&(statesLists.execTrainer.trainer));
-		return 1;
-	}else if(getDistanceToPokemonTarget(statesLists.execTrainer.trainer,statesLists.execTrainer.trainer.parameters.scheduledPokemon)==0){
-		catchPokemon();
-		return 0;
-	}
-		}else{
-			if(getDistanceToTrainerToExchange(statesLists.execTrainer.trainer)!=0){
-				moveTrainerToObjectiveDeadlock(&statesLists.execTrainer.trainer);
-				return 1;
-			}else if(getDistanceToTrainerToExchange(statesLists.execTrainer.trainer)==0){
-				exchangePokemon(&statesLists.execTrainer.trainer);
-				return 0;
-			}
+		if(getDistanceToPokemonTarget(statesLists.execTrainer.trainer,statesLists.execTrainer.trainer.parameters.scheduledPokemon)!=0){
+			moveTrainerToObjective(&(statesLists.execTrainer.trainer));
+			return 1;
+		}else if(getDistanceToPokemonTarget(statesLists.execTrainer.trainer,statesLists.execTrainer.trainer.parameters.scheduledPokemon)==0){
+			catchPokemon();
+			return 0;
+		}
+			}else{
+				if(getDistanceToTrainerToExchange(statesLists.execTrainer.trainer)!=0){
+					moveTrainerToObjectiveDeadlock(&statesLists.execTrainer.trainer);
+					return 1;
+				}else if(getDistanceToTrainerToExchange(statesLists.execTrainer.trainer)==0){
+					exchangePokemon(&statesLists.execTrainer.trainer);
+					return 0;
+				}
 	}
 	return -1;
 }

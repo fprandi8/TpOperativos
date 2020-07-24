@@ -54,6 +54,13 @@ typedef struct
 	uint32_t count;
 } t_idMessages;
 
+typedef enum
+{
+	AVAILABLE = 1,
+	DEADLOCK = 2,
+	WAITING = 3
+} t_blockState;
+
 typedef struct
 {
 	t_trainerPosition position;
@@ -64,17 +71,11 @@ typedef struct
 	int previousBurst;
 	float previousEstimate;
 	t_pokemon scheduledPokemon;//TODO: inicializar en "NULL"
+	uint32_t scheduledTrainerId;
 	int cpuClocksCount;
 } t_trainerParameters;
 
-typedef enum
-{
-	AVAILABLE = 1,
-	DEADLOCK = 2,
-	WAITING = 3
-} t_blockState;
-
- typedef struct
+typedef struct
 {
 	pthread_t trainer;
 	t_trainerParameters parameters;

@@ -8,15 +8,6 @@
 #include "CacheMemory.h"
 
 
-void signal_handler(int signum)
-{
-    if (signum == SIGUSR1)
-    {
-        printf("Received SIGUSR1!\n");
-    }
-}
-
-
 void start_cache(t_log* log)
 {
     cache_log = log;
@@ -25,6 +16,11 @@ void start_cache(t_log* log)
     define_cache_maximum_size();
     set_full_memory();
 
+    memorySchemeIsDynamic = strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"PARTICIONES") == 0;
+    partitionSelectionIsFirstFit = strcmp(config_get_string_value(config, ALGORITMO_PARTICION_LIBRE),"FF") == 0;
+    victimSelectionIsFifo = strcmp(config_get_string_value(config, ALGORITMO_REEMPLAZO),"FIFO") == 0;
+
+    //Initialize all semaphores
 	sem_init(&mutex_nextPartitionId, 0, 1);
 	sem_init(&mutex_partitions, 0, 1);
 	sem_init(&mutex_cached_messages, 0, 1);
@@ -34,7 +30,6 @@ void start_cache(t_log* log)
     sem_init(&mutex_saving, 0, 1);
 
     nextPartitionId = 0;
-	//signal(SIGUSR1, signal_handler);
 
     t_partition* first_partition = CreateNewPartition();
     first_partition->queue_type = 0;
@@ -42,7 +37,7 @@ void start_cache(t_log* log)
     first_partition->timestap = clock();
 	first_partition->begining = cache.full_memory;
 
-	if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") == 0)
+	if(memorySchemeIsDynamic)
 	{
     	first_partition->size = cache.memory_size;
 	}
@@ -68,8 +63,6 @@ void start_cache(t_log* log)
 	sem_wait(&mutex_parent_partitions);
 	parent_partitions = list_create();
 	sem_post(&mutex_parent_partitions);
-
-    PrintDumpOfCache();
 
 }
 
@@ -124,7 +117,7 @@ int save_message_body(void* messageContent, message_type queue){
 	uint32_t minSize = config_get_int_value(config, TAMANO_MINIMO_PARTICION);
 	uint32_t requiredSize = messageBuffer->bufferSize > minSize ? messageBuffer->bufferSize : minSize;
     partition = find_empty_partition_of_size(requiredSize);
-    log_info(cache_log, "MENSAJE GUARDADO EN PARTICION CON POSICION DE INICIO: %d", partition->begining);
+    log_info(cache_log, "MENSAJE GUARDADO EN PARTICION CON POSICION DE INICIO: 0x%X", partition->begining - cache.full_memory);
     int savedPartitionId = save_body_in_partition(messageBuffer, partition, queue);
 	sem_post(&mutex_saving);
 	return savedPartitionId;
@@ -148,13 +141,12 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
         list_remove(partitions, indexOfPartition);
         list_add(partitions, partition);
 
+
         return partition->id;
     }
 
-    if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") == 0)
+    if(memorySchemeIsDynamic)
     {
-
-
         t_partition* newPartition = CreateNewPartition();
         newPartition->begining = partition->begining;
         newPartition->size = newPartitionSize;
@@ -175,6 +167,7 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
     else
     {
 		int run = 1;
+		int firstOne = 1;
 		while(run == 1)
 		{
 			if(
@@ -187,10 +180,20 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
 				partition->timestap = clock();
 
 				memcpy(partition->begining, messageBuffer->stream, messageBuffer->bufferSize);
+
+				if(firstOne)
+				{
+			        //Take out the partition and add it again, this is so we keep consistent with the order of messages entering
+			        int indexOfPartition = find_index_in_list(partition);
+			        list_remove(partitions, indexOfPartition);
+			        list_add(partitions, partition);
+				}
+
 				return partition->id;	
 			} 
 			else 
 			{
+				firstOne = 0;
 				partition = create_childrens_from(partition);
 			}
 		}
@@ -201,14 +204,16 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
 
 t_partition* find_empty_partition_of_size(uint32_t size)
 {
-//	if(size > cache.memory_size); //TODO imprimir se pico, no deberia pasar que llegue algo mas grande que la memoria
+	if(size > cache.memory_size) return NULL;
     t_partition* partition = select_partition(size);
     int compaction_frequency =  config_get_int_value(config, FRECUENCIA_COMPACTACION);
     if(partition != NULL) return partition;
     int busyPartitions = GetBusyPartitionsCount();
-    //If its not dynamic, we set compaction_frequency to the same as busy partitions we have
+    //If its BS or is Dynamic a has frequency -1,  we set compaction_frequency be to the same as busy partitions we have
     //0 frequency does not make sense, so we de-activate compaction_frequency also on 0
-    if(compaction_frequency <= 0 || strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC")) compaction_frequency = busyPartitions;
+    if( !memorySchemeIsDynamic || (memorySchemeIsDynamic && compaction_frequency == -1) )
+         compaction_frequency = busyPartitions;
+
     do
     {
         if(partition == NULL)
@@ -224,7 +229,6 @@ t_partition* find_empty_partition_of_size(uint32_t size)
         if(partition == NULL) //Reached compaction frequency, or run out of busy partitions to delete. Should never reach here on buddy system setting.
         {
             compact_memory();
-            log_info(cache_log, "SE EJECUTO COMPACTACION");
             partition = select_partition(size);
         }
     } while(partition == NULL);
@@ -234,7 +238,7 @@ t_partition* find_empty_partition_of_size(uint32_t size)
 
 t_partition* select_partition(uint32_t size){
 	t_partition *partition;
-    if(strcmp(config_get_string_value(config, ALGORITMO_PARTICION_LIBRE),"FF") == 0 && strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") == 0){ //compare dif algoritmos
+    if(partitionSelectionIsFirstFit && memorySchemeIsDynamic){ //compare dif algoritmos
         partition = select_partition_ff(size);
     }else{
         partition = select_partition_bf(size);
@@ -268,9 +272,9 @@ t_partition* select_partition_bf(uint32_t size){
     return bestFitPartition;
 }
 
-//hasta aca de abajo para arriba semaforos
 
-void compact_memory(void){
+void compact_memory(void)
+{
     bool _is_empty_partition(t_partition* partition){ return partition->free; }
     bool _filter_busy_partition(t_partition* partition){ return !partition->free;}
 
@@ -293,11 +297,9 @@ void compact_memory(void){
         offsetPointerMem += partition->size;
     }
 
-
     //- create big empty partition
 
     uint32_t occupied_size = add_occupied_size_from(occupied_partitions);
-
 
     t_partition* emptySpacePartition = CreateNewPartition();
     emptySpacePartition->size = cache.memory_size - occupied_size;
@@ -325,7 +327,8 @@ void compact_memory(void){
 	free(partitions);
 
     partitions = occupied_partitions;
-    //TODO add times compacting here or outside?
+
+	log_info(cache_log, "SE EJECUTO COMPACTACION");
 }
 
 uint32_t add_occupied_size_from(t_list* occupied){
@@ -338,19 +341,16 @@ uint32_t add_occupied_size_from(t_list* occupied){
     return sum;
 }
 
-void check_compact_restrictions(void){
-    //TODO if needed
-}
 
 void delete_partition(void){
     t_partition* deletedPartition;
-    if(strcmp(config_get_string_value(config, ALGORITMO_REEMPLAZO),"FIFO") == 0){ //compare dif algoritmos
+    if(victimSelectionIsFifo){ //compare dif algoritmos
     	deletedPartition = delete_partition_fifo();
     }else{
     	deletedPartition = delete_partition_lru();
     }
 
-    log_info(cache_log, "PARTICION ELIMINADA CON POSICION DE INICIO: %d", deletedPartition->begining);
+    log_info(cache_log, "PARTICION ELIMINADA CON POSICION DE INICIO: 0x%X", deletedPartition->begining - cache.full_memory);
 
     bool _message_to_delete(t_cachedMessage* message)
     {
@@ -365,13 +365,16 @@ void delete_partition(void){
 }
 
 t_partition* delete_partition_fifo(void){
+
     bool _first_busy_partition(t_partition* partition)
     {
         if(partition->free == 0) return true; else return false;
     }
+
     sem_wait(&mutex_partitions);
     t_partition* partition = (t_partition*)list_find(partitions, (void*)_first_busy_partition);
     sem_post(&mutex_partitions);
+
     partition->free = 1;
     return partition;
 }
@@ -440,10 +443,13 @@ t_partition* CreateNewPartition()
     t_partition* partition = (t_partition*)malloc(sizeof(t_partition));
 	partition->id = GetNewId();
 	partition->timestap = clock();
+	partition->parentId = 0;
+	partition->free = 1;
+	partition->begining = NULL;
     return partition;
 }
 
-//TODO ver aca clock
+
 t_list* GetMessagesFromQueue(message_type type)
 {
     bool _message_by_queue(t_cachedMessage* message)
@@ -477,7 +483,7 @@ void UpdateTimestamp(uint32_t partitionId)
     part->timestap = clock();
 }
 
-//TODO ver aca clock
+
 t_cachedMessage* GetCachedMessage(int messageId)
 {
     bool _message_by_id(t_cachedMessage* message)
@@ -487,7 +493,6 @@ t_cachedMessage* GetCachedMessage(int messageId)
     return UpdateClockOnMessage((t_cachedMessage*)list_find(cached_messages, (void*)_message_by_id));
 }
 
-//TODO ver aca clock
 t_cachedMessage* GetCachedMessageInPartition(int partitionId)
 {
     bool _message_by_partition_id(t_cachedMessage* message)
@@ -497,7 +502,6 @@ t_cachedMessage* GetCachedMessageInPartition(int partitionId)
     return (t_cachedMessage*)list_find(cached_messages, (void*)_message_by_partition_id);
 }
 
-//TODO ver aca clock
 t_partition* GetPartition(int partitionId)
 {
     bool _partition_by_id(t_partition* partition)
@@ -557,51 +561,53 @@ void AddAcknowledgeToMessage(int messageId)
 	sem_post(&cachedMessage->mutex_message);
 }
 
-//TODO ver aca clock
-void* GetMessageContent(int messageId)
+deli_message* GetMessage(int messageId)
 {
-    t_cachedMessage* message = GetCachedMessage(messageId);
-    t_partition* partition = GetPartition(message->partitionId);
+    t_cachedMessage* cachedMessage = GetCachedMessage(messageId);
+    t_partition* partition = GetPartition(cachedMessage->partitionId);
     UpdateTimestamp(partition->id);
-    return DeserializeMessageContent(partition->queue_type, partition->begining);
+
+	deli_message* message = (deli_message*)malloc(sizeof(deli_message));
+	message->id = cachedMessage->id;
+	message->correlationId = cachedMessage->corelationId;
+	message->messageType = cachedMessage->queue_type;
+	message->messageContent =  DeserializeMessageContent(partition->queue_type, partition->begining);
+
+    return message;
 }
 
 
 
 void PrintDumpOfCache()
 {
-    log_info(cache_log, "SE SOLICITO DUMP DE CACHE.");
-//Imprimir:
-//  -----------------------------------------------------------------------------------------------------------------------------
-//  Dump: dd/mm/yy hh:mm:ss
-//Por cada particion:
-//  Particiones ocupadas:
-//      Particion <Id>: <memoryStart-MemoryEnd>. <asignada [x]>   Size:<xxxxb>  LRU:<Valor>  Cola:<COLA>   ID:<ID>
-//  Particiones libres:
-//      Particion <Id>: <memoryStart-MemoryEnd>. <libre [l]>   Size:<xxxxb>
-//Fin de por cada particion
-//  -----------------------------------------------------------------------------------------------------------------------------
+   log_info(cache_log, "SE SOLICITO DUMP DE CACHE.");
    time_t rawtime;
    struct tm *info;
    time( &rawtime );
    info = localtime( &rawtime );
 
-    printf("\n-----------------------------------------------------------------------------------------------------------------------------\n");
-    printf("Dump: %d/%d/%d %s\n", info->tm_mday, info->tm_mon, info->tm_year, temporal_get_string_time());
+   FILE *fp;
+   int myInt = 5;
+   fp = fopen("CacheDump.txt", "a");
+   fseek(fp, 0, SEEK_END);
+
+    fprintf(fp,"\n-----------------------------------------------------------------------------------------------------------------------------\n");
+    fprintf(fp,"Dump: %d/%d/%d %s\n", info->tm_mday, info->tm_mon, info->tm_year, temporal_get_string_time());
 
     void _print_partition_info(t_partition* partition)
     {
         char* busyStatus;
         char* memoryLocation[20];
-        sprintf(memoryLocation, "0x%X - 0x%X", partition->begining, partition->begining + partition->size - 1);
+        sprintf(memoryLocation, "0x%X - 0x%X",  partition->begining - cache.full_memory, partition->begining + partition->size - 1 - cache.full_memory);
         if(partition->free == 1)
         {
             busyStatus = "L";
-            printf("Partición %d: %s. [%s] Size:%ub\n",
+            fprintf(fp,"Partición %d: %s. [%s] Size:%ub\n",
             	(int)partition->id,
 				memoryLocation,
                 busyStatus, 
-                (uint32_t)partition->size
+                (uint32_t)partition->size,
+				partition->parentId
             );
 
         } 
@@ -610,9 +616,7 @@ void PrintDumpOfCache()
             busyStatus = "X";
             t_cachedMessage* message = GetCachedMessageInPartition(partition->id);
             char* queue = GetStringFromMessageType(message->queue_type);
-          //  printf("%d", partition->id);
-           // printf("%s", *(memoryLocation));
-            printf("Partición %d: %s. [%s] Size:%ub LRU:%ld Cola:%s ID:%d\n",
+            fprintf(fp,"Partición %d: %s. [%s] Size:%ub LRU:%ld Cola:%s ID:%d\n",
                 partition->id,
 				memoryLocation,
                 busyStatus,
@@ -626,13 +630,13 @@ void PrintDumpOfCache()
 
     list_iterate(partitions, (void*)_print_partition_info);
 
-    printf("-----------------------------------------------------------------------------------------------------------------------------\n");
+    fprintf(fp,"-----------------------------------------------------------------------------------------------------------------------------\n");
+    fclose(fp); //Don't forget to close the file when finished
 }
 
-void start_consolidation_for(t_partition* freed_partition){
-
-	log_info(cache_log, "ARRANCO LA CONSOLIDACION"); //TODO REMOVE
-    if(strcmp(config_get_string_value(config, ALGORITMO_MEMORIA),"DYNAMIC") != 0)
+void start_consolidation_for(t_partition* freed_partition)
+{
+    if(!memorySchemeIsDynamic)
     {
         uint32_t partitionId = freed_partition->id;
         int result = 0;
@@ -735,10 +739,6 @@ int check_validations_and_consolidate_BS(uint32_t* freed_partition_id)
     sem_wait(&mutex_partitions);
     bs_freed_partition = (t_partition*) list_find(partitions, (void*) _has_wanted_id);
     sem_post(&mutex_partitions);
-
-    log_info(cache_log, "ID OF DELETED PARTITION USED TO SEARCH %d", *freed_partition_id); //TODO REMOVE
-
-    log_info(cache_log, "ID OF FOUND PARTITION: %d", bs_freed_partition->id); //TODO REMOVE
         
     if(bs_freed_partition->size >= cache.memory_size)
         return -1;
@@ -764,11 +764,13 @@ void find_index_in_list_and_destroy(t_partition* partition){
     sem_post(&mutex_partitions);
  }
 
-int find_index_in_list(t_partition* partition){
+int find_index_in_list(t_partition* partition)
+{
     int index = 0;
     int wanted_id = partition->id;
     t_partition* aux_partition;
-    while(index < sizeof(partitions)){
+    while(index < list_size(partitions))
+    {
         aux_partition = (t_partition*)list_get(partitions, index);
         if(aux_partition->id == wanted_id)
             break;
@@ -784,17 +786,10 @@ int CalculateNearestPowerOfTwo(int x)
 	return (int)floor(log10(evenSize) / log10(2));
 }
 
-double CalculateNearestPowerOfTwoRelativeToCache(int memoryLocation)
-{
-		int relativeMemory = memoryLocation; //- cache.full_memory;
-		double evenSize = relativeMemory - (relativeMemory % 2);
-		return 1;//powerOfTwo = (int)floor(log10(evenSize) / log10(2));
-}
-
 uint32_t consolidate(t_partition* related_partition)
 {
 
-	uint32_t parentId = related_partition->parentId;
+	uint32_t parentId = (*related_partition).parentId;
 
     bool _is_wanted_parent(t_partition* partition){ return(partition->id == parentId); }
 
@@ -803,20 +798,11 @@ uint32_t consolidate(t_partition* related_partition)
         return (partition->parentId == parentId);
     }
 
-    t_partition* left_partition = related_partition;
-
-    if(bs_freed_partition->begining < related_partition->begining){
-        left_partition = bs_freed_partition;
-        log_info(cache_log, "SE ASOCIARON LOS BLOQUES CON COMIENZO EN: %d %d",  bs_freed_partition->begining, related_partition->begining);
-    }else{
-        log_info(cache_log, "SE ASOCIARON LOS BLOQUES CON COMIENZO EN: %d %d", related_partition->begining, bs_freed_partition->begining);
-    }
+    log_info(cache_log, "SE ASOCIARON LOS BLOQUES CON COMIENZO EN: 0x%X y 0x%X",  bs_freed_partition->begining, related_partition->begining);
 
     sem_wait(&mutex_parent_partitions);
     t_partition* parent = (t_partition*) list_remove_by_condition(parent_partitions, (void*) _is_wanted_parent);
     sem_post(&mutex_parent_partitions);
-
-    //parent->begining = left_partition->begining;
 
     sem_wait(&mutex_partitions);
     list_remove_and_destroy_by_condition(partitions, (void*)_is_child_partition, (void*)Free_Partition);

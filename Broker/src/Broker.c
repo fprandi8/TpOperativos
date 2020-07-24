@@ -19,11 +19,9 @@ int main(void) {
 	t_log* logger;
 	t_config* config;
 
-
 	char* ip;
 	char* puerto;
 	int server,cliente;
-//	char* tam_men, tam_min_part, algo_mem, algo_reem, algo_part, frec_comp;
 
 	signal(SIGINT,signaltHandler);
 	signal(SIGUSR1,cacheSigHandler);
@@ -41,12 +39,6 @@ int main(void) {
 
 	ip= get_config_value(config,logger,IP_BROKER);
 	puerto = get_config_value(config,logger,PUERTO_BROKER);
-//	tam_men = obtener_valor_config(config,logger,TAMANO_MEMORIA);
-//	tam_min_part =(char*) obtener_valor_config(config,logger,TAMANO_MINIMO_PARTICION);
-//	algo_mem=  obtener_valor_config(config,logger,ALGORITMO_MEMORIA);
-//	algo_reem=  obtener_valor_config(config,logger,ALGORITMO_REEMPLAZO);
-//	algo_part=  obtener_valor_config(config,logger,ALGORITMO_PARTICION_LIBRE);
-//	frec_comp=  obtener_valor_config(config,logger,FRECUENCIA_COMPACTACION);
 
 	broker= (t_Broker*) malloc(sizeof(t_Broker));
 
@@ -90,8 +82,6 @@ void serve_client(void* variables)
 	void* content;
 
 	int resultado= RecievePackage(cliente,&type,&content);
-
-	printf("result in serve_client %d\n", resultado); //TODO REMOVE
 
 	if (resultado == 0)
 	{
@@ -202,7 +192,7 @@ void broker_suscribe_process(void* buffer, int cliente, t_Broker* broker)
 		t_suscriptor* aux= (t_suscriptor*)malloc(sizeof(t_suscriptor));
 		aux->suscripted = cliente;
 		list_add(queueToSuscribe->suscriptors,aux);
-		log_info(broker->logger,"NUEVA SUSCRIPCIÓN AL BROKER QUEUE: %d", *queueType);
+		log_info(broker->logger,"NUEVA SUSCRIPCIÓN AL BROKER QUEUE: %s", GetStringFromMessageType(*queueType));
 		
 		//GetAllMessagesFromQueue that were not sent to him:
 		t_list* messagesToSend = GetAllMessagesForSuscriptor(cliente,*queueType);
@@ -221,7 +211,7 @@ void broker_suscribe_process(void* buffer, int cliente, t_Broker* broker)
 				//log_debug(broker->logger, "Envio mensaje al suscriptor: %d", cliente);
 
 				t_args_queue* args= (t_args_queue*) malloc (sizeof(t_args_queue));
-				args->message = message;
+				args->messageId = message->id;
 				args->queue = queueToSuscribe;
 				args->broker = broker;
 				args->cliente = cliente;
@@ -293,7 +283,7 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 		//log_debug(broker->logger, "Envio mensaje al suscriptor: %d", suscriptor->suscripted);
 
 		t_args_queue* args= (t_args_queue*) malloc (sizeof(t_args_queue));
-		args->message = message;
+		args->messageId = message->id;
 		args->queue = queue;
 		args->broker = broker;
 		args->cliente = suscriptor->suscripted;
@@ -309,14 +299,12 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 void queue_handler_send_message(void* args){
 
 	t_queue_handler* queue =((t_args_queue*)args)->queue;
-	deli_message* message= ((t_args_queue*)args)->message;
+	deli_message* message = GetMessage(((t_args_queue*)args)->messageId);
 	int client = ((t_args_queue*)args)->cliente;
 
-	//TODO sacar esto para la entrega Print in console the message type
-	puts(GetStringFromMessageType(message->messageType));
 
 	int result = SendMessage(*message,client);
-	log_info(broker->logger, "SE ENVIO EL MENSAJE AL CLIENTE %d", client);
+	log_info(broker->logger, "SE ENVIO EL MENSAJE %d AL CLIENTE %d", message->id, client);
 	//log_debug(broker->logger, "RESULTADO DEL ENVIO: %d", result);
 
 	struct pollfd pfds[1];
@@ -334,7 +322,7 @@ void queue_handler_send_message(void* args){
 		uint32_t op_code;
 		void* content;
 		result = RecievePackage(client,&op_code,&content);
-		log_info(broker->logger,"RESULTADO DEL ACKNOWLEDGE: %d", result);
+		log_info(broker->logger,"RECIBIDO ACKNOWLEDGE PARA MENSAGE %d", message->id);
 
 		if (op_code == ACKNOWLEDGE )
 		{
@@ -376,6 +364,7 @@ void destroy_queue_handler(t_queue_handler* self){
 	queue_destroy(self->queue);
 	list_destroy(self->suscriptors);
 	list_destroy(self->messagesAdministrator);
+	free(self);
 }
 
 t_suscriptor* queue_handler_get_suscriptor(t_queue_handler* self,int pos){
@@ -383,6 +372,7 @@ t_suscriptor* queue_handler_get_suscriptor(t_queue_handler* self,int pos){
 }
 
 // Message admnistrator logic
+/*
 t_message_administrator* message_administrator_initialize(uint32_t id)
 {
 	t_message_administrator* aux =(t_message_administrator*) malloc(sizeof(t_message_administrator));
@@ -428,7 +418,7 @@ void message_administrator_receive_acknowledge(t_message_administrator* self){
 
 uint32_t message_administrator_get_amountACK(t_message_administrator* self){
 	return self->amountPendingAcknowledge;
-}
+}*/
 
 //int message_administrator_compare(t_message_administrator* am ){
 //

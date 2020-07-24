@@ -238,7 +238,7 @@ void addToExit(t_trainer);
 void removeFromMissingPkms(t_pokemon);
 void* resolveDeadlock();
 void* finishTeam();
-
+void initCPUClocksCountForTrainers();
 
 
 void initBroker(struct Broker *broker){

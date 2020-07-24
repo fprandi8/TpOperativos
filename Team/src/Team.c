@@ -919,6 +919,7 @@ void startTrainers(int trainersCount,t_config *config){
 	statesLists.newList.count=trainersCount;
 	initBurstScheduledPokemon();
 	initTrainerName();
+	initCPUClocksCountForTrainers();
 	log_debug(logger,"5.Comienza el proceso de creación de threads");
 	for(int actualTrainer = 0; actualTrainer < trainersCount; actualTrainer++){
 		sem_init(&(statesLists.newList.trainerList[actualTrainer].semaphore),0,0);
@@ -946,6 +947,12 @@ void initTrainerName(){
 void initPreviousBurst(t_trainer* trainer){
 	trainer->parameters.previousBurst=-1;
 
+}
+
+void initCPUClocksCountForTrainers(){
+	for(int trainer = 0; trainer < statesLists.newList.count; trainer++){
+		statesLists.newList.trainerList[trainer].parameters.cpuClocksCount=0;
+	}
 }
 
 void initScheduledPokemon(t_trainer* trainer){
@@ -1496,6 +1503,9 @@ void scheduleFifo(){
 		int valueOfExecuteClock = 1;
 		while(valueOfExecuteClock){
 			valueOfExecuteClock = executeClock();
+			if(valueOfExecuteClock==1){
+				statesLists.execTrainer.trainer.parameters.cpuClocksCount++;
+			}
 		}
 	}
 }
@@ -1509,17 +1519,18 @@ void scheduleRR(){
 		for(int i=0;i<schedulingAlgorithm.quantum;i++){
 			if(valueOfExecuteClock == 1){
 				valueOfExecuteClock = executeClock();
+				statesLists.execTrainer.trainer.parameters.cpuClocksCount += valueOfExecuteClock;
+			}else{
+				break;
 			}
 		}
 		if(valueOfExecuteClock == 1){
 			removeFromExec();
 			addToReady(&statesLists.execTrainer.trainer);
-		}else{
+		}/*else{
 			removeFromExec();
-			statesLists.execTrainer.boolean=0;
-			statesLists.execTrainer.trainer.blockState=AVAILABLE;
 			addToBlocked(statesLists.execTrainer.trainer);
-		}
+		}*/
 	}
 }
 
@@ -1538,6 +1549,7 @@ void scheduleSJFSD(){
 			while(cutWhile){
 				cutWhile = executeClock();
 				if(cutWhile==1){
+					statesLists.execTrainer.trainer.parameters.cpuClocksCount++;
 					statesLists.execTrainer.trainer.parameters.previousBurst++;
 				}
 			}
@@ -1565,6 +1577,7 @@ void scheduleSJFCD(){
 			estimatedBurstTimeForCPU--;
 			cutWhile = executeClock();
 			if(cutWhile==1){
+				statesLists.execTrainer.trainer.parameters.cpuClocksCount++;
 				statesLists.execTrainer.trainer.parameters.previousBurst++;
 			}
 		}
@@ -1789,6 +1802,7 @@ int checkTrainerState(t_trainer trainer){
 		}
 		if(distinctPkmCount!=0){
 			log_debug(logger,"Entrenador en deadlock");
+			deadlockCount++;
 			return 1;//deadlock
 		}
 	}

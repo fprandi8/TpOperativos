@@ -18,7 +18,7 @@
 #include <arpa/inet.h>
 #include <semaphore.h>
 #include <commons/collections/list.h>
-#include <delibird/comms/pokeio.h>
+#include "delibird/comms/pokeio.h"
 #include <delibird/comms/messages.h>
 
 
@@ -54,18 +54,6 @@ typedef struct
 	uint32_t count;
 } t_idMessages;
 
-typedef struct
-{
-	t_trainerPosition position;
-	t_pokemon* pokemons;
-	int pokemonsCount;
-	t_pokemon* objetives;
-	uint32_t objetivesCount;
-	uint32_t previousBurst;
-	float previousEstimate;
-	t_pokemon scheduledPokemon;//TODO: inicializar en "NULL"
-} t_trainerParameters;
-
 typedef enum
 {
 	AVAILABLE = 1,
@@ -73,7 +61,21 @@ typedef enum
 	WAITING = 3
 } t_blockState;
 
- typedef struct
+typedef struct
+{
+	t_trainerPosition position;
+	t_pokemon* pokemons;
+	int pokemonsCount;
+	t_pokemon* objetives;
+	uint32_t objetivesCount;
+	int previousBurst;
+	float previousEstimate;
+	t_pokemon scheduledPokemon;//TODO: inicializar en "NULL"
+	uint32_t scheduledTrainerId;
+	int cpuClocksCount;
+} t_trainerParameters;
+
+typedef struct
 {
 	pthread_t trainer;
 	t_trainerParameters parameters;
@@ -208,8 +210,8 @@ void addToBlocked(t_trainer);
 int startServer();
 int waitClient(int);
 void scheduleByDistance();
-void initPreviousBurst(t_trainer);
-void initScheduledPokemon(t_trainer);
+void initPreviousBurst(t_trainer*);
+void initScheduledPokemon(t_trainer*);
 void initBurstScheduledPokemon();
 void removeFromExit();
 void removeFromExec();
@@ -233,8 +235,11 @@ void* startAlgorithmScheduling();
 void schedule();
 void addToPokemonList(t_trainer*);
 void processAcknowledge(void*,uint32_t,uint32_t);
-
-
+void addToExit(t_trainer);
+void removeFromMissingPkms(t_pokemon);
+void* resolveDeadlock();
+void* finishTeam();
+void initCPUClocksCountForTrainers();
 
 
 void initBroker(struct Broker *broker){
@@ -261,7 +266,7 @@ int calculateDifference(int, int);
 int getDistanceToPokemonTarget(t_trainer, t_pokemon);
 void moveTrainetToObjective(t_trainer*, t_pokemon*);
 int executeClock();
-int readConfigAlphaValue(t_config*);
+double readConfigAlphaValue(t_config*);
 int readConfigInitialEstimatedValue(t_config*);
 float estimatedTimeForNextBurstCalculation(int);
 void initializeTrainersWithBurts();

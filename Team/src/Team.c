@@ -215,9 +215,9 @@ void* resolveDeadlock(void* trainersCount){
 													removeFromExec();
 													solvedDeadlocks++;
 												}
-												if(checkTrainerState(statesLists.blockedList.trainerList[trainerPos2])==0){
-													addToExit(statesLists.blockedList.trainerList[trainerPos2]);
-													removeFromBlocked(trainerPos2);
+												if(checkTrainerState(statesLists.blockedList.trainerList[trainerPos2-1])==0){
+													addToExit(statesLists.blockedList.trainerList[trainerPos2-1]);
+													removeFromBlocked(trainerPos2-1);
 													solvedDeadlocks++;
 												}
 												pthread_create(thread,NULL,(void*)resolveDeadlock,NULL);
@@ -308,13 +308,14 @@ void* finishTeam(void* trainerCount){
 		sem_wait(&(exitCount_sem));
 	}
 	sem_wait(&exitCount_sem);
-	log_info(logger,"8. Cantidad de ciclos de CPU totales: %i",cpuClocksCount);
-	log_info(logger,"8. Cantidad de cambios de contesto realizados: %i",switchContextCount);
+	log_error(logger,"------------Fin del proceso----------");
+	log_error(logger,"8. Cantidad de ciclos de CPU totales: %i",cpuClocksCount);
+	log_error(logger,"8. Cantidad de cambios de contesto realizados: %i",switchContextCount);
 	for(int i = 0;i<statesLists.exitList.count;i++){
 		log_error(logger,"8. Cantidad de ciclos de CPU totales por entrenador: Trainer %u -> %i",statesLists.exitList.trainerList[i].id,statesLists.exitList.trainerList[i].parameters.cpuClocksCount);
 	}
-	log_info(logger,"8. Deadlocks producidos: %i",deadlockCount);
-	log_info(logger,"8. Deadlocks resueltos: %i",solvedDeadlocks);
+	log_error(logger,"8. Deadlocks producidos: %i",deadlockCount);
+	log_error(logger,"8. Deadlocks resueltos: %i",solvedDeadlocks);
 	return EXIT_SUCCESS;
 }
 
@@ -324,9 +325,7 @@ void* startCloseScheduling(){
 		sem_wait(&(availableTrainersCount_sem));
 		sem_wait(&(availablePokemonsCount_sem));
 		sem_wait(&availablePokemons_sem);
-		log_debug(logger,"Se comienza a planificar planificador por cercanía");
 		scheduleByDistance();
-		log_debug(logger,"Se termina de planificar planificador por cercania");
 		sem_post(&availablePokemons_sem);
 	}
 }
@@ -336,9 +335,7 @@ void* startAlgorithmScheduling(){
 
 		sem_wait(&(readyTrainer_sem));
 		sem_wait(&(execTrainer_sem));
-		log_debug(logger,"Se comienza a planificar la lista de ready");
 		schedule();
-		log_debug(logger,"Se termina de planificar la lista de ready");
 	}
 }
 
@@ -1440,7 +1437,7 @@ void addToBlocked(t_trainer trainer){
 
 void addToExec(t_trainer trainer){
 	statesLists.execTrainer.trainer=trainer;
-	log_info(logger,"1. Se movió al entrenador %u a la cola Exec por haber haber sido planificado por el algoritmo %s",trainer.id,schedulingAlgorithm);
+	log_info(logger,"1. Se movió al entrenador %u a la cola Exec por haber haber sido planificado por el algoritmo %s",trainer.id,schedulingAlgorithm.algorithm);
 	statesLists.execTrainer.boolean = 1;
 }
 
@@ -1494,12 +1491,9 @@ int getFirstBlockedAvailable(){
 }
 
 void getClosestTrainer(t_pokemon* pkmAvailable, int pkmAvailablePos){
-	log_debug(logger,"obteniendo el entrenador mas cercano");
 	int closestNew;
 	int closestBlocked;
-	log_debug(logger,"%i",getCountBlockedAvailable());
 	if(getCountBlockedAvailable()==0){
-		log_debug(logger,"entre");
 		closestNew = getClosestTrainerNew(pkmAvailable);
 		statesLists.newList.trainerList[closestNew].parameters.scheduledPokemon=*pkmAvailable;
 		removeFromAvailable(pkmAvailablePos);
@@ -1507,7 +1501,6 @@ void getClosestTrainer(t_pokemon* pkmAvailable, int pkmAvailablePos){
 		removeFromNew(closestNew);
 	}else if(statesLists.newList.count==0){
 		closestBlocked = getClosestTrainerBlocked(pkmAvailable);
-		log_debug(logger, "posición del closestBloqued %i", closestBlocked);
 		statesLists.blockedList.trainerList[closestBlocked].parameters.scheduledPokemon=*pkmAvailable;
 		removeFromAvailable(pkmAvailablePos);
 		addToReady(&statesLists.blockedList.trainerList[closestBlocked]);
@@ -1933,12 +1926,10 @@ int checkTrainerState(t_trainer trainer){
 			}
 		}
 		if(distinctPkmCount!=0){
-			log_debug(logger,"Entrenador en deadlock");
 			deadlockCount++;
 			return 1;//deadlock
 		}
 	}
-	log_debug(logger,"Entrenador finalizado");
 	return 0;//exit
 }
 

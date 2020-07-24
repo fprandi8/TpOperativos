@@ -195,6 +195,7 @@ void broker_suscribe_process(void* buffer, int cliente, t_Broker* broker)
 		log_info(broker->logger,"NUEVA SUSCRIPCIÓN AL BROKER QUEUE: %s", GetStringFromMessageType(*queueType));
 		
 		//GetAllMessagesFromQueue that were not sent to him:
+		log_info(broker->logger, "Cliente: %i Queue: %i ", cliente, *queueType);
 		t_list* messagesToSend = GetAllMessagesForSuscriptor(cliente,*queueType);
 
 		if(!list_is_empty(messagesToSend))

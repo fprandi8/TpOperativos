@@ -1717,8 +1717,8 @@ void* subscribeToBrokerNew(){
 
 void* subscribeToBrokerCatch(){
 	int socketCatch;
-
 	int connectionSuccess = 0;
+
 	while (!connectionSuccess){
 		socketCatch = connectBroker(broker.ip,broker.port,GameCard->logger);
 		if (socketCatch > 0){

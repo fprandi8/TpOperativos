@@ -92,12 +92,10 @@ typedef struct {
 typedef struct {
 	int suscription;
 	uint32_t queueType;
-	void* brokerAddress;
 } t_args;
 
 typedef struct {
 	deli_message* message;
-	void* brokerAddress;
 } t_args_process_message;
 
 
@@ -164,9 +162,9 @@ void rewrite_blocks(t_file_metadata* , char*);
 
 void readConfigBrokerValues(t_config*,t_log* ,struct Broker*);
 void subscribeToBroker(struct Broker broker,pthread_t* subs);
-void* subscribeToBrokerNew(void *brokerAdress);
-void* subscribeToBrokerCatch(void *brokerAdress);
-void* subscribeToBrokerGet(void *brokerAdress);
+void* subscribeToBrokerNew();
+void* subscribeToBrokerCatch();
+void* subscribeToBrokerGet();
 
 void initBroker(struct Broker *broker){
 	broker->ipKey=IP_BROKER;

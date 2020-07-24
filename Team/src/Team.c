@@ -1251,7 +1251,7 @@ void getTrainerAttrObj(char** trainersObjetives, int trainersCount)
 		  void _getRow(char *string) {
 			  if(string != NULL) {
 				  if(rowCount==actualTrainer){
-				  char **row = string_split(string, "|");
+						char **row = string_split(string, "|");
 				  string_iterate_lines(row, _toList);
 				  list_iterate(list, countPokemons);
 				  statesLists.newList.trainerList[actualTrainer].parameters.objetivesCount=pokemonCount;
@@ -1312,6 +1312,29 @@ void schedule(){//Para el caso de FIFO y RR no hace nada, ya que las listas est√
 		scheduleSJFSD();
 	}else if(strcmp(schedulingAlgorithm.algorithm,"SJF-CD")==0){
 		scheduleSJFCD();
+	}
+}
+
+void removeFromPokemonList(t_trainer* trainer,t_pokemon* pokemon){
+	int pkmPos;
+	for(pkmPos=0;pkmPos<trainer->parameters.pokemonsCount; pkmPos++){
+		if(0==strcmp(trainer->parameters.pokemons[pkmPos].name,pokemon->name)){
+			break;
+		}
+	}
+	for(int i=pkmPos;i<((trainer->parameters.pokemonsCount)-1); i++){
+		trainer->parameters.pokemons[i] =trainer->parameters.pokemons[i+1] ;
+	}
+
+	(trainer->parameters.pokemonsCount)--;
+
+	if(trainer->parameters.pokemonsCount){
+		void* temp = realloc(trainer->parameters.pokemons,sizeof(t_pokemon)*((trainer->parameters.pokemonsCount)));
+		if (!temp){
+			log_debug(logger,"error en realloc");
+			exit(9);
+		}
+	(trainer->parameters.pokemons)=temp;
 	}
 }
 
@@ -1414,7 +1437,7 @@ void removeFromAvailable(int pkmPosition){
 	(availablePokemons.count)--;
 
 	if(availablePokemons.count){
-		void* temp = realloc(availablePokemons.pokemons,sizeof(t_trainer)*((availablePokemons.count)));
+		void* temp = realloc(availablePokemons.pokemons,sizeof(t_pokemon)*((availablePokemons.count)));
 		if (!temp){
 			log_debug(logger,"error en realloc");
 			exit(9);

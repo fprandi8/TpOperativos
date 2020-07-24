@@ -247,6 +247,7 @@ void exchangePokemon(t_trainer*);
 int getClockTimeToNewPosition(int, int);
 void planificateDeadlockTrainer(t_trainer*);
 int checkTrainerState(t_trainer);
+void removeFromPokemonList(t_trainer*,t_pokemon*);
 
 void initBroker(struct Broker *broker){
 	broker->ipKey="IP_BROKER";

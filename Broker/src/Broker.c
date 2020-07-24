@@ -13,6 +13,7 @@
 
 uint32_t ID = 0;
 t_Broker* broker;
+sem_t mutexSuscription;
 
 int main(void) {
 
@@ -23,6 +24,7 @@ int main(void) {
 	char* puerto;
 	int server,cliente;
 
+	sem_init(&(mutexSuscription),0,1);
 	signal(SIGINT,signaltHandler);
 	signal(SIGUSR1,cacheSigHandler);
 
@@ -186,12 +188,15 @@ void broker_suscribe_process(void* buffer, int cliente, t_Broker* broker)
 {
 	message_type* queueType = (message_type*)buffer;
 
+
 	t_queue_handler* queueToSuscribe = broker_get_specific_Queue(*(broker), *queueType);
 
 	if (queueToSuscribe != NULL){
 		t_suscriptor* aux= (t_suscriptor*)malloc(sizeof(t_suscriptor));
 		aux->suscripted = cliente;
+		sem_wait(&(mutexSuscription));
 		list_add(queueToSuscribe->suscriptors,aux);
+		sem_post(&(mutexSuscription));
 		log_info(broker->logger,"NUEVA SUSCRIPCIÓN AL BROKER QUEUE: %s", GetStringFromMessageType(*queueType));
 		
 		//GetAllMessagesFromQueue that were not sent to him:

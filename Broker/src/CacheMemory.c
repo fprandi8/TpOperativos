@@ -472,7 +472,8 @@ t_list* UpdateClockOn(t_list* c_messages)
 }
 
 t_cachedMessage* UpdateClockOnMessage(t_cachedMessage* message){
-    UpdateTimestamp(message->partitionId);
+    if(message != NULL)
+        UpdateTimestamp(message->partitionId);
     return message;
 }
 
@@ -490,6 +491,7 @@ t_cachedMessage* GetCachedMessage(int messageId)
     {
         if(message->id == messageId) return true; else return false;
     }
+    //TODO ver que pasa si no encuentra el mensaje id en el casteo
     return UpdateClockOnMessage((t_cachedMessage*)list_find(cached_messages, (void*)_message_by_id));
 }
 
@@ -563,7 +565,10 @@ void AddAcknowledgeToMessage(int messageId)
 
 deli_message* GetMessage(int messageId)
 {
+    //TODO despues de resolver lo de abajo ver si aca va sem_wait(&mutex_saving);
     t_cachedMessage* cachedMessage = GetCachedMessage(messageId);
+    //TODO agregar analisis de cached message == NULL
+    //TODO el GetCachedMessages ya updatea le timestamp, sacarlo de abajo no?
     t_partition* partition = GetPartition(cachedMessage->partitionId);
     UpdateTimestamp(partition->id);
 

@@ -236,9 +236,6 @@ void* resolveDeadlock(void* trainersCount){
 			}
 		}
 	}
-	//TODO: RESOLVER DEADLOCKS
-	//TODO: Por cada entrenador que se resueve, sem_post(&exitCount_sem);
-	//TODO: Cada vez que se resuelve un deadlocl -> solvedDeadlocks++;
 	pthread_exit(NULL);
 }
 
@@ -1451,6 +1448,7 @@ void addToExec(t_trainer trainer){
 
 void removeFromExec(){
 	statesLists.execTrainer.boolean = 0;
+	switchContextCount++;
 	sem_post(&execTrainer_sem);
 }
 

@@ -686,23 +686,25 @@ void processMessageLocalized(deli_message* message){
 	log_info(logger,"7. Llegada de mensaje Localized. Datos: Nombre del Pokemon: %s, cantidad de ubicaciones: %u, correlation id: %u",localizedPokemon->pokemonName,localizedPokemon->ammount,cid);
 	int resultGetId = findIdInGetList(cid);
 	int resultReceivedPokemon = findNameInAvailableList(localizedPokemon->pokemonName);
-	if(resultGetId>=0 && resultReceivedPokemon==0){
-		log_error(logger,"valores: available count= %u, valores: ammount =%u",availablePokemons.count,localizedPokemon->ammount);
-		sem_wait(&availablePokemons_sem);
-		void* temp = realloc(availablePokemons.pokemons,sizeof(t_pokemon)*(availablePokemons.count+localizedPokemon->ammount));
-		if (!temp){
-			log_debug(logger,"error en realloc");
-			exit(9);
-		}
-		availablePokemons.pokemons=temp;
-		for(int i=0;i<localizedPokemon->ammount;i++){
-			availablePokemons.pokemons[availablePokemons.count].name=malloc(strlen(localizedPokemon->pokemonName)+1);
-			availablePokemons.pokemons[availablePokemons.count].name=localizedPokemon->pokemonName;
-			availablePokemons.pokemons[availablePokemons.count].position.x=localizedPokemon->coordinates->x;
-			availablePokemons.pokemons[availablePokemons.count].position.y=localizedPokemon->coordinates->y;
-			availablePokemons.count++;
-			sem_post(&availablePokemons_sem);
-			sem_post(&(availablePokemonsCount_sem));
+	if(localizedPokemon->ammount!=0){
+		if(resultGetId>=0 && resultReceivedPokemon==0){
+			log_error(logger,"valores: available count= %u, valores: ammount =%u",availablePokemons.count,localizedPokemon->ammount);
+			sem_wait(&availablePokemons_sem);
+			void* temp = realloc(availablePokemons.pokemons,sizeof(t_pokemon)*(availablePokemons.count+localizedPokemon->ammount));
+			if (!temp){
+				log_debug(logger,"error en realloc");
+				exit(9);
+			}
+			availablePokemons.pokemons=temp;
+			for(int i=0;i<localizedPokemon->ammount;i++){
+				availablePokemons.pokemons[availablePokemons.count].name=malloc(strlen(localizedPokemon->pokemonName)+1);
+				availablePokemons.pokemons[availablePokemons.count].name=localizedPokemon->pokemonName;
+				availablePokemons.pokemons[availablePokemons.count].position.x=localizedPokemon->coordinates->x;
+				availablePokemons.pokemons[availablePokemons.count].position.y=localizedPokemon->coordinates->y;
+				availablePokemons.count++;
+				sem_post(&availablePokemons_sem);
+				sem_post(&(availablePokemonsCount_sem));
+			}
 		}
 	}
 }

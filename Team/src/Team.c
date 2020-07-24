@@ -269,6 +269,86 @@ void* resolveDeadlock(){
 	pthread_exit(NULL);
 }
 
+void planificateDeadlockTrainer(t_trainer* trainer){
+
+	addToReady(trainer);
+	addToExec(*trainer);
+	int cutWhile = 1;
+	while(cutWhile){
+		cutWhile = executeClockForDeadlockTrainers(trainer);
+	}
+}
+
+int executeClockForDeadlockTrainers(t_trainer* trainer){
+	if(getDistanceToTrainerToExchange(*trainer)!=0){
+		moveTrainerToObjectiveDeadlock(trainer);
+		trainer->parameters.cpuClocksCount++;
+		cpuClocksCount++;
+		return 1;
+	}else if(getDistanceToTrainerToExchange(*trainer)==0){
+		trainer->parameters.cpuClocksCount += 5;
+		cpuClocksCount += 5;
+		exchangePokemon(trainer);
+		return 0;
+	}
+	return -1;
+}
+
+void exchangePokemon(t_trainer* trainer){
+	int positionPkmTrainerOne, positionPkmTrainerTwo;
+	for(int i=0;trainer->parameters.objetivesCount;i++){
+		if(0==strcmp(
+				trainer->parameters.scheduledPokemon.name,
+				trainer->parameters.pokemons[i].name))
+		{
+			positionPkmTrainerOne = i;
+			break;
+		}
+	}
+	for(int j=0; statesLists.blockedList.trainerList[trainer->parameters.scheduledTrainerId].parameters.objetivesCount;j++){
+		if(0==strcmp(
+				statesLists.blockedList.trainerList[trainer->parameters.scheduledTrainerId].parameters.scheduledPokemon.name,
+				statesLists.blockedList.trainerList[trainer->parameters.scheduledTrainerId].parameters.pokemons[j].name
+				))
+		{
+			positionPkmTrainerTwo = j;
+			break;
+		}
+	}
+
+	char* auxPkmName = trainer->parameters.pokemons[positionPkmTrainerOne].name;
+
+	trainer->parameters.pokemons[positionPkmTrainerOne].name = statesLists.blockedList.trainerList[trainer->parameters.scheduledTrainerId].parameters.pokemons[positionPkmTrainerTwo].name;
+
+	statesLists.blockedList.trainerList[trainer->parameters.scheduledTrainerId].parameters.pokemons[positionPkmTrainerTwo].name = auxPkmName;
+
+	trainer->parameters.scheduledPokemon.name = "NULL";
+	statesLists.blockedList.trainerList[trainer->parameters.scheduledTrainerId].parameters.scheduledPokemon.name = "NULL";
+}
+
+int getDistanceToTrainerToExchange(t_trainer trainerGoing){
+	int distanceInX = calculateDifference(trainerGoing.parameters.position.x, statesLists.blockedList.trainerList[trainerGoing.parameters.scheduledTrainerId].parameters.position.x);
+	int distanceInY = calculateDifference(trainerGoing.parameters.position.y, statesLists.blockedList.trainerList[trainerGoing.parameters.scheduledTrainerId].parameters.position.y);
+	int distance = getClockTimeToNewPosition(distanceInX, distanceInY);
+	log_debug(logger,"Entrenador: %i en X=%i Y=%i, Entrenador a ir a intercambiar: %i en X=%i Y=%i distancia %i",
+			trainerGoing.id,
+			trainerGoing.parameters.position.x,
+			trainerGoing.parameters.position.y,
+			trainerGoing.parameters.scheduledTrainerId,
+			statesLists.blockedList.trainerList[trainerGoing.parameters.scheduledTrainerId].parameters.position.x,
+			statesLists.blockedList.trainerList[trainerGoing.parameters.scheduledTrainerId].parameters.position.y,
+			distance);
+	return distance;
+
+}
+
+void moveTrainerToObjectiveDeadlock(t_trainer* trainer){
+	int difference_x = calculateDifference(trainer->parameters.position.x, trainer->parameters.scheduledPokemon.position.x);
+	int difference_y = calculateDifference(trainer->parameters.position.y, trainer->parameters.scheduledPokemon.position.y);
+	moveTrainerToTarget(trainer, difference_x, difference_y);
+}
+
+
 void* finishTeam(){
 	sem_wait(&exitCount_sem);
 	log_error(logger,"-----Proceso Finalizado-----");
@@ -288,7 +368,9 @@ void* startCloseScheduling(){
 		sem_wait(&(availableTrainersCount_sem));
 		sem_wait(&(availablePokemonsCount_sem));
 		sem_wait(&availablePokemons_sem);
+		log_debug(logger,"Se comienza a planificar planificador por cercanía");
 		scheduleByDistance();
+		log_debug(logger,"Se termina de planificar planificador por cercania");
 		sem_post(&availablePokemons_sem);
 	}
 }
@@ -298,7 +380,9 @@ void* startAlgorithmScheduling(){
 
 		sem_wait(&(readyTrainer_sem));
 		sem_wait(&(execTrainer_sem));
+		log_debug(logger,"Se comienza a planificar la lista de ready");
 		schedule();
+		log_debug(logger,"Se termina de planificar la lista de ready");
 	}
 }
 
@@ -321,15 +405,6 @@ void initTrainersPokemonLists(){
 	}
 
 }
-
-
-
-
-
-
-
-
-
 
 void readConfigClockSimulationTime(t_config* config){
 	if (config_has_property(config,"RETARDO_CICLO_CPU")){
@@ -1050,6 +1125,7 @@ void startTrainer(t_trainer* trainer){
 	trainer->blockState=AVAILABLE;
 	pthread_create(&(trainer->trainer),NULL,(void*)startThread,(void*)trainer);
 	pthread_detach(trainer->trainer);
+	log_debug(logger,"5. Se creó un entrenador");
 }
 
 void getTrainerAttr(char** trainersPosition,char** trainersPokemons,char** trainersObjetives, int trainersCount){
@@ -1057,12 +1133,14 @@ void getTrainerAttr(char** trainersPosition,char** trainersPokemons,char** train
 	getTrainerAttrPos(trainersPosition,trainersCount);
 	getTrainerAttrPkm(trainersPokemons,trainersCount);
 	getTrainerAttrObj(trainersObjetives,trainersCount);
+	log_debug(logger,"4. Finalizó el proceso de carga de atributos");
 }
 
 
 
 void getTrainerAttrPos(char** trainersPosition, int trainersCount){
 
+	log_debug(logger,"4.1. Comienza el proceso de carga de posición de entrenadores");
 	for(int actualTrainer = 0; actualTrainer < trainersCount; actualTrainer++){
 		int rowCount=0;
 			char pos='x';
@@ -1097,9 +1175,11 @@ void getTrainerAttrPos(char** trainersPosition, int trainersCount){
 		  string_iterate_lines(trainersPosition, _getRow);
 		  list_destroy_and_destroy_elements(list,free);
 	  }
+	log_debug(logger,"4.1. Finaliza el proceso de carga de posición de entrenadores");
 }
 void getTrainerAttrPkm(char** trainersPokemons, int trainersCount)
 {
+	log_debug(logger,"4.2. Comienza el proceso de carga de pokemons de entrenadores");
 	for(int actualTrainer = 0; actualTrainer < trainersCount; actualTrainer++){
 		statesLists.newList.trainerList[actualTrainer].parameters.pokemonsCount =0;
 
@@ -1144,6 +1224,8 @@ void getTrainerAttrPkm(char** trainersPokemons, int trainersCount)
 
 void getTrainerAttrObj(char** trainersObjetives, int trainersCount)
 {
+
+	log_debug(logger,"4.3. Comienza el proceso de carga de objetivos de entrenadores");
 	for(int actualTrainer = 0; actualTrainer < trainersCount; actualTrainer++){
 		int rowCount=0;
 
@@ -1182,6 +1264,7 @@ void getTrainerAttrObj(char** trainersObjetives, int trainersCount)
 		  string_iterate_lines(trainersObjetives, _getRow);
 		  list_destroy_and_destroy_elements(list,free);
 	  }
+	log_debug(logger,"4.3. Finaliza el proceso de carga de objetivos de entrenadores");
 }
 
 //TODO Agregar el cast de trainer (en realidad viene como void*)
@@ -1754,7 +1837,6 @@ int executeClock(){
 
 	if(getDistanceToPokemonTarget(statesLists.execTrainer.trainer,statesLists.execTrainer.trainer.parameters.scheduledPokemon)!=0){
 		moveTrainerToObjective(&(statesLists.execTrainer.trainer));
-		cpuClocksCount++;
 		return 1;
 	}else if(getDistanceToPokemonTarget(statesLists.execTrainer.trainer,statesLists.execTrainer.trainer.parameters.scheduledPokemon)==0){
 		catchPokemon();

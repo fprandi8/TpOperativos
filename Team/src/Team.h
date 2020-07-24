@@ -240,7 +240,11 @@ void removeFromMissingPkms(t_pokemon);
 void* resolveDeadlock();
 void* finishTeam();
 void initCPUClocksCountForTrainers();
-
+int getDistanceToTrainerToExchange(t_trainer);
+int executeClockForDeadlockTrainers(t_trainer*);
+void moveTrainerToObjectiveDeadlock(t_trainer*);
+void exchangePokemon(t_trainer*);
+int getClockTimeToNewPosition(int, int);
 
 void initBroker(struct Broker *broker){
 	broker->ipKey="IP_BROKER";

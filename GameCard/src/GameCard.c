@@ -1295,7 +1295,8 @@ int decrease_pokemon_amount(char** fileContent,int pos, t_file_metadata* metadat
 
 	while (file[pos + index2] != '\n') index2++;
 
-	char* line = (char*)malloc(index2);
+	// sumarle 1
+	char* line = (char*)malloc(index2+1);
 	memcpy(line,file+pos,index2+1);
 
 	int bytes = index2+1;
@@ -1307,13 +1308,13 @@ int decrease_pokemon_amount(char** fileContent,int pos, t_file_metadata* metadat
 	int auxAmount = atoi(stringAux) - 1;
 
 	if (auxAmount == 0 ){
-
-		char* auxBuffer=(char*)malloc(atoi(metadataFile->size) - index2-1);
+//ver esta variable
+		char* auxBuffer=(char*)malloc(atoi(metadataFile->size) - index2);
 		if (pos != 0) {
 			memcpy(auxBuffer,file,pos);
 			auxBuffer[pos]='\0';
 
-			auxIntSize = auxIntSize-pos+1;
+			auxIntSize = auxIntSize-pos;//+1;
 			if(auxIntSize > 0){
 				memcpy(auxBuffer+pos-1,file+pos+bytes-1,auxIntSize);
 				auxBuffer[pos+auxIntSize]='\0';

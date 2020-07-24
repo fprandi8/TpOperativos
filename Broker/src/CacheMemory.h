@@ -80,6 +80,10 @@ t_partition* bs_freed_partition;
 
 int nextPartitionId;
 
+int memorySchemeIsDynamic;
+int victimSelectionIsFifo;
+int partitionSelectionIsFirstFit;
+
 sem_t mutex_cached_messages;
 sem_t mutex_nextPartitionId;
 sem_t mutex_partitions;
@@ -98,12 +102,15 @@ void start_cache();
 t_config* get_config(void);
 void define_partition_size(void);
 void define_cache_maximum_size(void);
+
 //memory reservation
 void set_full_memory(void);
+
 //message handler
 void save_message(deli_message message);
 t_buffer* get_message_body(); //implement if needed
 int save_message_body(void*, message_type);
+
 //partition handlers
 t_partition* find_empty_partition_of_size(uint32_t size);
 uint32_t save_body_in_partition(t_buffer*, t_partition*, message_type); //check if this is needed
@@ -112,38 +119,46 @@ int find_index_in_list(t_partition* partition);
 uint32_t consolidate(t_partition* related_partition);
 void find_index_in_list_and_destroy(t_partition* partition);
 void check_compact_restrictions(void);
+t_cachedMessage* create_cached_from_message(deli_message message);
+void add_to_cached_messages(t_cachedMessage* new_message);
+t_partition* create_childrens_from(t_partition* parent);
+
+//delete a partition
 void delete_partition(void);
 t_partition* select_partition(uint32_t size);
 t_partition* select_partition_ff(uint32_t size); //select by first fit
 t_partition* select_partition_bf(uint32_t size); //select by best fit
 t_partition* delete_partition_fifo(void); //delete by fifo
 t_partition* delete_partition_lru(void); //delete by lru
+void find_index_in_list_and_destroy(t_partition* partition);
+
+//Access methods
 t_list* GetMessagesFromQueue(message_type queue_type);
 t_cachedMessage* GetCachedMessage(int);
 deli_message* GetMessage(int);
 t_partition* CreateNewPartition();
-t_cachedMessage* create_cached_from_message(deli_message message);
-void Free_CachedMessage(t_cachedMessage*);
-void add_to_cached_messages(t_cachedMessage* new_message);
-uint32_t add_occupied_size_from(t_list* occupied);
 int GetBusyPartitionsCount();
-int CalculateNearestPowerOfTwo(int x);
-double CalculateNearestPowerOfTwoRelativeToCache(int memoryLocation);
 void PrintDumpOfCache();
-t_partition* create_childrens_from(t_partition* parent);
+void AddASentSubscriberToMessage(int messageId, int client);
+void AddAcknowledgeToMessage(int messageId);
+t_partition* GetPartition(int partitionId);
+t_list* GetAllMessagesForSuscriptor(int client, message_type queueType);
+
+//Free's
+void Free_Partition(t_partition* partition);
+void Free_CachedMessage(t_cachedMessage*);
+
+
+//consolidation and compaction
+uint32_t add_occupied_size_from(t_list* occupied);
 void start_consolidation_for(t_partition* freed_partition);
 void check_validations_and_consolidate_PD(t_partition* freed_partition);
 int check_validations_and_consolidate_BS(uint32_t* freed_partition_id);
-void find_index_in_list_and_destroy(t_partition* partition);
-void AddASentSubscriberToMessage(int messageId, int client);
-void AddAcknowledgeToMessage(int messageId);
-t_list* GetAllMessagesForSuscriptor(int client, message_type queueType);
-void Free_Partition(t_partition* partition);
-t_list* UpdateClockOn(t_list* c_messages);
-t_partition* GetPartition(int partitionId);
-void UpdateTimestamp(uint32_t partitionId);
-t_cachedMessage* UpdateClockOnMessage(t_cachedMessage* message);
-void signal_handler(int signum);
 
+//misc
+t_list* UpdateClockOn(t_list* c_messages);
+t_cachedMessage* UpdateClockOnMessage(t_cachedMessage* message);
+void UpdateTimestamp(uint32_t partitionId);
+int CalculateNearestPowerOfTwo(int x);
 
 #endif /* CACHEMEMORY_H_ */

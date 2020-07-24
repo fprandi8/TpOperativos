@@ -117,8 +117,12 @@ int main(void) {
 */
 	trainersCount = getTrainersCount(config);
 	sem_init(&(availableTrainersCount_sem),0,trainersCount);
-	sem_init(&(deadlockCount_sem),0,1-trainersCount);
-	sem_init(&(exitCount_sem),0,1-trainersCount);
+	sem_init(&(deadlockCount_sem),0,1);
+	sem_init(&(exitCount_sem),0,1);
+	for(int tcount=0;tcount<=trainersCount;tcount++){
+		sem_wait(&(deadlockCount_sem));
+		sem_wait(&(exitCount_sem));
+	}
 	log_debug(logger,"4. Se contaron %i entrenadores",trainersCount);
 	log_debug(logger,"5.Se alocó memoria para el array de threads");
 	statesLists.newList.trainerList = (t_trainer*)malloc(sizeof(t_trainer)*trainersCount);

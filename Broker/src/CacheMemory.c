@@ -64,8 +64,6 @@ void start_cache(t_log* log)
 	parent_partitions = list_create();
 	sem_post(&mutex_parent_partitions);
 
-    PrintDumpOfCache();
-
 }
 
 t_config* get_config(){
@@ -588,8 +586,13 @@ void PrintDumpOfCache()
    time( &rawtime );
    info = localtime( &rawtime );
 
-    printf("\n-----------------------------------------------------------------------------------------------------------------------------\n");
-    printf("Dump: %d/%d/%d %s\n", info->tm_mday, info->tm_mon, info->tm_year, temporal_get_string_time());
+   FILE *fp;
+   int myInt = 5;
+   fp = fopen("CacheDump.txt", "a");
+   fseek(fp, 0, SEEK_END);
+
+    fprintf(fp,"\n-----------------------------------------------------------------------------------------------------------------------------\n");
+    fprintf(fp,"Dump: %d/%d/%d %s\n", info->tm_mday, info->tm_mon, info->tm_year, temporal_get_string_time());
 
     void _print_partition_info(t_partition* partition)
     {
@@ -599,7 +602,7 @@ void PrintDumpOfCache()
         if(partition->free == 1)
         {
             busyStatus = "L";
-            printf("Partición %d: %s. [%s] Size:%ub\n",
+            fprintf(fp,"Partición %d: %s. [%s] Size:%ub\n",
             	(int)partition->id,
 				memoryLocation,
                 busyStatus, 
@@ -613,7 +616,7 @@ void PrintDumpOfCache()
             busyStatus = "X";
             t_cachedMessage* message = GetCachedMessageInPartition(partition->id);
             char* queue = GetStringFromMessageType(message->queue_type);
-            printf("Partición %d: %s. [%s] Size:%ub LRU:%ld Cola:%s ID:%d\n",
+            fprintf(fp,"Partición %d: %s. [%s] Size:%ub LRU:%ld Cola:%s ID:%d\n",
                 partition->id,
 				memoryLocation,
                 busyStatus,
@@ -627,7 +630,8 @@ void PrintDumpOfCache()
 
     list_iterate(partitions, (void*)_print_partition_info);
 
-    printf("-----------------------------------------------------------------------------------------------------------------------------\n");
+    fprintf(fp,"-----------------------------------------------------------------------------------------------------------------------------\n");
+    fclose(fp); //Don't forget to close the file when finished
 }
 
 void start_consolidation_for(t_partition* freed_partition)

@@ -10,7 +10,7 @@ int SendAll(int client_socket, char *stream, uint32_t *lenght)
 
     while(totalBytesSent < *lenght)
     {
-    	sendResult = send(client_socket, stream + totalBytesSent, bytesleft, 0);
+    	sendResult = send(client_socket, stream + totalBytesSent, bytesleft, 0 | MSG_NOSIGNAL);
         if (sendResult == -1) { break; }
         totalBytesSent += sendResult;
         bytesleft -= sendResult;

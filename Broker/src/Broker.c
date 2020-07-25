@@ -313,6 +313,12 @@ void queue_handler_send_message(void* args){
 
 
 	int result = SendMessage(*message,client);
+	if(result == -1)
+	{
+		RemoveClient(client);
+		return;
+	}
+
 	log_info(broker->logger, "SE ENVIO EL MENSAJE %d AL CLIENTE %d", message->id, client);
 	//log_debug(broker->logger, "RESULTADO DEL ENVIO: %d", result);
 
@@ -331,6 +337,11 @@ void queue_handler_send_message(void* args){
 		uint32_t op_code;
 		void* content;
 		result = RecievePackage(client,&op_code,&content);
+		if(result == -1)
+		{
+			RemoveClient(client);
+			return;
+		}
 		log_info(broker->logger,"RECIBIDO ACKNOWLEDGE PARA MENSAGE %d", message->id);
 
 		if (op_code == ACKNOWLEDGE )
@@ -380,58 +391,19 @@ t_suscriptor* queue_handler_get_suscriptor(t_queue_handler* self,int pos){
 	return list_get(self->suscriptors,pos);
 }
 
-// Message admnistrator logic
-/*
-t_message_administrator* message_administrator_initialize(uint32_t id)
+void RemoveClient(int client)
 {
-	t_message_administrator* aux =(t_message_administrator*) malloc(sizeof(t_message_administrator));
+	bool is_disconnected_suscriber(t_suscriptor* suscriptor) { return suscriptor->suscripted == client; }
 
-	aux->messageId = id;
-	sem_init(&(aux->semaphoreACK),0,1);
-	aux->amountPendingAcknowledge = 0;
-
-	return aux;
-}
-
-t_message_administrator* messege_administrator_get_administrator(t_list* list, uint32_t id){
-	int index = 0;
-	int match = 0 ;
-
-	t_message_administrator* aux = (t_message_administrator*)malloc(sizeof(t_message_administrator));
-
-	while((list_get(list, index) != NULL)&&(!match)){
-
-		aux = (t_message_administrator*)list_get(list,index);
-
-		if (aux->messageId == id)
-			match = 1;
-		index ++;
+	void remove_disconnected_from_queues(t_queue_handler* queue_handler)
+	{
+		t_suscriptor* suscriptor = list_remove_by_condition(queue_handler->suscriptors, (void*)is_disconnected_suscriber);
+		free(suscriptor);
 	}
 
-	return aux;
+	list_iterate(broker->queues, (void*) remove_disconnected_from_queues);
+	close(client);
 }
-
-void message_administrator_pending_acknowledge(t_message_administrator* self){
-	sem_wait(&(self->semaphoreACK));
-	self->amountPendingAcknowledge++;
-	sem_post(&(self->semaphoreACK));
-
-}
-
-void message_administrator_receive_acknowledge(t_message_administrator* self){
-	sem_wait(&(self->semaphoreACK));
-	self->amountPendingAcknowledge--;
-	sem_post(&(self->semaphoreACK));
-
-}
-
-uint32_t message_administrator_get_amountACK(t_message_administrator* self){
-	return self->amountPendingAcknowledge;
-}*/
-
-//int message_administrator_compare(t_message_administrator* am ){
-//
-//}
 
 // Manage an interupt or segmentation fault
 void signaltHandler(int sig_num){

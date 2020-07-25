@@ -768,11 +768,12 @@ void processMessageCaught(deli_message* message){
 	log_info(logger,"7. Llegada de mensaje Caught. Datos: Respuesta de captura: %u, correlation id: %u",caughtPokemon->caught,cid);
 	int resultCatchId = findIdInCatchList(cid);
 	uint32_t trainerPos;
-	if(caughtPokemon->caught==1){
-		if(resultCatchId>=0){
+
+	if(resultCatchId>=0){
+		if(caughtPokemon->caught==1){
 			for(int i = 0;i<statesLists.blockedList.count;i++){
 				if(statesLists.blockedList.trainerList[i].id==resultCatchId){
-					trainerPos=i;;
+					trainerPos=i;
 				}
 			}
 			removeFromMissingPkms(statesLists.blockedList.trainerList[trainerPos].parameters.scheduledPokemon);
@@ -793,10 +794,11 @@ void processMessageCaught(deli_message* message){
 				statesLists.blockedList.trainerList[trainerPos].blockState = AVAILABLE;
 				sem_post(&(availableTrainersCount_sem));
 			}
-		}
+
 	}else{
 		statesLists.execTrainer.trainer.blockState = AVAILABLE;
 		sem_post(&(availableTrainersCount_sem));
+	}
 	}
 }
 

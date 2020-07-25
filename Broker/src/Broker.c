@@ -90,6 +90,12 @@ void serve_client(void* variables)
 
 	int resultado= RecievePackage(cliente,&type,&content);
 
+	if(resultado == -1)
+	{
+		RemoveClient(cliente);
+		return;
+	}
+
 	if (resultado == 0)
 	{
 		recive_message(type, cliente, broker, content);

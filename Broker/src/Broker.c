@@ -15,6 +15,7 @@ uint32_t ID = 0;
 t_Broker* broker;
 sem_t mutexSuscription;
 sem_t mutexClient;
+sem_t mutex_handler_process_message;
 
 int main(void) {
 
@@ -27,6 +28,7 @@ int main(void) {
 
 	sem_init(&(mutexSuscription),0,1);
 	sem_init(&(mutexClient),0,1);
+	sem_init(&(mutex_handler_process_message),0,1);
 	signal(SIGINT,signaltHandler);
 	signal(SIGUSR1,cacheSigHandler);
 
@@ -271,9 +273,9 @@ void broker_process_message(void* buffer, int cliente, t_Broker* broker){
 	//en principio no hacer nada, ver en reunion
 
 	t_queue_handler* queue = broker_get_specific_Queue(*broker,message->messageType);
-
+	sem_wait(&(mutex_handler_process_message));
 	queue_handler_process_message(queue,message, broker);
-
+	sem_post(&(mutex_handler_process_message));
 }
 
 //QUEUE LOGIC

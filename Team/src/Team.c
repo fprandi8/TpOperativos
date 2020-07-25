@@ -772,7 +772,6 @@ void processMessageCaught(deli_message* message){
 	log_info(logger,"7. Llegada de mensaje Caught. Datos: Respuesta de captura: %u, correlation id: %u",caughtPokemon->caught,cid);
     int resultCatchId = findIdInCatchList(cid);
 	uint32_t trainerPos;
-	log_info(logger,"entre vieja");
 
 
 	if(resultCatchId>=0){

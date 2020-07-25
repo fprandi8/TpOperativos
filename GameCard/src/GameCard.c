@@ -378,6 +378,8 @@ void* GameCard_Process_Message_Catch(deli_message* message){
 
 		resulCatchPokemon = catch_a_pokemon(&(fileContent),metadataFile,coordinate, catchPokemon->pokemonName);
 
+		sleep(GameCard->delayTime);
+
 		sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,catchPokemon->pokemonName);
 		sem_wait(pokeSem);
 		t_config* metadataConfig = read_metadata(file);
@@ -398,7 +400,7 @@ void* GameCard_Process_Message_Catch(deli_message* message){
 	else
 		caughtPokemon->caught = 0;
 
-	sleep(GameCard->delayTime);
+
 
 	free(directory);
 
@@ -442,6 +444,8 @@ void* GameCard_Process_Message_Get(deli_message* message){
 
 		create_localized_message(localizedPokemon, fileContent, getPokemon->pokemonName, metadataFile);
 
+		sleep(GameCard->delayTime);
+
 		sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,getPokemon->pokemonName);
 		sem_wait(pokeSem);
 		t_config* metadataConfig= read_metadata(file);
@@ -453,7 +457,6 @@ void* GameCard_Process_Message_Get(deli_message* message){
 		Metadata_File_Destroy(metadataFile);
 	}
 
-	sleep(GameCard->delayTime);
 
 	free(directory);
 
@@ -541,26 +544,42 @@ int catch_a_pokemon(char** fileContent, t_file_metadata* metadataFile, char* coo
 
 			metadataFile->size =  string_itoa(auxSize - resultDecreaseAmount);
 
-			int amountOfBlocks=get_amount_of_blocks(atoi(metadataFile->size), metadataFile);
+			if (atoi(metadataFile->size)!=0){
 
-			Metadata_File_Add_Blocks(metadataFile,amountOfBlocks);
+				int amountOfBlocks=get_amount_of_blocks(atoi(metadataFile->size), metadataFile);
 
-			write_blocks(metadataFile, file);
+				Metadata_File_Add_Blocks(metadataFile,amountOfBlocks);
 
-			metadataFile->directory='N';
-			metadataFile->open='N';
+				write_blocks(metadataFile, file);
 
-			t_values* values = (t_values*)malloc(sizeof(t_values));
-			values->values = list_create();
+				metadataFile->directory='N';
+				metadataFile->open='N';
 
-			list_add(values->values,pokemonName);
-			list_add(values->values,metadataFile);
+				t_values* values = (t_values*)malloc(sizeof(t_values));
+				values->values = list_create();
 
-			result=create_file(POKE_METADATA,values);
+				list_add(values->values,pokemonName);
+				list_add(values->values,metadataFile);
 
-			list_remove(values->values,1);
-			list_remove(values->values,0);
-			free(values);
+				result=create_file(POKE_METADATA,values);
+
+				list_remove(values->values,1);
+				list_remove(values->values,0);
+				free(values);
+			}else{
+				char* pokeMetadata = (char*)malloc(strlen(GameCard->filePath) + strlen(pokemonName) + strlen("/matadata.bin") + 1 );
+				strcpy(pokeMetadata,GameCard->filePath);
+				strcat(pokeMetadata,pokemonName);
+				strcat(pokeMetadata,"/metadata.bin");
+
+				remove(pokeMetadata);
+				free(pokeMetadata);
+
+				char* pokeDirectory = (char*)malloc(strlen(GameCard->filePath)+strlen(pokemonName)+1);
+				rmdir(pokeDirectory);
+				free(pokeDirectory);
+
+			}
 		}
 		return 0;
 	}
@@ -715,12 +734,12 @@ void* modify_poke_file(t_values* values, char* directory){;
 
 	sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,newPokemon->pokemonName);
 
+	sleep(GameCard->delayTime);
+
 	sem_wait(pokeSem);
 	t_config* metadataConfig = read_metadata(file);
 	Metadata_File_Open_Flag(metadataFile,metadataConfig,"N");
 	sem_post(pokeSem);
-
-	sleep(GameCard->delayTime);
 
 	free(horCoordinate);
 	free(verCoordinate);

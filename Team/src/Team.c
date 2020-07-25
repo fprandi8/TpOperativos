@@ -776,6 +776,7 @@ void processMessageCaught(deli_message* message){
 					trainerPos=i;
 				}
 			}
+			log_debug(logger,"Pokemon que voy a capturar %s ",statesLists.blockedList.trainerList[trainerPos].parameters.scheduledPokemon.name);
 			removeFromMissingPkms(statesLists.blockedList.trainerList[trainerPos].parameters.scheduledPokemon);
 			addToPokemonList(&(statesLists.blockedList.trainerList[trainerPos]));
 			log_debug(logger,"Se captura el pokemon por Caught message");

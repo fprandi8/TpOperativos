@@ -274,8 +274,6 @@ t_partition* select_partition_bf(uint32_t size){
 
 void compact_memory(void)
 {
-	PrintDumpOfCache();
-
     bool _is_empty_partition(t_partition* partition){ return partition->free; }
     bool _filter_busy_partition(t_partition* partition){ return !partition->free;}
 
@@ -335,8 +333,6 @@ void compact_memory(void)
 	free(partitions);
 
     partitions = occupied_partitions;
-
-    PrintDumpOfCache();
 
 	log_info(cache_log, "SE EJECUTO COMPACTACION");
 }

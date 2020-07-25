@@ -64,7 +64,7 @@ typedef struct {
 	} t_Broker;
 
 typedef struct {
-	int* cliente;
+	int cliente;
 	t_Broker * broker;
 	} t_args;
 

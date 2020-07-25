@@ -193,7 +193,9 @@ int GetPackage(int client_socket, t_package** recievedPackage)
 		uint32_t streamSize;
 		recv(client_socket, &streamSize, sizeof(uint32_t), MSG_WAITALL);
 		void* stream = malloc(streamSize);
-		recv(client_socket, stream, streamSize, MSG_WAITALL);
+		int result = recv(client_socket, stream, streamSize, MSG_WAITALL);
+
+		if(result == -1) return -1;
 
 		t_package* newPackage = (t_package*)malloc(sizeof(t_package));
 		newPackage->operationCode = op_code;

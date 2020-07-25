@@ -288,13 +288,13 @@ void compact_memory(void)
     int offsetMem = 0;
     void _asignPartitionOnBackUpMem(t_partition* partition)
     {
-    	log_debug(cache_log, "Offset memory before: %d", offsetMem);
+    	//log_debug(cache_log, "Offset memory before: %d", offsetMem);
     	//log_debug(cache_log, "Partition start: %d", partition->begining);
-    	log_info(cache_log, "Partition final location: %d", (cache.full_memory + cache.memory_size) - (partition->begining + partition->size));
+    	//log_info(cache_log, "Partition final location: %d", (cache.full_memory + cache.memory_size) - (partition->begining + partition->size));
         memcpy(backUp_memory + offsetMem, partition->begining, partition->size);
         partition->begining = cache.full_memory + offsetMem;
         offsetMem += partition->size;
-        log_debug(cache_log, "Offset memory after: %d", offsetMem);
+        //log_debug(cache_log, "Offset memory after: %d", offsetMem);
     }
 
     int offsetPointerMem = 0;
@@ -317,8 +317,8 @@ void compact_memory(void)
 
     list_add(occupied_partitions, emptySpacePartition);
 
-    log_info(cache_log, "Size of backup: %d", cache.memory_size * sizeof(char));
-    log_info(cache_log, "Size of cache: %d", cache.memory_size);
+    //log_info(cache_log, "Size of backup: %d", cache.memory_size * sizeof(char));
+    //log_info(cache_log, "Size of cache: %d", cache.memory_size);
     list_iterate(occupied_partitions, (void*)_asignPartitionOnBackUpMem);
 
     memcpy(cache.full_memory, backUp_memory, sizeof(cache.memory_size));

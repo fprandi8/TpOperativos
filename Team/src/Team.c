@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
 	missingPokemons(statesLists.newList.trainerList,trainersCount);
 	void* temp = realloc(missingPkms,sizeof(t_objetive)*globalObjetivesDistinctCount);
 	if (!temp){
-		log_debug(logger,"error en realloc");
+
 		exit(9);
 	}
 	missingPkms=temp;
@@ -136,7 +136,7 @@ int main(int argc, char **argv) {
 	int client;
 	while(1){
 		client = waitClient(teamServer);
-		log_debug(logger,"Gameboy connected");
+
 		pthread_create(thread,NULL,(void*)attendGameboy,&client);
 		pthread_detach(*thread);
 	}
@@ -387,20 +387,20 @@ void attendGameboy(void* var){
 	int* client = (int*)var;
 	int result = RecievePackage(*(client),&type,&content);
 	if(!result){
-		log_debug(logger,"Gameboy's message processed");
+
 		deli_message* message = (deli_message*)content;
 		int result = SendMessageAcknowledge(message->id,*(client));
 		if(!result){
-			log_debug(logger,"Acknowledge sent to Gameboy");
+
 		}
 		processGameBoyMessage(message);
 	}else{
-		log_debug(logger,"Error receiving Gameboy's message");
+
 	}
 	pthread_exit(NULL);
 }
 void processGameBoyMessage(deli_message* message){
-	log_debug(logger,"processGameBoyMessage");
+
 	switch(message->messageType){
 		case APPEARED_POKEMON: {
 			processMessageAppeared(message);
@@ -434,18 +434,18 @@ int startServer()
     for (p = servinfo; p != NULL; p = p->ai_next) {
     	teamSocket = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
 		if (teamSocket == -1){
-			log_debug(logger,"El socket se configuró incorrectamente");
+
 			continue;
 		}
-		log_debug(logger,"Socket configurado");
+
 		uint32_t flag=1;
 		setsockopt(teamSocket,SOL_SOCKET,SO_REUSEPORT,&(flag),sizeof(flag));
 		if (bind(teamSocket, p->ai_addr, p->ai_addrlen)==-1) {
 			close(teamSocket);
-			log_debug(logger,"La conexión falló");
+
 			continue;
 		}else{
-			log_debug(logger,"La conexión fue realizada");
+
 			break;
 		}
 	}
@@ -485,7 +485,7 @@ void subscribeToBroker(){
 }
 
 void* subscribeToBrokerLocalized(){
-	log_debug(logger,"Creando thread Localized Subscriptions Handler");
+
 	int socketLocalized;
 	int flagConnected = 0;
 
@@ -494,9 +494,9 @@ void* subscribeToBrokerLocalized(){
 		if(socketLocalized!=-1){
 			log_info(logger,"11. Conexión satisfactoria al Broker");
 			if (-1==SendSubscriptionRequest(LOCALIZED_POKEMON,socketLocalized)){
-				log_debug(logger,"Error en subscripcion de Localized");
+
 			}else{
-				log_debug(logger,"Se subscribió a Localized");
+
 				flagConnected=1;
 			}
 		}else{
@@ -532,7 +532,7 @@ void* subscribeToBrokerAppeared(){
 		if(socketAppeared!=-1){
 			log_info(logger,"11. Conexión satisfactoria al Broker");
 			if (-1==SendSubscriptionRequest(APPEARED_POKEMON,socketAppeared)){
-				log_debug(logger,"Error en subscripcion de Appeared");
+
 			}else{
 
 				flagConnected=1;
@@ -568,7 +568,7 @@ void* subscribeToBrokerCaught(){
 		if(socketCaught!=-1){
 			log_info(logger,"11. Conexión satisfactoria al Broker");
 			if (-1==SendSubscriptionRequest(CAUGHT_POKEMON,socketCaught)){
-				log_debug(logger,"Error en subscripcion de caught");
+
 			}else{
 
 				flagConnected=1;
@@ -703,7 +703,7 @@ void processMessageLocalized(deli_message* message){
 			sem_wait(&availablePokemons_sem);
 			void* temp = realloc(availablePokemons.pokemons,sizeof(t_pokemon)*(availablePokemons.count+localizedPokemon->ammount));
 			if (!temp){
-				log_debug(logger,"error en realloc");
+
 				exit(9);
 			}
 			availablePokemons.pokemons=temp;
@@ -744,7 +744,7 @@ void processMessageAppeared(deli_message* message){
 			sem_wait(&availablePokemons_sem);
 			void* temp = realloc(availablePokemons.pokemons,sizeof(t_pokemon)*(availablePokemons.count+1));
 			if (!temp){
-				log_debug(logger,"error en realloc");
+
 				exit(9);
 			}
 			availablePokemons.pokemons=temp;
@@ -757,7 +757,7 @@ void processMessageAppeared(deli_message* message){
 			sem_post(&availablePokemons_sem);
 			sem_post(&(availablePokemonsCount_sem));
 		}else{
-			log_debug(logger,"After AddMessageAppeared: Pokemon no sirve availablePokemonCount: %i",availablePokemons.count);
+
 		}
 
 }
@@ -765,11 +765,11 @@ void processMessageAppeared(deli_message* message){
 int findIdInCatchList(uint32_t cid){
 	int position=-1;
 	for(int i=0;i<catchList.count;i++){
-		log_debug(logger,"Se compara el catch catchid %u  con el cid %u. el catch es del trainer %u",catchList.catchMessage[i].catchId,cid,catchList.catchMessage[i].trainerId);
+
 		int compare = catchList.catchMessage[i].catchId==cid;
 		if(compare!=0){
 			position=i;
-			log_error(logger,"catch id %i tiene cid %u, y lo solicitó el trainer %u",catchList.catchMessage[i].catchId,cid,catchList.catchMessage[i].trainerId);
+
 			break;
 		}
 			}
@@ -1067,7 +1067,7 @@ void startTrainers(int trainersCount,t_config *config){
 	initCPUClocksCountForTrainers();
 	for(int actualTrainer = 0; actualTrainer < trainersCount; actualTrainer++){
 		sem_init(&(statesLists.newList.trainerList[actualTrainer].semaphore),0,0);
-		log_debug(logger,"Creando el entrenador %i",actualTrainer);
+
 		startTrainer(&(statesLists.newList.trainerList[actualTrainer]));
 	}
 
@@ -1312,7 +1312,7 @@ void removeFromPokemonList(t_trainer* trainer,t_pokemon* pokemon){
 	if(trainer->parameters.pokemonsCount){
 		void* temp = realloc(trainer->parameters.pokemons,sizeof(t_pokemon)*((trainer->parameters.pokemonsCount)));
 		if (!temp){
-			log_debug(logger,"error en realloc");
+
 			exit(9);
 		}
 	(trainer->parameters.pokemons)=temp;
@@ -1325,7 +1325,7 @@ void addToPokemonList(t_trainer* trainer){
 	}else{
 		void* temp = realloc((*trainer).parameters.pokemons,sizeof(t_pokemon)*(((*trainer).parameters.pokemonsCount)+1));
 		if (!temp){
-			log_debug(logger,"error en realloc");
+
 					exit(9);
 				}
 		((*trainer).parameters.pokemons)=temp;
@@ -1338,7 +1338,7 @@ void addToReady(t_trainer* trainer){
 	log_info(logger,"1. Se movió al entrenador %u a la cola Ready por haber sido planificado por su cercanía con el pokemon",trainer->id);
 	void* temp = realloc(statesLists.readyList.trainerList,sizeof(t_trainer)*((statesLists.readyList.count)+1));
 	if (!temp){
-		log_debug(logger,"error en realloc");
+
 				exit(9);
 			}
 	(statesLists.readyList.trainerList)=temp;
@@ -1361,7 +1361,7 @@ void removeFromReady(int trainerPositionInList){
 	if(statesLists.readyList.count){
 		void* temp = realloc(statesLists.readyList.trainerList,sizeof(t_trainer)*((statesLists.readyList.count)));
 		if (!temp){
-			log_debug(logger,"error en realloc");
+
 			exit(9);
 		}
 		(statesLists.readyList.trainerList)=temp;
@@ -1376,7 +1376,7 @@ void removeFromNew(int trainerPositionInList){
 	if(statesLists.newList.count){
 	void* temp = realloc(statesLists.newList.trainerList,sizeof(t_trainer)*((statesLists.newList.count)));
 	if (!temp){
-		log_debug(logger,"error en realloc");
+
 		exit(9);
 	}
 	(statesLists.newList.trainerList)=temp;
@@ -1399,7 +1399,7 @@ void removeFromMissingPkms(t_pokemon pkm){
 	if(missingPokemonsCount>0){
 			void* temp = realloc(missingPkms,sizeof(t_objetive)*missingPokemonsCount);
 			if (!temp){
-				log_debug(logger,"error en realloc");
+
 				exit(9);
 			}
 		(missingPkms)=temp;
@@ -1418,7 +1418,7 @@ void removeFromAvailable(int pkmPosition){
 	if(availablePokemons.count){
 		void* temp = realloc(availablePokemons.pokemons,sizeof(t_pokemon)*((availablePokemons.count)));
 		if (!temp){
-			log_debug(logger,"error en realloc");
+
 			exit(9);
 		}
 	(availablePokemons.pokemons)=temp;
@@ -1439,7 +1439,7 @@ void removeFromBlocked(int trainerPositionInList){
 	if(statesLists.blockedList.count){
 		void* temp = realloc(statesLists.blockedList.trainerList,sizeof(t_trainer)*(statesLists.blockedList.count));
 		if (!temp){
-			log_debug(logger,"error en realloc");
+
 			exit(9);
 		}
 
@@ -1450,7 +1450,7 @@ void removeFromBlocked(int trainerPositionInList){
 void addToBlocked(t_trainer trainer){
 	void* temp = realloc(statesLists.blockedList.trainerList,sizeof(t_trainer)*((statesLists.blockedList.count)+1));
 		if (!temp){
-			log_debug(logger,"error en realloc");
+
 			exit(10);
 		}
 		(statesLists.blockedList.trainerList)=temp;
@@ -1478,7 +1478,7 @@ void addToExit(t_trainer trainer){
 	log_info(logger,"1. Se movió al entrenador %u a la cola Exit por haber finalizado",trainer.id);
 	void* temp = realloc(statesLists.exitList.trainerList,sizeof(t_trainer)*((statesLists.exitList.count)+1));
 		if (!temp){
-			log_debug(logger,"error en realloc");
+
 			exit(10);
 		}
 		(statesLists.exitList.trainerList)=temp;
@@ -1625,7 +1625,7 @@ void scheduleByDistance(){
 						for(int j=0;j<statesLists.readyList.count;j++){
 
 							if(0==strcmp(statesLists.readyList.trainerList[j].parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name)){
-								log_debug(logger,"entré 2 con entrenado %u",statesLists.readyList.trainerList[j].id);
+
 								selectedMissingPokemonCount--;
 							}
 						}
@@ -1634,7 +1634,7 @@ void scheduleByDistance(){
 							if(statesLists.blockedList.trainerList[j].blockState==WAITING){
 
 								if(0==strcmp(statesLists.blockedList.trainerList[j].parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name)){
-									log_debug(logger,"entré 3");
+
 									selectedMissingPokemonCount--;
 								}
 							}
@@ -1904,7 +1904,7 @@ void processAcknowledge(void* buffer,uint32_t type ,uint32_t trainerId){
 			}else{
 				void* temp = realloc(catchList.catchMessage,sizeof(t_catchMessage)*((catchList.count)+1));
 				if (!temp){
-					log_debug(logger,"error en realloc");
+
 					exit(9);
 				}
 				(catchList.catchMessage)=temp;
@@ -1925,7 +1925,7 @@ void processAcknowledge(void* buffer,uint32_t type ,uint32_t trainerId){
 			}else{
 				void* temp = realloc(getList.id,sizeof(uint32_t)*((getList.count)+1));
 				if (!temp){
-					log_debug(logger,"error en realloc");
+
 					exit(9);
 				}
 				(getList.id)=temp;

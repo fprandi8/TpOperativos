@@ -56,7 +56,6 @@ int main(void) {
 
 		sem_wait(&(mutexClient));
 		cliente = esperar_cliente(server);
-		sem_post(&(mutexClient));
 		t_args* args= (t_args*) malloc (sizeof (t_args));
 
 		args->cliente = &cliente;
@@ -66,6 +65,7 @@ int main(void) {
 
 		pthread_create(thread,NULL,(void*)serve_client,args);
 		pthread_detach(*thread);
+		sem_post(&(mutexClient));
 
 	}
 

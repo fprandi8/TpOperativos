@@ -1,0 +1,5 @@
+gcc -L/home/utnso/workspace/tp-2020-1c-MATE-OS/SharedLibrary/Debug -o "GameCard"  ./src/GameCard.o ./src/utils.o   -lSharedLibrary -lpthread
+gcc -L/home/utnso/workspace/tp-2020-1c-MATE-OS/SharedLibrary/Debug -o "Broker"  ./src/Broker.o ./src/CacheMemory.o ./src/utils.o   -lcommons -lm -lSharedLibrary -lpthread
+gcc -L/home/utnso/workspace/tp-2020-1c-MATE-OS/SharedLibrary/Debug -o "GameBoy"  ./src/GameBoy.o   -lSharedLibrary -lpthread
+gcc -L/home/utnso/workspace/tp-2020-1c-MATE-OS/SharedLibrary/Debug -o "Team"  ./src/Team.o ./src/utils.o   -lSharedLibrary -lpthread
+gcc -shared -o "libSharedLibrary.so"  ./delibird/comms/messages.o ./delibird/comms/pokeio.o ./delibird/comms/serialization.o  ./commons/collections/dictionary.o ./commons/collections/list.o ./commons/collections/queue.o  ./commons/bitarray.o ./commons/config.o ./commons/error.o ./commons/log.o ./commons/memory.o ./commons/process.o ./commons/string.o ./commons/temporal.o ./commons/txt.o 

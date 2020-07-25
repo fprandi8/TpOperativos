@@ -568,7 +568,7 @@ deli_message* GetMessage(int messageId)
     //TODO despues de resolver lo de abajo ver si aca va sem_wait(&mutex_saving);
     sem_wait(&mutex_saving);
     t_cachedMessage* cachedMessage = GetCachedMessage(messageId);
-    if(cached_messages == NULL){
+    if(cachedMessage == NULL){
         sem_post(&mutex_saving);
         return NULL;
     }

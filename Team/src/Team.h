@@ -110,7 +110,7 @@ struct SchedulingAlgorithm
 	char* algorithmKey;
 	char* algorithm;
 	char* quantumKey;
-	char* quantum;
+	int quantum;
 	char* initEstimationKey;
 	char* initEstimation;
 } schedulingAlgorithm;
@@ -241,13 +241,16 @@ void* resolveDeadlock();
 void* finishTeam();
 void initCPUClocksCountForTrainers();
 int getDistanceToTrainerToExchange(t_trainer);
-int executeClockForDeadlockTrainers(t_trainer*);
+int executeClockFdeadlockCount_semorDeadlockTrainers(t_trainer*);
 void moveTrainerToObjectiveDeadlock(t_trainer*);
 void exchangePokemon(t_trainer*);
 int getClockTimeToNewPosition(int, int);
 void planificateDeadlockTrainer(t_trainer*);
 int checkTrainerState(t_trainer);
 void removeFromPokemonList(t_trainer*,t_pokemon*);
+int findIdInCatchList(uint32_t);
+void* resolveAllDeadlocks();
+
 
 void initBroker(struct Broker *broker){
 	broker->ipKey="IP_BROKER";

@@ -46,7 +46,6 @@ int trainersCount=0;
 pthread_t* subs;
 int clockSimulationTime;
 int deadlockCount = 0;
-int solvedDeadlocks = 0;
 int cpuClocksCount = 0;
 int switchContextCount = 0;
 
@@ -60,7 +59,6 @@ int main(int argc, char **argv) {
 	}
 
 	t_config* config;
-	int trainersCount;
 	catchList.count=0;
 	catchList.catchMessage = (t_catchMessage*)malloc(sizeof(t_catchMessage));
 	getList.count=0;
@@ -131,9 +129,9 @@ int main(int argc, char **argv) {
 	pthread_detach(*thread);
 	pthread_create(thread,NULL,(void*)startAlgorithmScheduling,NULL);
 	pthread_detach(*thread);
-	pthread_create(thread,NULL,(void*)resolveDeadlock,(void*)trainersCount);
+	pthread_create(thread,NULL,(void*)resolveAllDeadlocks,NULL);
 	pthread_detach(*thread);
-	pthread_create(thread,NULL,(void*)finishTeam,(void*)trainersCount);
+	pthread_create(thread,NULL,(void*)finishTeam,NULL);
 	pthread_detach(*thread);
 	int teamServer = startServer();
 	int client;
@@ -148,11 +146,17 @@ int main(int argc, char **argv) {
 }
 
 
-void* resolveDeadlock(void* trainersCount){
-	for(int tcount=0;tcount<(int)trainersCount;tcount++){
+void* resolveAllDeadlocks(){
+	for(int tcount=0;tcount<trainersCount;tcount++){
+		log_error(logger,"Entrenador %i a la orden deadlock pa",tcount);
 		sem_wait(&(deadlockCount_sem));
 	}
 	sem_wait(&(deadlockCount_sem));
+	resolveDeadlock();
+	pthread_exit(NULL);
+}
+
+void* resolveDeadlock(){
 	log_info(logger,"5. Inicio de algortimo de detección de deadlock");
 	log_info(logger,"6. Deadlocks detectados: %i",deadlockCount);
 	for(int trainerPos=0;trainerPos<statesLists.blockedList.count;trainerPos++){
@@ -216,12 +220,13 @@ void* resolveDeadlock(void* trainersCount){
 												if(checkTrainerState(statesLists.execTrainer.trainer)==0){
 													addToExit(statesLists.execTrainer.trainer);
 													removeFromExec();
-													solvedDeadlocks++;
+												}else{
+													addToBlocked(statesLists.execTrainer.trainer);
+													removeFromExec();
 												}
 												if(checkTrainerState(statesLists.blockedList.trainerList[trainerPos2-1])==0){
 													addToExit(statesLists.blockedList.trainerList[trainerPos2-1]);
 													removeFromBlocked(trainerPos2-1);
-													solvedDeadlocks++;
 												}
 												pthread_create(thread,NULL,(void*)resolveDeadlock,NULL);
 												pthread_detach(*thread);
@@ -252,7 +257,7 @@ void planificateDeadlockTrainer(t_trainer* trainer){
 		}
 	}
 	removeFromBlocked(pos);
-	sem_post(&(readyTrainer_sem));
+	//sem_post(&(readyTrainer_sem));
 
 }
 
@@ -303,8 +308,9 @@ void moveTrainerToObjectiveDeadlock(t_trainer* trainer){
 }
 
 
-void* finishTeam(void* trainerCount){
-	for(int tcount=0;tcount<(int)trainerCount;tcount++){
+void* finishTeam(){
+	for(int tcount=0;tcount<trainersCount;tcount++){
+		log_error(logger,"Entrenador %i a la orden finish",tcount);
 		sem_wait(&(exitCount_sem));
 	}
 	sem_wait(&exitCount_sem);
@@ -315,7 +321,7 @@ void* finishTeam(void* trainerCount){
 		log_error(logger,"8. Cantidad de ciclos de CPU totales por entrenador: Trainer %u -> %i",statesLists.exitList.trainerList[i].id,statesLists.exitList.trainerList[i].parameters.cpuClocksCount);
 	}
 	log_error(logger,"8. Deadlocks producidos: %i",deadlockCount);
-	log_error(logger,"8. Deadlocks resueltos: %i",solvedDeadlocks);
+	log_error(logger,"8. Deadlocks resueltos: %i",deadlockCount);
 	return EXIT_SUCCESS;
 }
 
@@ -766,13 +772,17 @@ void processMessageCaught(deli_message* message){
 	caught_pokemon* caughtPokemon = (caught_pokemon*)message->messageContent;
 	uint32_t cid = (uint32_t)message->correlationId;
 	log_info(logger,"7. Llegada de mensaje Caught. Datos: Respuesta de captura: %u, correlation id: %u",caughtPokemon->caught,cid);
-	int resultCatchId = findIdInCatchList(cid);
+    int resultCatchId = findIdInCatchList(cid);
 	uint32_t trainerPos;
+	log_info(logger,"entre vieja");
+
 
 	if(resultCatchId>=0){
 		if(caughtPokemon->caught==1){
+			log_info(logger,"statesLists.blockedList.count %u",statesLists.blockedList.count);
 			for(int i = 0;i<statesLists.blockedList.count;i++){
-				if(statesLists.blockedList.trainerList[i].id==resultCatchId){
+				log_error(logger,"entrenador %u vieja, pero busco al %u",statesLists.blockedList.trainerList[i].id,resultCatchId);
+				if(statesLists.blockedList.trainerList[i].id==catchList.catchMessage[resultCatchId].trainerId){
 					trainerPos=i;
 				}
 			}
@@ -1422,7 +1432,7 @@ void removeFromAvailable(int pkmPosition){
 
 void removeFromBlocked(int trainerPositionInList){
 
-	for(int i=trainerPositionInList;i<(statesLists.blockedList.count)-1; i++){
+	for(int i=trainerPositionInList;i<((statesLists.blockedList.count)-1); i++){
 		statesLists.blockedList.trainerList[i] = statesLists.blockedList.trainerList[i+1];
 
 	}
@@ -1430,7 +1440,7 @@ void removeFromBlocked(int trainerPositionInList){
 	(statesLists.blockedList.count)--;
 	sem_post(&countBlocked_semaphore);
 	if(statesLists.blockedList.count){
-		void* temp = realloc(statesLists.blockedList.trainerList,sizeof(t_trainer)*((statesLists.blockedList.count)));
+		void* temp = realloc(statesLists.blockedList.trainerList,sizeof(t_trainer)*(statesLists.blockedList.count));
 		if (!temp){
 			log_debug(logger,"error en realloc");
 			exit(9);
@@ -1450,6 +1460,7 @@ void addToBlocked(t_trainer trainer){
 		sem_wait(&countBlocked_semaphore);
 		statesLists.blockedList.trainerList[statesLists.blockedList.count]=trainer;
 		(statesLists.blockedList.count)++;
+		log_error(logger,"la concha de tu madre %u",statesLists.blockedList.count);
 		sem_post(&countBlocked_semaphore);
 }
 
@@ -1817,14 +1828,14 @@ int executeClock(){
 			catchPokemon();
 			return 0;
 		}
-			}else{
-				if(getDistanceToTrainerToExchange(statesLists.execTrainer.trainer)!=0){
-					moveTrainerToObjectiveDeadlock(&statesLists.execTrainer.trainer);
-					return 1;
-				}else if(getDistanceToTrainerToExchange(statesLists.execTrainer.trainer)==0){
-					exchangePokemon(&statesLists.execTrainer.trainer);
-					return 0;
-				}
+	}else{
+		if(getDistanceToTrainerToExchange(statesLists.execTrainer.trainer)!=0){
+			moveTrainerToObjectiveDeadlock(&statesLists.execTrainer.trainer);
+			return 1;
+		}else if(getDistanceToTrainerToExchange(statesLists.execTrainer.trainer)==0){
+			exchangePokemon(&statesLists.execTrainer.trainer);
+			return 0;
+		}
 	}
 	return -1;
 }
@@ -1946,7 +1957,6 @@ int checkTrainerState(t_trainer trainer){
 			}
 		}
 		if(distinctPkmCount!=0){
-			deadlockCount++;
 			return 1;//deadlock
 		}
 	}

@@ -785,7 +785,6 @@ void processMessageCaught(deli_message* message){
 
 	if(resultCatchId>=0){
 		if(caughtPokemon->caught==1){
-			log_info(logger,"statesLists.blockedList.count %u",statesLists.blockedList.count);
 			for(int i = 0;i<statesLists.blockedList.count;i++){
 
 				if(statesLists.blockedList.trainerList[i].id==catchList.catchMessage[resultCatchId].trainerId){

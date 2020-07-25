@@ -67,6 +67,7 @@ int main(void) {
 
 		pthread_create(thread,NULL,(void*)serve_client,args);
 		pthread_detach(*thread);
+		sem_post(&(mutexClient));
 
 	}
 

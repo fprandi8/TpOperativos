@@ -14,6 +14,7 @@
 uint32_t ID = 0;
 t_Broker* broker;
 sem_t mutexSuscription;
+sem_t mutexClient;
 
 int main(void) {
 
@@ -25,6 +26,7 @@ int main(void) {
 	int server,cliente;
 
 	sem_init(&(mutexSuscription),0,1);
+	sem_init(&(mutexClient),0,1);
 	signal(SIGINT,signaltHandler);
 	signal(SIGUSR1,cacheSigHandler);
 
@@ -52,8 +54,9 @@ int main(void) {
 
 	while (1){
 
+		sem_wait(&(mutexClient));
 		cliente = esperar_cliente(server);
-
+		sem_post(&(mutexClient));
 		t_args* args= (t_args*) malloc (sizeof (t_args));
 
 		args->cliente = &cliente;

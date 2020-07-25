@@ -757,12 +757,14 @@ void processMessageAppeared(deli_message* message){
 int findIdInCatchList(uint32_t cid){
 	int position=-1;
 	for(int i=0;i<catchList.count;i++){
+		log_debug(logger,"Se compara el catch catchid %u  con el cid %u. el catch es del trainer %u",catchList.catchMessage[i].catchId,cid,catchList.catchMessage[i].trainerId);
 		int compare = catchList.catchMessage[i].catchId==cid;
 		if(compare!=0){
 			position=i;
+			log_error(logger,"catch id %i tiene cid %u, y lo solicitó el trainer %u",catchList.catchMessage[i].catchId,cid,catchList.catchMessage[i].trainerId);
 			break;
 		}
-	}
+			}
 	return position;
 }
 
@@ -772,7 +774,6 @@ void processMessageCaught(deli_message* message){
 	log_info(logger,"7. Llegada de mensaje Caught. Datos: Respuesta de captura: %u, correlation id: %u",caughtPokemon->caught,cid);
     int resultCatchId = findIdInCatchList(cid);
 	uint32_t trainerPos;
-
 
 	if(resultCatchId>=0){
 		if(caughtPokemon->caught==1){

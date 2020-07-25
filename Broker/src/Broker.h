@@ -35,6 +35,7 @@
 #include "delibird/comms/pokeio.h"
 #include <signal.h>
 #include <poll.h>
+#include <stdbool.h>
 
 
 typedef struct {
@@ -106,6 +107,8 @@ t_message_administrator* messege_administrator_get_administrator(t_list* , uint3
 void message_administrator_pending_acknowledge(t_message_administrator* );
 void message_administrator_receive_acknowledge(t_message_administrator* );
 uint32_t message_admnistrator(t_message_administrator*);
+
+void RemoveClient(int client);
 
 
 

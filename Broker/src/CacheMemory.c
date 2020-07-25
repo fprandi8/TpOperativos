@@ -566,16 +566,21 @@ void AddAcknowledgeToMessage(int messageId)
 deli_message* GetMessage(int messageId)
 {
     //TODO despues de resolver lo de abajo ver si aca va sem_wait(&mutex_saving);
+    sem_wait(&mutex_saving);
     t_cachedMessage* cachedMessage = GetCachedMessage(messageId);
+    if(cached_messages == NULL){
+        sem_post(&mutex_saving);
+        return;
+    }
     //TODO agregar analisis de cached message == NULL
     //TODO el GetCachedMessages ya updatea le timestamp, sacarlo de abajo no?
     t_partition* partition = GetPartition(cachedMessage->partitionId);
-    UpdateTimestamp(partition->id);
 
 	deli_message* message = (deli_message*)malloc(sizeof(deli_message));
 	message->id = cachedMessage->id;
 	message->correlationId = cachedMessage->corelationId;
 	message->messageType = cachedMessage->queue_type;
+    sem_post(&mutex_saving);
 	message->messageContent =  DeserializeMessageContent(partition->queue_type, partition->begining);
 
     return message;

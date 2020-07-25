@@ -311,6 +311,7 @@ void queue_handler_send_message(void* args){
 
 	t_queue_handler* queue =((t_args_queue*)args)->queue;
 	deli_message* message = GetMessage(((t_args_queue*)args)->messageId);
+	if(message == NULL) return;
 	int client = ((t_args_queue*)args)->cliente;
 
 

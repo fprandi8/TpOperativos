@@ -570,7 +570,7 @@ deli_message* GetMessage(int messageId)
     t_cachedMessage* cachedMessage = GetCachedMessage(messageId);
     if(cached_messages == NULL){
         sem_post(&mutex_saving);
-        return;
+        return NULL;
     }
     //TODO agregar analisis de cached message == NULL
     //TODO el GetCachedMessages ya updatea le timestamp, sacarlo de abajo no?

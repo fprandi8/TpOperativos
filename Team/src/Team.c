@@ -42,7 +42,6 @@ char* SJFCD = "SJF-CD";
 char* SJFSD = "SJF-SD";
 char* FIFO = "FIFO";
 int retryConnectionTime=0;
-int connectedToBroker=0;
 int trainersCount=0;
 pthread_t* subs;
 int clockSimulationTime;
@@ -52,7 +51,13 @@ int cpuClocksCount = 0;
 int switchContextCount = 0;
 
 
-int main(void) {
+int main(int argc, char **argv) {
+//param = configName -> team2.config, team1.config
+	if(argc != 2)
+	{
+		printf("Incorrect number of parameters for any team\n");
+		return 1;
+	}
 
 	t_config* config;
 	int trainersCount;
@@ -82,14 +87,12 @@ int main(void) {
 	thread = (pthread_t*)malloc(sizeof(pthread_t));
 
 	//Init de config y logger
-	createConfig(&config);
+	createConfig(&config,argv[1]);
 	startLogger(config);
 
 	//Init de broker
 	initBroker(&broker);
-	initTeamServer();	int teamSocket;
-	char* ip;
-	char* port;
+	initTeamServer();
 	readConfigBrokerValues(config,&broker);
 	readConfigTeamValues(config);
 	readConfigReconnectWaiting(config);
@@ -604,7 +607,6 @@ void waitForMessage(void* variables){
 
 	}
 	else{
-		connectedToBroker = 0;
 		switch (queueType) {
 
 			case LOCALIZED_POKEMON: {
@@ -763,36 +765,38 @@ int findIdInCatchList(uint32_t cid){
 void processMessageCaught(deli_message* message){
 	caught_pokemon* caughtPokemon = (caught_pokemon*)message->messageContent;
 	uint32_t cid = (uint32_t)message->correlationId;
-	//TODO:log_info(logger,"7. Llegada de mensaje Caught. Datos: Nombre del Pokemon: %s, cantidad de ubicaciones: %u, correlation id: %u",localizedPokemon->pokemonName,localizedPokemon->ammount,cid);
+	log_info(logger,"7. Llegada de mensaje Caught. Datos: Respuesta de captura: %u, correlation id: %u",caughtPokemon->caught,cid);
 	int resultCatchId = findIdInCatchList(cid);
 	uint32_t trainerPos;
-	if(resultCatchId>=0){
-		for(int i = 0;i<statesLists.blockedList.count;i++){
-			if(statesLists.blockedList.trainerList[i].id==resultCatchId){
-				trainerPos=i;;
+	if(caughtPokemon->caught==1){
+		if(resultCatchId>=0){
+			for(int i = 0;i<statesLists.blockedList.count;i++){
+				if(statesLists.blockedList.trainerList[i].id==resultCatchId){
+					trainerPos=i;;
+				}
 			}
-		}
-		removeFromMissingPkms(statesLists.blockedList.trainerList[trainerPos].parameters.scheduledPokemon);
-		addToPokemonList(&(statesLists.blockedList.trainerList[trainerPos]));
-		log_debug(logger,"Se captura el pokemon por Caught message");
+			removeFromMissingPkms(statesLists.blockedList.trainerList[trainerPos].parameters.scheduledPokemon);
+			addToPokemonList(&(statesLists.blockedList.trainerList[trainerPos]));
+			log_debug(logger,"Se captura el pokemon por Caught message");
 
-		if(statesLists.blockedList.trainerList[trainerPos].parameters.objetivesCount==statesLists.blockedList.trainerList[trainerPos].parameters.pokemonsCount){
-			if(checkTrainerState(statesLists.blockedList.trainerList[trainerPos])==1){
-				statesLists.blockedList.trainerList[trainerPos].blockState = DEADLOCK;
-				deadlockCount++;
-				sem_post(&(deadlockCount_sem));
+			if(statesLists.blockedList.trainerList[trainerPos].parameters.objetivesCount==statesLists.blockedList.trainerList[trainerPos].parameters.pokemonsCount){
+				if(checkTrainerState(statesLists.blockedList.trainerList[trainerPos])==1){
+					statesLists.blockedList.trainerList[trainerPos].blockState = DEADLOCK;
+					deadlockCount++;
+					sem_post(&(deadlockCount_sem));
+				}else{
+					addToExit(statesLists.execTrainer.trainer);
+					removeFromBlocked(trainerPos);
+					sem_post(&(deadlockCount_sem));
+				}
 			}else{
-				addToExit(statesLists.execTrainer.trainer);
-				removeFromBlocked(trainerPos);
-				sem_post(&(deadlockCount_sem));
+				statesLists.blockedList.trainerList[trainerPos].blockState = AVAILABLE;
+				sem_post(&(availableTrainersCount_sem));
 			}
-		}else{
-			statesLists.execTrainer.trainer.blockState = AVAILABLE;
-			sem_post(&(availableTrainersCount_sem));
 		}
 	}else{
-			//catchList.catchMessage[resultCatchId].trainer.blockState = AVAILABLE;
-		//TODO: ACá habría que chequear si hay pokemons disponibles para atrapar, si Sí, ; si no, fin de la función.SACAR PKM de scheduledPokemon
+		statesLists.execTrainer.trainer.blockState = AVAILABLE;
+		sem_post(&(availableTrainersCount_sem));
 	}
 }
 
@@ -825,7 +829,9 @@ void requestNewPokemon(t_pokemon missingPkm, struct Broker broker){
 		int result;
 		int cut = 0;
 		while(cut != 1){
+			log_error(logger,"Esperando ack");
 			result = RecievePackage(socketGet,&type,&content);
+			log_error(logger,"Se recibió ack");
 			if(type == ACKNOWLEDGE){
 				cut=1;
 			}
@@ -921,9 +927,15 @@ void removeLogger(char* logFilename)
 	remove(logFilename);
 }
 
-void createConfig(t_config **config)
+void createConfig(t_config **config,char* configName)
 {
-	*config = config_create("/home/utnso/workspace/tp-2020-1c-MATE-OS/Team/Team.config");
+	char* configNameAux=configName;
+	char* configDir=(char*)malloc(strlen("/home/utnso/workspace/tp-2020-1c-MATE-OS/Team/")+strlen(".config")+strlen(configName)+1);
+	strcpy(configDir,"/home/utnso/workspace/tp-2020-1c-MATE-OS/Team/");
+	strcat(configDir,configNameAux);
+	strcat(configDir,".config");
+	printf("exploto por %s",configDir);
+	*config = config_create(configDir);
 	if (*config == NULL){
 		printf("No se pudo crear el config\n");
 		exit(2);
@@ -1816,36 +1828,37 @@ int executeClock(){
 }
 
 void catchPokemon(){
-	if(connectedToBroker){
 		log_debug(logger,"Se enviará el catch");
 		catch_pokemon catch;
 		catch.pokemonName = statesLists.execTrainer.trainer.parameters.scheduledPokemon.name;
 		catch.horizontalCoordinate = statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.x;
 		catch.verticalCoordinate = statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.y;
+
 		int socketCatch = connectBroker(broker.ip, broker.port);
-		Send_CATCH(catch, socketCatch);
-		log_info(logger,"3. Operación de atrapar: X=%i Y=%i %s",statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.x,statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.y,statesLists.execTrainer.trainer.parameters.scheduledPokemon.name);
-		op_code type;
-		void* content = malloc(sizeof(void*));
-		int result;
-		int cut = 0;
-		while(cut != 1){
-			result = RecievePackage(socketCatch,&type,&content);
-			if(type == ACKNOWLEDGE){
-				cut=1;
+		if(socketCatch != -1){
+			Send_CATCH(catch, socketCatch);
+			log_info(logger,"3. Operación de atrapar: X=%i Y=%i %s",statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.x,statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.y,statesLists.execTrainer.trainer.parameters.scheduledPokemon.name);
+			op_code type;
+			void* content = malloc(sizeof(void*));
+			int result;
+			int cut = 0;
+			while(cut != 1){
+				result = RecievePackage(socketCatch,&type,&content);
+				if(type == ACKNOWLEDGE){
+					cut=1;
+				}
 			}
-		}
-		uint32_t originMessageType = CATCH_POKEMON;
-		if(!result){
-				processAcknowledge(content,originMessageType,statesLists.execTrainer.trainer.id);
-		}
-		sleep(clockSimulationTime);
-		cpuClocksCount++;
-		log_debug(logger,"Se envió el catchdel pokemon %s por elentrenador %i",catch.pokemonName,statesLists.execTrainer.trainer.id);
-		statesLists.execTrainer.trainer.blockState = WAITING;
-		addToBlocked(statesLists.execTrainer.trainer);
-		log_info(logger,"1. Se movió al entrenador %u a la cola Blocked por haber enviado un catch",statesLists.execTrainer.trainer.id);
-		removeFromExec();
+			uint32_t originMessageType = CATCH_POKEMON;
+			if(!result){
+					processAcknowledge(content,originMessageType,statesLists.execTrainer.trainer.id);
+			}
+			sleep(clockSimulationTime);
+			cpuClocksCount++;
+			log_debug(logger,"Se envió el catchdel pokemon %s por elentrenador %i",catch.pokemonName,statesLists.execTrainer.trainer.id);
+			statesLists.execTrainer.trainer.blockState = WAITING;
+			addToBlocked(statesLists.execTrainer.trainer);
+			log_info(logger,"1. Se movió al entrenador %u a la cola Blocked por haber enviado un catch",statesLists.execTrainer.trainer.id);
+			removeFromExec();
 	}else{
 		removeFromMissingPkms(statesLists.execTrainer.trainer.parameters.scheduledPokemon);
 		addToPokemonList(&(statesLists.execTrainer.trainer));
@@ -1869,9 +1882,7 @@ void catchPokemon(){
 			removeFromExec();
 			sem_post(&(availableTrainersCount_sem));
 		}
-
 	}
-
 }
 
 void processAcknowledge(void* buffer,uint32_t type ,uint32_t trainerId){

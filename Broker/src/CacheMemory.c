@@ -153,6 +153,7 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
         newPartition->queue_type = queue;
         newPartition->free = 0;
         newPartition->timestap = clock();
+        memcpy(newPartition->begining, messageBuffer->stream, messageBuffer->bufferSize);//Marcos:modificamos esto y ahora arranca
 
         list_add(partitions, newPartition);
 
@@ -160,7 +161,8 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
         partition->size = partition->size - newPartitionSize;
         partition->timestap = clock();
 
-        memcpy(partition->begining, messageBuffer->stream, messageBuffer->bufferSize);
+        //memcpy(partition->begining, messageBuffer->stream, messageBuffer->bufferSize);
+
 
         return newPartition->id;
     }
@@ -580,9 +582,9 @@ deli_message* GetMessage(int messageId)
 	message->id = cachedMessage->id;
 	message->correlationId = cachedMessage->corelationId;
 	message->messageType = cachedMessage->queue_type;
-    sem_post(&mutex_saving);
-	message->messageContent =  DeserializeMessageContent(partition->queue_type, partition->begining);
 
+	message->messageContent =  DeserializeMessageContent(partition->queue_type, partition->begining);
+	sem_post(&mutex_saving);
     return message;
 }
 

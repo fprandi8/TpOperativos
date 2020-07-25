@@ -380,12 +380,6 @@ void* GameCard_Process_Message_Catch(deli_message* message){
 
 		sleep(GameCard->delayTime);
 
-		sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,catchPokemon->pokemonName);
-		sem_wait(pokeSem);
-		t_config* metadataConfig = read_metadata(file);
-		Metadata_File_Open_Flag(metadataFile,metadataConfig,"N");
-		sem_post(pokeSem);
-
 		free(horCoordinate);
 		free(verCoordinate);
 		free(coordinate);
@@ -567,6 +561,11 @@ int catch_a_pokemon(char** fileContent, t_file_metadata* metadataFile, char* coo
 				list_remove(values->values,1);
 				list_remove(values->values,0);
 				free(values);
+				sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,pokemonName);
+				sem_wait(pokeSem);
+				t_config* metadataConfig = read_metadata(file);
+				Metadata_File_Open_Flag(metadataFile,metadataConfig,"N");
+				sem_post(pokeSem);
 			}else{
 				char* pokeMetadata = (char*)malloc(strlen(GameCard->filePath) + strlen(pokemonName) + strlen("/matadata.bin") + 1 );
 				strcpy(pokeMetadata,GameCard->filePath);
@@ -581,7 +580,7 @@ int catch_a_pokemon(char** fileContent, t_file_metadata* metadataFile, char* coo
 				char* pokeDirectory = (char*)malloc(strlen(GameCard->filePath)+strlen(pokemonName)+1);
 
 				strcpy(pokeDirectory,GameCard->filePath);
-				strcpy(pokeDirectory,pokemonName);
+				strcat(pokeDirectory,pokemonName);
 				log_debug(GameCard->logger,"Elimina la carpeta del pokemon %s" , pokeDirectory);
 
 				rmdir(pokeDirectory);

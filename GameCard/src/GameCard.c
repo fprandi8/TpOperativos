@@ -229,9 +229,9 @@ void GameCard_Wait_For_Message(void* variables){
 	if (!resultado)
 	{
 		deli_message* message = (deli_message*)content;
-		log_debug(GameCard->logger,"Suscriptor que envia el acknowldge: %d", suscription);
+//		log_debug(GameCard->logger,"Suscriptor que envia el acknowldge: %d", suscription);
 		int result = SendMessageAcknowledge(message->id, suscription);
-		log_debug(GameCard->logger, "Resultado del acknowdlege: %d", result);
+//		log_debug(GameCard->logger, "Resultado del acknowdlege: %d", result);
 		t_args_process_message* argsProcessMessage= (t_args_process_message*) malloc (sizeof (t_args_process_message));
 		argsProcessMessage->message = message;
 
@@ -289,7 +289,7 @@ void GameCard_Process_Message(void* variables){
 	void* responseMessage;
 	int result;
 
-	log_debug(GameCard->logger, "voy a procesar el mensaje ");
+//	log_debug(GameCard->logger, "voy a procesar el mensaje ");
 
 	switch (message->messageType){
 		case NEW_POKEMON: {
@@ -544,6 +544,7 @@ int catch_a_pokemon(char** fileContent, t_file_metadata* metadataFile, char* coo
 
 			metadataFile->size =  string_itoa(auxSize - resultDecreaseAmount);
 
+			log_debug(GameCard->logger,"Nuevo tamaño de la metadata luego del catch %i" , atoi(metadataFile->size));
 			if (atoi(metadataFile->size)!=0){
 
 				int amountOfBlocks=get_amount_of_blocks(atoi(metadataFile->size), metadataFile);
@@ -572,10 +573,15 @@ int catch_a_pokemon(char** fileContent, t_file_metadata* metadataFile, char* coo
 				strcat(pokeMetadata,pokemonName);
 				strcat(pokeMetadata,"/metadata.bin");
 
+				log_debug(GameCard->logger,"Elimina la metadata del pokemon %s" , pokeMetadata);
+
 				remove(pokeMetadata);
 				free(pokeMetadata);
 
 				char* pokeDirectory = (char*)malloc(strlen(GameCard->filePath)+strlen(pokemonName)+1);
+
+				log_debug(GameCard->logger,"Elimina la carpeta del pokemon %s" , pokeDirectory);
+
 				rmdir(pokeDirectory);
 				free(pokeDirectory);
 

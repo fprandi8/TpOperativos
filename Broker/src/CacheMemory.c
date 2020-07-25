@@ -84,10 +84,11 @@ void set_full_memory(void){
 
 void save_message(deli_message message)
 {
+	sem_wait(&mutex_saving);
     t_cachedMessage* new_message = create_cached_from_message(message);
     new_message->partitionId = save_message_body(message.messageContent, message.messageType);
     add_to_cached_messages(new_message);
-
+	sem_post(&mutex_saving);
 }
 
 t_cachedMessage* create_cached_from_message(deli_message message)
@@ -112,14 +113,13 @@ void add_to_cached_messages(t_cachedMessage* new_message)
 
 int save_message_body(void* messageContent, message_type queue){
     t_buffer* messageBuffer = SerializeMessageContent(queue, messageContent);
-	sem_wait(&mutex_saving);
+
 	t_partition* partition;
 	uint32_t minSize = config_get_int_value(config, TAMANO_MINIMO_PARTICION);
 	uint32_t requiredSize = messageBuffer->bufferSize > minSize ? messageBuffer->bufferSize : minSize;
     partition = find_empty_partition_of_size(requiredSize);
     log_info(cache_log, "MENSAJE GUARDADO EN PARTICION CON POSICION DE INICIO: 0x%X", partition->begining - cache.full_memory);
     int savedPartitionId = save_body_in_partition(messageBuffer, partition, queue);
-	sem_post(&mutex_saving);
 	return savedPartitionId;
 }
 
@@ -288,11 +288,13 @@ void compact_memory(void)
     int offsetMem = 0;
     void _asignPartitionOnBackUpMem(t_partition* partition)
     {
-    	log_debug(cache_log, "Partition start: %d", partition->begining);
-    	log_info(cache_log, "PartitionSize: %d", partition->size);
+    	log_debug(cache_log, "Offset memory before: %d", offsetMem);
+    	//log_debug(cache_log, "Partition start: %d", partition->begining);
+    	log_info(cache_log, "Partition final location: %d", (cache.full_memory + cache.memory_size) - (partition->begining + partition->size));
         memcpy(backUp_memory + offsetMem, partition->begining, partition->size);
+        partition->begining = cache.full_memory + offsetMem;
         offsetMem += partition->size;
-   //     partition->begining = cache.full_memory + offsetMem;
+        log_debug(cache_log, "Offset memory after: %d", offsetMem);
     }
 
     int offsetPointerMem = 0;
@@ -315,12 +317,13 @@ void compact_memory(void)
 
     list_add(occupied_partitions, emptySpacePartition);
 
-
+    log_info(cache_log, "Size of backup: %d", cache.memory_size * sizeof(char));
+    log_info(cache_log, "Size of cache: %d", cache.memory_size);
     list_iterate(occupied_partitions, (void*)_asignPartitionOnBackUpMem);
 
     memcpy(cache.full_memory, backUp_memory, sizeof(cache.memory_size));
 
-    list_iterate(occupied_partitions, (void*)_reasignPartitionPointers);
+  //  list_iterate(occupied_partitions, (void*)_reasignPartitionPointers);
 
     free(backUp_memory);
 
@@ -553,7 +556,11 @@ void AddASentSubscriberToMessage(int messageId, int client)
 {
 	sem_wait(&mutex_saving);
 	t_cachedMessage* cachedMessage = GetCachedMessage(messageId);
-	if(cachedMessage == NULL) return;
+	if(cachedMessage == NULL)
+	{
+		sem_post(&mutex_saving);
+		return;
+	}
 	sem_wait(&cachedMessage->mutex_message);
 	int* cachedClient = (int*)malloc(sizeof(int));
 	*cachedClient = client;
@@ -567,7 +574,11 @@ void AddAcknowledgeToMessage(int messageId)
 {
 	sem_wait(&mutex_saving);
 	t_cachedMessage* cachedMessage = GetCachedMessage(messageId);
-	if(cachedMessage == NULL) return;
+	if(cachedMessage == NULL)
+	{
+		sem_post(&mutex_saving);
+		return;
+	}
 	sem_wait(&cachedMessage->mutex_message);
 	cachedMessage->ack_by_subscribers_left--;
 	sem_post(&cachedMessage->mutex_message);
@@ -642,14 +653,15 @@ void PrintDumpOfCache()
             busyStatus = "X";
             t_cachedMessage* message = GetCachedMessageInPartition(partition->id);
             char* queue = GetStringFromMessageType(message->queue_type);
-            fprintf(fp,"Partición %d: %s. [%s] Size:%ub LRU:%ld Cola:%s ID:%d\n",
+            fprintf(fp,"Partición %d: %s. [%s] Size:%ub LRU:%ld Cola:%s ID:%d CorrelationId:%d\n",
                 partition->id,
 				memoryLocation,
                 busyStatus,
                 (uint32_t)partition->size,
                 clock() - partition->timestap,
                 queue,
-                message->id
+                message->id,
+				message->corelationId
             );
         }
     }

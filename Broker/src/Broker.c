@@ -282,7 +282,7 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 
 	save_message(*message);
 
-	log_info(broker->logger,"NUEVO MENSAJE PARA LA QUEUE: %d", queue->type);
+	log_info(broker->logger,"NUEVO MENSAJE PARA LA QUEUE: %s", GetStringFromMessageType(queue->type));
 
 	pthread_t* thread;
 

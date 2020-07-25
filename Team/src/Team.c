@@ -98,8 +98,8 @@ int main(int argc, char **argv) {
 
 
 	//Init de scheduler
-	initScheduler(&schedulingAlgorithm);
-	readConfigSchedulerValues(config,&schedulingAlgorithm);
+	initScheduler();
+	readConfigSchedulerValues(config);
 	//Init Alpha for SJF and Initial Estimated Burst
 	alphaForSJF = readConfigAlphaValue(config);
 	initialEstimatedBurst = readConfigInitialEstimatedValue(config);
@@ -772,7 +772,6 @@ void processMessageCaught(deli_message* message){
 	log_info(logger,"7. Llegada de mensaje Caught. Datos: Respuesta de captura: %u, correlation id: %u",caughtPokemon->caught,cid);
     int resultCatchId = findIdInCatchList(cid);
 	uint32_t trainerPos;
-	log_info(logger,"entre vieja");
 
 
 	if(resultCatchId>=0){
@@ -989,36 +988,30 @@ void readConfigTeamValues(t_config *config){
 
 }
 
-void readConfigSchedulerValues(t_config *config,struct SchedulingAlgorithm *schedulingAlgorithm){
 
-	if (config_has_property(config,schedulingAlgorithm->algorithmKey)){
-		schedulingAlgorithm->algorithm=config_get_string_value(config,schedulingAlgorithm->algorithmKey);
-		if(schedulingAlgorithm->algorithm==SJFCD || schedulingAlgorithm->algorithm==FIFO || schedulingAlgorithm->algorithm==SJFSD || schedulingAlgorithm->algorithm==RR){
-			log_debug(logger,"3. Algoritmo de planificación reconocido: %s", schedulingAlgorithm->algorithm);
-		}else{
-			log_debug(logger,"3. No se reconoce el algoritmo de planificación %s", schedulingAlgorithm->algorithm);
-		}
-	}else{
-		exit(-3);
+void initScheduler(){
+	schedulingAlgorithm.algorithmKey="ALGORITMO_PLANIFICACION";
+	schedulingAlgorithm.quantumKey="QUANTUM";
+	schedulingAlgorithm.initEstimationKey="ESTIMACION_INICIAL";
+}
+
+void readConfigSchedulerValues(t_config *config){
+
+	if (config_has_property(config,schedulingAlgorithm.algorithmKey)){
+		schedulingAlgorithm.algorithm=config_get_string_value(config,schedulingAlgorithm.algorithmKey);
 	}
-	if (config_has_property(config, schedulingAlgorithm->quantumKey)){
-		schedulingAlgorithm->quantum=config_get_int_value(config,schedulingAlgorithm->quantumKey);
-		log_debug(logger,"3. Se leyó el quantum: %i",schedulingAlgorithm->quantum);
-	}else{
-		exit(-3);
+	if (config_has_property(config, schedulingAlgorithm.quantumKey)){
+		schedulingAlgorithm.quantum=config_get_int_value(config,schedulingAlgorithm.quantumKey);
 	}
-	if (config_has_property(config,schedulingAlgorithm->initEstimationKey)){
-		schedulingAlgorithm->initEstimation=config_get_string_value(config,schedulingAlgorithm->initEstimationKey);
-		log_debug(logger,"3. Se leyó la estimación inicial: %s",schedulingAlgorithm->initEstimation);
-	}else{
-		exit(-3);
+	if (config_has_property(config,schedulingAlgorithm.initEstimationKey)){
+		schedulingAlgorithm.initEstimation=config_get_string_value(config,schedulingAlgorithm.initEstimationKey);
 	}
-	log_debug(logger,"3. Finaliza lectura de config de scheduler");
+
 }
 
 
 void readConfigTrainersValues(t_config *config,char*** trainersPosition,char*** trainersPokemons,char*** trainersObjetives){
-	log_debug(logger,"4. Comienza lectura de parámetros de entrenador");
+
 	if (config_has_property(config,"POSICIONES_ENTRENADORES")){
 		*trainersPosition=config_get_array_value(config,"POSICIONES_ENTRENADORES");
 	}
@@ -1028,7 +1021,7 @@ void readConfigTrainersValues(t_config *config,char*** trainersPosition,char*** 
 	if (config_has_property(config,"OBJETIVOS_ENTRENADORES")){
 		*trainersObjetives=config_get_array_value(config,"OBJETIVOS_ENTRENADORES");
 	}
-	log_debug(logger,"4. Finalizó la carga de config de entrenadores");
+
 
 }
 
@@ -1057,22 +1050,18 @@ void startTrainers(int trainersCount,t_config *config){
 	char** trainersObjetives;
 
 	readConfigTrainersValues(config,&trainersPosition,&trainersPokemons,&trainersObjetives);
-	log_debug(logger,"4. Se alocó memoria para el array de parametros de entrenadore");
-	log_debug(logger,"4. Comienza el proceso de carga de atributos en struc");
 	initTrainersPokemonLists();
 	getTrainerAttr(trainersPosition,trainersPokemons,trainersObjetives,trainersCount);
 	statesLists.newList.count=trainersCount;
 	initBurstScheduledPokemon();
 	initTrainerName();
 	initCPUClocksCountForTrainers();
-	log_debug(logger,"5.Comienza el proceso de creación de threads");
 	for(int actualTrainer = 0; actualTrainer < trainersCount; actualTrainer++){
 		sem_init(&(statesLists.newList.trainerList[actualTrainer].semaphore),0,0);
 		log_debug(logger,"Creando el entrenador %i",actualTrainer);
 		startTrainer(&(statesLists.newList.trainerList[actualTrainer]));
 	}
 
-	log_debug(logger,"5. Terminó el proceso de creación de threads");
 }
 
 void initBurstScheduledPokemon(){
@@ -1080,7 +1069,7 @@ void initBurstScheduledPokemon(){
 		initPreviousBurst(&(statesLists.newList.trainerList[trainer]));
 		initScheduledPokemon(&(statesLists.newList.trainerList[trainer]));
 	}
-	log_debug(logger,"valor del count %u", statesLists.newList.count);
+
 }
 
 void initTrainerName(){
@@ -1110,7 +1099,7 @@ void startTrainer(t_trainer* trainer){
 	trainer->blockState=AVAILABLE;
 	pthread_create(&(trainer->trainer),NULL,(void*)startThread,(void*)trainer);
 	pthread_detach(trainer->trainer);
-	log_debug(logger,"5. Se creó un entrenador");
+
 }
 
 void getTrainerAttr(char** trainersPosition,char** trainersPokemons,char** trainersObjetives, int trainersCount){
@@ -1118,14 +1107,14 @@ void getTrainerAttr(char** trainersPosition,char** trainersPokemons,char** train
 	getTrainerAttrPos(trainersPosition,trainersCount);
 	getTrainerAttrPkm(trainersPokemons,trainersCount);
 	getTrainerAttrObj(trainersObjetives,trainersCount);
-	log_debug(logger,"4. Finalizó el proceso de carga de atributos");
+
 }
 
 
 
 void getTrainerAttrPos(char** trainersPosition, int trainersCount){
 
-	log_debug(logger,"4.1. Comienza el proceso de carga de posición de entrenadores");
+
 	for(int actualTrainer = 0; actualTrainer < trainersCount; actualTrainer++){
 		int rowCount=0;
 			char pos='x';
@@ -1160,11 +1149,11 @@ void getTrainerAttrPos(char** trainersPosition, int trainersCount){
 		  string_iterate_lines(trainersPosition, _getRow);
 		  list_destroy_and_destroy_elements(list,free);
 	  }
-	log_debug(logger,"4.1. Finaliza el proceso de carga de posición de entrenadores");
+
 }
 void getTrainerAttrPkm(char** trainersPokemons, int trainersCount)
 {
-	log_debug(logger,"4.2. Comienza el proceso de carga de pokemons de entrenadores");
+
 	for(int actualTrainer = 0; actualTrainer < trainersCount; actualTrainer++){
 		statesLists.newList.trainerList[actualTrainer].parameters.pokemonsCount =0;
 
@@ -1210,7 +1199,7 @@ void getTrainerAttrPkm(char** trainersPokemons, int trainersCount)
 void getTrainerAttrObj(char** trainersObjetives, int trainersCount)
 {
 
-	log_debug(logger,"4.3. Comienza el proceso de carga de objetivos de entrenadores");
+
 	for(int actualTrainer = 0; actualTrainer < trainersCount; actualTrainer++){
 		int rowCount=0;
 
@@ -1249,7 +1238,7 @@ void getTrainerAttrObj(char** trainersObjetives, int trainersCount)
 		  string_iterate_lines(trainersObjetives, _getRow);
 		  list_destroy_and_destroy_elements(list,free);
 	  }
-	log_debug(logger,"4.3. Finaliza el proceso de carga de objetivos de entrenadores");
+
 }
 
 //TODO Agregar el cast de trainer (en realidad viene como void*)
@@ -1409,7 +1398,7 @@ void removeFromMissingPkms(t_pokemon pkm){
 }
 
 void removeFromAvailable(int pkmPosition){
-	log_debug(logger,"Before removeMessageAppeared: availablePokemonCount: %i",availablePokemons.count);
+
 	for(int i=pkmPosition;i<(availablePokemons.count)-1; i++){
 		availablePokemons.pokemons[i] = availablePokemons.pokemons[i+1] ;
 
@@ -1425,7 +1414,7 @@ void removeFromAvailable(int pkmPosition){
 		}
 	(availablePokemons.pokemons)=temp;
 	}
-	log_debug(logger,"After removeMessageAppeared: availablePokemonCount: %i",availablePokemons.count);
+
 }
 
 
@@ -1583,7 +1572,7 @@ int getClosestTrainerBlocked(t_pokemon* pkmAvailable){
 	if(getCountBlockedAvailable()>0){
 		int i=getFirstBlockedAvailable();
 		pos=i;
-		log_debug(logger, "entrenador seleccionado de la lista bloque %u", statesLists.blockedList.trainerList[i].id);
+
 		clockTimeToPokemon = getDistanceToPokemonTarget(statesLists.blockedList.trainerList[i],*pkmAvailable);
 		i++;
 		int clockTimeToPokemonAux;
@@ -1605,39 +1594,36 @@ void scheduleByDistance(){
 		int i;
 		int selectedMissingPokemonCount;
 		for(int pkm=0;pkm<availablePokemons.count;pkm++){
-			//log_debug(logger,"1. Available Itera en %i, max: %i",pkm,availablePokemons.count);
+
 			for(i=0; (i<missingPokemonsCount); i++){
-				//log_debug(logger,"2. missingPokemons Itera en %i,max: %i",i,missingPokemonsCount);
+
 				selectedMissingPokemonCount = 0;
-				log_debug(logger,"a. Comparo: %s %s",availablePokemons.pokemons[pkm].name,missingPkms[i].pokemon.name);
+
 				if(0==strcmp(availablePokemons.pokemons[pkm].name,missingPkms[i].pokemon.name)){
-					//log_debug(logger,"entré");
+
 					selectedMissingPokemonCount = missingPkms[i].count;
-					log_debug(logger,"selectedMissingPokemonCount: %i", selectedMissingPokemonCount);
-					//log_debug(logger,"b. valido: readyList %i + blockedwaiting %i + exectrainer %i < missingPokemons %i",statesLists.readyList.count,getCountBlockedWaiting(),statesLists.execTrainer.boolean,missingPokemonsCount);
+
+
 					if(statesLists.readyList.count+getCountBlockedWaiting()+statesLists.execTrainer.boolean < missingPokemonsCount){
-						//log_debug(logger,"entré");
+
 						if(statesLists.execTrainer.boolean!=0){
-							log_debug(logger,"c. Comparo: %s %s",statesLists.execTrainer.trainer.parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name);
+
 							if(0==strcmp(statesLists.execTrainer.trainer.parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name)){
-								log_debug(logger,"entré 1");
+
 								selectedMissingPokemonCount--;
 							}
 						}
 						for(int j=0;j<statesLists.readyList.count;j++){
-							//log_debug(logger,"3. readyListCount Itera en %i, max: %i",j,statesLists.readyList.count);
-							//log_debug(logger,"d. Comparo: %s %s",statesLists.readyList.trainerList[j].parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name);
+
 							if(0==strcmp(statesLists.readyList.trainerList[j].parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name)){
 								log_debug(logger,"entré 2 con entrenado %u",statesLists.readyList.trainerList[j].id);
 								selectedMissingPokemonCount--;
 							}
 						}
 						for(int j=0;j<statesLists.blockedList.count;j++){
-							//log_debug(logger,"4. readyListCount Itera en %i, max: %i",j,statesLists.readyList.count);
-							//log_debug(logger,"e. Comparo: %s %s",statesLists.blockedList.trainerList[j].blockState,WAITING);
+
 							if(statesLists.blockedList.trainerList[j].blockState==WAITING){
-								//log_debug(logger,"entré");
-								//log_debug(logger,"e. Comparo: %s %s",statesLists.blockedList.trainerList[j].parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name);
+
 								if(0==strcmp(statesLists.blockedList.trainerList[j].parameters.scheduledPokemon.name,availablePokemons.pokemons[pkm].name)){
 									log_debug(logger,"entré 3");
 									selectedMissingPokemonCount--;
@@ -1646,7 +1632,7 @@ void scheduleByDistance(){
 						}
 
 						if(selectedMissingPokemonCount>0){
-							//log_debug(logger,"Se buscara al enrrenador mas cercano");
+
 							getClosestTrainer(&(availablePokemons.pokemons[pkm]),pkm);
 							return;
 						}
@@ -1726,9 +1712,9 @@ void scheduleSJFSD(){
 void scheduleSJFCD(){
 	if(statesLists.readyList.count  && statesLists.execTrainer.boolean==0){
 		int pos = getTrainerWithBestEstimatedBurst();
-		log_debug(logger, "ráfaga ejecutada anteriormente %i ráfaga estimada anterior %f para entrenador %u ", statesLists.readyList.trainerList[pos].parameters.previousBurst,statesLists.readyList.trainerList[pos].parameters.previousEstimate,statesLists.readyList.trainerList[pos].id);
+
 		float estimatedBurstTimeForCPU = estimatedTimeForNextBurstCalculation(pos);
-		log_debug(logger,"estimatedBurstTimeForCPU %f para entrenador %u ", estimatedBurstTimeForCPU,statesLists.readyList.trainerList[pos].id);
+
 		addToExec(statesLists.readyList.trainerList[pos]);
 		removeFromReady(pos);
 		int cutWhile = 1;
@@ -1840,7 +1826,7 @@ int executeClock(){
 }
 
 void catchPokemon(){
-		log_debug(logger,"Se enviará el catch");
+
 		catch_pokemon catch;
 		catch.pokemonName = statesLists.execTrainer.trainer.parameters.scheduledPokemon.name;
 		catch.horizontalCoordinate = statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.x;
@@ -1866,7 +1852,7 @@ void catchPokemon(){
 			}
 			sleep(clockSimulationTime);
 			cpuClocksCount++;
-			log_debug(logger,"Se envió el catchdel pokemon %s por elentrenador %i",catch.pokemonName,statesLists.execTrainer.trainer.id);
+
 			statesLists.execTrainer.trainer.blockState = WAITING;
 			addToBlocked(statesLists.execTrainer.trainer);
 			log_info(logger,"1. Se movió al entrenador %u a la cola Blocked por haber enviado un catch",statesLists.execTrainer.trainer.id);
@@ -1874,7 +1860,7 @@ void catchPokemon(){
 	}else{
 		removeFromMissingPkms(statesLists.execTrainer.trainer.parameters.scheduledPokemon);
 		addToPokemonList(&(statesLists.execTrainer.trainer));
-		log_debug(logger,"Se captura el pokemon por falta de conexión con broker");
+		log_info(logger,"Se captura el pokemon por falta de conexión con broker");
 
 		if(statesLists.execTrainer.trainer.parameters.objetivesCount==statesLists.execTrainer.trainer.parameters.pokemonsCount){
 			if(checkTrainerState(statesLists.execTrainer.trainer)==1){
@@ -2034,21 +2020,21 @@ int connectBroker(char* ip, char* port)
     hints.ai_protocol = 0;
 
     getaddrinfo(ip, port, &hints, &servinfo);
-    log_debug(logger,"IP y puerto configurado");
+
     for (p = servinfo; p != NULL; p = p->ai_next) {
     	teamSocket = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
-		log_debug(logger,"Socket configurado");
+
 		if (teamSocket == -1){
-			log_debug(logger,"El socket se configuró incorrectamente");
+
 			return -2;
 		}
-		log_debug(logger,"Se intentará conectar con Broker");
+
 		if (connect(teamSocket, p->ai_addr, p->ai_addrlen)==0) {
-			log_debug(logger,"La conexión fue realizada");
+
 			freeaddrinfo(servinfo);
 			return teamSocket;
 		}else{
-			log_debug(logger,"La conexión falló");
+
 			close(teamSocket);
 			return -1;
 		}

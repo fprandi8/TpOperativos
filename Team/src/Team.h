@@ -163,9 +163,9 @@ void removeLogger(char*);
 void initBroker(struct Broker*);
 //void initTeam_stateListsServer(struct Broker*);
 void readConfigBrokerValues(t_config*,struct Broker*);
-void readConfigSchedulerValues(t_config*, struct SchedulingAlgorithm*);
+void readConfigSchedulerValues(t_config*);
 void readConfigTrainersValues(t_config*,char***,char***,char***);
-void initScheduler(struct SchedulingAlgorithm*);
+void initScheduler();
 void addToReady(t_trainer*);
 void addToExec(t_trainer);
 void scheduleFifo();
@@ -264,11 +264,6 @@ void initTeamServer(){
 
 }
 
-void initScheduler(struct SchedulingAlgorithm *schedulingAlgorithm){
-	schedulingAlgorithm->algorithmKey="ALGORITMO_PLANIFICACION";
-	schedulingAlgorithm->quantumKey="QUANTUM";
-	schedulingAlgorithm->initEstimationKey="ESTIMACION_INICIAL";
-}
 
 void moveTrainerToTarget(t_trainer*, int distanceToMoveInX, int distanceToMoveInY);
 void moveTrainerToObjective(t_trainer*);

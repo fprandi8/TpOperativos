@@ -321,7 +321,7 @@ void* finishTeam(){
 	}
 	log_error(logger,"8. Deadlocks producidos: %i",deadlockCount);
 	log_error(logger,"8. Deadlocks resueltos: %i",deadlockCount);
-	return EXIT_SUCCESS;
+	exit(1);
 }
 
 void* startCloseScheduling(){

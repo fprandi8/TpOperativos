@@ -55,11 +55,12 @@ int main(void) {
 	while (1){
 
 		sem_wait(&(mutexClient));
-		cliente = esperar_cliente(server);
+		int cliente = esperar_cliente(server);
 		sem_post(&(mutexClient));
+
 		t_args* args= (t_args*) malloc (sizeof (t_args));
 
-		args->cliente = &cliente;
+		args->cliente = cliente;
 		args->broker = broker;
 
 		//log_debug(logger,"Va a atender un cliente");
@@ -79,7 +80,7 @@ int main(void) {
 void serve_client(void* variables)
 {
 	t_args* args= (t_args*)variables;
-	int cliente = *((t_args*)variables)->cliente;
+	int cliente = ((t_args*)variables)->cliente;
 	t_Broker* broker = ((t_args*)variables)->broker;
 	log_info(broker->logger,"NUEVO PROCESO CONECTADO CLIENTE %d", cliente);
 

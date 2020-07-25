@@ -1,0 +1,184 @@
+[DEBUG] 23:48:49:265 Team/(25279:25279): 1. Finaliza creación de config y logger
+[DEBUG] 23:48:49:292 Team/(25279:25279): 2. Comienza lectura de config de broker
+[DEBUG] 23:48:49:295 Team/(25279:25279): 2. Se leyó la IP: 127.0.0.1
+[DEBUG] 23:48:49:296 Team/(25279:25279): 2. Se leyó el puerto: 6009
+[DEBUG] 23:48:49:297 Team/(25279:25279): 2. Finaliza lectura de config de broker
+[DEBUG] 23:48:49:297 Team/(25279:25279): 2. Comienza lectura de config de teamAttr
+[DEBUG] 23:48:49:298 Team/(25279:25279): 2. Se leyó la IP: 127.0.0.1
+[DEBUG] 23:48:49:299 Team/(25279:25279): 2. Se leyó el puerto: 5002
+[DEBUG] 23:48:49:300 Team/(25279:25279): 2. Finaliza lectura de config de teamAttr
+[DEBUG] 23:48:49:305 Team/(25279:25279): 3. Comienza lectura de config de scheduler
+[DEBUG] 23:48:49:307 Team/(25279:25279): 3. No se reconoce el algoritmo de planificación RR
+[DEBUG] 23:48:49:309 Team/(25279:25279): 3. Se leyó el quantum: 1
+[DEBUG] 23:48:49:310 Team/(25279:25279): 3. Se leyó la estimación inicial: 5
+[DEBUG] 23:48:49:310 Team/(25279:25279): 3. Finaliza lectura de config de scheduler
+[DEBUG] 23:48:49:352 Team/(25279:25279): alpha valor 0.500000
+[DEBUG] 23:48:49:372 Team/(25279:25279): 4. Comienza lectura de parámetros de entrenador
+[DEBUG] 23:48:49:375 Team/(25279:25279): 4. Finalizó la carga de config de entrenadores
+[DEBUG] 23:48:49:376 Team/(25279:25279): 4. Se alocó memoria para el array de parametros de entrenadore
+[DEBUG] 23:48:49:377 Team/(25279:25279): 4. Comienza el proceso de carga de atributos en struc
+[DEBUG] 23:48:49:379 Team/(25279:25279): 4.1. Comienza el proceso de carga de posición de entrenadores
+[DEBUG] 23:48:49:389 Team/(25279:25279): 4.1. Finaliza el proceso de carga de posición de entrenadores
+[DEBUG] 23:48:49:398 Team/(25279:25279): 4.2. Comienza el proceso de carga de pokemons de entrenadores
+[DEBUG] 23:48:49:399 Team/(25279:25279): 4.3. Comienza el proceso de carga de objetivos de entrenadores
+[DEBUG] 23:48:49:424 Team/(25279:25279): 4.3. Finaliza el proceso de carga de objetivos de entrenadores
+[DEBUG] 23:48:49:426 Team/(25279:25279): 4. Finalizó el proceso de carga de atributos
+[DEBUG] 23:48:49:428 Team/(25279:25279): valor del count 5
+[DEBUG] 23:48:49:430 Team/(25279:25279): 5.Comienza el proceso de creación de threads
+[DEBUG] 23:48:49:433 Team/(25279:25279): Creando el entrenador 0
+[DEBUG] 23:48:49:455 Team/(25279:25279): 5. Se creó un entrenador
+[DEBUG] 23:48:49:465 Team/(25279:25279): Creando el entrenador 1
+[DEBUG] 23:48:49:467 Team/(25279:25279): 5. Se creó un entrenador
+[DEBUG] 23:48:49:468 Team/(25279:25279): Creando el entrenador 2
+[DEBUG] 23:48:49:470 Team/(25279:25279): 5. Se creó un entrenador
+[DEBUG] 23:48:49:471 Team/(25279:25279): Creando el entrenador 3
+[DEBUG] 23:48:49:475 Team/(25279:25279): 5. Se creó un entrenador
+[DEBUG] 23:48:49:480 Team/(25279:25279): Creando el entrenador 4
+[DEBUG] 23:48:49:481 Team/(25279:25279): 5. Se creó un entrenador
+[DEBUG] 23:48:49:483 Team/(25279:25279): 5. Terminó el proceso de creación de threads
+[DEBUG] 23:48:49:500 Team/(25279:25285): Creando thread Caught Subscriptions Handler
+[DEBUG] 23:48:49:519 Team/(25279:25285): IP y puerto configurado
+[DEBUG] 23:48:49:521 Team/(25279:25285): Socket configurado
+[DEBUG] 23:48:49:521 Team/(25279:25285): Se intentará conectar con Broker
+[DEBUG] 23:48:49:525 Team/(25279:25285): La conexión fue realizada
+[DEBUG] 23:48:49:549 Team/(25279:25285): Se subscribió a Caught
+[DEBUG] 23:48:52:502 Team/(25279:25297): Creando thread Appeared Subscriptions Handler
+[DEBUG] 23:48:52:503 Team/(25279:25297): IP y puerto configurado
+[DEBUG] 23:48:52:504 Team/(25279:25297): Socket configurado
+[DEBUG] 23:48:52:504 Team/(25279:25297): Se intentará conectar con Broker
+[DEBUG] 23:48:52:505 Team/(25279:25297): La conexión fue realizada
+[DEBUG] 23:48:52:506 Team/(25279:25297): Se subscribió a Appeared
+[DEBUG] 23:48:52:535 Team/(25279:25302): Before AddMessageAppeared: availablePokemonCount: 0
+[INFO] 23:48:52:547 Team/(25279:25302): 7. Llegada de mensaje Appeared. Datos: Nombre del Pokemon: Flareon, ubicación X: 4, ubicación Y: 6
+[DEBUG] 23:48:52:556 Team/(25279:25302): After processMessageAppeared: Pokemon sirve availablePokemonCount: 1
+[DEBUG] 23:48:52:557 Team/(25279:25304): Before AddMessageAppeared: availablePokemonCount: 1
+[INFO] 23:48:52:570 Team/(25279:25304): 7. Llegada de mensaje Appeared. Datos: Nombre del Pokemon: Pikachu, ubicación X: 9, ubicación Y: 9
+[DEBUG] 23:48:52:571 Team/(25279:25304): After AddMessageAppeared: Pokemon no sirve availablePokemonCount: 1
+[DEBUG] 23:48:52:573 Team/(25279:25304): Se procesó el mensaje
+[DEBUG] 23:48:52:581 Team/(25279:25302): Se procesó el mensaje
+[DEBUG] 23:48:55:504 Team/(25279:25309): Creando thread Localized Subscriptions Handler
+[DEBUG] 23:48:55:505 Team/(25279:25309): IP y puerto configurado
+[DEBUG] 23:48:55:506 Team/(25279:25309): Socket configurado
+[DEBUG] 23:48:55:506 Team/(25279:25309): Se intentará conectar con Broker
+[DEBUG] 23:48:55:507 Team/(25279:25309): La conexión fue realizada
+[DEBUG] 23:48:55:508 Team/(25279:25309): Se subscribió a Localized
+[DEBUG] 23:48:58:505 Team/(25279:25279): Se solicitarán 5 pokemons
+[DEBUG] 23:48:58:506 Team/(25279:25279): Se solicitará el pokemon Vaporeon
+[DEBUG] 23:48:58:508 Team/(25279:25279): IP y puerto configurado
+[DEBUG] 23:48:58:508 Team/(25279:25279): Socket configurado
+[DEBUG] 23:48:58:509 Team/(25279:25279): Se intentará conectar con Broker
+[DEBUG] 23:48:58:509 Team/(25279:25279): La conexión fue realizada
+[DEBUG] 23:48:58:511 Team/(25279:25279): Se enviará el send para el pokemon Vaporeon
+[INFO] 23:49:02:163 Team/(25279:25328): 7. Llegada de mensaje Localized. Datos: Nombre del Pokemon: Pikachu, cantidad de ubicaciones: 1, correlation id: 9
+[DEBUG] 23:49:02:174 Team/(25279:25328): Se procesó el mensaje
+[DEBUG] 23:49:03:524 Team/(25279:25279): Pokemon requested: Vaporeon
+[ERROR] 23:49:03:525 Team/(25279:25279): Esperando ack
+[ERROR] 23:49:03:527 Team/(25279:25279): Se recibió ack
+[DEBUG] 23:49:03:528 Team/(25279:25279): Se solicitará el pokemon Jolteon
+[DEBUG] 23:49:03:529 Team/(25279:25279): IP y puerto configurado
+[DEBUG] 23:49:03:529 Team/(25279:25279): Socket configurado
+[DEBUG] 23:49:03:533 Team/(25279:25279): Se intentará conectar con Broker
+[DEBUG] 23:49:03:540 Team/(25279:25279): La conexión fue realizada
+[DEBUG] 23:49:03:540 Team/(25279:25279): Se enviará el send para el pokemon Jolteon
+[INFO] 23:49:03:711 Team/(25279:25338): 7. Llegada de mensaje Localized. Datos: Nombre del Pokemon: Vaporeon, cantidad de ubicaciones: 0, correlation id: 10
+[DEBUG] 23:49:03:734 Team/(25279:25338): Se procesó el mensaje
+[INFO] 23:49:07:91 Team/(25279:25351): 7. Llegada de mensaje Localized. Datos: Nombre del Pokemon: Squirtle, cantidad de ubicaciones: 1, correlation id: 11
+[DEBUG] 23:49:07:92 Team/(25279:25351): Se procesó el mensaje
+[DEBUG] 23:49:08:545 Team/(25279:25279): Pokemon requested: Jolteon
+[ERROR] 23:49:08:545 Team/(25279:25279): Esperando ack
+[ERROR] 23:49:08:546 Team/(25279:25279): Se recibió ack
+[DEBUG] 23:49:08:547 Team/(25279:25279): Se solicitará el pokemon Flareon
+[DEBUG] 23:49:08:548 Team/(25279:25279): IP y puerto configurado
+[DEBUG] 23:49:08:548 Team/(25279:25279): Socket configurado
+[DEBUG] 23:49:08:549 Team/(25279:25279): Se intentará conectar con Broker
+[DEBUG] 23:49:08:550 Team/(25279:25279): La conexión fue realizada
+[DEBUG] 23:49:08:550 Team/(25279:25279): Se enviará el send para el pokemon Flareon
+[INFO] 23:49:08:697 Team/(25279:25364): 7. Llegada de mensaje Localized. Datos: Nombre del Pokemon: Jolteon, cantidad de ubicaciones: 1, correlation id: 13
+[ERROR] 23:49:08:698 Team/(25279:25364): valores: available count= 1, valores: ammount =1
+[DEBUG] 23:49:08:709 Team/(25279:25364): Se procesó el mensaje
+[INFO] 23:49:12:128 Team/(25279:25375): 7. Llegada de mensaje Localized. Datos: Nombre del Pokemon: Gengar, cantidad de ubicaciones: 0, correlation id: 15
+[DEBUG] 23:49:12:129 Team/(25279:25375): Se procesó el mensaje
+[DEBUG] 23:49:13:552 Team/(25279:25279): Pokemon requested: Flareon
+[ERROR] 23:49:13:553 Team/(25279:25279): Esperando ack
+[ERROR] 23:49:13:555 Team/(25279:25279): Se recibió ack
+[DEBUG] 23:49:13:555 Team/(25279:25279): Se solicitará el pokemon Umbreon
+[DEBUG] 23:49:13:556 Team/(25279:25279): IP y puerto configurado
+[DEBUG] 23:49:13:557 Team/(25279:25279): Socket configurado
+[DEBUG] 23:49:13:557 Team/(25279:25279): Se intentará conectar con Broker
+[DEBUG] 23:49:13:559 Team/(25279:25279): La conexión fue realizada
+[DEBUG] 23:49:13:560 Team/(25279:25279): Se enviará el send para el pokemon Umbreon
+[INFO] 23:49:13:646 Team/(25279:25384): 7. Llegada de mensaje Localized. Datos: Nombre del Pokemon: Flareon, cantidad de ubicaciones: 1, correlation id: 17
+[DEBUG] 23:49:13:677 Team/(25279:25384): Se procesó el mensaje
+[INFO] 23:49:17:60 Team/(25279:25397): 7. Llegada de mensaje Localized. Datos: Nombre del Pokemon: Onix, cantidad de ubicaciones: 0, correlation id: 19
+[DEBUG] 23:49:17:67 Team/(25279:25397): Se procesó el mensaje
+[DEBUG] 23:49:18:563 Team/(25279:25279): Pokemon requested: Umbreon
+[ERROR] 23:49:18:567 Team/(25279:25279): Esperando ack
+[ERROR] 23:49:18:569 Team/(25279:25279): Se recibió ack
+[DEBUG] 23:49:18:570 Team/(25279:25279): Se solicitará el pokemon Espeon
+[DEBUG] 23:49:18:570 Team/(25279:25279): IP y puerto configurado
+[DEBUG] 23:49:18:571 Team/(25279:25279): Socket configurado
+[DEBUG] 23:49:18:572 Team/(25279:25279): Se intentará conectar con Broker
+[DEBUG] 23:49:18:574 Team/(25279:25279): La conexión fue realizada
+[DEBUG] 23:49:18:583 Team/(25279:25279): Se enviará el send para el pokemon Espeon
+[INFO] 23:49:18:884 Team/(25279:25408): 7. Llegada de mensaje Localized. Datos: Nombre del Pokemon: Umbreon, cantidad de ubicaciones: 0, correlation id: 21
+[DEBUG] 23:49:18:887 Team/(25279:25408): Se procesó el mensaje
+[DEBUG] 23:49:23:588 Team/(25279:25279): Pokemon requested: Espeon
+[ERROR] 23:49:23:588 Team/(25279:25279): Esperando ack
+[ERROR] 23:49:23:588 Team/(25279:25279): Se recibió ack
+[DEBUG] 23:49:23:594 Team/(25279:25412): a. Comparo: Flareon Vaporeon
+[DEBUG] 23:49:23:598 Team/(25279:25412): a. Comparo: Flareon Jolteon
+[DEBUG] 23:49:23:600 Team/(25279:25412): a. Comparo: Flareon Flareon
+[DEBUG] 23:49:23:602 Team/(25279:25279): IP 127.0.0.1 y puerto 5002 configurado
+[DEBUG] 23:49:23:603 Team/(25279:25412): selectedMissingPokemonCount: 1
+[DEBUG] 23:49:23:610 Team/(25279:25412): Before removeMessageAppeared: availablePokemonCount: 2
+[DEBUG] 23:49:23:612 Team/(25279:25279): Socket configurado
+[DEBUG] 23:49:23:621 Team/(25279:25279): La conexión fue realizada
+[DEBUG] 23:49:23:623 Team/(25279:25412): After removeMessageAppeared: availablePokemonCount: 1
+[INFO] 23:49:23:632 Team/(25279:25412): 1. Se movió al entrenador 1 a la cola Ready por haber sido planificado por su cercanía con el pokemon
+[INFO] 23:49:23:667 Team/(25279:25413): 1. Se movió al entrenador 1 a la cola Exec por haber haber sido planificado por el algoritmo RR
+[DEBUG] 23:49:23:670 Team/(25279:25412): a. Comparo: Jolteon Vaporeon
+[DEBUG] 23:49:23:705 Team/(25279:25412): a. Comparo: Jolteon Jolteon
+[DEBUG] 23:49:23:705 Team/(25279:25412): selectedMissingPokemonCount: 1
+[DEBUG] 23:49:23:706 Team/(25279:25412): c. Comparo: Flareon Jolteon
+[DEBUG] 23:49:23:710 Team/(25279:25412): Before removeMessageAppeared: availablePokemonCount: 1
+[DEBUG] 23:49:23:719 Team/(25279:25412): After removeMessageAppeared: availablePokemonCount: 0
+[INFO] 23:49:23:722 Team/(25279:25412): 1. Se movió al entrenador 0 a la cola Ready por haber sido planificado por su cercanía con el pokemon
+[INFO] 23:49:23:772 Team/(25279:25421): 7. Llegada de mensaje Localized. Datos: Nombre del Pokemon: Espeon, cantidad de ubicaciones: 0, correlation id: 24
+[DEBUG] 23:49:23:772 Team/(25279:25421): Se procesó el mensaje
+[INFO] 23:49:28:716 Team/(25279:25413): 2. Se movió al entrenador 1 a la posición 5 5
+[INFO] 23:49:28:718 Team/(25279:25413): 1. Se movió al entrenador 1 a la cola Ready por haber sido planificado por su cercanía con el pokemon
+[INFO] 23:49:28:720 Team/(25279:25413): 1. Se movió al entrenador 0 a la cola Exec por haber haber sido planificado por el algoritmo RR
+[INFO] 23:49:33:722 Team/(25279:25413): 2. Se movió al entrenador 0 a la posición 2 2
+[INFO] 23:49:33:723 Team/(25279:25413): 1. Se movió al entrenador 0 a la cola Ready por haber sido planificado por su cercanía con el pokemon
+[INFO] 23:49:33:724 Team/(25279:25413): 1. Se movió al entrenador 1 a la cola Exec por haber haber sido planificado por el algoritmo RR
+[INFO] 23:49:38:725 Team/(25279:25413): 2. Se movió al entrenador 1 a la posición 4 5
+[INFO] 23:49:38:725 Team/(25279:25413): 1. Se movió al entrenador 1 a la cola Ready por haber sido planificado por su cercanía con el pokemon
+[INFO] 23:49:38:726 Team/(25279:25413): 1. Se movió al entrenador 0 a la cola Exec por haber haber sido planificado por el algoritmo RR
+[DEBUG] 23:49:38:727 Team/(25279:25413): Se enviará el catch
+[DEBUG] 23:49:38:728 Team/(25279:25413): IP y puerto configurado
+[DEBUG] 23:49:38:729 Team/(25279:25413): Socket configurado
+[DEBUG] 23:49:38:729 Team/(25279:25413): Se intentará conectar con Broker
+[DEBUG] 23:49:38:729 Team/(25279:25413): La conexión fue realizada
+[INFO] 23:49:38:733 Team/(25279:25413): 3. Operación de atrapar: X=2 Y=2 Jolteon
+[DEBUG] 23:49:43:743 Team/(25279:25413): Se envió el catchdel pokemon Jolteon por elentrenador 0
+[INFO] 23:49:43:745 Team/(25279:25413): 1. Se movió al entrenador 0 a la cola Blocked por haber enviado un catch
+[INFO] 23:49:43:745 Team/(25279:25413): 1. Se movió al entrenador 1 a la cola Exec por haber haber sido planificado por el algoritmo RR
+[INFO] 23:49:43:894 Team/(25279:25432): 7. Llegada de mensaje Caught. Datos: Respuesta de captura: 1, correlation id: 27
+[DEBUG] 23:49:43:912 Team/(25279:25432): Se captura el pokemon por Caught message
+[DEBUG] 23:49:43:915 Team/(25279:25432): Se procesó el mensaje
+[INFO] 23:49:48:747 Team/(25279:25413): 2. Se movió al entrenador 1 a la posición 4 6
+[INFO] 23:49:48:748 Team/(25279:25413): 1. Se movió al entrenador 1 a la cola Ready por haber sido planificado por su cercanía con el pokemon
+[INFO] 23:49:48:748 Team/(25279:25413): 1. Se movió al entrenador 1 a la cola Exec por haber haber sido planificado por el algoritmo RR
+[DEBUG] 23:49:48:749 Team/(25279:25413): Se enviará el catch
+[DEBUG] 23:49:48:749 Team/(25279:25413): IP y puerto configurado
+[DEBUG] 23:49:48:750 Team/(25279:25413): Socket configurado
+[DEBUG] 23:49:48:750 Team/(25279:25413): Se intentará conectar con Broker
+[DEBUG] 23:49:48:751 Team/(25279:25413): La conexión fue realizada
+[INFO] 23:49:48:751 Team/(25279:25413): 3. Operación de atrapar: X=4 Y=6 Flareon
+[DEBUG] 23:49:53:754 Team/(25279:25413): Se envió el catchdel pokemon Flareon por elentrenador 1
+[INFO] 23:49:53:755 Team/(25279:25413): 1. Se movió al entrenador 1 a la cola Blocked por haber enviado un catch
+[INFO] 23:49:53:843 Team/(25279:25443): 7. Llegada de mensaje Caught. Datos: Respuesta de captura: 1, correlation id: 29
+[DEBUG] 23:49:53:861 Team/(25279:25443): Se captura el pokemon por Caught message
+[DEBUG] 23:49:53:863 Team/(25279:25443): Se procesó el mensaje
+[INFO] 23:50:27:147 Team/(25279:25456): 7. Llegada de mensaje Caught. Datos: Respuesta de captura: 1, correlation id: 31
+[DEBUG] 23:50:27:287 Team/(25279:25456): Se procesó el mensaje

@@ -1486,7 +1486,7 @@ void turn_bit_off(int block){
 	memcpy(GameCard->fileMapped, GameCard->bitArray->bitarray, (GameCard->blocks/8));
 	int result= msync(GameCard->fileMapped, (GameCard->blocks/8) , MS_SYNC);
 	sem_post(&(GameCard->semMap));
-	log_info(GameCard->logger, "Se libero el bloque &i", block);
+	log_info(GameCard->logger, "Se libero el bloque %i", block);
 }
 
 

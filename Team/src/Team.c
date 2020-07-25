@@ -753,8 +753,8 @@ void processMessageAppeared(deli_message* message){
 int findIdInCatchList(uint32_t cid){
 	int position=-1;
 	for(int i=0;i<catchList.count;i++){
-		int compare = memcmp(catchList.catchMessage[i].catchId,cid,sizeof(uint32_t));
-		if(compare==0){
+		int compare = catchList.catchMessage[i].catchId==cid;
+		if(compare!=0){
 			position=i;
 			break;
 		}

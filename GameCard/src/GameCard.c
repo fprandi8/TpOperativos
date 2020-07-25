@@ -940,6 +940,7 @@ int create_file_bitmap(){
 
 	char* filename = (char*)malloc(strlen(GameCard->metadataPath) + strlen("bitmap.bin") + 1);
 	strcpy(filename,GameCard->metadataPath);
+	strcat(filename,"bitmap.bin");
 
 	int f;
 

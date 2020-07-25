@@ -1349,6 +1349,7 @@ int decrease_pokemon_amount(char** fileContent,int pos, t_file_metadata* metadat
 		else
 		{
 			memcpy(auxBuffer,file+bytes,auxIntSize);
+			auxBuffer[auxIntSize]='\0';
 
 		}
 

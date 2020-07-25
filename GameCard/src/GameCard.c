@@ -565,11 +565,18 @@ int catch_a_pokemon(char** fileContent, t_file_metadata* metadataFile, char* coo
 				list_remove(values->values,1);
 				list_remove(values->values,0);
 				free(values);
+
+				char* pokeMetadata = (char*)malloc(strlen(GameCard->filePath) + strlen(pokemonName) + strlen("/matadata.bin") + 1 );
+				strcpy(pokeMetadata,GameCard->filePath);
+				strcat(pokeMetadata,pokemonName);
+				strcat(pokeMetadata,"/metadata.bin");
+
 				sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,pokemonName);
 				sem_wait(pokeSem);
-				t_config* metadataConfig = read_metadata(file);
+				t_config* metadataConfig = read_metadata(pokeMetadata);
 				Metadata_File_Open_Flag(metadataFile,metadataConfig,"N");
 				sem_post(pokeSem);
+
 			}else{
 				char* pokeMetadata = (char*)malloc(strlen(GameCard->filePath) + strlen(pokemonName) + strlen("/matadata.bin") + 1 );
 				strcpy(pokeMetadata,GameCard->filePath);

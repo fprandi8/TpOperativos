@@ -153,16 +153,13 @@ uint32_t save_body_in_partition(t_buffer* messageBuffer, t_partition* partition,
         newPartition->queue_type = queue;
         newPartition->free = 0;
         newPartition->timestap = clock();
-        memcpy(newPartition->begining, messageBuffer->stream, messageBuffer->bufferSize);//Marcos:modificamos esto y ahora arranca
 
+        memcpy(newPartition->begining, messageBuffer->stream, messageBuffer->bufferSize);
         list_add(partitions, newPartition);
 
         partition->begining += newPartitionSize;
         partition->size = partition->size - newPartitionSize;
         partition->timestap = clock();
-
-        //memcpy(partition->begining, messageBuffer->stream, messageBuffer->bufferSize);
-
 
         return newPartition->id;
     }
@@ -277,6 +274,8 @@ t_partition* select_partition_bf(uint32_t size){
 
 void compact_memory(void)
 {
+	PrintDumpOfCache();
+
     bool _is_empty_partition(t_partition* partition){ return partition->free; }
     bool _filter_busy_partition(t_partition* partition){ return !partition->free;}
 
@@ -289,9 +288,13 @@ void compact_memory(void)
     int offsetMem = 0;
     void _asignPartitionOnBackUpMem(t_partition* partition)
     {
+    	log_debug(cache_log, "Partition start: %d", partition->begining);
+    	log_info(cache_log, "PartitionSize: %d", partition->size);
         memcpy(backUp_memory + offsetMem, partition->begining, partition->size);
         offsetMem += partition->size;
+   //     partition->begining = cache.full_memory + offsetMem;
     }
+
     int offsetPointerMem = 0;
     void _reasignPartitionPointers(t_partition* partition)
     {
@@ -329,6 +332,8 @@ void compact_memory(void)
 	free(partitions);
 
     partitions = occupied_partitions;
+
+    PrintDumpOfCache();
 
 	log_info(cache_log, "SE EJECUTO COMPACTACION");
 }
@@ -546,6 +551,7 @@ t_list* GetAllMessagesForSuscriptor(int client, message_type queueType)
 
 void AddASentSubscriberToMessage(int messageId, int client)
 {
+	sem_wait(&mutex_saving);
 	t_cachedMessage* cachedMessage = GetCachedMessage(messageId);
 	if(cachedMessage == NULL) return;
 	sem_wait(&cachedMessage->mutex_message);
@@ -554,15 +560,18 @@ void AddASentSubscriberToMessage(int messageId, int client)
 	list_add(cachedMessage->sent_to_subscribers, cachedClient);
 	cachedMessage->ack_by_subscribers_left++;
 	sem_post(&cachedMessage->mutex_message);
+	sem_post(&mutex_saving);
 }
 
 void AddAcknowledgeToMessage(int messageId)
 {
+	sem_wait(&mutex_saving);
 	t_cachedMessage* cachedMessage = GetCachedMessage(messageId);
 	if(cachedMessage == NULL) return;
 	sem_wait(&cachedMessage->mutex_message);
 	cachedMessage->ack_by_subscribers_left--;
 	sem_post(&cachedMessage->mutex_message);
+	sem_post(&mutex_saving);
 }
 
 deli_message* GetMessage(int messageId)
@@ -577,6 +586,11 @@ deli_message* GetMessage(int messageId)
     //TODO agregar analisis de cached message == NULL
     //TODO el GetCachedMessages ya updatea le timestamp, sacarlo de abajo no?
     t_partition* partition = GetPartition(cachedMessage->partitionId);
+    if(partition->free)
+    {
+    	sem_post(&mutex_saving);
+    	return NULL;
+    }
 
 	deli_message* message = (deli_message*)malloc(sizeof(deli_message));
 	message->id = cachedMessage->id;

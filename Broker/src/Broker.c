@@ -133,7 +133,7 @@ void recive_message(uint32_t type, int cliente, t_Broker* broker, void* content 
 
 t_log* iniciar_logger(void)
 {
-	return log_create("Broker.log","Broker",1,LOG_LEVEL_INFO);
+	return log_create("Broker.log","Broker",1,LOG_LEVEL_DEBUG);
 }
 
 t_config* leer_config(void)

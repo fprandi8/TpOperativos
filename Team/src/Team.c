@@ -102,7 +102,6 @@ int main(int argc, char **argv) {
 	readConfigSchedulerValues(config,&schedulingAlgorithm);
 	//Init Alpha for SJF and Initial Estimated Burst
 	alphaForSJF = readConfigAlphaValue(config);
-	log_debug(logger, "alpha valor %f", alphaForSJF);
 	initialEstimatedBurst = readConfigInitialEstimatedValue(config);
 
 	trainersCount = getTrainersCount(config);
@@ -432,7 +431,6 @@ int startServer()
     //hints.ai_protocol = 0;
 
     getaddrinfo(teamServerAttr.ip, teamServerAttr.port, &hints, &servinfo);
-    log_debug(logger,"IP %s y puerto %s configurado",teamServerAttr.ip, teamServerAttr.port);
     for (p = servinfo; p != NULL; p = p->ai_next) {
     	teamSocket = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
 		if (teamSocket == -1){
@@ -503,6 +501,7 @@ void* subscribeToBrokerLocalized(){
 		}else{
 			log_info(logger,"9. Se intentará reconectarse al broker para subscribirse a Localized cada %i. Se realizará la operación por default",retryConnectionTime);
 			sleep(retryConnectionTime);
+			log_info(logger,"10. Se inicia el intento de reconexión con el Broker");
 			pthread_create(&(subs[2]),NULL,subscribeToBrokerLocalized,NULL);
 			pthread_detach(subs[2]);
 			pthread_exit(NULL);
@@ -523,7 +522,6 @@ void* subscribeToBrokerLocalized(){
 
 
 void* subscribeToBrokerAppeared(){
-	log_debug(logger,"Creando thread Appeared Subscriptions Handler");
 	int socketAppeared;
 	int flagConnected = 0;
 
@@ -533,7 +531,7 @@ void* subscribeToBrokerAppeared(){
 			if (-1==SendSubscriptionRequest(APPEARED_POKEMON,socketAppeared)){
 				log_debug(logger,"Error en subscripcion de Appeared");
 			}else{
-				log_debug(logger,"Se subscribió a Appeared");
+
 				flagConnected=1;
 			}
 		}else{
@@ -556,7 +554,7 @@ void* subscribeToBrokerAppeared(){
 }
 
 void* subscribeToBrokerCaught(){
-	log_debug(logger,"Creando thread Caught Subscriptions Handler");
+
 	int socketCaught;
 	int flagConnected = 0;
 
@@ -566,7 +564,7 @@ void* subscribeToBrokerCaught(){
 			if (-1==SendSubscriptionRequest(CAUGHT_POKEMON,socketCaught)){
 				log_debug(logger,"Error en subscripcion de caught");
 			}else{
-				log_debug(logger,"Se subscribió a Caught");
+
 				flagConnected=1;
 			}
 		}else{
@@ -656,7 +654,7 @@ void processMessage(void* variables){
 	}
 
 	free(args);
-	log_debug(logger, "Se procesó el mensaje");
+
 }
 
 int findIdInGetList(uint32_t cid){
@@ -730,7 +728,7 @@ int findNameInMissingPokemons(char* pokeName){
 
 
 void processMessageAppeared(deli_message* message){
-	log_debug(logger,"Before AddMessageAppeared: availablePokemonCount: %i",availablePokemons.count);
+
 	appeared_pokemon* appearedPokemon = (appeared_pokemon*)message->messageContent;
 	log_info(logger,"7. Llegada de mensaje Appeared. Datos: Nombre del Pokemon: %s, ubicación X: %u, ubicación Y: %u",appearedPokemon->pokemonName,appearedPokemon->horizontalCoordinate,appearedPokemon->verticalCoordinate);
 	int resultMissingPokemon = findNameInMissingPokemons(appearedPokemon->pokemonName);
@@ -747,7 +745,7 @@ void processMessageAppeared(deli_message* message){
 			availablePokemons.pokemons[availablePokemons.count].position.x=appearedPokemon->horizontalCoordinate;
 			availablePokemons.pokemons[availablePokemons.count].position.y=appearedPokemon->verticalCoordinate;
 			availablePokemons.count++;
-			log_debug(logger,"After processMessageAppeared: Pokemon sirve availablePokemonCount: %i",availablePokemons.count);
+
 			sem_post(&availablePokemons_sem);
 			sem_post(&(availablePokemonsCount_sem));
 		}else{
@@ -786,10 +784,10 @@ void processMessageCaught(deli_message* message){
 					trainerPos=i;
 				}
 			}
-			log_debug(logger,"Pokemon que voy a capturar %s ",statesLists.blockedList.trainerList[trainerPos].parameters.scheduledPokemon.name);
+
 			removeFromMissingPkms(statesLists.blockedList.trainerList[trainerPos].parameters.scheduledPokemon);
 			addToPokemonList(&(statesLists.blockedList.trainerList[trainerPos]));
-			log_debug(logger,"Se captura el pokemon por Caught message");
+
 
 			if(statesLists.blockedList.trainerList[trainerPos].parameters.objetivesCount==statesLists.blockedList.trainerList[trainerPos].parameters.pokemonsCount){
 				if(checkTrainerState(statesLists.blockedList.trainerList[trainerPos])==1){
@@ -817,7 +815,7 @@ void processMessageCaught(deli_message* message){
 void requestNewPokemons(t_objetive* pokemons,int globalObjetivesDistinctCount,struct Broker broker){
 	getList.id = 0;
 	getList.count=0;
-	log_debug(logger,"Se solicitarán %i pokemons",globalObjetivesDistinctCount);
+
 	for(int obj=0;obj<globalObjetivesDistinctCount;obj++){
 		requestNewPokemon(pokemons[obj].pokemon,broker);
 	}
@@ -826,17 +824,17 @@ void requestNewPokemons(t_objetive* pokemons,int globalObjetivesDistinctCount,st
 
 //TODO debería usar la shared cuando este implementado para mandar.
 void requestNewPokemon(t_pokemon missingPkm, struct Broker broker){
-	log_debug(logger,"Se solicitará el pokemon %s", missingPkm.name);
+
 	int socketGet = connectBroker(broker.ip, broker.port);
 	if(socketGet != -1){
 		get_pokemon get;
 		get.pokemonName=(char*)malloc(strlen(missingPkm.name)+1);
 		strcpy(get.pokemonName,missingPkm.name);
-		log_debug(logger,"Se enviará el send para el pokemon %s", missingPkm.name);
+
 		Send_GET(get, socketGet);
 		sleep(clockSimulationTime);
 		cpuClocksCount++;
-		log_debug(logger,"Pokemon requested: %s",missingPkm.name);
+
 		op_code type;
 		void* content = malloc(sizeof(void*));
 		int result;
@@ -926,7 +924,7 @@ void startLogger(t_config *config){
 		removeLogger(logFilename);
 		createLogger(logFilename);
 	}
-	log_debug(logger,"1. Finaliza creación de config y logger");
+
 }
 
 void deleteLogger()
@@ -956,43 +954,43 @@ void createConfig(t_config **config,char* configName)
 }
 
 void readConfigBrokerValues(t_config *config,struct Broker *broker){
-	log_debug(logger,"2. Comienza lectura de config de broker");
+
 	if (config_has_property(config,broker->ipKey)){
 		broker->ip=config_get_string_value(config,broker->ipKey);
-		log_debug(logger,"2. Se leyó la IP: %s",broker->ip);
+
 	}else{
 		exit(-3);
 	}
 
 	if (config_has_property(config,broker->portKey)){
 		broker->port=config_get_string_value(config,broker->portKey);
-		log_debug(logger,"2. Se leyó el puerto: %s",broker->port);
+
 	}else{
 		exit(-3);
 	}
-	log_debug(logger,"2. Finaliza lectura de config de broker");
+
 }
 
 void readConfigTeamValues(t_config *config){
-	log_debug(logger,"2. Comienza lectura de config de teamAttr");
+
 	if (config_has_property(config,teamServerAttr.ipKey)){
 		teamServerAttr.ip=config_get_string_value(config,teamServerAttr.ipKey);
-		log_debug(logger,"2. Se leyó la IP: %s",teamServerAttr.ip);
+
 	}else{
 		exit(-3);
 	}
 
 	if (config_has_property(config,teamServerAttr.portKey)){
 		teamServerAttr.port=config_get_string_value(config,teamServerAttr.portKey);
-		log_debug(logger,"2. Se leyó el puerto: %s",teamServerAttr.port);
+
 	}else{
 		exit(-3);
 	}
-	log_debug(logger,"2. Finaliza lectura de config de teamAttr");
+
 }
 
 void readConfigSchedulerValues(t_config *config,struct SchedulingAlgorithm *schedulingAlgorithm){
-	log_debug(logger,"3. Comienza lectura de config de scheduler");
+
 	if (config_has_property(config,schedulingAlgorithm->algorithmKey)){
 		schedulingAlgorithm->algorithm=config_get_string_value(config,schedulingAlgorithm->algorithmKey);
 		if(schedulingAlgorithm->algorithm==SJFCD || schedulingAlgorithm->algorithm==FIFO || schedulingAlgorithm->algorithm==SJFSD || schedulingAlgorithm->algorithm==RR){

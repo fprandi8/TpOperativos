@@ -492,6 +492,7 @@ void* subscribeToBrokerLocalized(){
 	while(!flagConnected){
 		socketLocalized = connectBroker(broker.ip,broker.port);
 		if(socketLocalized!=-1){
+			log_info(logger,"11. Conexión satisfactoria al Broker");
 			if (-1==SendSubscriptionRequest(LOCALIZED_POKEMON,socketLocalized)){
 				log_debug(logger,"Error en subscripcion de Localized");
 			}else{
@@ -499,6 +500,7 @@ void* subscribeToBrokerLocalized(){
 				flagConnected=1;
 			}
 		}else{
+			log_info(logger,"11. Conexión insatisfactoria al Broker");
 			log_info(logger,"9. Se intentará reconectarse al broker para subscribirse a Localized cada %i. Se realizará la operación por default",retryConnectionTime);
 			sleep(retryConnectionTime);
 			log_info(logger,"10. Se inicia el intento de reconexión con el Broker");
@@ -528,6 +530,7 @@ void* subscribeToBrokerAppeared(){
 	while(!flagConnected){
 		socketAppeared = connectBroker(broker.ip,broker.port);
 		if(socketAppeared!=-1){
+			log_info(logger,"11. Conexión satisfactoria al Broker");
 			if (-1==SendSubscriptionRequest(APPEARED_POKEMON,socketAppeared)){
 				log_debug(logger,"Error en subscripcion de Appeared");
 			}else{
@@ -535,8 +538,10 @@ void* subscribeToBrokerAppeared(){
 				flagConnected=1;
 			}
 		}else{
+			log_info(logger,"11. Conexión insatisfactoria al Broker");
 			log_info(logger,"9. Se intentará reconectarse al broker para subscribirse a Appeared cada %i. Se realizará la operación por default",retryConnectionTime);
 			sleep(retryConnectionTime);
+			log_info(logger,"10. Se intentará reconectarse al Broker");
 			pthread_create(&(subs[1]),NULL,subscribeToBrokerAppeared,NULL);
 			pthread_detach(*thread);
 			pthread_exit(NULL);
@@ -561,6 +566,7 @@ void* subscribeToBrokerCaught(){
 	while(!flagConnected){
 		socketCaught = connectBroker(broker.ip,broker.port);
 		if(socketCaught!=-1){
+			log_info(logger,"11. Conexión satisfactoria al Broker");
 			if (-1==SendSubscriptionRequest(CAUGHT_POKEMON,socketCaught)){
 				log_debug(logger,"Error en subscripcion de caught");
 			}else{
@@ -568,8 +574,10 @@ void* subscribeToBrokerCaught(){
 				flagConnected=1;
 			}
 		}else{
+			log_info(logger,"11. Conexión insatisfactoria al Broker");
 			log_info(logger,"9. Se intentará reconectarse al broker para subscribirse a Caught cada %i. Se realizará la operación por default",retryConnectionTime);
 			sleep(retryConnectionTime);
+			log_info(logger,"10. Se intentará reconectarse al Broker");
 			pthread_create(&(subs[0]),NULL,subscribeToBrokerCaught,NULL);
 			pthread_detach(*thread);
 			pthread_exit(NULL);

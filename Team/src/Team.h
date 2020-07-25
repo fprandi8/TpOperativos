@@ -153,7 +153,7 @@ typedef struct t_list_of_objectives{
 } t_list_of_objectives_validation;
 
 
-void createConfig(t_config**);
+void createConfig(t_config**,char*);
 void startLogger(t_config*);
 void createLogger(char*);
 t_config* readConfig(void);

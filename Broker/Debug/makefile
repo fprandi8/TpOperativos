@@ -26,7 +26,7 @@ endif
 all: Broker
 
 dependents:
-	-cd /home/utnso/workspace/tp-2020-1c-MATE-OS/SharedLibrary/Debug && $(MAKE) all
+	-cd /home/utnso/workspace/tp-2020-1c-MATE-OS/SharedLibrary/Debug && $(MAKE) clean all
 
 # Tool invocations
 Broker: $(OBJS) $(USER_OBJS) /home/utnso/workspace/tp-2020-1c-MATE-OS/SharedLibrary/Debug/libSharedLibrary.so

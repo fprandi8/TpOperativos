@@ -147,7 +147,7 @@ int main(int argc, char **argv) {
 
 void* resolveAllDeadlocks(){
 	for(int tcount=0;tcount<trainersCount;tcount++){
-		log_error(logger,"Entrenador %i a la orden deadlock pa",tcount);
+
 		sem_wait(&(deadlockCount_sem));
 	}
 	sem_wait(&(deadlockCount_sem));
@@ -309,7 +309,7 @@ void moveTrainerToObjectiveDeadlock(t_trainer* trainer){
 
 void* finishTeam(){
 	for(int tcount=0;tcount<trainersCount;tcount++){
-		log_error(logger,"Entrenador %i a la orden finish",tcount);
+
 		sem_wait(&(exitCount_sem));
 	}
 	sem_wait(&exitCount_sem);
@@ -691,7 +691,7 @@ void processMessageLocalized(deli_message* message){
 	int resultReceivedPokemon = findNameInAvailableList(localizedPokemon->pokemonName);
 	if(localizedPokemon->ammount!=0){
 		if(resultGetId>=0 && resultReceivedPokemon==0){
-			log_error(logger,"valores: available count= %u, valores: ammount =%u",availablePokemons.count,localizedPokemon->ammount);
+
 			sem_wait(&availablePokemons_sem);
 			void* temp = realloc(availablePokemons.pokemons,sizeof(t_pokemon)*(availablePokemons.count+localizedPokemon->ammount));
 			if (!temp){
@@ -778,7 +778,7 @@ void processMessageCaught(deli_message* message){
 		if(caughtPokemon->caught==1){
 			log_info(logger,"statesLists.blockedList.count %u",statesLists.blockedList.count);
 			for(int i = 0;i<statesLists.blockedList.count;i++){
-				log_error(logger,"entrenador %u vieja, pero busco al %u",statesLists.blockedList.trainerList[i].id,resultCatchId);
+
 				if(statesLists.blockedList.trainerList[i].id==catchList.catchMessage[resultCatchId].trainerId){
 					trainerPos=i;
 				}
@@ -839,9 +839,9 @@ void requestNewPokemon(t_pokemon missingPkm, struct Broker broker){
 		int result;
 		int cut = 0;
 		while(cut != 1){
-			log_error(logger,"Esperando ack");
+
 			result = RecievePackage(socketGet,&type,&content);
-			log_error(logger,"Se recibió ack");
+
 			if(type == ACKNOWLEDGE){
 				cut=1;
 			}
@@ -1448,7 +1448,7 @@ void addToBlocked(t_trainer trainer){
 		sem_wait(&countBlocked_semaphore);
 		statesLists.blockedList.trainerList[statesLists.blockedList.count]=trainer;
 		(statesLists.blockedList.count)++;
-		log_error(logger,"la concha de tu madre %u",statesLists.blockedList.count);
+
 		sem_post(&countBlocked_semaphore);
 }
 

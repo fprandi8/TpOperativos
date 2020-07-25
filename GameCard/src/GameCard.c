@@ -580,6 +580,8 @@ int catch_a_pokemon(char** fileContent, t_file_metadata* metadataFile, char* coo
 
 				char* pokeDirectory = (char*)malloc(strlen(GameCard->filePath)+strlen(pokemonName)+1);
 
+				strcpy(pokeDirectory,GameCard->filePath);
+				strcpy(pokeDirectory,pokemonName);
 				log_debug(GameCard->logger,"Elimina la carpeta del pokemon %s" , pokeDirectory);
 
 				rmdir(pokeDirectory);

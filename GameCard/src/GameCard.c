@@ -1146,15 +1146,16 @@ void read_metadata_file(t_file_metadata* metadataFile, char* file, char* pokemon
 			config_set_value(metadataConfig, OPEN, newValue);
 			config_save(metadataConfig);
 			fileAvailable=1;
+			config_destroy(metadataConfig);
 			sem_post(pokeSem);
 		}
 		else
 		{
+			config_destroy(metadataConfig);
 			sem_post(pokeSem);
 			log_error(GameCard->logger, "Archivo abierto, re intenta en %d segundos", GameCard->retryOperation);
 			sleep(GameCard->retryOperation);
 		}
-		config_destroy(metadataConfig);
 	}
 
 	metadataConfig = read_metadata(file);

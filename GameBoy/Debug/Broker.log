@@ -9,3 +9,29 @@
 [INFO] 20:20:28:128 Broker/(14873:14873): Subscribed to NEW_POKEMON
 [INFO] 20:20:37:5 Broker/(14954:14954): Subscribed to NEW_POKEMON
 [INFO] 20:20:45:200 Broker/(15056:15056): Subscribed to NEW_POKEMON
+[INFO] 03:50:04:241 Broker/(2085:2085): Subscribed to CAUGHT_POKEMON
+[INFO] 03:50:04:241 Broker/(2085:2085): Recived CAUGHT_POKEMON message with id: 2, correlation id: 2
+[INFO] 03:50:04:242 Broker/(2085:2085): Recived CAUGHT_POKEMON message with id: 1, correlation id: 1
+[INFO] 03:50:21:948 Broker/(2106:2106): Subscribed to CAUGHT_POKEMON
+[INFO] 03:50:21:949 Broker/(2106:2106): Recived CAUGHT_POKEMON message with id: 2, correlation id: 2
+[INFO] 03:50:21:949 Broker/(2106:2106): Recived CAUGHT_POKEMON message with id: 1, correlation id: 1
+[INFO] 10:14:59:692 Broker/(1754:1754): Subscribed to CAUGHT_POKEMON
+[INFO] 10:14:59:706 Broker/(1754:1754): Recived CAUGHT_POKEMON message with id: 2, correlation id: 2
+[INFO] 10:14:59:707 Broker/(1754:1754): Recived CAUGHT_POKEMON message with id: 1, correlation id: 1
+[INFO] 18:46:26:233 Broker/(2785:2785): Subscribed to CAUGHT_POKEMON
+[INFO] 18:46:26:234 Broker/(2785:2785): Recived CAUGHT_POKEMON message with id: 2, correlation id: 2
+[INFO] 18:46:26:234 Broker/(2785:2785): Recived CAUGHT_POKEMON message with id: 1, correlation id: 1
+[INFO] 18:47:03:143 Broker/(2829:2829): Subscribed to CAUGHT_POKEMON
+[INFO] 18:47:03:144 Broker/(2829:2829): Recived CAUGHT_POKEMON message with id: 2, correlation id: 2
+[INFO] 18:47:03:145 Broker/(2829:2829): Recived CAUGHT_POKEMON message with id: 1, correlation id: 1
+[INFO] 18:48:03:353 Broker/(2861:2861): Subscribed to CAUGHT_POKEMON
+[INFO] 18:48:03:354 Broker/(2861:2861): Recived CAUGHT_POKEMON message with id: 2, correlation id: 2
+[INFO] 18:48:03:354 Broker/(2861:2861): Recived CAUGHT_POKEMON message with id: 1, correlation id: 1
+[INFO] 18:48:55:870 Broker/(2881:2881): Subscribed to CAUGHT_POKEMON
+[INFO] 18:48:55:871 Broker/(2881:2881): Recived CAUGHT_POKEMON message with id: 2, correlation id: 2
+[INFO] 18:48:55:871 Broker/(2881:2881): Recived CAUGHT_POKEMON message with id: 1, correlation id: 1
+[INFO] 18:49:46:81 Broker/(2914:2914): Subscribed to CAUGHT_POKEMON
+[INFO] 18:49:46:83 Broker/(2914:2914): Recived CAUGHT_POKEMON message with id: 2, correlation id: 2
+[INFO] 18:49:46:84 Broker/(2914:2914): Recived CAUGHT_POKEMON message with id: 1, correlation id: 1
+[INFO] 18:52:37:753 Broker/(2952:2952): Subscribed to NEW_POKEMON
+[INFO] 18:52:37:753 Broker/(2952:2952): Recived NEW_POKEMON message with id: 2, correlation id: 0

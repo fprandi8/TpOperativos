@@ -39,12 +39,12 @@ int main(void) {
 
 	config = read_config();
 
-	ptoMnt = get_config_value(config,logger,PUNTO_MONTAJE_TALLGRASS);
-    retryConnection = get_config_value(config,logger,TIEMPO_DE_REINTENTO_CONEXION);
-	retryOperation = get_config_value(config,logger,TIEMPO_DE_REINTENTO_OPERACION);
-	delayTime = get_config_value(config,logger,TIEMPO_RETARDO_OPERACION);
-	ip = get_config_value(config,logger,IP_GAMECARD);
-	puerto = get_config_value(config,logger,PUERTO_GAMECARD);
+	ptoMnt = get_config_value(config,PUNTO_MONTAJE_TALLGRASS);
+    retryConnection = get_config_value(config,TIEMPO_DE_REINTENTO_CONEXION);
+	retryOperation = get_config_value(config,TIEMPO_DE_REINTENTO_OPERACION);
+	delayTime = get_config_value(config,TIEMPO_RETARDO_OPERACION);
+	ip = get_config_value(config,IP_GAMECARD);
+	puerto = get_config_value(config,PUERTO_GAMECARD);
 
 	server = iniciar_servidor(ip, puerto);
 
@@ -143,11 +143,11 @@ int GameCard_mountFS(t_config* config){
 
 	result = create_directory(GameCard->metadataPath);
 
-	char* blocksize= get_config_value(config,GameCard->logger,BLOCK_SIZE);
+	char* blocksize= get_config_value(config,BLOCK_SIZE);
 
-	char* blocks=get_config_value(config,GameCard->logger,BLOCKS);
+	char* blocks=get_config_value(config,BLOCKS);
 
-	char* magicNumber = get_config_value(config,GameCard->logger,MAGIC_NUMBER);
+	char* magicNumber = get_config_value(config,MAGIC_NUMBER);
 
 	values->values= list_create();
 
@@ -1138,8 +1138,9 @@ void read_metadata_file(t_file_metadata* metadataFile, char* file, char* pokemon
 		sem_wait(pokeSem);
 
 		metadataConfig = read_metadata(file);
-		metadataFile->open = *(get_config_value(metadataConfig,GameCard->logger,OPEN));
-
+		log_debug(GameCard->logger, "valor del config obtenido %s", metadataConfig->path);
+		metadataFile->open = *(get_config_value(metadataConfig,OPEN));
+		log_debug(GameCard->logger, "valor del Key OPEN %c", metadataFile->open);
 		if(metadataFile->open =='N'){
 			metadataFile->open = 'S';
 			char* newValue ="S";
@@ -1160,14 +1161,14 @@ void read_metadata_file(t_file_metadata* metadataFile, char* file, char* pokemon
 
 	metadataConfig = read_metadata(file);
 
-	metadataFile->directory= *(get_config_value(metadataConfig,GameCard->logger,DIRECTORY));
+	metadataFile->directory= *(get_config_value(metadataConfig,DIRECTORY));
 
-	metadataFile->size= (char*)malloc(strlen(get_config_value(metadataConfig,GameCard->logger,SIZE))+1);
-	strcpy(metadataFile->size,get_config_value(metadataConfig,GameCard->logger,SIZE));
+	metadataFile->size= (char*)malloc(strlen(get_config_value(metadataConfig,SIZE))+1);
+	strcpy(metadataFile->size,get_config_value(metadataConfig,SIZE));
 
 	metadataFile->block = list_create();
 
-	char** blocks = get_config_value_array(metadataConfig,GameCard->logger,BLOCKS);
+	char** blocks = get_config_value_array(metadataConfig,BLOCKS);
 
 	int i=0;
 	while (blocks[i]!='\0'){

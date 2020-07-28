@@ -30,6 +30,6 @@ void process_request(int cod_op, int cliente_fd);
 t_config* read_config(void);
 t_config* read_metadata(char*);
 t_log* iniciar_logger(void);
-char* get_config_value(t_config*, t_log*, char*);
-char** get_config_value_array(t_config* , t_log* , char*);
+char* get_config_value(t_config*, char*);
+char** get_config_value_array(t_config* , char*);
 #endif /* CONEXIONES_H_ */

@@ -62,7 +62,7 @@ t_config* read_metadata(char* file)
 	return config_create(file);
 }
 
-char* get_config_value(t_config* config, t_log* logger, char* propiedad){
+char* get_config_value(t_config* config, char* propiedad){
 
 	if (config_has_property(config,propiedad)){
 //		log_info(logger,config_get_string_value(config,propiedad));
@@ -73,7 +73,7 @@ char* get_config_value(t_config* config, t_log* logger, char* propiedad){
 	}
 }
 
-char ** get_config_value_array(t_config* config, t_log* logger, char* propiedad){
+char ** get_config_value_array(t_config* config, char* propiedad){
 
 	if (config_has_property(config,propiedad)){
 //		log_info(logger,"Obtiene el array de datos");

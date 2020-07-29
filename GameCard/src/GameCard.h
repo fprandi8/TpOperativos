@@ -106,7 +106,7 @@ void GameCard_Process_Message(void*);
 void* GameCard_Process_Message_New(deli_message*);
 void* GameCard_Process_Message_Get(deli_message*);
 void* GameCard_Process_Message_Catch(deli_message*);
-void GameCard_Attend_Gameboy(void*);
+void GameCard_Attend_Gameboy(int);
 void GameCard_Process_Gameboy_Message(deli_message*);
 void GameCard_Initialize_bitarray();
 void GameCard_Destroy(t_GameCard*);

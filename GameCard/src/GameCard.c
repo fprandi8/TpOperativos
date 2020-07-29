@@ -16,6 +16,7 @@ pthread_t* thread;
 sem_t mutexDictionaty;
 sem_t mutexDirectory;
 sem_t mutexBitArray;
+sem_t mutexCliente;
 
 int main(void) {
 
@@ -30,11 +31,11 @@ int main(void) {
 	char* ip;
 	char* puerto;
 	int server;
-	int cliente;
 	char* retryConnection;
 	sem_init(&(mutexDictionaty),0,1);
 	sem_init(&(mutexDirectory),0,1);
 	sem_init(&(mutexBitArray),0,1);
+	sem_init(&(mutexCliente),0,1);
 	thread = (pthread_t*)malloc(sizeof(pthread_t));
 
 	logger = iniciar_logger();
@@ -67,10 +68,13 @@ int main(void) {
 
 	while(1){
 
-		cliente = esperar_cliente(server);
+		sem_wait(&mutexCliente);
+		int cliente = esperar_cliente(server);
+		sem_post(&mutexCliente);
 
-		pthread_create(thread,NULL,(void*)GameCard_Attend_Gameboy,&cliente);
+		pthread_create(thread,NULL,(void*)GameCard_Attend_Gameboy,cliente);
 		pthread_detach(*thread);
+
 	}
 
 	munmap(GameCard->fileMapped, (GameCard->blocks/8));
@@ -175,20 +179,20 @@ int GameCard_mountFS(t_config* config){
 	return result;
 }
 
-void GameCard_Attend_Gameboy(void* var){
+void GameCard_Attend_Gameboy(int var){
 
 	uint32_t type;
 	void* content = malloc(sizeof(void*));
 
-	int* cliente = (int*)var;
+	int cliente = var;
 
-	int result= RecievePackage(*(cliente),&type,&content);
+	int result= RecievePackage(cliente,&type,&content);
 
 	if (!result)
 	{
 		deli_message* message = (deli_message*)content;
 
-		int result = SendMessageAcknowledge(message->id, *(cliente));
+		int result = SendMessageAcknowledge(message->id, cliente);
 
 		GameCard_Process_Gameboy_Message(message);
 	}
@@ -800,7 +804,7 @@ void* create_poke_file(t_values* values){
 
 	metadataFile->block= list_create();
 
-	create_poke_semaphore(newPokemon->pokemonName);
+	sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,newPokemon->pokemonName);
 
 	int size = get_message_size(newPokemon);
 
@@ -831,7 +835,6 @@ void* create_poke_file(t_values* values){
 	list_remove(values->values,1);
 	list_remove(values->values,0);
 
-	sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,newPokemon->pokemonName);
 	sem_post(pokeSem);
 
 	Metadata_File_Destroy(metadataFile);

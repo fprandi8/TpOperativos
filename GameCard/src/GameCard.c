@@ -14,6 +14,7 @@ t_GameCard* GameCard;
 t_dictionary* pokeSemaphore;
 pthread_t* thread;
 sem_t mutexDictionaty;
+sem_t mutexDirectory;
 
 int main(void) {
 
@@ -31,6 +32,7 @@ int main(void) {
 	int cliente;
 	char* retryConnection;
 	sem_init(&(mutexDictionaty),0,1);
+	sem_init(&(mutexDirectory),0,1);
 	thread = (pthread_t*)malloc(sizeof(pthread_t));
 
 	logger = iniciar_logger();
@@ -471,8 +473,9 @@ void* GameCard_Process_Message_New(deli_message* message){
 	strcpy(directory,GameCard->filePath);
 	strcat(directory,newPokemon->pokemonName);
 
+	sem_wait(&(mutexDirectory));
 	int result = create_directory(directory);
-
+	sem_post(&(mutexDirectory));
 	t_values* values= (t_values*)malloc(sizeof(t_values));
 	values->values= list_create();
 

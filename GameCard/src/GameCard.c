@@ -39,12 +39,12 @@ int main(void) {
 
 	config = read_config();
 
-	ptoMnt = get_config_value(config,PUNTO_MONTAJE_TALLGRASS);
-    retryConnection = get_config_value(config,TIEMPO_DE_REINTENTO_CONEXION);
-	retryOperation = get_config_value(config,TIEMPO_DE_REINTENTO_OPERACION);
-	delayTime = get_config_value(config,TIEMPO_RETARDO_OPERACION);
-	ip = get_config_value(config,IP_GAMECARD);
-	puerto = get_config_value(config,PUERTO_GAMECARD);
+	ptoMnt = get_config_value(config,logger,PUNTO_MONTAJE_TALLGRASS);
+    retryConnection = get_config_value(config,logger,TIEMPO_DE_REINTENTO_CONEXION);
+	retryOperation = get_config_value(config,logger,TIEMPO_DE_REINTENTO_OPERACION);
+	delayTime = get_config_value(config,logger,TIEMPO_RETARDO_OPERACION);
+	ip = get_config_value(config,logger,IP_GAMECARD);
+	puerto = get_config_value(config,logger,PUERTO_GAMECARD);
 
 	server = iniciar_servidor(ip, puerto);
 
@@ -143,11 +143,11 @@ int GameCard_mountFS(t_config* config){
 
 	result = create_directory(GameCard->metadataPath);
 
-	char* blocksize= get_config_value(config,BLOCK_SIZE);
+	char* blocksize= get_config_value(config,GameCard->logger,BLOCK_SIZE);
 
-	char* blocks=get_config_value(config,BLOCKS);
+	char* blocks=get_config_value(config,GameCard->logger,BLOCKS);
 
-	char* magicNumber = get_config_value(config,MAGIC_NUMBER);
+	char* magicNumber = get_config_value(config,GameCard->logger,MAGIC_NUMBER);
 
 	values->values= list_create();
 
@@ -819,6 +819,9 @@ void* create_poke_file(t_values* values){
 	list_remove(values->values,1);
 	list_remove(values->values,0);
 
+	sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,newPokemon->pokemonName);
+	sem_post(pokeSem);
+
 	sleep(GameCard->delayTime);
 
 	Metadata_File_Destroy(metadataFile);
@@ -834,7 +837,7 @@ void destroy_poke_dictionary(t_dictionary* pokeSemaphore){
 
 void create_poke_semaphore(char* pokemonName){
 	sem_t* pokeSem = (sem_t*)malloc(sizeof(sem_t));
-	sem_init(pokeSem,0,1);
+	sem_init(pokeSem,0,0);
 	dictionary_put(pokeSemaphore, pokemonName,(void*)pokeSem);
 }
 
@@ -1138,37 +1141,35 @@ void read_metadata_file(t_file_metadata* metadataFile, char* file, char* pokemon
 		sem_wait(pokeSem);
 
 		metadataConfig = read_metadata(file);
-		log_debug(GameCard->logger, "valor del config obtenido %s", metadataConfig->path);
-		metadataFile->open = *(get_config_value(metadataConfig,OPEN));
-		log_debug(GameCard->logger, "valor del Key OPEN %c", metadataFile->open);
+		metadataFile->open = *(get_config_value(metadataConfig,GameCard->logger,OPEN));
+
 		if(metadataFile->open =='N'){
 			metadataFile->open = 'S';
 			char* newValue ="S";
 			config_set_value(metadataConfig, OPEN, newValue);
 			config_save(metadataConfig);
 			fileAvailable=1;
-			config_destroy(metadataConfig);
 			sem_post(pokeSem);
 		}
 		else
 		{
-			config_destroy(metadataConfig);
 			sem_post(pokeSem);
 			log_error(GameCard->logger, "Archivo abierto, re intenta en %d segundos", GameCard->retryOperation);
 			sleep(GameCard->retryOperation);
 		}
+		config_destroy(metadataConfig);
 	}
 
 	metadataConfig = read_metadata(file);
 
-	metadataFile->directory= *(get_config_value(metadataConfig,DIRECTORY));
+	metadataFile->directory= *(get_config_value(metadataConfig,GameCard->logger,DIRECTORY));
 
-	metadataFile->size= (char*)malloc(strlen(get_config_value(metadataConfig,SIZE))+1);
-	strcpy(metadataFile->size,get_config_value(metadataConfig,SIZE));
+	metadataFile->size= (char*)malloc(strlen(get_config_value(metadataConfig,GameCard->logger,SIZE))+1);
+	strcpy(metadataFile->size,get_config_value(metadataConfig,GameCard->logger,SIZE));
 
 	metadataFile->block = list_create();
 
-	char** blocks = get_config_value_array(metadataConfig,BLOCKS);
+	char** blocks = get_config_value_array(metadataConfig,GameCard->logger,BLOCKS);
 
 	int i=0;
 	while (blocks[i]!='\0'){

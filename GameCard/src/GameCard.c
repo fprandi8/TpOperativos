@@ -825,9 +825,9 @@ void* create_poke_file(t_values* values){
 	sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,newPokemon->pokemonName);
 	sem_post(pokeSem);
 
-	sleep(GameCard->delayTime);
-
 	Metadata_File_Destroy(metadataFile);
+
+	sleep(GameCard->delayTime);
 
 	return (void*)appearedPokemon;
 }
@@ -1137,12 +1137,11 @@ void Metadata_File_Initialize_Block(t_file_metadata* metadataFile){
 }
 
 void read_metadata_file(t_file_metadata* metadataFile, char* file, char* pokemonName){
-	t_config* metadataConfig;
 	sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,pokemonName);
 	int fileAvailable=0;
 	while(!fileAvailable){
 		sem_wait(pokeSem);
-
+		t_config* metadataConfig;
 		metadataConfig = read_metadata(file);
 		metadataFile->open = *(get_config_value(metadataConfig,OPEN));
 
@@ -1152,17 +1151,20 @@ void read_metadata_file(t_file_metadata* metadataFile, char* file, char* pokemon
 			config_set_value(metadataConfig, OPEN, newValue);
 			config_save(metadataConfig);
 			fileAvailable=1;
+			config_destroy(metadataConfig);
 			sem_post(pokeSem);
 		}
 		else
 		{
+			config_destroy(metadataConfig);
 			sem_post(pokeSem);
 			log_error(GameCard->logger, "Archivo abierto, re intenta en %d segundos", GameCard->retryOperation);
 			sleep(GameCard->retryOperation);
 		}
-		config_destroy(metadataConfig);
+
 	}
 
+	t_config* metadataConfig;
 	metadataConfig = read_metadata(file);
 
 	metadataFile->directory= *(get_config_value(metadataConfig,DIRECTORY));

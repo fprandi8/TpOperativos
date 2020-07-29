@@ -49,20 +49,20 @@ void start_cache(t_log* log)
 	}
 
 	//Initialize lists
-	sem_wait(&mutex_cached_messages);
+	//sem_wait(&mutex_cached_messages);
     cached_messages = list_create();
-	sem_post(&mutex_cached_messages);
+	//sem_post(&mutex_cached_messages);
 
 
-	sem_wait(&mutex_partitions);
+	//sem_wait(&mutex_partitions);
 	partitions = list_create();
     list_add(partitions, first_partition);
-	sem_post(&mutex_partitions);
+	//sem_post(&mutex_partitions);
 
 
-	sem_wait(&mutex_parent_partitions);
+	//sem_wait(&mutex_parent_partitions);
 	parent_partitions = list_create();
-	sem_post(&mutex_parent_partitions);
+	//sem_post(&mutex_parent_partitions);
 
 }
 
@@ -106,12 +106,13 @@ t_cachedMessage* create_cached_from_message(deli_message message)
 
 void add_to_cached_messages(t_cachedMessage* new_message)
 {
-	sem_wait(&mutex_cached_messages);
+	//sem_wait(&mutex_cached_messages);
     list_add(cached_messages, new_message);
-	sem_post(&mutex_cached_messages);
+//	sem_post(&mutex_cached_messages);
 }
 
 int save_message_body(void* messageContent, message_type queue){
+	printf("In save message body: %p\n", messageContent);
     t_buffer* messageBuffer = SerializeMessageContent(queue, messageContent);
 
 	t_partition* partition;
@@ -277,57 +278,41 @@ void compact_memory(void)
     bool _is_empty_partition(t_partition* partition){ return partition->free; }
     bool _filter_busy_partition(t_partition* partition){ return !partition->free;}
 
-    sem_wait(&mutex_partitions);
+   // sem_wait(&mutex_partitions);
     t_list* occupied_partitions = list_filter(partitions, (void *) _filter_busy_partition);
-    sem_post(&mutex_partitions);
+   // sem_post(&mutex_partitions);
 
     char* backUp_memory = (char*) malloc(cache.memory_size * sizeof(char));
 
     int offsetMem = 0;
     void _asignPartitionOnBackUpMem(t_partition* partition)
     {
-    	//log_debug(cache_log, "Offset memory before: %d", offsetMem);
-    	//log_debug(cache_log, "Partition start: %d", partition->begining);
-    	//log_info(cache_log, "Partition final location: %d", (cache.full_memory + cache.memory_size) - (partition->begining + partition->size));
-        memcpy(backUp_memory + offsetMem, partition->begining, partition->size);
+
+    	memcpy(backUp_memory + offsetMem, partition->begining, partition->size);
         partition->begining = cache.full_memory + offsetMem;
         offsetMem += partition->size;
-        //log_debug(cache_log, "Offset memory after: %d", offsetMem);
     }
 
-    int offsetPointerMem = 0;
-    void _reasignPartitionPointers(t_partition* partition)
-    {
-        partition->begining = cache.full_memory + offsetPointerMem;
-        offsetPointerMem += partition->size;
-    }
+    list_iterate(occupied_partitions, (void*)_asignPartitionOnBackUpMem);
 
     //- create big empty partition
 
-    uint32_t occupied_size = add_occupied_size_from(occupied_partitions);
-
     t_partition* emptySpacePartition = CreateNewPartition();
-    emptySpacePartition->size = cache.memory_size - occupied_size;
-    emptySpacePartition->begining = cache.full_memory + emptySpacePartition->size;
+    emptySpacePartition->size = cache.memory_size - offsetMem;
+    emptySpacePartition->begining = cache.full_memory + offsetMem;
     emptySpacePartition->queue_type = 0;
-    emptySpacePartition->free = true;
+    emptySpacePartition->free = 1;
 
 
     list_add(occupied_partitions, emptySpacePartition);
 
-    //log_info(cache_log, "Size of backup: %d", cache.memory_size * sizeof(char));
-    //log_info(cache_log, "Size of cache: %d", cache.memory_size);
-    list_iterate(occupied_partitions, (void*)_asignPartitionOnBackUpMem);
-
     memcpy(cache.full_memory, backUp_memory, sizeof(cache.memory_size));
-
-  //  list_iterate(occupied_partitions, (void*)_reasignPartitionPointers);
 
     free(backUp_memory);
 
-    sem_wait(&mutex_partitions);
+   // sem_wait(&mutex_partitions);
 	list_remove_and_destroy_by_condition(partitions, (void*)_is_empty_partition, (void*)Free_Partition);
-    sem_post(&mutex_partitions);
+   // sem_post(&mutex_partitions);
 
 	list_clean(partitions);
 	free(partitions);
@@ -335,12 +320,13 @@ void compact_memory(void)
     partitions = occupied_partitions;
 
 	log_info(cache_log, "SE EJECUTO COMPACTACION");
+	PrintDumpOfCache();
 }
 
 uint32_t add_occupied_size_from(t_list* occupied){
     uint32_t sum = 0;
     t_partition* partition;
-    for (int i = 0; i < list_size(occupied); ++i) {
+    for (int i = 0; i < list_size(occupied); i++) {
         partition = (t_partition*) list_get(occupied, i);
         sum += partition->size;
     }
@@ -363,9 +349,9 @@ void delete_partition(void){
         if(message->partitionId == deletedPartition->id) return true; else return false;
     }
 
-    sem_wait(&mutex_cached_messages);
+   // sem_wait(&mutex_cached_messages);
     list_remove_and_destroy_by_condition(cached_messages, (void*)_message_to_delete, (void*)Free_CachedMessage);
-    sem_post(&mutex_cached_messages);
+    //sem_post(&mutex_cached_messages);
 
     start_consolidation_for(deletedPartition);
 }
@@ -377,9 +363,9 @@ t_partition* delete_partition_fifo(void){
         if(partition->free == 0) return true; else return false;
     }
 
-    sem_wait(&mutex_partitions);
+  //  sem_wait(&mutex_partitions);
     t_partition* partition = (t_partition*)list_find(partitions, (void*)_first_busy_partition);
-    sem_post(&mutex_partitions);
+  //  sem_post(&mutex_partitions);
 
     partition->free = 1;
     return partition;
@@ -409,9 +395,9 @@ int GetBusyPartitionsCount()
     {
         if(partition->free == 0) return true; else return false;
     }
-    sem_wait(&mutex_partitions);
+   // sem_wait(&mutex_partitions);
     t_list* busyPartitions = list_filter(partitions, (void*)_filter_busy_parittion);
-    sem_post(&mutex_partitions);
+  //  sem_post(&mutex_partitions);
     int busyPartitionsCount = list_size(busyPartitions);
     list_clean(busyPartitions);
     return busyPartitionsCount;
@@ -436,11 +422,11 @@ void Free_Partition(t_partition* partition)
 int GetNewId()
 {
     int result;
-	sem_wait(&mutex_nextPartitionId);
+//	sem_wait(&mutex_nextPartitionId);
 	result = nextPartitionId;
     nextPartitionId++;
     if(nextPartitionId == INT_MAX) nextPartitionId = 0;
-	sem_post(&mutex_nextPartitionId);
+//	sem_post(&mutex_nextPartitionId);
     return result;    
 }
 
@@ -521,6 +507,7 @@ t_partition* GetPartition(int partitionId)
 
 t_list* GetAllMessagesForSuscriptor(int client, message_type queueType)
 {
+	sem_wait(&mutex_saving);
 	bool _contains_client(int* id)
 	{
 		if(*id == client) return true; else return false;
@@ -545,6 +532,7 @@ t_list* GetAllMessagesForSuscriptor(int client, message_type queueType)
 
     filteredMessages = UpdateClockOn(filteredMessages);
 
+    sem_post(&mutex_saving);
     return list_map(filteredMessages, (void*)_get_deli_message);
 }
 
@@ -557,12 +545,12 @@ void AddASentSubscriberToMessage(int messageId, int client)
 		sem_post(&mutex_saving);
 		return;
 	}
-	sem_wait(&cachedMessage->mutex_message);
+	//sem_wait(&cachedMessage->mutex_message);
 	int* cachedClient = (int*)malloc(sizeof(int));
 	*cachedClient = client;
 	list_add(cachedMessage->sent_to_subscribers, cachedClient);
 	cachedMessage->ack_by_subscribers_left++;
-	sem_post(&cachedMessage->mutex_message);
+	//sem_post(&cachedMessage->mutex_message);
 	sem_post(&mutex_saving);
 }
 
@@ -575,9 +563,9 @@ void AddAcknowledgeToMessage(int messageId)
 		sem_post(&mutex_saving);
 		return;
 	}
-	sem_wait(&cachedMessage->mutex_message);
+	//sem_wait(&cachedMessage->mutex_message);
 	cachedMessage->ack_by_subscribers_left--;
-	sem_post(&cachedMessage->mutex_message);
+	//sem_post(&cachedMessage->mutex_message);
 	sem_post(&mutex_saving);
 }
 

@@ -570,9 +570,9 @@ int catch_a_pokemon(char** fileContent, t_file_metadata* metadataFile, char* coo
 				list_add(values->values,metadataFile);
 
 				sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,pokemonName);
-				sem_wait(&(pokeSem));
+				sem_wait(pokeSem);
 				result=create_file(POKE_METADATA,values);
-				sem_post(&(pokeSem));
+				sem_post(pokeSem);
 
 				list_remove(values->values,1);
 				list_remove(values->values,0);
@@ -729,9 +729,9 @@ void* modify_poke_file(t_values* values, char* directory){;
 			list_add(values->values,newPokemon->pokemonName);
 			list_add(values->values,metadataFile);
 
-			sem_wait(&(pokeSem));
+			sem_wait(pokeSem);
 			int result=create_file(POKE_METADATA,values);
-			sem_post(&(pokeSem));
+			sem_post(pokeSem);
 		}
 	}
 	else
@@ -765,9 +765,9 @@ void* modify_poke_file(t_values* values, char* directory){;
 		list_add(values->values,newPokemon->pokemonName);
 		list_add(values->values,metadataFile);
 
-		sem_wait(&(pokeSem));
+		sem_wait(pokeSem);
 		result=create_file(POKE_METADATA,values);
-		sem_post(&(pokeSem));
+		sem_post(pokeSem);
 	}
 
 
@@ -1387,7 +1387,7 @@ int decrease_pokemon_amount(char** fileContent,int pos, t_file_metadata* metadat
 			memcpy(auxBuffer,file,pos);
 			auxBuffer[pos]='\0';
 
-			auxIntSize = auxIntSize-pos;//+1;
+			auxIntSize = auxIntSize-pos+1;
 			if(auxIntSize > 0){
 				memcpy(auxBuffer+pos-1,file+pos+bytes-1,auxIntSize);
 				auxBuffer[pos+auxIntSize]='\0';

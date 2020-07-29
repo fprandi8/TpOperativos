@@ -306,7 +306,7 @@ void compact_memory(void)
 
     list_add(occupied_partitions, emptySpacePartition);
 
-    memcpy(cache.full_memory, backUp_memory, sizeof(cache.memory_size));
+    memcpy(cache.full_memory, backUp_memory, cache.memory_size);
 
     free(backUp_memory);
 

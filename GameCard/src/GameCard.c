@@ -1118,8 +1118,10 @@ int create_file(fileType fileType, t_values* values){
 
 void Metadata_File_Add_Blocks(t_file_metadata* metadataFile,int amountOfBlocks){
 	for(int i = 0; i < amountOfBlocks; i++){
+		sem_wait(&(mutexBitArray));
 		int block = get_first_free_block();
 		turn_bit_on(block);
+		sem_post(&(mutexBitArray));
 		char* charblock = string_itoa(block);
 		list_add(metadataFile->block,charblock);
 		log_info(GameCard->logger, "Agrega el bloque %i a la metadata del pokemon", block);
@@ -1202,15 +1204,18 @@ void read_metadata_file(t_file_metadata* metadataFile, char* file, char* pokemon
 
 sem_t* get_poke_semaphore(t_dictionary* pokeSempahore, char* pokemonName){
 
+	sem_t* aux;
 	sem_wait(&(mutexDictionaty));
 	if (dictionary_has_key(pokeSemaphore, pokemonName)){
+		aux=dictionary_get(pokeSemaphore,pokemonName);
 		sem_post(&(mutexDictionaty));
-		return dictionary_get(pokeSemaphore,pokemonName);
+		return aux;
 	}else
 	{
 		create_poke_semaphore(pokemonName);
+		aux=dictionary_get(pokeSemaphore,pokemonName);
 		sem_post(&(mutexDictionaty));
-		return dictionary_get(pokeSemaphore,pokemonName);
+		return aux;
 	}
 }
 
@@ -1481,19 +1486,15 @@ char* get_y_coordinate(char* line){
 int get_first_free_block(){
 	int max = bitarray_get_max_bit(GameCard->bitArray);
 	int i = 0;
-	sem_wait(&(mutexBitArray));
 	while((bitarray_test_bit(GameCard->bitArray,i)) && (i<=max))
 	{
 		i++;
 	}
-	sem_post(&(mutexBitArray));
 	return i;
 }
 
 void turn_bit_on(int block){
-	sem_wait(&(mutexBitArray));
 	bitarray_set_bit(GameCard->bitArray, block);
-	sem_post(&(mutexBitArray));
 	sem_wait(&(GameCard->semMap));
 	memcpy(GameCard->fileMapped, GameCard->bitArray->bitarray, (GameCard->blocks/8));
 	int result= msync(GameCard->fileMapped, (GameCard->blocks/8) , MS_SYNC);
@@ -1502,9 +1503,7 @@ void turn_bit_on(int block){
 }
 
 void turn_bit_off(int block){
-	sem_wait(&(mutexBitArray));
 	bitarray_clean_bit(GameCard->bitArray, block);
-	sem_post(&(mutexBitArray));
 	sem_wait(&(GameCard->semMap));
 	memcpy(GameCard->fileMapped, GameCard->bitArray->bitarray, (GameCard->blocks/8));
 	int result= msync(GameCard->fileMapped, (GameCard->blocks/8) , MS_SYNC);

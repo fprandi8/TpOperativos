@@ -15,6 +15,7 @@ t_dictionary* pokeSemaphore;
 pthread_t* thread;
 sem_t mutexDictionaty;
 sem_t mutexDirectory;
+sem_t mutexBitArray;
 
 int main(void) {
 
@@ -33,6 +34,7 @@ int main(void) {
 	char* retryConnection;
 	sem_init(&(mutexDictionaty),0,1);
 	sem_init(&(mutexDirectory),0,1);
+	sem_init(&(mutexBitArray),0,1);
 	thread = (pthread_t*)malloc(sizeof(pthread_t));
 
 	logger = iniciar_logger();
@@ -555,7 +557,7 @@ int catch_a_pokemon(char** fileContent, t_file_metadata* metadataFile, char* coo
 				write_blocks(metadataFile, file);
 
 				metadataFile->directory='N';
-				metadataFile->open='N';
+				metadataFile->open='S';
 
 				t_values* values = (t_values*)malloc(sizeof(t_values));
 				values->values = list_create();
@@ -563,7 +565,10 @@ int catch_a_pokemon(char** fileContent, t_file_metadata* metadataFile, char* coo
 				list_add(values->values,pokemonName);
 				list_add(values->values,metadataFile);
 
+				sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,pokemonName);
+				sem_wait(&(pokeSem));
 				result=create_file(POKE_METADATA,values);
+				sem_post(&(pokeSem));
 
 				list_remove(values->values,1);
 				list_remove(values->values,0);
@@ -574,7 +579,7 @@ int catch_a_pokemon(char** fileContent, t_file_metadata* metadataFile, char* coo
 				strcat(pokeMetadata,pokemonName);
 				strcat(pokeMetadata,"/metadata.bin");
 
-				sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,pokemonName);
+
 				sem_wait(pokeSem);
 				t_config* metadataConfig = read_metadata(pokeMetadata);
 				Metadata_File_Open_Flag(metadataFile,metadataConfig,"N");
@@ -690,6 +695,7 @@ void* modify_poke_file(t_values* values, char* directory){;
 	strcpy(coordinate,horCoordinate);
 	strcat(coordinate,"-");
 	strcat(coordinate,verCoordinate);
+	sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,newPokemon->pokemonName);
 
 	if (string_contains(fileContent,coordinate))
 	{
@@ -719,7 +725,9 @@ void* modify_poke_file(t_values* values, char* directory){;
 			list_add(values->values,newPokemon->pokemonName);
 			list_add(values->values,metadataFile);
 
+			sem_wait(&(pokeSem));
 			int result=create_file(POKE_METADATA,values);
+			sem_post(&(pokeSem));
 		}
 	}
 	else
@@ -753,10 +761,11 @@ void* modify_poke_file(t_values* values, char* directory){;
 		list_add(values->values,newPokemon->pokemonName);
 		list_add(values->values,metadataFile);
 
+		sem_wait(&(pokeSem));
 		result=create_file(POKE_METADATA,values);
+		sem_post(&(pokeSem));
 	}
 
-	sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,newPokemon->pokemonName);
 
 	sleep(GameCard->delayTime);
 
@@ -1140,6 +1149,7 @@ void read_metadata_file(t_file_metadata* metadataFile, char* file, char* pokemon
 	sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,pokemonName);
 	int fileAvailable=0;
 	while(!fileAvailable){
+
 		sem_wait(pokeSem);
 		t_config* metadataConfig;
 		metadataConfig = read_metadata(file);
@@ -1471,16 +1481,19 @@ char* get_y_coordinate(char* line){
 int get_first_free_block(){
 	int max = bitarray_get_max_bit(GameCard->bitArray);
 	int i = 0;
+	sem_wait(&(mutexBitArray));
 	while((bitarray_test_bit(GameCard->bitArray,i)) && (i<=max))
 	{
 		i++;
 	}
-
+	sem_post(&(mutexBitArray));
 	return i;
 }
 
 void turn_bit_on(int block){
+	sem_wait(&(mutexBitArray));
 	bitarray_set_bit(GameCard->bitArray, block);
+	sem_post(&(mutexBitArray));
 	sem_wait(&(GameCard->semMap));
 	memcpy(GameCard->fileMapped, GameCard->bitArray->bitarray, (GameCard->blocks/8));
 	int result= msync(GameCard->fileMapped, (GameCard->blocks/8) , MS_SYNC);
@@ -1489,7 +1502,9 @@ void turn_bit_on(int block){
 }
 
 void turn_bit_off(int block){
+	sem_wait(&(mutexBitArray));
 	bitarray_clean_bit(GameCard->bitArray, block);
+	sem_post(&(mutexBitArray));
 	sem_wait(&(GameCard->semMap));
 	memcpy(GameCard->fileMapped, GameCard->bitArray->bitarray, (GameCard->blocks/8));
 	int result= msync(GameCard->fileMapped, (GameCard->blocks/8) , MS_SYNC);

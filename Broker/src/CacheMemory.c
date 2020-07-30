@@ -112,7 +112,6 @@ void add_to_cached_messages(t_cachedMessage* new_message)
 }
 
 int save_message_body(void* messageContent, message_type queue){
-	printf("In save message body: %p\n", messageContent);
     t_buffer* messageBuffer = SerializeMessageContent(queue, messageContent);
 
 	t_partition* partition;
@@ -320,7 +319,6 @@ void compact_memory(void)
     partitions = occupied_partitions;
 
 	log_info(cache_log, "SE EJECUTO COMPACTACION");
-	PrintDumpOfCache();
 }
 
 uint32_t add_occupied_size_from(t_list* occupied){
@@ -612,7 +610,16 @@ void PrintDumpOfCache()
    fp = fopen("CacheDump.txt", "a");
    fseek(fp, 0, SEEK_END);
 
-    fprintf(fp,"\n-----------------------------------------------------------------------------------------------------------------------------\n");
+   t_list* listToPrint = list_duplicate(partitions);
+
+   bool _sort_by_position(t_partition* one, t_partition* two)
+   {
+	   return one->begining < two->begining;
+   }
+
+   list_sort(listToPrint, (void*)_sort_by_position);
+
+    fprintf(fp,"\n------------------------------------------------------------------------\n");
     fprintf(fp,"Dump: %d/%d/%d %s\n", info->tm_mday, info->tm_mon, info->tm_year, temporal_get_string_time());
 
     void _print_partition_info(t_partition* partition)
@@ -637,23 +644,24 @@ void PrintDumpOfCache()
             busyStatus = "X";
             t_cachedMessage* message = GetCachedMessageInPartition(partition->id);
             char* queue = GetStringFromMessageType(message->queue_type);
-            fprintf(fp,"Partición %d: %s. [%s] Size:%ub LRU:%ld Cola:%s ID:%d CorrelationId:%d\n",
+            fprintf(fp,"Partición %d: %s. [%s] Size:%ub LRU:%ld Cola:%s ID:%d\n",
                 partition->id,
 				memoryLocation,
                 busyStatus,
                 (uint32_t)partition->size,
                 clock() - partition->timestap,
                 queue,
-                message->id,
-				message->corelationId
+                message->id
             );
         }
     }
 
-    list_iterate(partitions, (void*)_print_partition_info);
+    list_iterate(listToPrint, (void*)_print_partition_info);
 
-    fprintf(fp,"-----------------------------------------------------------------------------------------------------------------------------\n");
+    fprintf(fp,"------------------------------------------------------------------------\n");
     fclose(fp); //Don't forget to close the file when finished
+    list_clean(listToPrint);
+    free(listToPrint);
 }
 
 void start_consolidation_for(t_partition* freed_partition)
@@ -863,6 +871,14 @@ t_partition* create_childrens_from(t_partition* parent){
 
 
     return one_children;
+}
+
+void destroy_cache()
+{
+	free(cache.full_memory);
+	list_clean_and_destroy_elements(partitions,(void*)Free_Partition);
+	list_clean_and_destroy_elements(parent_partitions,(void*)Free_Partition);
+	list_clean_and_destroy_elements(cached_messages,(void*)Free_CachedMessage);
 }
 
 

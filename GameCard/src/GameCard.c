@@ -12,6 +12,7 @@
 
 t_GameCard* GameCard;
 t_dictionary* pokeSemaphore;
+t_dictionary* pokeMetadataFile;
 pthread_t* thread;
 sem_t mutexDictionaty;
 sem_t mutexDirectory;
@@ -23,6 +24,7 @@ int main(void) {
 	t_log* logger;
 	t_config* config;
 	pokeSemaphore=dictionary_create();
+	pokeMetadataFile=dictionary_create();
 	signal(SIGINT,signaltHandler);
 
 	char* ptoMnt;
@@ -72,7 +74,8 @@ int main(void) {
 		int cliente = esperar_cliente(server);
 		sem_post(&mutexCliente);
 
-		pthread_create(thread,NULL,(void*)GameCard_Attend_Gameboy,cliente);
+		pthread_create(thread,NULL,(void*)GameCard_Attend_Gameboy,(void*)cliente);
+
 		pthread_detach(*thread);
 
 	}
@@ -192,7 +195,7 @@ void GameCard_Attend_Gameboy(int var){
 	{
 		deli_message* message = (deli_message*)content;
 
-		int result = SendMessageAcknowledge(message->id, cliente);
+		SendMessageAcknowledge(message->id, cliente);
 
 		GameCard_Process_Gameboy_Message(message);
 	}
@@ -238,7 +241,7 @@ void GameCard_Wait_For_Message(void* variables){
 	{
 		deli_message* message = (deli_message*)content;
 //		log_debug(GameCard->logger,"Suscriptor que envia el acknowldge: %d", suscription);
-		int result = SendMessageAcknowledge(message->id, suscription);
+		SendMessageAcknowledge(message->id, suscription);
 //		log_debug(GameCard->logger, "Resultado del acknowdlege: %d", result);
 		t_args_process_message* argsProcessMessage= (t_args_process_message*) malloc (sizeof (t_args_process_message));
 		argsProcessMessage->message = message;
@@ -257,7 +260,6 @@ void GameCard_Wait_For_Message(void* variables){
 		switch (queueType) {
 
 			case NEW_POKEMON: {
-				log_debug(GameCard->logger, "Vuelve a subscribir new");
 				pthread_create(thread,NULL,(void*)subscribeToBrokerNew,NULL);
 				pthread_detach(*thread);
 
@@ -266,7 +268,6 @@ void GameCard_Wait_For_Message(void* variables){
 			}
 
 			case GET_POKEMON:{
-				log_debug(GameCard->logger, "Vuelve a subscribir get");
 				pthread_create(thread,NULL,(void*)subscribeToBrokerGet,NULL);
 				pthread_detach(*thread);
 
@@ -275,7 +276,6 @@ void GameCard_Wait_For_Message(void* variables){
 			}
 
 			case CATCH_POKEMON:{
-				log_debug(GameCard->logger, "Vuelve a subscribir catch");
 				pthread_create(thread,NULL,(void*)subscribeToBrokerCatch,NULL);
 				pthread_detach(*thread);
 
@@ -295,7 +295,6 @@ void GameCard_Process_Message(void* variables){
 	deli_message* message = args->message;
 
 	void* responseMessage;
-	int result;
 
 //	log_debug(GameCard->logger, "voy a procesar el mensaje ");
 
@@ -306,7 +305,7 @@ void GameCard_Process_Message(void* variables){
 
 			int brokerSocket = connectBroker(broker.ip,broker.port,GameCard->logger);
 			if (brokerSocket > 0){
-				result=Send_APPEARED(*(appearedPokemon),message->id,brokerSocket);
+				Send_APPEARED(*(appearedPokemon),message->id,brokerSocket);
 			}else{
 				log_info(GameCard->logger, "El Mensaje no pudo ser enviado al broker");
 			}
@@ -319,7 +318,7 @@ void GameCard_Process_Message(void* variables){
 
 			int brokerSocket = connectBroker(broker.ip,broker.port,GameCard->logger);
 			if (brokerSocket > 0){
-				result=Send_LOCALIZED(*(localizedPokemon),message->id,brokerSocket);
+				Send_LOCALIZED(*(localizedPokemon),message->id,brokerSocket);
 			}else{
 				log_info(GameCard->logger, "El Mensaje no pudo ser enviado al broker");
 			}
@@ -333,7 +332,7 @@ void GameCard_Process_Message(void* variables){
 
 			int brokerSocket = connectBroker(broker.ip,broker.port,GameCard->logger);
 			if (brokerSocket > 0){
-				result=Send_CAUGHT(*(caughtPokemon),message->id,brokerSocket);
+				Send_CAUGHT(*(caughtPokemon),message->id,brokerSocket);
 			}else{
 				log_info(GameCard->logger, "El Mensaje no pudo ser enviado al broker");
 			}
@@ -359,6 +358,9 @@ void* GameCard_Process_Message_Catch(deli_message* message){
 
 	if (result !=2){
 		caughtPokemon->caught = 0;
+		resulCatchPokemon =1;
+		log_error(GameCard->logger, "No hay ningún pokemon %s en el File System", catchPokemon->pokemonName);
+
 	}
 	else
 	{
@@ -374,7 +376,7 @@ void* GameCard_Process_Message_Catch(deli_message* message){
 		// Levantar el archivo leyendo todos los bloques
 		char* fileContent = get_file_content(metadataFile);
 
-		log_info("Archivo de pokemon %s leido", catchPokemon->pokemonName);
+		log_info(GameCard->logger,"Archivo de pokemon %s leido", catchPokemon->pokemonName);
 
 		char* horCoordinate = string_itoa(catchPokemon->horizontalCoordinate);
 		char* verCoordinate = string_itoa(catchPokemon->verticalCoordinate);
@@ -446,7 +448,7 @@ void* GameCard_Process_Message_Get(deli_message* message){
 		// Levantar el archivo leyendo todos los bloques
 		char* fileContent = get_file_content(metadataFile);
 
-		log_info("Archivo de pokemon %s leido", getPokemon->pokemonName);
+		log_info(GameCard->logger,"Archivo de pokemon %s leido", getPokemon->pokemonName);
 
 		create_localized_message(localizedPokemon, fileContent, getPokemon->pokemonName, metadataFile);
 
@@ -525,14 +527,13 @@ void GameCard_Initialize_bitarray(){
 }
 
 int catch_a_pokemon(char** fileContent, t_file_metadata* metadataFile, char* coordinate, char* pokemonName){
-	int result;
 
 	char * file = *(fileContent);
 	if (string_contains(file,coordinate))
 	{
 		int pos= get_string_file_position(file,coordinate);
 		int resultDecreaseAmount = decrease_pokemon_amount(fileContent,pos,metadataFile);
-		log_info("Pokemon %s ha sido capturado", pokemonName);
+		log_info(GameCard->logger,"Pokemon %s ha sido capturado", pokemonName);
 		if (resultDecreaseAmount == 0)
 		{
 			char * file = *(fileContent);
@@ -571,7 +572,9 @@ int catch_a_pokemon(char** fileContent, t_file_metadata* metadataFile, char* coo
 
 				sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,pokemonName);
 				sem_wait(pokeSem);
-				result=create_file(POKE_METADATA,values);
+
+				create_file(POKE_METADATA,values);
+
 				sem_post(pokeSem);
 
 				list_remove(values->values,1);
@@ -688,7 +691,7 @@ void* modify_poke_file(t_values* values, char* directory){;
 
 	char* fileContent = get_file_content(metadataFile);
 
-	log_info("Archivo de pokemon %s leido", newPokemon->pokemonName);
+	log_info(GameCard->logger,"Archivo de pokemon %s leido", newPokemon->pokemonName);
 
 	char* horCoordinate = string_itoa(newPokemon->horizontalCoordinate);
 	char* verCoordinate = string_itoa(newPokemon->verticalCoordinate);
@@ -730,13 +733,14 @@ void* modify_poke_file(t_values* values, char* directory){;
 			list_add(values->values,metadataFile);
 
 			sem_wait(pokeSem);
-			int result=create_file(POKE_METADATA,values);
+
+			create_file(POKE_METADATA,values);
+
 			sem_post(pokeSem);
 		}
 	}
 	else
 	{
-		int result;
 		int size = get_message_size(newPokemon);
 
 		int amountOfBlocks=get_amount_of_blocks(size,metadataFile);
@@ -766,7 +770,9 @@ void* modify_poke_file(t_values* values, char* directory){;
 		list_add(values->values,metadataFile);
 
 		sem_wait(pokeSem);
-		result=create_file(POKE_METADATA,values);
+
+		create_file(POKE_METADATA,values);
+
 		sem_post(pokeSem);
 	}
 
@@ -814,7 +820,6 @@ void* create_poke_file(t_values* values){
 
 	Metadata_File_Add_Blocks(metadataFile,amountOfBlocks);
 
-	int result;
 
 	char* buffer=serialize_data(atoi(metadataFile->size),newPokemon);
 
@@ -830,7 +835,7 @@ void* create_poke_file(t_values* values){
 
 	list_add(values->values,metadataFile);
 
-	result=create_file(POKE_METADATA,values);
+	create_file(POKE_METADATA,values);
 
 	list_remove(values->values,1);
 	list_remove(values->values,0);
@@ -852,7 +857,18 @@ void destroy_poke_dictionary(t_dictionary* pokeSemaphore){
 
 void create_poke_semaphore(char* pokemonName){
 	sem_t* pokeSem = (sem_t*)malloc(sizeof(sem_t));
-	sem_init(pokeSem,0,0);
+
+	char* file = (char*)malloc(strlen(GameCard->filePath) + strlen(pokemonName) +strlen("/metadata.bin") + 1);
+	strcpy(file,GameCard->filePath);
+	strcat(file,pokemonName);
+	strcat(file, "/metadata.bin");
+	if( access( file, F_OK ) != -1 ) {
+		sem_init(pokeSem,0,1);
+	}else{
+		sem_init(pokeSem,0,0);
+	}
+	free(file);
+
 	dictionary_put(pokeSemaphore, pokemonName,(void*)pokeSem);
 }
 
@@ -950,7 +966,7 @@ int create_file_bin(t_values* values){
 	memcpy(bytes,list_get(values->values,1),tam);
 	fwrite(bytes,tam, 1, f);
 
-	log_info(GameCard->logger, "Escribe el archivo de boques: %s", filename);
+	log_info(GameCard->logger, "Escribe el archivo de bloque: %s", filename);
 	free(bytes);
 	free(filename);
 	free(blockChar);
@@ -983,14 +999,14 @@ int create_file_bitmap(){
 	}
 
 	if (exist){
-			int result= read(f,(void*)GameCard->bitArray->bitarray,(GameCard->blocks/8));
+			read(f,(void*)GameCard->bitArray->bitarray,(GameCard->blocks/8));
 	}
 	else{
 			int max = bitarray_get_max_bit(GameCard->bitArray);
 			for (int i = 0; i< max; i++){
 				bitarray_clean_bit(GameCard->bitArray,i);
 			}
-			int result= write(f,(void*)GameCard->bitArray->bitarray,(GameCard->blocks/8));
+			write(f,(void*)GameCard->bitArray->bitarray,(GameCard->blocks/8));
 	}
 
 	if ((GameCard->fileMapped = mmap(0,(GameCard->blocks/8),PROT_READ|PROT_WRITE,MAP_SHARED|MAP_FILE,f,0)) ==  MAP_FAILED){
@@ -1153,6 +1169,7 @@ void Metadata_File_Initialize_Block(t_file_metadata* metadataFile){
 void read_metadata_file(t_file_metadata* metadataFile, char* file, char* pokemonName){
 	sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,pokemonName);
 	int fileAvailable=0;
+
 	while(!fileAvailable){
 
 		sem_wait(pokeSem);
@@ -1381,16 +1398,16 @@ int decrease_pokemon_amount(char** fileContent,int pos, t_file_metadata* metadat
 	int auxAmount = atoi(stringAux) - 1;
 
 	if (auxAmount == 0 ){
-		//TODO: ver esta variable
-		char* auxBuffer=(char*)malloc(atoi(metadataFile->size) - index2);
+		char* auxBuffer=(char*)malloc(atoi(metadataFile->size) - index2+1 + 1);
 		if (pos != 0) {
 			memcpy(auxBuffer,file,pos);
 			auxBuffer[pos]='\0';
 
 			auxIntSize = auxIntSize-pos+1;
 			if(auxIntSize > 0){
+				//TODO; probar el +1
 				memcpy(auxBuffer+pos-1,file+pos+bytes-1,auxIntSize);
-				auxBuffer[pos+auxIntSize]='\0';
+				auxBuffer[pos+auxIntSize-1]='\0';
 			}
 		}
 		else
@@ -1500,7 +1517,7 @@ void turn_bit_on(int block){
 	bitarray_set_bit(GameCard->bitArray, block);
 	sem_wait(&(GameCard->semMap));
 	memcpy(GameCard->fileMapped, GameCard->bitArray->bitarray, (GameCard->blocks/8));
-	int result= msync(GameCard->fileMapped, (GameCard->blocks/8) , MS_SYNC);
+	msync(GameCard->fileMapped, (GameCard->blocks/8) , MS_SYNC);
 	sem_post(&(GameCard->semMap));
 	log_info(GameCard->logger, "Se solicitó el bloque %i ", block);
 }
@@ -1509,7 +1526,7 @@ void turn_bit_off(int block){
 	bitarray_clean_bit(GameCard->bitArray, block);
 	sem_wait(&(GameCard->semMap));
 	memcpy(GameCard->fileMapped, GameCard->bitArray->bitarray, (GameCard->blocks/8));
-	int result= msync(GameCard->fileMapped, (GameCard->blocks/8) , MS_SYNC);
+	msync(GameCard->fileMapped, (GameCard->blocks/8) , MS_SYNC);
 	sem_post(&(GameCard->semMap));
 	log_info(GameCard->logger, "Se libero el bloque %i", block);
 }
@@ -1589,8 +1606,6 @@ void write_blocks(t_file_metadata* metadataFile, char* buffer ){
 
 	int cantBytes=0;
 	int index=0;
-	int result;
-
 	int tam = strlen(buffer);
 
 
@@ -1619,7 +1634,7 @@ void write_blocks(t_file_metadata* metadataFile, char* buffer ){
 		list_add(values->values,bufferAux);
 		list_add(values->values,(void*)index);
 
-		result=create_file(BIN_FILE,values);
+		create_file(BIN_FILE,values);
 
 		list_remove(values->values,2);
 		list_remove(values->values,1);

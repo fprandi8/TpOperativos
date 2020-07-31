@@ -57,7 +57,6 @@ typedef struct {
 
 typedef struct {
 	t_list * queues;
-	t_CacheMemory* cacheMemory;
 	sem_t semaphoreID;
 	int servidor;
 	t_log * logger;

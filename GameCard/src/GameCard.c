@@ -75,6 +75,7 @@ int main(void) {
 		sem_post(&mutexCliente);
 
 		pthread_create(thread,NULL,(void*)GameCard_Attend_Gameboy,(void*)cliente);
+
 		pthread_detach(*thread);
 
 	}
@@ -571,7 +572,9 @@ int catch_a_pokemon(char** fileContent, t_file_metadata* metadataFile, char* coo
 
 				sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,pokemonName);
 				sem_wait(pokeSem);
+
 				create_file(POKE_METADATA,values);
+
 				sem_post(pokeSem);
 
 				list_remove(values->values,1);
@@ -730,7 +733,9 @@ void* modify_poke_file(t_values* values, char* directory){;
 			list_add(values->values,metadataFile);
 
 			sem_wait(pokeSem);
+
 			create_file(POKE_METADATA,values);
+
 			sem_post(pokeSem);
 		}
 	}
@@ -765,7 +770,9 @@ void* modify_poke_file(t_values* values, char* directory){;
 		list_add(values->values,metadataFile);
 
 		sem_wait(pokeSem);
+
 		create_file(POKE_METADATA,values);
+
 		sem_post(pokeSem);
 	}
 
@@ -850,6 +857,7 @@ void destroy_poke_dictionary(t_dictionary* pokeSemaphore){
 
 void create_poke_semaphore(char* pokemonName){
 	sem_t* pokeSem = (sem_t*)malloc(sizeof(sem_t));
+
 	char* file = (char*)malloc(strlen(GameCard->filePath) + strlen(pokemonName) +strlen("/metadata.bin") + 1);
 	strcpy(file,GameCard->filePath);
 	strcat(file,pokemonName);
@@ -860,6 +868,7 @@ void create_poke_semaphore(char* pokemonName){
 		sem_init(pokeSem,0,0);
 	}
 	free(file);
+
 	dictionary_put(pokeSemaphore, pokemonName,(void*)pokeSem);
 }
 
@@ -1393,6 +1402,7 @@ int decrease_pokemon_amount(char** fileContent,int pos, t_file_metadata* metadat
 		if (pos != 0) {
 			memcpy(auxBuffer,file,pos);
 			auxBuffer[pos]='\0';
+
 			auxIntSize = auxIntSize-pos+1;
 			if(auxIntSize > 0){
 				//TODO; probar el +1

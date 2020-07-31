@@ -97,6 +97,7 @@ sem_t mutex_saving;
 */
 
 void start_cache();
+void destroy_cache();
 
 //size configuration
 t_config* get_config(void);

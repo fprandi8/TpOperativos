@@ -127,6 +127,7 @@ void destroy_poke_semaphore(char*);
 void destroy_poke_dictionary(t_dictionary*);
 int catch_a_pokemon(char**,t_file_metadata*, char*, char*);
 void create_localized_message(localized_pokemon*, char*,char*, t_file_metadata*);
+int check_if_metadata_file_exists(char*, char*);
 
 int check_directory(char*);
 

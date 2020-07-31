@@ -140,7 +140,7 @@ int main(int argc, char **argv) {
 		pthread_create(thread,NULL,(void*)attendGameboy,&client);
 		pthread_detach(*thread);
 	}
-	deleteLogger();
+	//deleteLogger();
 	return EXIT_SUCCESS;
 }
 

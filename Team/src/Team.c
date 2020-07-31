@@ -319,7 +319,7 @@ void* finishTeam(){
 	sem_wait(&exitCount_sem);
 	log_debug(logger,"------------Fin del proceso----------");
 	log_debug(logger,"Cantidad de ciclos de CPU totales: %i",cpuClocksCount);
-	log_debug(logger,"Cantidad de cambios de contesto realizados: %i",switchContextCount);
+	log_debug(logger,"Cantidad de cambios de contexto realizados: %i",switchContextCount);
 	for(int i = 0;i<statesLists.exitList.count;i++){
 		log_debug(logger,"Cantidad de ciclos de CPU totales por entrenador: Trainer %u -> %i",statesLists.exitList.trainerList[i].id,statesLists.exitList.trainerList[i].parameters.cpuClocksCount);
 	}

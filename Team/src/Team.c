@@ -278,7 +278,7 @@ void exchangePokemon(){
 	addToPokemonList(&statesLists.blockedList.trainerList[pos]);
 	removeFromPokemonList(&(statesLists.blockedList.trainerList[pos]), &(statesLists.execTrainer.trainer.parameters.scheduledPokemon));
 	removeFromPokemonList(&(statesLists.execTrainer.trainer), &(statesLists.blockedList.trainerList[pos].parameters.scheduledPokemon));
-	log_info(logger,"Se realizó un intercambio entre el entrenador %u (%s) y el entrenador %u (%s)",statesLists.execTrainer.trainer.id,statesLists.blockedList.trainerList[pos].parameters.scheduledPokemon,statesLists.execTrainer.trainer.parameters.scheduledTrainerId,statesLists.execTrainer.trainer.parameters.scheduledPokemon);
+	log_info(logger,"Se realizó un intercambio entre el entrenador %u (%s) y el entrenador %u (%s)",statesLists.execTrainer.trainer.id,statesLists.blockedList.trainerList[pos].parameters.scheduledPokemon.name,statesLists.execTrainer.trainer.parameters.scheduledTrainerId,statesLists.execTrainer.trainer.parameters.scheduledPokemon.name);
 
 	sem_post(&(finishDeadlock_mutex));
 }
@@ -783,7 +783,7 @@ void processMessageCaught(deli_message* message){
 					trainerPos=i;
 				}
 			}
-			log_info(logger,"Llegada de mensaje Caught. Datos: Respuesta de captura: %u, correlation id: %u (Pokemon %s",caughtPokemon->caught,cid,statesLists.blockedList.trainerList[trainerPos].parameters.scheduledPokemon.name);
+			log_info(logger,"Llegada de mensaje Caught. Datos: Respuesta de captura: %u, correlation id: %u (Pokemon %s)",caughtPokemon->caught,cid,statesLists.blockedList.trainerList[trainerPos].parameters.scheduledPokemon.name);
 			removeFromMissingPkms(statesLists.blockedList.trainerList[trainerPos].parameters.scheduledPokemon);
 			addToPokemonList(&(statesLists.blockedList.trainerList[trainerPos]));
 
@@ -1804,7 +1804,7 @@ void catchPokemon(){
 			log_info(logger,"Operación de atrapar del entrenador %u: X=%i Y=%i %s",statesLists.execTrainer.trainer.id,statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.x,statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.y,statesLists.execTrainer.trainer.parameters.scheduledPokemon.name);
 			cpuClocksCount++;
 			sleep(clockSimulationTime);
-			log_info(logger,"Se movió al entrenador %u a la cola Blocked por haber enviado un catch al pokemon &s",statesLists.execTrainer.trainer.id, statesLists.execTrainer.trainer.parameters.scheduledPokemon.name);
+			log_info(logger,"Se movió al entrenador %u a la cola Blocked por haber enviado un catch al pokemon %s",statesLists.execTrainer.trainer.id, statesLists.execTrainer.trainer.parameters.scheduledPokemon.name);
 			Send_CATCH(catch, socketCatch);
 				op_code type;
 			void* content = malloc(sizeof(void*));

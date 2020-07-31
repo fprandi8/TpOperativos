@@ -18,7 +18,6 @@ sem_t mutexDictionaty;
 sem_t mutexDirectory;
 sem_t mutexBitArray;
 sem_t mutexCliente;
-sem_t mutexFileExists;
 
 int main(void) {
 
@@ -38,8 +37,6 @@ int main(void) {
 	sem_init(&(mutexDictionaty),0,1);
 	sem_init(&(mutexDirectory),0,1);
 	sem_init(&(mutexBitArray),0,1);
-	sem_init(&(mutexCliente),0,1);
-	sem_init(&(mutexFileExists),0,1);
 	thread = (pthread_t*)malloc(sizeof(pthread_t));
 
 	logger = iniciar_logger();
@@ -563,7 +560,6 @@ int catch_a_pokemon(char** fileContent, t_file_metadata* metadataFile, char* coo
 
 				Metadata_File_Add_Blocks(metadataFile,amountOfBlocks);
 
-				log_error(GameCard->logger, "Archivo buffer antes de escribir [ %s ]", file);
 				write_blocks(metadataFile, file);
 
 				metadataFile->directory='N';
@@ -856,7 +852,16 @@ void destroy_poke_dictionary(t_dictionary* pokeSemaphore){
 
 void create_poke_semaphore(char* pokemonName){
 	sem_t* pokeSem = (sem_t*)malloc(sizeof(sem_t));
-	sem_init(pokeSem,0,0);
+	char* file = (char*)malloc(strlen(GameCard->filePath) + strlen(pokemonName) +strlen("/metadata.bin") + 1);
+	strcpy(file,GameCard->filePath);
+	strcat(file,pokemonName);
+	strcat(file, "/metadata.bin");
+	if( access( file, F_OK ) != -1 ) {
+		sem_init(pokeSem,0,1);
+	}else{
+		sem_init(pokeSem,0,0);
+	}
+	free(file);
 	dictionary_put(pokeSemaphore, pokemonName,(void*)pokeSem);
 }
 
@@ -954,7 +959,7 @@ int create_file_bin(t_values* values){
 	memcpy(bytes,list_get(values->values,1),tam);
 	fwrite(bytes,tam, 1, f);
 
-	log_info(GameCard->logger, "Escribe el archivo de boques: %s", filename);
+	log_info(GameCard->logger, "Escribe el archivo de bloque: %s", filename);
 	free(bytes);
 	free(filename);
 	free(blockChar);
@@ -1157,10 +1162,6 @@ void Metadata_File_Initialize_Block(t_file_metadata* metadataFile){
 void read_metadata_file(t_file_metadata* metadataFile, char* file, char* pokemonName){
 	sem_t* pokeSem = get_poke_semaphore(pokeSemaphore,pokemonName);
 	int fileAvailable=0;
-
-	if(check_if_metadata_file_exists(file, pokemonName)==0){
-		sem_post(pokeSem);
-	}
 
 	while(!fileAvailable){
 
@@ -1390,29 +1391,20 @@ int decrease_pokemon_amount(char** fileContent,int pos, t_file_metadata* metadat
 	int auxAmount = atoi(stringAux) - 1;
 
 	if (auxAmount == 0 ){
-		//TODO: ver esta variable
 		char* auxBuffer=(char*)malloc(atoi(metadataFile->size) - index2+1 + 1);
-		log_error(GameCard->logger, "0. Contenido file [ %s ]", file);
 		if (pos != 0) {
 			memcpy(auxBuffer,file,pos);
 			auxBuffer[pos]='\0';
-			log_error(GameCard->logger, "1. Carga de archivo buffer [ %s ]", auxBuffer);
-
-			log_error(GameCard->logger, "valor de tamaño del archivo menos la linea a quitar %i y "
-					"cantidad de bytes leidos hasta donde comienza la línea %i", auxIntSize, pos);
-
 			auxIntSize = auxIntSize-pos+1;
 			if(auxIntSize > 0){
 				memcpy(auxBuffer+pos-1,file+pos+bytes-1,auxIntSize);
-				auxBuffer[pos+auxIntSize+1]='\0';
-				log_error(GameCard->logger, "2. Carga de archivo buffer [ %s ]", auxBuffer);
+				auxBuffer[pos+auxIntSize-1]='\0';
 			}
 		}
 		else
 		{
 			memcpy(auxBuffer,file+bytes,auxIntSize);
 			auxBuffer[auxIntSize]='\0';
-			log_error(GameCard->logger, "3. Carga de archivo buffer [ %s ]", auxBuffer);
 
 		}
 
@@ -1498,23 +1490,6 @@ char* get_y_coordinate(char* line){
 	while (line[index2+index1] != '=') index2++;
 	return string_substring(line,index1+1,index2-1);
 
-}
-
-int check_if_metadata_file_exists(char* file, char* pokemonName){
-	sem_wait(&(mutexFileExists));
-	if (dictionary_has_key(pokeMetadataFile, pokemonName)){
-		sem_post(&mutexFileExists);
-		return 1;
-	}
-	if( access( file, F_OK ) != -1 ) {
-		dictionary_put(pokeMetadataFile,pokemonName,"OK");
-		sem_post(&mutexFileExists);
-		return 0;
-	}
-	else {
-		sem_post(&mutexFileExists);
-		return 1;
-	}
 }
 
 //BITARRAY LOGIC

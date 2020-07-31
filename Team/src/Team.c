@@ -151,13 +151,14 @@ void* resolveAllDeadlocks(){
 		sem_wait(&(deadlockCount_sem));
 	}
 	sem_wait(&(deadlockCount_sem));
+	log_info(logger,"5. Inicio de algortimo de detección de deadlock");
+	log_info(logger,"6. Deadlocks detectados: %i",deadlockCount);
 	resolveDeadlock();
 	pthread_exit(NULL);
 }
 
 void* resolveDeadlock(){
-	log_info(logger,"5. Inicio de algortimo de detección de deadlock");
-	log_info(logger,"6. Deadlocks detectados: %i",deadlockCount);
+
 	for(int trainerPos=0;trainerPos<statesLists.blockedList.count;trainerPos++){
 		if(statesLists.blockedList.trainerList[trainerPos].blockState==DEADLOCK){
 			for(int trainerPos2=trainerPos+1;trainerPos2<statesLists.blockedList.count;trainerPos2++){
@@ -1842,9 +1843,14 @@ void catchPokemon(){
 
 		int socketCatch = connectBroker(broker.ip, broker.port);
 		if(socketCatch != -1){
-			Send_CATCH(catch, socketCatch);
+			statesLists.execTrainer.trainer.blockState = WAITING;
+			addToBlocked(statesLists.execTrainer.trainer);
 			log_info(logger,"3. Operación de atrapar: X=%i Y=%i %s",statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.x,statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.y,statesLists.execTrainer.trainer.parameters.scheduledPokemon.name);
-			op_code type;
+			cpuClocksCount++;
+			sleep(clockSimulationTime);
+			log_info(logger,"1. Se movió al entrenador %u a la cola Blocked por haber enviado un catch",statesLists.execTrainer.trainer.id);
+			Send_CATCH(catch, socketCatch);
+				op_code type;
 			void* content = malloc(sizeof(void*));
 			int result;
 			int cut = 0;
@@ -1858,13 +1864,8 @@ void catchPokemon(){
 			if(!result){
 					processAcknowledge(content,originMessageType,statesLists.execTrainer.trainer.id);
 			}
-			sleep(clockSimulationTime);
-			cpuClocksCount++;
 
-			statesLists.execTrainer.trainer.blockState = WAITING;
-			addToBlocked(statesLists.execTrainer.trainer);
-			log_info(logger,"1. Se movió al entrenador %u a la cola Blocked por haber enviado un catch",statesLists.execTrainer.trainer.id);
-			removeFromExec();
+
 	}else{
 		removeFromMissingPkms(statesLists.execTrainer.trainer.parameters.scheduledPokemon);
 		addToPokemonList(&(statesLists.execTrainer.trainer));

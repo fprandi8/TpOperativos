@@ -25,19 +25,19 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 
 # All Target
-all: libSharedLibrary.so
+all: libSharedLibray.so
 
 # Tool invocations
-libSharedLibrary.so: $(OBJS) $(USER_OBJS)
+libSharedLibray.so: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
-	gcc -shared -o "libSharedLibrary.so" $(OBJS) $(USER_OBJS) $(LIBS)
+	gcc -shared -o "libSharedLibray.so" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(LIBRARIES)$(OBJS)$(C_DEPS) libSharedLibrary.so
+	-$(RM) $(LIBRARIES)$(OBJS)$(C_DEPS) libSharedLibray.so
 	-@echo ' '
 
 .PHONY: all clean dependents

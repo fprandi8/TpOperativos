@@ -33,7 +33,7 @@ t_catchMessages catchList;
 t_objetive* missingPkms;
 int globalObjetivesDistinctCount;
 int globalObjetivesCount;
-int missingPokemonsCount;//TODO: Decrementar cada vez que hay un caught
+int missingPokemonsCount;
 struct SchedulingAlgorithm schedulingAlgorithm;
 double alphaForSJF;
 int initialEstimatedBurst;
@@ -458,18 +458,6 @@ int startServer()
     return teamSocket;
 }
 
-
-
-//TODO - FIX
-/*void initStateLists(t_stateLists statesLists){
-	stateLists.new = new;
-	stateLists.blocked= blocked;
-	stateLists.ready = ready;
-	stateLists.exec = exec;
-	stateLists.exit = l_exit;
-}*/
-
-
 int getGlobalObjetivesCount(t_trainer* trainers, int trainersCount){
 	int objcount = 0;
 	for(int trainer=0;trainer<trainersCount;trainer++){
@@ -744,7 +732,7 @@ void processMessageAppeared(deli_message* message){
 	appeared_pokemon* appearedPokemon = (appeared_pokemon*)message->messageContent;
 	log_info(logger,"Llegada de mensaje Appeared. Datos: Nombre del Pokemon: %s, ubicación X: %u, ubicación Y: %u",appearedPokemon->pokemonName,appearedPokemon->horizontalCoordinate,appearedPokemon->verticalCoordinate);
 	int resultMissingPokemon = findNameInMissingPokemons(appearedPokemon->pokemonName);
-		if(resultMissingPokemon==1){//TODO: Agregar en el planificador que valide si ya hay un entrenador planificado para ese pokemon que llego por otro appeared o localized
+		if(resultMissingPokemon==1){
 			sem_wait(&availablePokemons_sem);
 			void* temp = realloc(availablePokemons.pokemons,sizeof(t_pokemon)*(availablePokemons.count+1));
 			if (!temp){
@@ -833,7 +821,6 @@ void requestNewPokemons(t_objetive* pokemons,int globalObjetivesDistinctCount,st
 
 }
 
-//TODO debería usar la shared cuando este implementado para mandar.
 void requestNewPokemon(t_pokemon missingPkm, struct Broker broker){
 
 	int socketGet = connectBroker(broker.ip, broker.port);
@@ -1751,43 +1738,6 @@ void scheduleSJFCD(){
 	}
 }
 
-void deadlockForTrainer(){
-	int flag;
-	for(int i = 0; i<statesLists.blockedList.count; i++){
-		if(statesLists.blockedList.trainerList[i].parameters.objetivesCount == statesLists.blockedList.trainerList[i].parameters.pokemonsCount){
-			for(int j = 0; j<statesLists.blockedList.trainerList[i].parameters.objetivesCount;j++){
-				for(int k = 0; k<statesLists.blockedList.trainerList[i].parameters.pokemonsCount;k++){
-					flag = strcmp(statesLists.blockedList.trainerList[i].parameters.pokemons[j].name,statesLists.blockedList.trainerList[i].parameters.objetives[k].name);
-
-				}
-			}
-		}
-	}
-}
-
-
-int evaluateDeadlockCondition(){
-	int deadlock=0;
-	int blockedDeadlocks = blockedInDeadlock();
-	if((statesLists.readyList.count == 0) && (statesLists.newList.count == 0) && blockedDeadlocks && (statesLists.execTrainer.boolean == 0)){
-		deadlock = 1;
-	}
-	return deadlock;
-}
-
-int blockedInDeadlock(){
-	int blockedTrainers = statesLists.blockedList.count;
-	int flagBlockedInDeadlock = 1;
-	for(int i=0; i<blockedTrainers; i++){
-		if(statesLists.blockedList.trainerList[i].blockState == WAITING || statesLists.blockedList.trainerList[i].blockState == AVAILABLE){
-			flagBlockedInDeadlock = 0;
-			break;
-		}
-	}
-	return flagBlockedInDeadlock;
-}
-
-
 float differenceBetweenEstimatedBurtsAndExecutedClocks(float estimatedTrainerBurstTime, uint32_t executedBursts){
 	float difference = estimatedTrainerBurstTime - executedBursts;
 	return difference;
@@ -1851,7 +1801,7 @@ void catchPokemon(){
 		if(socketCatch != -1){
 			statesLists.execTrainer.trainer.blockState = WAITING;
 			addToBlocked(statesLists.execTrainer.trainer);
-			log_info(logger,"Operación de atrapar del entrenador &u: X=%i Y=%i %s",statesLists.execTrainer.trainer.id,statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.x,statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.y,statesLists.execTrainer.trainer.parameters.scheduledPokemon.name);
+			log_info(logger,"Operación de atrapar del entrenador %u: X=%i Y=%i %s",statesLists.execTrainer.trainer.id,statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.x,statesLists.execTrainer.trainer.parameters.scheduledPokemon.position.y,statesLists.execTrainer.trainer.parameters.scheduledPokemon.name);
 			cpuClocksCount++;
 			sleep(clockSimulationTime);
 			log_info(logger,"Se movió al entrenador %u a la cola Blocked por haber enviado un catch al pokemon &s",statesLists.execTrainer.trainer.id, statesLists.execTrainer.trainer.parameters.scheduledPokemon.name);
@@ -1962,7 +1912,6 @@ int checkTrainerState(t_trainer trainer){
 	return 0;//exit
 }
 
-//TODO - Función que mueve al entrenador - Falta ver como implementaremos los semáforos
 void moveTrainerToObjective(t_trainer* trainer){
 
 	int difference_x = calculateDifference(trainer->parameters.position.x, trainer->parameters.scheduledPokemon.position.x);
@@ -1971,7 +1920,6 @@ void moveTrainerToObjective(t_trainer* trainer){
 
 }
 
-//TODO - funcion que mueve una posición al entrenador - Falta Definir como haremos el CATCH
 void moveTrainerToTarget(t_trainer* trainer, int distanceToMoveInX, int distanceToMoveInY){
 	if(distanceToMoveInX > 0){
 		trainer->parameters.position.x--;

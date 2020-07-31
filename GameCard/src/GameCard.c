@@ -37,6 +37,7 @@ int main(void) {
 	sem_init(&(mutexDictionaty),0,1);
 	sem_init(&(mutexDirectory),0,1);
 	sem_init(&(mutexBitArray),0,1);
+	sem_init(&(mutexCliente),0,1);
 	thread = (pthread_t*)malloc(sizeof(pthread_t));
 
 	logger = iniciar_logger();
@@ -258,7 +259,6 @@ void GameCard_Wait_For_Message(void* variables){
 		switch (queueType) {
 
 			case NEW_POKEMON: {
-				log_debug(GameCard->logger, "Vuelve a subscribir new");
 				pthread_create(thread,NULL,(void*)subscribeToBrokerNew,NULL);
 				pthread_detach(*thread);
 
@@ -267,7 +267,6 @@ void GameCard_Wait_For_Message(void* variables){
 			}
 
 			case GET_POKEMON:{
-				log_debug(GameCard->logger, "Vuelve a subscribir get");
 				pthread_create(thread,NULL,(void*)subscribeToBrokerGet,NULL);
 				pthread_detach(*thread);
 
@@ -276,7 +275,6 @@ void GameCard_Wait_For_Message(void* variables){
 			}
 
 			case CATCH_POKEMON:{
-				log_debug(GameCard->logger, "Vuelve a subscribir catch");
 				pthread_create(thread,NULL,(void*)subscribeToBrokerCatch,NULL);
 				pthread_detach(*thread);
 
@@ -1397,6 +1395,7 @@ int decrease_pokemon_amount(char** fileContent,int pos, t_file_metadata* metadat
 			auxBuffer[pos]='\0';
 			auxIntSize = auxIntSize-pos+1;
 			if(auxIntSize > 0){
+				//TODO; probar el +1
 				memcpy(auxBuffer+pos-1,file+pos+bytes-1,auxIntSize);
 				auxBuffer[pos+auxIntSize-1]='\0';
 			}

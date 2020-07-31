@@ -243,7 +243,7 @@ void initCPUClocksCountForTrainers();
 int getDistanceToTrainerToExchange(t_trainer);
 int executeClockFdeadlockCount_semorDeadlockTrainers(t_trainer*);
 void moveTrainerToObjectiveDeadlock(t_trainer*);
-void exchangePokemon(t_trainer*);
+void exchangePokemon();
 int getClockTimeToNewPosition(int, int);
 void planificateDeadlockTrainer(t_trainer*);
 int checkTrainerState(t_trainer);

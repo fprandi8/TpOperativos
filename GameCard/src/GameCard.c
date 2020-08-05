@@ -12,7 +12,6 @@
 
 t_GameCard* GameCard;
 t_dictionary* pokeSemaphore;
-t_dictionary* pokeMetadataFile;
 pthread_t* thread;
 sem_t mutexDictionaty;
 sem_t mutexDirectory;
@@ -24,7 +23,6 @@ int main(void) {
 	t_log* logger;
 	t_config* config;
 	pokeSemaphore=dictionary_create();
-	pokeMetadataFile=dictionary_create();
 	signal(SIGINT,signaltHandler);
 
 	char* ptoMnt;
@@ -239,15 +237,11 @@ void GameCard_Wait_For_Message(void* variables){
 	if (!resultado)
 	{
 		deli_message* message = (deli_message*)content;
-//		log_debug(GameCard->logger,"Suscriptor que envia el acknowldge: %d", suscription);
 		SendMessageAcknowledge(message->id, suscription);
-//		log_debug(GameCard->logger, "Resultado del acknowdlege: %d", result);
 		t_args_process_message* argsProcessMessage= (t_args_process_message*) malloc (sizeof (t_args_process_message));
 		argsProcessMessage->message = message;
 
 		pthread_create(thread,NULL,(void*)GameCard_Process_Message,argsProcessMessage);
-
-//		thread = (pthread_t*)malloc(sizeof(pthread_t));
 
 		pthread_create(thread,NULL,(void*)GameCard_Wait_For_Message,variables);
 		pthread_detach(*thread);
@@ -295,7 +289,6 @@ void GameCard_Process_Message(void* variables){
 
 	void* responseMessage;
 
-//	log_debug(GameCard->logger, "voy a procesar el mensaje ");
 
 	switch (message->messageType){
 		case NEW_POKEMON: {

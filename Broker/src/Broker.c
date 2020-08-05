@@ -173,7 +173,6 @@ void broker_initialize(t_Broker* broker, int server, t_log* logger){
 
 void broker_destroy(t_Broker* broker){
 	list_destroy_and_destroy_elements(broker->queues,(void*)destroy_queue_handler);
-	free(broker->cacheMemory);
 	free(broker);
 }
 
@@ -416,10 +415,37 @@ void RemoveClient(int client)
 	close(client);
 }
 
+void CloseAllClients()
+{
+	t_list* closedClients = list_create();
+
+	void check_unique_client_and_close(t_suscriptor* suscriptor)
+	{
+		int suscriptorId = suscriptor->suscripted;
+		for(int i = 0; i< list_size(closedClients); i++)
+		{
+			if(((t_suscriptor*)list_get(closedClients, i))->suscripted == suscriptorId) return;
+		}
+		list_add(closedClients, suscriptor);
+		close(suscriptorId);
+	}
+
+	void remove_unique_clients(t_queue_handler* queue_handler)
+	{
+		list_iterate(queue_handler->suscriptors, (void*) check_unique_client_and_close);
+	}
+
+	list_iterate(broker->queues, (void*) remove_unique_clients);
+	list_clean(closedClients);
+	free(closedClients);
+}
+
 // Manage an interupt or segmentation fault
 void signaltHandler(int sig_num){
 	//log_debug(broker->logger, "SE INTERRUMPIO EL PROCESO");
+	CloseAllClients();
 	broker_destroy(broker);
+	destroy_cache();
 	exit(-5);
 }
 

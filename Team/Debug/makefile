@@ -25,8 +25,11 @@ endif
 # All Target
 all: Team
 
+dependents:
+	-cd /home/utnso/workspace/tp-2020-1c-MATE-OS/SharedLibrary/Debug && $(MAKE) all
+
 # Tool invocations
-Team: $(OBJS) $(USER_OBJS)
+Team: $(OBJS) $(USER_OBJS) /home/utnso/workspace/tp-2020-1c-MATE-OS/SharedLibrary/Debug/libSharedLibray.so
 	@echo 'Building target: $@'
 	@echo 'Invoking: GCC C Linker'
 	gcc -L/home/utnso/workspace/tp-2020-1c-MATE-OS/SharedLibrary/Debug -o "Team" $(OBJS) $(USER_OBJS) $(LIBS)
@@ -39,5 +42,6 @@ clean:
 	-@echo ' '
 
 .PHONY: all clean dependents
+/home/utnso/workspace/tp-2020-1c-MATE-OS/SharedLibrary/Debug/libSharedLibray.so:
 
 -include ../makefile.targets

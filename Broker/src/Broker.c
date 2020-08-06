@@ -326,8 +326,7 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 		args->cliente = suscriptor->suscripted;
 
 		pthread_create(thread,NULL,(void*)queue_handler_send_message,args);
-		//pthread_detach(*thread);
-		pthread_join(*thread, NULL);
+		pthread_detach(*thread);
 
 
 		index++;
@@ -339,13 +338,18 @@ void queue_handler_send_message(void* args){
 
 	t_queue_handler* queue =((t_args_queue*)args)->queue;
 	deli_message* message = GetMessage(((t_args_queue*)args)->messageId);
-	if(message == NULL) return;
+	if(message == NULL)
+	{
+		log_debug(broker->logger, "MESSAGE %d WAS NOT FOUND", ((t_args_queue*)args)->messageId);
+		return;
+	}
 	int client = ((t_args_queue*)args)->cliente;
 
 
 	int result = SendMessage(*message,client);
 	if(result == -1)
 	{
+		log_debug(broker->logger, "MESSAGE %d COULD NOT BE SENT BECAUSE CLIENT IS UNAVALIABLE", ((t_args_queue*)args)->messageId);
 		RemoveClient(client);
 		return;
 	}

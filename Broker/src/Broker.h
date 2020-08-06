@@ -69,7 +69,7 @@ typedef struct {
 
 typedef struct {
 	t_queue_handler* queue;
-	deli_message* message;
+	deli_message message;
 	t_Broker* broker;
 	int cliente;
 	//t_message_administrator* messageAdministrator;

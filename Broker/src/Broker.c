@@ -129,7 +129,19 @@ void recive_message(uint32_t type, int cliente, t_Broker* broker, void* content 
 			//log_info(broker->logger,"Tipo de mensaje invalido: %d", type);
 		}
 	}
-	free(content);
+
+	if (type == ACKNOWLEDGE )
+	{
+		free((int*)content);
+	}
+	else if(type == MESSAGE)
+	{
+		Free_deli_message_withContent((deli_message*)content);
+	}
+	else
+	{
+		free((message_type*)content);
+	}
 }
 
 
@@ -229,7 +241,7 @@ void broker_suscribe_process(void* buffer, int cliente, t_Broker* broker)
 				//log_debug(broker->logger, "Envio mensaje al suscriptor: %d", cliente);
 
 				t_args_queue* args= (t_args_queue*) malloc (sizeof(t_args_queue));
-				args->message = message;
+				args->message = *message;
 				args->queue = queueToSuscribe;
 				args->broker = broker;
 				args->cliente = cliente;
@@ -247,7 +259,7 @@ void broker_suscribe_process(void* buffer, int cliente, t_Broker* broker)
 }
 
 void broker_get_acknowledge(void* buffer, int cliente, t_Broker* broker){
-
+ //TODO algo?
 }
 
 void broker_assign_id(t_Broker* broker, deli_message* message){
@@ -301,7 +313,7 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 		//log_debug(broker->logger, "Envio mensaje al suscriptor: %d", suscriptor->suscripted);
 
 		t_args_queue* args= (t_args_queue*) malloc (sizeof(t_args_queue));
-		args->message = message;
+		args->message = *message;
 		args->queue = queue;
 		args->broker = broker;
 		args->cliente = suscriptor->suscripted;
@@ -319,18 +331,18 @@ void queue_handler_send_message(void* args){
 	t_queue_handler* queue =((t_args_queue*)args)->queue;
 	//deli_message* message = GetMessage(((t_args_queue*)args)->messageId);
 	//if(message == NULL) return;
-	deli_message* message = ((t_args_queue*)args)->message;
+	deli_message message = ((t_args_queue*)args)->message;
 	int client = ((t_args_queue*)args)->cliente;
 
 
-	int result = SendMessage(*message,client);
+	int result = SendMessage(message,client);
 	if(result == -1)
 	{
 		RemoveClient(client);
 		return;
 	}
 
-	log_info(broker->logger, "SE ENVIO EL MENSAJE %d AL CLIENTE %d", message->id, client);
+	log_info(broker->logger, "SE ENVIO EL MENSAJE %d AL CLIENTE %d", message.id, client);
 	//log_debug(broker->logger, "RESULTADO DEL ENVIO: %d", result);
 
 	struct pollfd pfds[1];
@@ -340,7 +352,7 @@ void queue_handler_send_message(void* args){
 
 	//TODO re-intentar, quiza tambien checkquear que el cliente siga ahi
 
-	AddASentSubscriberToMessage(message->id, client);
+	AddASentSubscriberToMessage(message.id, client);
 
 	if (!result)
 	{
@@ -353,13 +365,13 @@ void queue_handler_send_message(void* args){
 			RemoveClient(client);
 			return;
 		}
-		log_info(broker->logger,"RECIBIDO ACKNOWLEDGE PARA MENSAGE %d", message->id);
+		log_info(broker->logger,"RECIBIDO ACKNOWLEDGE PARA MENSAGE %d", message.id);
 
 		if (op_code == ACKNOWLEDGE )
 		{
-			if(*(int*)content == message->id)
+			if(*(int*)content == message.id)
 			{
-				AddAcknowledgeToMessage(message->id);
+				AddAcknowledgeToMessage(message.id);
 			}
 			free((int*)content);
 		}

@@ -16,6 +16,7 @@ t_Broker* broker;
 sem_t mutexSuscription;
 sem_t mutexClient;
 sem_t mutex_handler_process_message;
+sem_t mutex_handle_message;
 
 int main(void) {
 
@@ -29,6 +30,7 @@ int main(void) {
 	sem_init(&(mutexSuscription),0,1);
 	sem_init(&(mutexClient),0,1);
 	sem_init(&(mutex_handler_process_message),0,1);
+	sem_init(&(mutex_handle_message), 0, 1);
 	signal(SIGINT,signaltHandler);
 	signal(SIGUSR1,cacheSigHandler);
 
@@ -112,6 +114,7 @@ void serve_client(void* variables)
 void recive_message(uint32_t type, int cliente, t_Broker* broker, void* content ){
 
 	//log_debug(broker->logger,"Tipo de mensaje recibido; %d", type);
+	sem_wait(&(mutex_handle_message));
 	switch (type){
 		case SUBSCRIPTION:
 			//log_debug(broker->logger, "Suscripción");
@@ -142,6 +145,7 @@ void recive_message(uint32_t type, int cliente, t_Broker* broker, void* content 
 	{
 		free((message_type*)content);
 	}
+	sem_post(&(mutex_handle_message));
 }
 
 
@@ -241,7 +245,7 @@ void broker_suscribe_process(void* buffer, int cliente, t_Broker* broker)
 				//log_debug(broker->logger, "Envio mensaje al suscriptor: %d", cliente);
 
 				t_args_queue* args= (t_args_queue*) malloc (sizeof(t_args_queue));
-				args->message = *message;
+				args->messageId = message->id;
 				args->queue = queueToSuscribe;
 				args->broker = broker;
 				args->cliente = cliente;
@@ -253,6 +257,9 @@ void broker_suscribe_process(void* buffer, int cliente, t_Broker* broker)
 			}
 
 		}
+
+		list_clean_and_destroy_elements(messagesToSend, (void*)Free_deli_message_withContent);
+		free(messagesToSend);
 
 	}
 
@@ -313,7 +320,7 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 		//log_debug(broker->logger, "Envio mensaje al suscriptor: %d", suscriptor->suscripted);
 
 		t_args_queue* args= (t_args_queue*) malloc (sizeof(t_args_queue));
-		args->message = *message;
+		args->messageId = message->id;
 		args->queue = queue;
 		args->broker = broker;
 		args->cliente = suscriptor->suscripted;
@@ -329,20 +336,19 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 void queue_handler_send_message(void* args){
 
 	t_queue_handler* queue =((t_args_queue*)args)->queue;
-	//deli_message* message = GetMessage(((t_args_queue*)args)->messageId);
-	//if(message == NULL) return;
-	deli_message message = ((t_args_queue*)args)->message;
+	deli_message* message = GetMessage(((t_args_queue*)args)->messageId);
+	if(message == NULL) return;
 	int client = ((t_args_queue*)args)->cliente;
 
 
-	int result = SendMessage(message,client);
+	int result = SendMessage(*message,client);
 	if(result == -1)
 	{
 		RemoveClient(client);
 		return;
 	}
 
-	log_info(broker->logger, "SE ENVIO EL MENSAJE %d AL CLIENTE %d", message.id, client);
+	log_info(broker->logger, "SE ENVIO EL MENSAJE %d AL CLIENTE %d", message->id, client);
 	//log_debug(broker->logger, "RESULTADO DEL ENVIO: %d", result);
 
 	struct pollfd pfds[1];
@@ -352,7 +358,7 @@ void queue_handler_send_message(void* args){
 
 	//TODO re-intentar, quiza tambien checkquear que el cliente siga ahi
 
-	AddASentSubscriberToMessage(message.id, client);
+	AddASentSubscriberToMessage(message->id, client);
 
 	if (!result)
 	{
@@ -365,13 +371,13 @@ void queue_handler_send_message(void* args){
 			RemoveClient(client);
 			return;
 		}
-		log_info(broker->logger,"RECIBIDO ACKNOWLEDGE PARA MENSAGE %d", message.id);
+		log_info(broker->logger,"RECIBIDO ACKNOWLEDGE PARA MENSAGE %d", message->id);
 
 		if (op_code == ACKNOWLEDGE )
 		{
-			if(*(int*)content == message.id)
+			if(*(int*)content == message->id)
 			{
-				AddAcknowledgeToMessage(message.id);
+				AddAcknowledgeToMessage(message->id);
 			}
 			free((int*)content);
 		}

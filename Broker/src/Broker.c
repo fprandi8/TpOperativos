@@ -229,7 +229,7 @@ void broker_suscribe_process(void* buffer, int cliente, t_Broker* broker)
 				//log_debug(broker->logger, "Envio mensaje al suscriptor: %d", cliente);
 
 				t_args_queue* args= (t_args_queue*) malloc (sizeof(t_args_queue));
-				args->messageId = message->id;
+				args->message = message;
 				args->queue = queueToSuscribe;
 				args->broker = broker;
 				args->cliente = cliente;
@@ -301,7 +301,7 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 		//log_debug(broker->logger, "Envio mensaje al suscriptor: %d", suscriptor->suscripted);
 
 		t_args_queue* args= (t_args_queue*) malloc (sizeof(t_args_queue));
-		args->messageId = message->id;
+		args->message = message;
 		args->queue = queue;
 		args->broker = broker;
 		args->cliente = suscriptor->suscripted;
@@ -317,8 +317,9 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 void queue_handler_send_message(void* args){
 
 	t_queue_handler* queue =((t_args_queue*)args)->queue;
-	deli_message* message = GetMessage(((t_args_queue*)args)->messageId);
-	if(message == NULL) return;
+	//deli_message* message = GetMessage(((t_args_queue*)args)->messageId);
+	//if(message == NULL) return;
+	deli_message* message = ((t_args_queue*)args)->message;
 	int client = ((t_args_queue*)args)->cliente;
 
 
@@ -386,14 +387,14 @@ t_queue_handler* queue_handler_initialize(message_type type){
 	aux->queue = queue_create();
 	aux->suscriptors = list_create();
 	aux->type=type;
-	aux->messagesAdministrator = list_create();
+	//aux->messagesAdministrator = list_create();
 	return aux;
 }
 
 void destroy_queue_handler(t_queue_handler* self){
 	queue_destroy(self->queue);
 	list_destroy(self->suscriptors);
-	list_destroy(self->messagesAdministrator);
+	//list_destroy(self->messagesAdministrator);
 	free(self);
 }
 

@@ -42,15 +42,15 @@ typedef struct {
 	message_type type;
 	t_queue* queue;
 	t_list* suscriptors;
-	t_list* messagesAdministrator;
+	//t_list* messagesAdministrator;
 	} t_queue_handler;
-
+/*
 typedef struct{
 	uint32_t messageId;
 	uint32_t amountPendingAcknowledge;
 	sem_t semaphoreACK;
 	}t_message_administrator;
-
+*/
 typedef struct {
 	int suscripted;
 	} t_suscriptor;
@@ -69,10 +69,10 @@ typedef struct {
 
 typedef struct {
 	t_queue_handler* queue;
-	int messageId;
+	deli_message* message;
 	t_Broker* broker;
 	int cliente;
-	t_message_administrator* messageAdministrator;
+	//t_message_administrator* messageAdministrator;
 	} t_args_queue;
 
 
@@ -100,12 +100,12 @@ t_suscriptor* queue_handler_get_suscriptor(t_queue_handler* ,int );
 
 void serve_client(void *);
 void recive_message(uint32_t , int, t_Broker*, void*);
-
+/*
 t_message_administrator* message_administrator_initialize(uint32_t);
 t_message_administrator* messege_administrator_get_administrator(t_list* , uint32_t);
 void message_administrator_pending_acknowledge(t_message_administrator* );
 void message_administrator_receive_acknowledge(t_message_administrator* );
-uint32_t message_admnistrator(t_message_administrator*);
+uint32_t message_admnistrator(t_message_administrator*);*/
 
 void RemoveClient(int client);
 

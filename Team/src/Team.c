@@ -918,7 +918,6 @@ void startLogger(t_config *config){
 	if (config_has_property(config,"LOG_FILE")){
 		char* logFilename;
 		logFilename=config_get_string_value(config,"LOG_FILE");
-		printf("\n %s \n",logFilename);
 		removeLogger(logFilename);
 		createLogger(logFilename);
 	}
@@ -1832,6 +1831,7 @@ void catchPokemon(){
 				addToBlocked(statesLists.execTrainer.trainer);
 				log_info(logger,"Se movió al entrenador %u a la cola Blocked por no poder atrapar más pokemons",statesLists.execTrainer.trainer.id);
 				removeFromExec();
+				deadlockCount++;
 				sem_post(&(deadlockCount_sem));
 			}else{
 				addToExit(statesLists.execTrainer.trainer);

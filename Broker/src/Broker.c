@@ -302,7 +302,7 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 
 	save_message(*message);
 
-	log_info(broker->logger,"NUEVO MENSAJE PARA LA QUEUE: %s", GetStringFromMessageType(queue->type));
+	log_info(broker->logger,"NUEVO MENSAJE %d PARA LA QUEUE: %s", message->id, GetStringFromMessageType(queue->type));
 
 	pthread_t* thread;
 
@@ -326,7 +326,9 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 		args->cliente = suscriptor->suscripted;
 
 		pthread_create(thread,NULL,(void*)queue_handler_send_message,args);
-		pthread_detach(*thread);
+		//pthread_detach(*thread);
+		pthread_join(*thread, NULL);
+
 
 		index++;
 	}
@@ -393,6 +395,7 @@ void queue_handler_send_message(void* args){
 		}
 	}
 	free(args);
+	return;
 }
 
 int destroy_queue_list(t_list* self){

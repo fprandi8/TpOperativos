@@ -16,6 +16,7 @@ t_Broker* broker;
 sem_t mutexSuscription;
 sem_t mutexClient;
 sem_t mutex_handler_process_message;
+sem_t mutex_handle_message;
 
 int main(void) {
 
@@ -29,6 +30,7 @@ int main(void) {
 	sem_init(&(mutexSuscription),0,1);
 	sem_init(&(mutexClient),0,1);
 	sem_init(&(mutex_handler_process_message),0,1);
+	sem_init(&(mutex_handle_message), 0, 1);
 	signal(SIGINT,signaltHandler);
 	signal(SIGUSR1,cacheSigHandler);
 
@@ -112,6 +114,7 @@ void serve_client(void* variables)
 void recive_message(uint32_t type, int cliente, t_Broker* broker, void* content ){
 
 	//log_debug(broker->logger,"Tipo de mensaje recibido; %d", type);
+	sem_wait(&(mutex_handle_message));
 	switch (type){
 		case SUBSCRIPTION:
 			//log_debug(broker->logger, "Suscripción");
@@ -129,7 +132,20 @@ void recive_message(uint32_t type, int cliente, t_Broker* broker, void* content 
 			//log_info(broker->logger,"Tipo de mensaje invalido: %d", type);
 		}
 	}
-	free(content);
+
+	if (type == ACKNOWLEDGE )
+	{
+		free((int*)content);
+	}
+	else if(type == MESSAGE)
+	{
+		Free_deli_message_withContent((deli_message*)content);
+	}
+	else
+	{
+		free((message_type*)content);
+	}
+	sem_post(&(mutex_handle_message));
 }
 
 
@@ -242,12 +258,15 @@ void broker_suscribe_process(void* buffer, int cliente, t_Broker* broker)
 
 		}
 
+		list_clean_and_destroy_elements(messagesToSend, (void*)Free_deli_message_withContent);
+		free(messagesToSend);
+
 	}
 
 }
 
 void broker_get_acknowledge(void* buffer, int cliente, t_Broker* broker){
-
+ //TODO algo?
 }
 
 void broker_assign_id(t_Broker* broker, deli_message* message){
@@ -283,7 +302,7 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 
 	save_message(*message);
 
-	log_info(broker->logger,"NUEVO MENSAJE PARA LA QUEUE: %s", GetStringFromMessageType(queue->type));
+	log_info(broker->logger,"NUEVO MENSAJE %d PARA LA QUEUE: %s", message->id, GetStringFromMessageType(queue->type));
 
 	pthread_t* thread;
 
@@ -309,6 +328,7 @@ void queue_handler_process_message(t_queue_handler* queue, deli_message* message
 		pthread_create(thread,NULL,(void*)queue_handler_send_message,args);
 		pthread_detach(*thread);
 
+
 		index++;
 	}
 
@@ -318,13 +338,18 @@ void queue_handler_send_message(void* args){
 
 	t_queue_handler* queue =((t_args_queue*)args)->queue;
 	deli_message* message = GetMessage(((t_args_queue*)args)->messageId);
-	if(message == NULL) return;
+	if(message == NULL)
+	{
+		log_debug(broker->logger, "MESSAGE %d WAS NOT FOUND", ((t_args_queue*)args)->messageId);
+		return;
+	}
 	int client = ((t_args_queue*)args)->cliente;
 
 
 	int result = SendMessage(*message,client);
 	if(result == -1)
 	{
+		log_debug(broker->logger, "MESSAGE %d COULD NOT BE SENT BECAUSE CLIENT IS UNAVALIABLE", ((t_args_queue*)args)->messageId);
 		RemoveClient(client);
 		return;
 	}
@@ -374,6 +399,7 @@ void queue_handler_send_message(void* args){
 		}
 	}
 	free(args);
+	return;
 }
 
 int destroy_queue_list(t_list* self){
@@ -386,14 +412,14 @@ t_queue_handler* queue_handler_initialize(message_type type){
 	aux->queue = queue_create();
 	aux->suscriptors = list_create();
 	aux->type=type;
-	aux->messagesAdministrator = list_create();
+	//aux->messagesAdministrator = list_create();
 	return aux;
 }
 
 void destroy_queue_handler(t_queue_handler* self){
 	queue_destroy(self->queue);
 	list_destroy(self->suscriptors);
-	list_destroy(self->messagesAdministrator);
+	//list_destroy(self->messagesAdministrator);
 	free(self);
 }
 
